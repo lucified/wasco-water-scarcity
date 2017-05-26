@@ -16,17 +16,9 @@ $widescreenMonitorBreakpoint : 1920px;
 // colors from design
 $color-red: #DD0035;
 $color-blue: #23408F;
+$color-blue-darker: #000D5C;
 $color-cerise: #E6007E;
 $color-light-blue: #58ADDB;
-$color-light-gray: #CCCCCC;
-$color-gray: #6E7075;
-$color-lightest-gray: #6E7075; // TODO: fix
-$color-darkest-gray: #0B1328;
-
-$color-expand-border: $color-light-blue;
-
-$color-blue-darker: #000D5C;
-$color-gray-divider: $color-light-gray;
 
 $color-blue-chill: rgb(10, 135, 165);
 $color-blue-chill-darker: rgb(0, 84, 114);
@@ -37,12 +29,15 @@ $color-light-gray: #e5dddb;
 $color-gray: #999999;
 $color-dark-gray: #807775;
 $color-darker-gray: #292220;
+$color-darkest-gray: #0B1328;
 $color-lightest-gray-with-transparency: rgba($color-lightest-gray, 0.04);
 $color-lighter-red: #e19791;
 $color-dark-red: #930e03;
 
 // COMMON COLOR PRESETS
 
+$color-expand-border: $color-light-blue;
+$color-gray-divider: $color-light-gray;
 $color-border: rgba(60, 30, 0, 0.12);
 $color-text: $color-darker-gray;
 $color-text-hover: black;

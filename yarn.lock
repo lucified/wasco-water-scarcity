@@ -13,6 +13,20 @@
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.0.tgz#f2312039e780bdf89d7d4102a26ec11de5ec58aa"
 
+"@types/d3-geo@^1.6.3":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/@types/d3-geo/-/d3-geo-1.6.3.tgz#21b501d1fe224d88877f39f84cb8c9dd8aa1bf28"
+  dependencies:
+    "@types/geojson" "*"
+
+"@types/d3-selection@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-1.1.0.tgz#59b88f10d2cff7d9ffd7fe986b3aaef3de048224"
+
+"@types/geojson@*":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-1.0.2.tgz#b02d10ab028e2928ac592a051aaa4981a1941d03"
+
 "@types/history@*":
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.5.1.tgz#da4a145410466eac20e94b51c8778a7551d1d4db"
@@ -62,6 +76,10 @@
 "@types/react@*", "@types/react@^15.0.25":
   version "15.0.25"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.25.tgz#d396949cccc9a90b61755def9781e5aced9b2261"
+
+"@types/topojson@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/topojson/-/topojson-3.0.2.tgz#83efd21d05b963b6fa9db2fedfee90f366591fa1"
 
 abbrev@1:
   version "1.1.0"
@@ -1342,7 +1360,7 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@2.9.x, commander@^2.9.0, commander@~2.9.0:
+commander@2, commander@2.9.x, commander@^2.9.0, commander@~2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:
@@ -1607,6 +1625,28 @@ cwd@^0.9.1:
   resolved "https://registry.yarnpkg.com/cwd/-/cwd-0.9.1.tgz#41e10a7e1ab833dc59c2eca83814c7de77b5a4fd"
   dependencies:
     find-pkg "^0.1.0"
+
+d3-array@1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.0.tgz#147d269720e174c4057a7f42be8b0f3f2ba53108"
+
+d3-geo-projection@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/d3-geo-projection/-/d3-geo-projection-2.1.2.tgz#7df8e1e9d046d631c6509f7e531357d4adc24aa3"
+  dependencies:
+    commander "2"
+    d3-array "1"
+    d3-geo "^1.1.0"
+
+d3-geo@^1.1.0, d3-geo@^1.6.4:
+  version "1.6.4"
+  resolved "https://registry.yarnpkg.com/d3-geo/-/d3-geo-1.6.4.tgz#f20e1e461cb1845f5a8be55ab6f876542a7e3199"
+  dependencies:
+    d3-array "1"
+
+d3-selection@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-1.1.0.tgz#1998684896488f839ca0372123da34f1d318809c"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -5261,6 +5301,33 @@ to-arraybuffer@^1.0.0:
 to-fast-properties@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-1.0.3.tgz#b83571fa4d8c25b82e231b06e3a3055de4ca1a47"
+
+topojson-client@3, topojson-client@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/topojson-client/-/topojson-client-3.0.0.tgz#1f99293a77ef42a448d032a81aa982b73f360d2f"
+  dependencies:
+    commander "2"
+
+topojson-server@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/topojson-server/-/topojson-server-3.0.0.tgz#378e78e87c3972a7b5be2c5d604369b6bae69c5e"
+  dependencies:
+    commander "2"
+
+topojson-simplify@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/topojson-simplify/-/topojson-simplify-3.0.0.tgz#58527d26ca85bd8589b5800f6c10e93885245ae5"
+  dependencies:
+    commander "2"
+    topojson-client "3"
+
+topojson@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/topojson/-/topojson-3.0.0.tgz#c2aca1b76435e801dce3f229586bbd5767115ce3"
+  dependencies:
+    topojson-client "3.0.0"
+    topojson-server "3.0.0"
+    topojson-simplify "3.0.0"
 
 toposort@^1.0.0:
   version "1.0.3"

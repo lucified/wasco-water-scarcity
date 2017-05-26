@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Route, RouteComponentProps, Switch } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 
 import Footer from './footer';
 import Header from './header';
+import Map from './map';
 
 import * as styles from './app.scss';
 
@@ -18,9 +19,7 @@ class App extends React.Component<Props, void> {
           <Header />
         </div>
         <div className={styles.content}>
-          <Switch>
-            <Route path="/" component={undefined} />
-          </Switch>
+          <Map />
         </div>
         <div className={styles.footer}>
           <Footer />

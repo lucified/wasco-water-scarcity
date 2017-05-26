@@ -1,0 +1,30 @@
+@import '../definitions.scss';
+
+.svg {}
+
+.stroke {
+  fill: none;
+  stroke: $color-gray;
+  stroke-width: 3px;
+}
+
+.fill {
+  fill: white;
+}
+
+.graticule {
+  fill: none;
+  stroke: $color-light-gray;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: $color-light-gray;
+}
+
+.boundary {
+  fill: none;
+  stroke: $color-gray;
+  stroke-width: .5px;
+}
