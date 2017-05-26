@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-import Footer from './footer';
-import Header from './header';
 import Map from './map';
+import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
 
@@ -15,15 +14,12 @@ class App extends React.Component<Props, void> {
   public render() {
     return (
       <div className={styles.root}>
-        <div className={styles.header}>
-          <Header />
-        </div>
+        <div className={styles.header} />
         <div className={styles.content}>
+          <TimeSelector />
           <Map />
         </div>
-        <div className={styles.footer}>
-          <Footer />
-        </div>
+        <div className={styles.footer} />
       </div>
     );
   }
