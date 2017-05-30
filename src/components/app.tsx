@@ -16,6 +16,7 @@ class App extends React.Component<Props, void> {
       <div className={styles.root}>
         <div className={styles.header} />
         <div className={styles.content}>
+          <h1>Blue water stress</h1>
           <TimeSelector />
           <Map />
         </div>
