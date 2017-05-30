@@ -60,11 +60,11 @@ class Map extends React.Component<Props, void> {
 
   private drawMap() {
     // Based on https://gist.github.com/mbostock/4448587
-    const width = 1400;
-    const height = 700;
+    const width = 1000;
+    const height = width / 2;
     const projection = geoEckert1()
-      .scale(300)
-      .translate([width / 2.2, height / 1.7])
+      .scale(width / 4.8)
+      .translate([width / 2.3, height / 1.7])
       .precision(.1);
     const graticule = geoGraticule();
     const path = geoPath()
