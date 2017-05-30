@@ -2,7 +2,7 @@ import { extent } from 'd3-array';
 import { geoGraticule, geoPath } from 'd3-geo';
 import { scaleSequential, ScaleSequential } from 'd3-scale';
 import { interpolateReds } from 'd3-scale-chromatic';
-import { event, select } from 'd3-selection';
+import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
@@ -70,7 +70,7 @@ class Map extends React.Component<Props, void> {
     const path = geoPath()
       .projection(projection);
 
-    const svg = select(this.svgRef!)
+    const svg = select<SVGElement, undefined>(this.svgRef!)
       .attr('width', width)
       .attr('height', height);
     const defs = svg.select('defs');
@@ -91,9 +91,9 @@ class Map extends React.Component<Props, void> {
 
     // Water regions
     const features: WaterRegionFeature[] = waterRegions.features;
-    const waterRegionsGroup = svg.select('g#water-regions');
-    const regions = waterRegionsGroup.selectAll('path')
-      .data(features, d => d.properties.featureid);
+    const waterRegionsGroup = svg.select<SVGGElement>('g#water-regions');
+    const regions = waterRegionsGroup.selectAll<SVGPathElement, WaterRegionFeature>('path')
+      .data(features, d => String(d.properties.featureid));
 
     // Enter
     regions.enter().append('path')
@@ -126,8 +126,8 @@ class Map extends React.Component<Props, void> {
   private redrawFills() {
     const features: WaterRegionFeature[] = waterRegions.features;
     const t = transition('waterRegion').duration(100);
-    select('g#water-regions').selectAll('path')
-      .data(features, d => d.properties.featureid)
+    select<SVGGElement, undefined>('g#water-regions').selectAll<SVGPathElement, WaterRegionFeature>('path')
+      .data(features, d => String(d.properties.featureid))
       .transition(t)
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid));
   }
