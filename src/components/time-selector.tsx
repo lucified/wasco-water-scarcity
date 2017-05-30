@@ -37,6 +37,7 @@ class TimeSelector extends React.Component<Props, void> {
     return (
       <div className={styles.root}>
         <input
+          className={styles.input}
           type="range"
           onChange={this.handleIndexUpdate}
           value={selectedIndex}

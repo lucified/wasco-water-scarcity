@@ -14,10 +14,11 @@ class App extends React.Component<Props, void> {
   public render() {
     return (
       <div className={styles.root}>
-        <div className={styles.header} />
-        <div className={styles.content}>
+        <div className={styles.header}>
           <h1>Blue water stress</h1>
           <TimeSelector />
+        </div>
+        <div className={styles.content}>
           <Map />
         </div>
         <div className={styles.footer} />
