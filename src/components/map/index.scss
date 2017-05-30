@@ -1,14 +1,12 @@
 @import '../definitions.scss';
 
-.svg {}
-
-.stroke {
+.globe-stroke {
   fill: none;
   stroke: $color-light-gray;
   stroke-width: 3px;
 }
 
-.fill {
+.globe-fill {
   fill: white;
 }
 
@@ -29,11 +27,12 @@
   stroke-width: .5px;
 }
 
-.water-regions {
-
-}
-
 .water-region {
   stroke: $color-gray;
   stroke-width: 1px;
+
+  &.selected {
+    stroke-width: 2px;
+    stroke: $color-darker-gray;
+  }
 }

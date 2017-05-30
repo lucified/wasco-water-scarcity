@@ -9,5 +9,9 @@ export function getSelectedData(state: StateTree): TimeAggregate {
 }
 
 export function getSelectedTimeIndex(state: StateTree): number {
-  return state.selectedTimeIndex;
+  return state.selections.timeIndex;
+}
+
+export function getSelectedRegion(state: StateTree): number | undefined {
+  return state.selections.region;
 }

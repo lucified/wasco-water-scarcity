@@ -4,7 +4,7 @@ import values = require('lodash/values');
 import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
-import { Action, SET_TIME_INDEX } from '../actions';
+import { Action, SET_SELECTED_REGION, SET_TIME_INDEX, TOGGLE_SELECTED_REGION } from '../actions';
 import { RawWaterDatum, StateTree, TimeAggregate, toWaterDatum } from './types';
 
 let rawWaterData: RawWaterDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
@@ -19,7 +19,9 @@ const defaultState: StateTree = {
     endYear: group[0].endYear,
     data: keyBy(group.map(toWaterDatum), d => d.featureId),
   })),
-  selectedTimeIndex: 0,
+  selections: {
+    timeIndex: 0,
+  },
 };
 
 // Don't keep raw and temporary data in memory
@@ -32,10 +34,30 @@ export function dataReducer(state = initialState.waterData, _action: Action): Ti
   return state;
 }
 
-export function timeIndexReducer(state = initialState.selectedTimeIndex, action: Action): number {
+export function selectionsReducer(state = initialState.selections, action: Action) {
   switch (action.type) {
     case SET_TIME_INDEX:
-      return action.value;
+      return {
+        ...state,
+        timeIndex: action.value,
+      };
+    case TOGGLE_SELECTED_REGION:
+      if (state.region === action.id) {
+        return {
+          ...state,
+          region: undefined,
+        };
+      }
+
+      return {
+        ...state,
+        region: action.id,
+      };
+    case SET_SELECTED_REGION:
+      return {
+        ...state,
+        region: action.id,
+      };
   }
 
   return state;
@@ -43,7 +65,7 @@ export function timeIndexReducer(state = initialState.selectedTimeIndex, action:
 
 export default combineReducers<StateTree>({
   routing: routerReducer,
-  selectedTimeIndex: timeIndexReducer,
+  selections: selectionsReducer,
   waterData: dataReducer,
 });
 

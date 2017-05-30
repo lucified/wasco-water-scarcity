@@ -3,7 +3,10 @@ import { RouterState } from 'react-router-redux';
 export interface StateTree {
   waterData: TimeAggregate[];
   routing: RouterState;
-  selectedTimeIndex: number;
+  selections: {
+    timeIndex: number;
+    region?: number;
+  };
 }
 
 export interface TimeAggregate {

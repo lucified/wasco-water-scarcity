@@ -8,10 +8,12 @@ import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import { feature, mesh } from 'topojson';
 
+import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { StateTree, TimeAggregate, WaterDatum } from '../../reducers';
-import { getSelectedData, getWaterData } from '../../selectors';
+import { getSelectedData, getSelectedRegion, getWaterData } from '../../selectors';
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
@@ -26,9 +28,15 @@ const styles = require('./index.scss');
 interface GeneratedStateProps {
   selectedData: TimeAggregate;
   allData: TimeAggregate[];
+  selectedRegion?: number;
 }
 
-type Props = GeneratedStateProps;
+interface GeneratedDispatchProps {
+  toggleSelectedRegion: (regionId: number) => void;
+  clearSelectedRegion: () => void;
+}
+
+type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 const waterPropertySelector = (d: WaterDatum) => d.blueWaterStress;
 
@@ -37,6 +45,7 @@ class Map extends React.Component<Props, void> {
     super(props);
 
     this.saveSvgRef = this.saveSvgRef.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   private svgRef?: SVGElement;
@@ -59,6 +68,8 @@ class Map extends React.Component<Props, void> {
   }
 
   private drawMap() {
+    const { clearSelectedRegion, selectedRegion } = this.props;
+
     // Based on https://gist.github.com/mbostock/4448587
     const width = 1000;
     const height = width / 2;
@@ -78,6 +89,9 @@ class Map extends React.Component<Props, void> {
       .datum({ type: 'Sphere' })
       .attr('d', path);
 
+    svg.select(`use.${styles['globe-fill']}`)
+      .on('click', clearSelectedRegion);
+
     // Countries and graticule
     svg.select(`path.${styles.graticule}`)
       .datum(graticule)
@@ -95,21 +109,17 @@ class Map extends React.Component<Props, void> {
     const regions = waterRegionsGroup.selectAll<SVGPathElement, WaterRegionFeature>('path')
       .data(features, d => String(d.properties.featureid));
 
-    // Enter
     regions.enter().append('path')
       .attr('class', styles['water-region'])
+      .classed(styles.selected, d => selectedRegion === d.properties.featureid)
       .attr('d', path as any)
       .attr('vector-effect', 'non-scaling-stroke')
-      .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid));
-      /*.on('mouseover', onMouseOver);
-      .on('mouseout', this.onMouseOut)
-      .on('click', this.onClick);
+      .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid))
+      .on('click', this.handleClick);
+  }
 
-    function onMouseOver() {
-      const node = select(this);
-      console.log('node', node, node.data())
-      console.log('event', event)
-    }*/
+  private handleClick(d: WaterRegionFeature) {
+    this.props.toggleSelectedRegion(d.properties.featureid);
   }
 
   private getColorForWaterRegion(featureId: number): string {
@@ -117,32 +127,37 @@ class Map extends React.Component<Props, void> {
     return this.colorScale!(waterPropertySelector(data[featureId]));
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.selectedData !== this.props.selectedData) {
-      this.redrawFills();
+  public componentDidUpdate(prevProps: Props) {
+    if (
+      prevProps.selectedData !== this.props.selectedData ||
+      prevProps.selectedRegion !== this.props.selectedRegion
+    ) {
+      this.redrawFillsAndBorders();
     }
   }
 
-  private redrawFills() {
+  private redrawFillsAndBorders() {
+    const { selectedRegion } = this.props;
     const features: WaterRegionFeature[] = waterRegions.features;
     const t = transition('waterRegion').duration(100);
     select<SVGGElement, undefined>('g#water-regions').selectAll<SVGPathElement, WaterRegionFeature>('path')
       .data(features, d => String(d.properties.featureid))
+      .classed(styles.selected, d => selectedRegion === d.properties.featureid)
       .transition(t)
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid));
   }
 
   public render() {
     return (
-      <svg className={styles.svg} ref={this.saveSvgRef}>
+      <svg ref={this.saveSvgRef}>
         <defs>
           <clipPath id="clip">
             <use xlinkHref="#sphere" />
           </clipPath>
           <path id="sphere" />
         </defs>
-        <use className={styles.stroke} xlinkHref="#sphere" />
-        <use className={styles.fill} xlinkHref="#sphere" />
+        <use className={styles['globe-stroke']} xlinkHref="#sphere" />
+        <use className={styles['globe-fill']} xlinkHref="#sphere" />
         <g>
           <path className={styles.land} clipPath="url(#clip)" />
           <path className={styles.boundary} clipPath="url(#clip)" />
@@ -158,7 +173,18 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     allData: getWaterData(state),
     selectedData: getSelectedData(state),
+    selectedRegion: getSelectedRegion(state),
   };
 }
 
-export default connect<GeneratedStateProps, {}, {}>(mapStateToProps)(Map);
+function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
+  return {
+    toggleSelectedRegion: (regionId: number) => { dispatch(toggleSelectedRegion(regionId)); },
+    clearSelectedRegion: () => { dispatch(setSelectedRegion()); },
+  };
+}
+
+export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Map);

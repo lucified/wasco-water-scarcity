@@ -4,4 +4,16 @@ export interface SetTimeIndexAction {
   value: number;
 }
 
-export type Action = SetTimeIndexAction;
+export const TOGGLE_SELECTED_REGION = 'TOGGLE_SELECTED_REGION';
+export interface ToggleSelectedRegionAction {
+  type: 'TOGGLE_SELECTED_REGION';
+  id: number;
+}
+
+export const SET_SELECTED_REGION = 'SET_SELECTED_REGION';
+export interface SetSelectedRegionAction {
+  type: 'SET_SELECTED_REGION';
+  id?: number;
+}
+
+export type Action = SetSelectedRegionAction | SetTimeIndexAction | ToggleSelectedRegionAction;
