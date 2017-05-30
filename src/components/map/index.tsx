@@ -15,7 +15,7 @@ import { getSelectedData, getWaterData } from '../../selectors';
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
-const geoEckert1 = require('d3-geo-projection').geoEckert1;
+const geoNaturalEarth2 = require('d3-geo-projection').geoNaturalEarth2;
 
 // From https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-50m.json
 const world = require('../../../data/world-50m.json');
@@ -62,9 +62,9 @@ class Map extends React.Component<Props, void> {
     // Based on https://gist.github.com/mbostock/4448587
     const width = 1000;
     const height = width / 2;
-    const projection = geoEckert1()
-      .scale(width / 4.8)
-      .translate([width / 2.3, height / 1.7])
+    const projection = geoNaturalEarth2()
+      .scale(width / 4.85)
+      .translate([width / 2.2, height / 1.7])
       .precision(.1);
     const graticule = geoGraticule();
     const path = geoPath()
