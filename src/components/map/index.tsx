@@ -1,11 +1,13 @@
-import { extent } from 'd3-array';
+declare module 'd3-scale-chromatic' {
+  const schemeReds: string[][];
+}
+
+import { axisBottom } from 'd3-axis';
 import { geoGraticule, geoPath } from 'd3-geo';
-import { scaleSequential, ScaleSequential } from 'd3-scale';
-import { interpolateReds } from 'd3-scale-chromatic';
+import { scaleLinear, scaleThreshold } from 'd3-scale';
+import { schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
-import flatMap = require('lodash/flatMap');
-import values = require('lodash/values');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -45,47 +47,42 @@ class Map extends React.Component<Props, void> {
     super(props);
 
     this.saveSvgRef = this.saveSvgRef.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleRegionClick = this.handleRegionClick.bind(this);
   }
 
   private svgRef?: SVGElement;
-  private colorScale?: ScaleSequential<string>;
+  private width = 1000;
+  private height = this.width / 2;
+  private thresholds = [0.2, 0.4, 1];
+  private colorScale = scaleThreshold<number, string>()
+    .domain(this.thresholds)
+    .range(schemeReds[this.thresholds.length + 1]);
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
   }
 
   public componentDidMount() {
-    this.generateScale();
     this.drawMap();
-  }
-
-  private generateScale() {
-    const { allData } = this.props;
-    const allWaterData = flatMap<WaterDatum[], WaterDatum>(allData.map(d => values(d.data)));
-    const dataExtent = extent(allWaterData, waterPropertySelector) as [number, number];
-    this.colorScale = scaleSequential(interpolateReds).clamp(true).domain(dataExtent);
+    this.drawLegend();
   }
 
   private drawMap() {
     const { clearSelectedRegion, selectedRegion } = this.props;
 
     // Based on https://gist.github.com/mbostock/4448587
-    const width = 1000;
-    const height = width / 2;
     const projection = geoNaturalEarth2()
-      .scale(width / 4.85)
-      .translate([width / 2.2, height / 1.7])
+      .scale(this.width / 4.85)
+      .translate([this.width / 2.2, this.height / 1.7])
       .precision(.1);
     const graticule = geoGraticule();
     const path = geoPath()
       .projection(projection);
 
     const svg = select<SVGElement, undefined>(this.svgRef!)
-      .attr('width', width)
-      .attr('height', height);
-    const defs = svg.select('defs');
-    defs.select('#sphere')
+      .attr('width', this.width)
+      .attr('height', this.height);
+    svg.select('#sphere')
       .datum({ type: 'Sphere' })
       .attr('d', path);
 
@@ -105,26 +102,69 @@ class Map extends React.Component<Props, void> {
 
     // Water regions
     const features: WaterRegionFeature[] = waterRegions.features;
-    const waterRegionsGroup = svg.select<SVGGElement>('g#water-regions');
-    const regions = waterRegionsGroup.selectAll<SVGPathElement, WaterRegionFeature>('path')
-      .data(features, d => String(d.properties.featureid));
-
-    regions.enter().append('path')
-      .attr('class', styles['water-region'])
-      .classed(styles.selected, d => selectedRegion === d.properties.featureid)
-      .attr('d', path as any)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid))
-      .on('click', this.handleClick);
+    svg.select<SVGGElement>('g#water-regions')
+      .selectAll<SVGPathElement, WaterRegionFeature>('path')
+      .data(features, d => String(d.properties.featureid))
+      .enter().append('path')
+        .attr('class', styles['water-region'])
+        .classed(styles.selected, d => selectedRegion === d.properties.featureid)
+        .attr('d', path as any)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid))
+        .on('click', this.handleRegionClick);
   }
 
-  private handleClick(d: WaterRegionFeature) {
+  private drawLegend() {
+    // Based on https://bl.ocks.org/mbostock/4060606
+    const width = 200;
+    const svg = select<SVGElement, undefined>(this.svgRef!);
+
+    const xScale = scaleLinear()
+      .domain([0, this.thresholds[this.thresholds.length - 1] + 1])
+      .rangeRound([0, width]);
+    const g = svg.select<SVGGElement>('g#legend');
+
+    g.selectAll('rect')
+      .data(this.colorScale.range().map(d => {
+          const colorExtent = this.colorScale.invertExtent(d);
+          if (colorExtent[0] == null) {
+            colorExtent[0] = xScale.domain()[0];
+          }
+          if (colorExtent[1] == null) {
+            colorExtent[1] = xScale.domain()[1];
+          }
+
+          return colorExtent as [number, number];
+        }))
+      .enter().append('rect')
+        .attr('height', 8)
+        .attr('x', d => xScale(d[0]))
+        .attr('width', d => xScale(d[1]) - xScale(d[0]))
+        .attr('fill', d => this.colorScale(d[0]));
+
+    g.append('text')
+      .attr('class', 'caption')
+      .attr('x', xScale.range()[0])
+      .attr('y', -6)
+      .attr('fill', '#000')
+      .attr('text-anchor', 'start')
+      .attr('font-weight', 'bold')
+      .text('Water stress');
+
+    g.call(axisBottom(xScale)
+        .tickSize(13)
+        .tickValues(this.colorScale.domain()))
+      .select('.domain')
+        .remove();
+  }
+
+  private handleRegionClick(d: WaterRegionFeature) {
     this.props.toggleSelectedRegion(d.properties.featureid);
   }
 
   private getColorForWaterRegion(featureId: number): string {
     const { data } = this.props.selectedData;
-    return this.colorScale!(waterPropertySelector(data[featureId]));
+    return this.colorScale(waterPropertySelector(data[featureId]));
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -140,7 +180,8 @@ class Map extends React.Component<Props, void> {
     const { selectedRegion } = this.props;
     const features: WaterRegionFeature[] = waterRegions.features;
     const t = transition('waterRegion').duration(100);
-    select<SVGGElement, undefined>('g#water-regions').selectAll<SVGPathElement, WaterRegionFeature>('path')
+    select<SVGGElement, undefined>('g#water-regions')
+      .selectAll<SVGPathElement, WaterRegionFeature>('path')
       .data(features, d => String(d.properties.featureid))
       .classed(styles.selected, d => selectedRegion === d.properties.featureid)
       .transition(t)
@@ -164,6 +205,7 @@ class Map extends React.Component<Props, void> {
           <path className={styles.graticule} clipPath="url(#clip)" />
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
+        <g id="legend" transform={`translate(${this.width * 0.6}, ${this.height - 40})`} />
       </svg>
     );
   }
