@@ -41,7 +41,7 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
-const waterPropertySelector = (d: WaterDatum) => d.blueWaterStress;
+const waterPropertySelector = (d: WaterDatum): number | undefined => d.blueWaterStress;
 
 class Map extends React.Component<Props, void> {
   constructor(props: Props) {
@@ -165,7 +165,8 @@ class Map extends React.Component<Props, void> {
 
   private getColorForWaterRegion(featureId: number): string {
     const { data } = this.props.selectedData;
-    return this.colorScale(waterPropertySelector(data[featureId]));
+    const value = waterPropertySelector(data[featureId]);
+    return value != null ? this.colorScale(value) : '#807775';
   }
 
   public componentDidUpdate(prevProps: Props) {
