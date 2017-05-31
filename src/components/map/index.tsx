@@ -1,11 +1,12 @@
 declare module 'd3-scale-chromatic' {
   const schemeReds: string[][];
+  const schemeBlues: string[][];
 }
 
 import { axisBottom } from 'd3-axis';
 import { geoGraticule, geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold } from 'd3-scale';
-import { schemeReds } from 'd3-scale-chromatic';
+import { schemeBlues, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
@@ -56,7 +57,7 @@ class Map extends React.Component<Props, void> {
   private thresholds = [0.2, 0.4, 1];
   private colorScale = scaleThreshold<number, string>()
     .domain(this.thresholds)
-    .range(schemeReds[this.thresholds.length + 1]);
+    .range([schemeBlues[this.thresholds.length + 1][0], ...schemeReds[this.thresholds.length + 1].slice(1)]);
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
