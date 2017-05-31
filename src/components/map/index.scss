@@ -36,3 +36,13 @@
     stroke: $color-darker-gray;
   }
 }
+
+.legend {
+  user-select: none;
+}
+
+.legend-caption {
+  fill: #000;
+  text-anchor: start;
+  font-weight: bold;
+}

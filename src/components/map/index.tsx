@@ -143,15 +143,6 @@ class Map extends React.Component<Props, void> {
         .attr('width', d => xScale(d[1]) - xScale(d[0]))
         .attr('fill', d => this.colorScale(d[0]));
 
-    g.append('text')
-      .attr('class', 'caption')
-      .attr('x', xScale.range()[0])
-      .attr('y', -6)
-      .attr('fill', '#000')
-      .attr('text-anchor', 'start')
-      .attr('font-weight', 'bold')
-      .text('Water stress');
-
     g.call(axisBottom(xScale)
         .tickSize(13)
         .tickValues(this.colorScale.domain()))
@@ -207,7 +198,11 @@ class Map extends React.Component<Props, void> {
           <path className={styles.graticule} clipPath="url(#clip)" />
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
-        <g id="legend" transform={`translate(${this.width * 0.6}, ${this.height - 40})`} />
+        <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 40})`}>
+          <text className={styles['legend-caption']} x="0" y="-6">
+            Water stress
+          </text>
+        </g>
       </svg>
     );
   }
