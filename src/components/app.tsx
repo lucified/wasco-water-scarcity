@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import Map from './map';
+import SelectedRegionInformation from './selected-region-information';
 import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
@@ -20,6 +21,7 @@ class App extends React.Component<Props, void> {
         </div>
         <div className={styles.content}>
           <Map />
+          <SelectedRegionInformation />
         </div>
         <div className={styles.footer} />
       </div>
