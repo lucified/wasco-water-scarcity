@@ -1,6 +1,6 @@
 // FONT
 
-$bodyFontSize: 14; // in pixels
+$bodyFontSize: 16; // in pixels
 $fontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
 // BREAKPOINTS
@@ -52,6 +52,7 @@ $color-selection-active: white;
 $border-radius: 2px;
 $border-width: 1px;
 $divider-width: 1px;
+$default-margin: 20px;
 
 @mixin mobile-only {
   @media (max-width: 767px) {

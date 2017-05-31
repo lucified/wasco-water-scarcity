@@ -1,0 +1,15 @@
+@import '../definitions';
+
+.root {
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.logo {
+  margin: $default-margin $default-margin $default-margin 0;
+}
+
+.heading {
+  font-size: 48px;
+  font-weight: 300;
+  margin: $default-margin;
+}
