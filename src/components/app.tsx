@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import Map from './map';
 import SelectedRegionInformation from './selected-region-information';
 import TimeSelector from './time-selector';
+import Header from './header';
 
 import * as styles from './app.scss';
 
@@ -15,6 +16,7 @@ class App extends React.Component<Props, void> {
   public render() {
     return (
       <div className={styles.root}>
+        <Header />
         <div className={styles.header}>
           <h1>Blue water stress</h1>
           <TimeSelector />
