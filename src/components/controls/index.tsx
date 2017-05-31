@@ -4,12 +4,10 @@ import TimeSelector from './time-selector';
 
 export default function Controls() {
   return (
-    <div>
-      <div className="container">
-        <div className="row">
-          <h1>Blue water stress</h1>
-          <TimeSelector />
-        </div>
+    <div className="container">
+      <div className="row">
+        <h1>Blue water stress</h1>
+        <TimeSelector />
       </div>
     </div>
   );
