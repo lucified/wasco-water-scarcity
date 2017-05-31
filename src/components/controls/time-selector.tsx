@@ -2,9 +2,9 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../actions';
-import { StateTree } from '../reducers';
-import { getSelectedTimeIndex, getWaterData } from '../selectors';
+import { setTimeIndex } from '../../actions';
+import { StateTree } from '../../reducers';
+import { getSelectedTimeIndex, getWaterData } from '../../selectors';
 
 const styles = require('./time-selector.scss');
 
