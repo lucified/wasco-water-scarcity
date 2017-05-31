@@ -53,7 +53,7 @@ class Map extends React.Component<Props, void> {
 
   private svgRef?: SVGElement;
   private width = 1200;
-  private height = this.width / 1.5;
+  private height = this.width / 1.7;
   private thresholds = [0.2, 0.4, 1];
   private colorScale = scaleThreshold<number, string>()
     .domain(this.thresholds)
@@ -199,7 +199,7 @@ class Map extends React.Component<Props, void> {
             <path className={styles.graticule} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
-          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 40})`}>
+          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 80})`}>
             <text className={styles['legend-caption']} x="0" y="-6">
               Water stress
             </text>
