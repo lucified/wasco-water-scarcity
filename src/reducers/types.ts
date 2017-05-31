@@ -43,6 +43,7 @@ export interface RawWaterDatum {
   blueWaterConsumptionManufacturing: number;
 }
 
+// All units have been converted to m^3 from km^3
 export interface WaterDatum {
   featureId: number;
   population: number;
@@ -57,28 +58,30 @@ export interface WaterDatum {
   blueWaterConsumptionManufacturing: number;
 }
 
+const KM_3_TO_M_3_RATIO = 1000000000;
+
 export function toWaterDatum({
   featureid,
-  blueWaterConsumptionLivestock,
   blueWaterAvailability,
   blueWaterConsumptionDomestic,
   blueWaterConsumptionElectric,
   blueWaterConsumptionIrrigation,
-  blueWaterShortage,
+  blueWaterConsumptionLivestock,
+  blueWaterConsumptionManufacturing,
   blueWaterConsumptionTotal,
   blueWaterStress,
+  blueWaterShortage,
   population,
-  blueWaterConsumptionManufacturing,
 }: RawWaterDatum): WaterDatum {
   return {
     featureId: featureid,
     blueWaterAvailability,
-    blueWaterConsumptionDomestic,
-    blueWaterConsumptionElectric,
-    blueWaterConsumptionIrrigation,
-    blueWaterConsumptionLivestock,
-    blueWaterConsumptionManufacturing,
-    blueWaterConsumptionTotal,
+    blueWaterConsumptionDomestic: blueWaterConsumptionDomestic * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionElectric: blueWaterConsumptionElectric * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionIrrigation: blueWaterConsumptionIrrigation * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionLivestock: blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionManufacturing: blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
     blueWaterStress,
     blueWaterShortage,
     population,
