@@ -15,8 +15,9 @@ import { Dispatch } from 'redux';
 import { feature, mesh } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
-import { StateTree, TimeAggregate, WaterDatum } from '../../reducers';
+import { StateTree } from '../../reducers';
 import { getSelectedData, getSelectedRegion, getWaterData } from '../../selectors';
+import { TimeAggregate, WaterDatum } from '../../types';
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist

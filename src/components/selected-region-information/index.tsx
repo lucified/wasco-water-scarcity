@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../../actions';
-import { StateTree, TimeAggregate } from '../../reducers';
 import { getSelectedRegion, getWaterData } from '../../selectors';
+import { StateTree } from '../../reducers';
+import { WaterDatum } from '../../types';
 
 const styles = require('./index.scss');
 

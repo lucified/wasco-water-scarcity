@@ -5,7 +5,8 @@ import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
 import { Action, SET_SELECTED_REGION, SET_TIME_INDEX, TOGGLE_SELECTED_REGION } from '../actions';
-import { RawWaterDatum, StateTree, TimeAggregate, toWaterDatum } from './types';
+import { RawWaterDatum, TimeAggregate, toWaterDatum } from '../types';
+import { StateTree } from './types';
 
 let rawWaterData: RawWaterDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
 let yearlyGroupedData: RawWaterDatum[][] | null =

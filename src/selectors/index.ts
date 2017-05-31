@@ -1,4 +1,5 @@
-import { StateTree, TimeAggregate } from '../reducers';
+import { StateTree } from '../reducers';
+import { TimeAggregate } from '../types';
 
 export function getWaterData(state: StateTree): TimeAggregate[] {
   return state.waterData;
