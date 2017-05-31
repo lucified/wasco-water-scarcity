@@ -6,7 +6,6 @@
 }
 
 .content {
-  @include center-content;
   padding: $default-margin 0;
   display: flex;
   flex-direction: row;

@@ -52,8 +52,8 @@ class Map extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private width = 1000;
-  private height = this.width / 2;
+  private width = 1200;
+  private height = this.width / 1.5;
   private thresholds = [0.2, 0.4, 1];
   private colorScale = scaleThreshold<number, string>()
     .domain(this.thresholds)
@@ -73,8 +73,8 @@ class Map extends React.Component<Props, void> {
 
     // Based on https://gist.github.com/mbostock/4448587
     const projection = geoNaturalEarth2()
-      .scale(this.width / 4.85)
-      .translate([this.width / 2.2, this.height / 1.7])
+      .scale(this.width / 5.35)
+      .translate([this.width / 2, this.height / 2])
       .precision(.1);
     const graticule = geoGraticule();
     const path = geoPath()
@@ -183,27 +183,29 @@ class Map extends React.Component<Props, void> {
 
   public render() {
     return (
-      <svg ref={this.saveSvgRef}>
-        <defs>
-          <clipPath id="clip">
-            <use xlinkHref="#sphere" />
-          </clipPath>
-          <path id="sphere" />
-        </defs>
-        <use className={styles['globe-stroke']} xlinkHref="#sphere" />
-        <use className={styles['globe-fill']} xlinkHref="#sphere" />
-        <g>
-          <path className={styles.land} clipPath="url(#clip)" />
-          <path className={styles.boundary} clipPath="url(#clip)" />
-          <path className={styles.graticule} clipPath="url(#clip)" />
-        </g>
-        <g id="water-regions" clipPath="url(#clip)" />
-        <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 40})`}>
-          <text className={styles['legend-caption']} x="0" y="-6">
-            Water stress
-          </text>
-        </g>
-      </svg>
+      <div className="container">
+        <svg ref={this.saveSvgRef}>
+          <defs>
+            <clipPath id="clip">
+              <use xlinkHref="#sphere" />
+            </clipPath>
+            <path id="sphere" />
+          </defs>
+          <use className={styles['globe-stroke']} xlinkHref="#sphere" />
+          <use className={styles['globe-fill']} xlinkHref="#sphere" />
+          <g>
+            <path className={styles.land} clipPath="url(#clip)" />
+            <path className={styles.boundary} clipPath="url(#clip)" />
+            <path className={styles.graticule} clipPath="url(#clip)" />
+          </g>
+          <g id="water-regions" clipPath="url(#clip)" />
+          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 40})`}>
+            <text className={styles['legend-caption']} x="0" y="-6">
+              Water stress
+            </text>
+          </g>
+        </svg>
+      </div>
     );
   }
 }

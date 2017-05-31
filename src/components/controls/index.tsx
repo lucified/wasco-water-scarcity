@@ -7,9 +7,11 @@ const styles = require('./index.scss');
 export default function Controls() {
   return (
     <div className={styles.root}>
-      <div className={styles.content}>
-        <h1>Blue water stress</h1>
-        <TimeSelector />
+      <div className="container">
+        <div className={styles.content}>
+          <h1>Blue water stress</h1>
+          <TimeSelector />
+        </div>
       </div>
     </div>
   );
