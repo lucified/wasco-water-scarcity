@@ -3,15 +3,18 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../../actions';
-import { getSelectedRegion, getWaterData } from '../../selectors';
 import { StateTree } from '../../reducers';
+import { getSelectedTimeIndex, getTimeSeriesForSelectedRegion } from '../../selectors';
 import { WaterDatum } from '../../types';
 
-const styles = require('./index.scss');
+// import AvailabilityChart from './availability-chart';
+// import ConsumptionChart from './consumption-chart';
+// import PopulationChart from './population-chart';
+import StressShortageChart from './stress-shortage-chart';
 
 interface GeneratedStateProps {
-  allData: TimeAggregate[];
-  selectedRegion?: number;
+  selectedTimeIndex: number;
+  timeSeriesForSelectedRegion?: WaterDatum[];
 }
 
 interface GeneratedDispatchProps {
@@ -21,21 +24,64 @@ interface GeneratedDispatchProps {
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 class SelectedRegionInformation extends React.Component<Props, void> {
-  public render() {
-    const { selectedRegion } = this.props;
+  constructor(props: Props) {
+    super(props);
 
-    if (!selectedRegion) {
+    this.handleTimeIndexChange = this.handleTimeIndexChange.bind(this);
+  }
+
+  private handleTimeIndexChange(index: number) {
+    this.props.setTimeIndex(index);
+  }
+
+  public render() {
+    const { selectedTimeIndex, timeSeriesForSelectedRegion } = this.props;
+
+    if (!timeSeriesForSelectedRegion) {
       return null;
     }
 
-    return <span className={styles.root}>Selected region {selectedRegion}</span>;
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-12 col-m-6">
+            <StressShortageChart
+              data={timeSeriesForSelectedRegion}
+              selectedTimeIndex={selectedTimeIndex}
+              onTimeIndexChange={this.handleTimeIndexChange}
+            />
+          </div>
+          {/*<div className="col-xs-12 col-m-6">
+            <PopulationChart
+              data={timeSeriesForSelectedRegion}
+              selectedTimeIndex={selectedTimeIndex}
+              onTimeIndexChange={this.handleTimeIndexChange}
+            />
+          </div>
+          <div className="col-xs-12 col-m-6">
+            <AvailabilityChart
+              data={timeSeriesForSelectedRegion}
+              selectedTimeIndex={selectedTimeIndex}
+              onTimeIndexChange={this.handleTimeIndexChange}
+            />
+          </div>
+          <div className="col-xs-12 col-m-6">
+            <ConsumptionChart
+              data={timeSeriesForSelectedRegion}
+              selectedTimeIndex={selectedTimeIndex}
+              onTimeIndexChange={this.handleTimeIndexChange}
+            />
+          </div> */}
+        </div>
+      </div>
+    );
   }
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
-    allData: getWaterData(state),
-    selectedRegion: getSelectedRegion(state),
+    selectedTimeIndex: getSelectedTimeIndex(state),
+    timeSeriesForSelectedRegion: getTimeSeriesForSelectedRegion(state),
   };
 }
 
