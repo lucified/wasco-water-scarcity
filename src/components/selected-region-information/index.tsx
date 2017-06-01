@@ -10,8 +10,7 @@ import { WaterDatum } from '../../types';
 // import AvailabilityChart from './availability-chart';
 // import ConsumptionChart from './consumption-chart';
 // import PopulationChart from './population-chart';
-import ShortageLineChart from './shortage-line-chart';
-import StressLineChart from './stress-line-chart';
+import DataLineChart from './data-line-chart';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
@@ -46,14 +45,22 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       <div className="container">
         <div className="row">
           <div className="col-xs-12 col-md-6">
-            <StressLineChart
+            <DataLineChart
+              dataType="blueWaterStress"
+              dataLabel="Stress"
+              dataColor="red"
+              yAxisLabel="Consumption / Availability"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
           <div className="col-xs-12 col-md-6">
-            <ShortageLineChart
+            <DataLineChart
+              dataType="blueWaterShortage"
+              dataLabel="Shortage"
+              dataColor="blue"
+              yAxisLabel="Availability per capita (m³)"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
