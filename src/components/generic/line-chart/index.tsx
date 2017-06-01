@@ -1,4 +1,4 @@
-import { extent } from 'd3-array';
+import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
@@ -32,8 +32,8 @@ interface PassedProps {
   maxY?: number;
   minY?: number;
   yAxisLabel?: string;
-  annotationLine?: Date;
-  onHover?: (hoveredDate: Date) => void;
+  annotationLineIndex?: number;
+  onHover?: (hoveredIndex: number) => void;
 }
 
 interface DefaultProps {
@@ -81,7 +81,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
-      annotationLine,
+      annotationLineIndex,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -107,10 +107,11 @@ class LineChart extends React.Component<Props, void> {
     g.select('g#x-axis').call(axisBottom(xScale));
     g.select('g#y-axis').call(axisLeft(yScale));
 
-    if (annotationLine) {
+    if (annotationLineIndex != null) {
       g.append('g')
+        .attr('id', 'annotation-group')
         .append('path')
-          .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
+          .datum(dataValueExtent.map(d => ({ date: seriesData[annotationLineIndex].date, value: d })))
           .attr('d', lineGenerator)
           .attr('class', styles['annotation-line']);
     }
@@ -141,18 +142,43 @@ class LineChart extends React.Component<Props, void> {
       .on('mousemove', this.handleMouseMove);
   }
 
+  private findClosestIndex(date: Date) {
+    const { data } = this.props as PropsWithDefaults;
+
+    // TODO: make this more efficient
+    const dataDates = data.series.map(d => d.date);
+    // All earlier times are to the left of this index. It should never be 0.
+    const indexOnRight = bisectRight(dataDates, date);
+
+    if (indexOnRight < 1) {
+      return 0;
+    }
+
+    if (indexOnRight >= data.series.length) {
+      return data.series.length - 1;
+    }
+
+    const dateOnLeft = dataDates[indexOnRight - 1];
+    const dateOnRight = dataDates[indexOnRight];
+    if (date.getTime() - dateOnLeft.getTime() > dateOnRight.getTime() - date.getTime()) {
+      return indexOnRight;
+    }
+
+    return indexOnRight - 1;
+  }
+
   private handleMouseMove() {
     const { data, width, marginLeft, marginRight, onHover } = this.props as PropsWithDefaults;
 
     if (onHover) {
-      // TODO: don't scale on each handling
+      // TODO: don't create scale on each handling
       const chartWidth = width - marginLeft - marginRight;
       const xScale = scaleTime<number, number>()
         .domain(extent(data.series, d => d.date) as [Date, Date])
         .range([0, chartWidth]);
       const lineGroup = select(this.svgRef!).select<SVGGElement>('g#line-group');
-
-      onHover(xScale.invert(mouse(lineGroup.node() as any)[0]));
+      const hoveredTime = xScale.invert(mouse(lineGroup.node() as any)[0]);
+      onHover(this.findClosestIndex(hoveredTime));
     }
   }
 
@@ -166,7 +192,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
-      annotationLine,
+      annotationLineIndex,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -210,9 +236,10 @@ class LineChart extends React.Component<Props, void> {
         .text(d => d.label);
 
     // TODO: The following will break if annotationLine doesn't exist when the component is mounted
-    if (annotationLine) {
-      g.select(`path.${styles['annotation-line']}`)
-        .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
+    if (annotationLineIndex != null) {
+      const annotationGroup = g.select('g#annotation-group');
+      annotationGroup.select('path')
+        .datum(dataValueExtent.map(d => ({ date: seriesData[annotationLineIndex].date, value: d })))
         .transition(t)
           .attr('d', lineGenerator);
     }
