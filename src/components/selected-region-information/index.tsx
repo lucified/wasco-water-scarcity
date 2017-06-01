@@ -59,7 +59,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
             <DataLineChart
               dataType="blueWaterShortage"
               dataLabel="Shortage"
-              dataColor="blue"
+              dataColor="purple"
               yAxisLabel="Availability per capita (m³)"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
