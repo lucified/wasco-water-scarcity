@@ -1,3 +1,4 @@
+import some = require('lodash/some');
 import * as React from 'react';
 
 import { WaterDatum } from '../../types';
@@ -28,6 +29,11 @@ class StressLineChart extends React.Component<Props, void> {
         series: data.map(d => ({ value: d.blueWaterStress, date: toMidpoint(d.startYear, d.endYear) })),
       },
     ];
+
+    if (some<{ value?: number; date: Date }>(chartData[0].series, d => d.value == null)) {
+      console.warn('Missing water stress data for selected region');
+      return null;
+    }
 
     return <LineChart data={chartData} width={500} height={400} yAxisLabel="Consumption / Availability" />;
   }
