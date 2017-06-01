@@ -4,7 +4,6 @@ import { scaleLinear, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
 import { curveBasis, line } from 'd3-shape';
 import { transition } from 'd3-transition';
-import flatten = require('lodash/flatten');
 import * as React from 'react';
 
 const styles = require('./index.scss');
@@ -22,7 +21,7 @@ export interface Data {
 
 interface PassedProps {
   // Each Data is a separate line
-  data: Data[];
+  data: Data;
   width: number;
   height: number;
   marginLeft?: number;
@@ -86,15 +85,15 @@ class LineChart extends React.Component<Props, void> {
       data,
     } = this.props as PropsWithDefaults;
 
-    const allData = flatten(data.map(d => d.series));
-    const dataValueExtent = extent(allData, d => d.value) as [number, number];
+    const seriesData = data.series;
+    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(allData, d => d.date) as [Date, Date])
+      .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
@@ -117,7 +116,7 @@ class LineChart extends React.Component<Props, void> {
     }
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
-      .data(data)
+      .data([data])
       .enter().append('g')
         .attr('id', 'line-group');
 
@@ -146,11 +145,10 @@ class LineChart extends React.Component<Props, void> {
     const { data, width, marginLeft, marginRight, onHover } = this.props as PropsWithDefaults;
 
     if (onHover) {
-      // TODO: don't regenerate data and scale on each handling
-      const allData = flatten(data.map(d => d.series));
+      // TODO: don't scale on each handling
       const chartWidth = width - marginLeft - marginRight;
       const xScale = scaleTime<number, number>()
-        .domain(extent(allData, d => d.date) as [Date, Date])
+        .domain(extent(data.series, d => d.date) as [Date, Date])
         .range([0, chartWidth]);
       const lineGroup = select(this.svgRef!).select<SVGGElement>('g#line-group');
 
@@ -172,15 +170,15 @@ class LineChart extends React.Component<Props, void> {
       data,
     } = this.props as PropsWithDefaults;
 
-    const allData = flatten(data.map(d => d.series));
-    const dataValueExtent = extent(allData, d => d.value) as [number, number];
+    const seriesData = data.series;
+    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(allData, d => d.date) as [Date, Date])
+      .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
@@ -199,7 +197,7 @@ class LineChart extends React.Component<Props, void> {
       .call(axisLeft(yScale) as any);
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
-      .data(data);
+      .data([data]);
 
     lineGroup.select('path')
       .transition(t)

@@ -28,16 +28,14 @@ export default function ShortageLineChart({
   selectedTimeIndex,
   onTimeIndexChange,
 }: Props) {
-  const chartData: Data[] = [
-    {
-      label: dataLabel,
-      color: dataColor,
-      series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
-    },
-  ];
   const selectedData = data[selectedTimeIndex];
+  const chartData: Data = {
+    label: dataLabel,
+    color: dataColor,
+    series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
+  };
 
-  if (some<{ value?: number; date: Date }>(chartData[0].series, d => d.value == null)) {
+  if (some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)) {
     console.warn(`Missing ${dataType} data for selected region`);
     return null;
   }
