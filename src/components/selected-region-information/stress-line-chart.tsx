@@ -21,7 +21,7 @@ class StressLineChart extends React.Component<Props, void> {
   }
 
   public render() {
-    const { data } = this.props;
+    const { data, selectedTimeIndex } = this.props;
     const chartData: Data[] = [
       {
         label: 'Stress',
@@ -29,13 +29,22 @@ class StressLineChart extends React.Component<Props, void> {
         series: data.map(d => ({ value: d.blueWaterStress, date: toMidpoint(d.startYear, d.endYear) })),
       },
     ];
+    const selectedData = data[selectedTimeIndex];
 
     if (some<{ value?: number; date: Date }>(chartData[0].series, d => d.value == null)) {
       console.warn('Missing water stress data for selected region');
       return null;
     }
 
-    return <LineChart data={chartData} width={500} height={400} yAxisLabel="Consumption / Availability" />;
+    return (
+      <LineChart
+        data={chartData}
+        width={500}
+        height={400}
+        yAxisLabel="Consumption / Availability"
+        annotationLine={toMidpoint(selectedData.startYear, selectedData.endYear)}
+      />
+    );
   }
 }
 

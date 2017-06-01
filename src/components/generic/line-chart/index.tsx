@@ -33,6 +33,7 @@ interface PassedProps {
   maxY?: number;
   minY?: number;
   yAxisLabel?: string;
+  annotationLine?: Date;
 }
 
 interface DefaultProps {
@@ -79,6 +80,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
+      annotationLine,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -103,6 +105,14 @@ class LineChart extends React.Component<Props, void> {
 
     g.select('g#x-axis').call(axisBottom(xScale));
     g.select('g#y-axis').call(axisLeft(yScale));
+
+    if (annotationLine) {
+      g.append('g')
+        .append('path')
+          .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
+          .attr('d', lineGenerator)
+          .attr('class', styles['annotation-line']);
+    }
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
       .data(data)
@@ -133,6 +143,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
+      annotationLine,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -174,6 +185,14 @@ class LineChart extends React.Component<Props, void> {
       .transition(t)
         .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
         .text(d => d.label);
+
+    // TODO: The following will break if annotationLine doesn't exist when the component is mounted
+    if (annotationLine) {
+      g.select(`path.${styles['annotation-line']}`)
+        .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
+        .transition(t)
+          .attr('d', lineGenerator);
+    }
   }
 
   private storeSvgRef(el: SVGElement) {

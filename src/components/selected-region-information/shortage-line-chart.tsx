@@ -21,7 +21,7 @@ class ShortageLineChart extends React.Component<Props, void> {
   }
 
   public render() {
-    const { data } = this.props;
+    const { data, selectedTimeIndex } = this.props;
     const chartData: Data[] = [
       {
         label: 'Shortage',
@@ -29,13 +29,22 @@ class ShortageLineChart extends React.Component<Props, void> {
         series: data.map(d => ({ value: d.blueWaterShortage, date: toMidpoint(d.startYear, d.endYear) })),
       },
     ];
+    const selectedData = data[selectedTimeIndex];
 
     if (some<{ value?: number; date: Date }>(chartData[0].series, d => d.value == null)) {
       console.warn('Missing water shortage data for selected region');
       return null;
     }
 
-    return <LineChart data={chartData} width={500} height={400} yAxisLabel="Availability per capita (m³)" />;
+    return (
+      <LineChart
+        data={chartData}
+        width={500}
+        height={400}
+        yAxisLabel="Availability per capita (m³)"
+        annotationLine={toMidpoint(selectedData.startYear, selectedData.endYear)}
+      />
+    );
   }
 }
 
