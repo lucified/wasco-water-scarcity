@@ -1,10 +1,10 @@
-import { extent } from 'd3-array';
+import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
+import { format } from 'd3-format';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
-import { curveBasis, line } from 'd3-shape';
+import { curveMonotoneX, line } from 'd3-shape';
 import { transition } from 'd3-transition';
-import flatten = require('lodash/flatten');
 import * as React from 'react';
 
 const styles = require('./index.scss');
@@ -22,7 +22,7 @@ export interface Data {
 
 interface PassedProps {
   // Each Data is a separate line
-  data: Data[];
+  data: Data;
   width: number;
   height: number;
   marginLeft?: number;
@@ -33,8 +33,8 @@ interface PassedProps {
   maxY?: number;
   minY?: number;
   yAxisLabel?: string;
-  annotationLine?: Date;
-  onHover?: (hoveredDate: Date) => void;
+  annotationLineIndex?: number;
+  onHover?: (hoveredIndex: number) => void;
 }
 
 interface DefaultProps {
@@ -63,6 +63,7 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
+  private numberFormatter = format('.2g');
 
   public componentDidMount() {
     this.drawChart();
@@ -82,42 +83,52 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
-      annotationLine,
+      annotationLineIndex,
       data,
     } = this.props as PropsWithDefaults;
 
-    const allData = flatten(data.map(d => d.series));
-    const dataValueExtent = extent(allData, d => d.value) as [number, number];
+    const seriesData = data.series;
+    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(allData, d => d.date) as [Date, Date])
+      .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
-      .curve(curveBasis)
+      .curve(curveMonotoneX)
       .x(d => xScale(d.date))
       .y(d => yScale(d.value));
 
     g.select('g#x-axis').call(axisBottom(xScale));
     g.select('g#y-axis').call(axisLeft(yScale));
 
-    if (annotationLine) {
-      g.append('g')
-        .append('path')
-          .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
-          .attr('d', lineGenerator)
-          .attr('class', styles['annotation-line']);
+    if (annotationLineIndex != null) {
+      const selectedData = seriesData[annotationLineIndex];
+      const annotationGroup = g.append('g')
+        .attr('id', 'annotation-group');
+
+      annotationGroup.append('path')
+        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
+        .attr('d', lineGenerator)
+        .attr('class', styles['annotation-line']);
+
+      annotationGroup.append('text')
+        .attr('class', styles['annotation-label'])
+        .attr('x', 9)
+        .attr('dy', '.35em')
+        .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+        .text(this.numberFormatter(selectedData.value));
     }
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
-      .data(data)
+      .data([data])
       .enter().append('g')
         .attr('id', 'line-group');
 
@@ -142,19 +153,43 @@ class LineChart extends React.Component<Props, void> {
       .on('mousemove', this.handleMouseMove);
   }
 
+  private findClosestIndex(date: Date) {
+    const { data } = this.props as PropsWithDefaults;
+
+    // TODO: make this more efficient
+    const dataDates = data.series.map(d => d.date);
+    // All earlier times are to the left of this index. It should never be 0.
+    const indexOnRight = bisectRight(dataDates, date);
+
+    if (indexOnRight < 1) {
+      return 0;
+    }
+
+    if (indexOnRight >= data.series.length) {
+      return data.series.length - 1;
+    }
+
+    const dateOnLeft = dataDates[indexOnRight - 1];
+    const dateOnRight = dataDates[indexOnRight];
+    if (date.getTime() - dateOnLeft.getTime() > dateOnRight.getTime() - date.getTime()) {
+      return indexOnRight;
+    }
+
+    return indexOnRight - 1;
+  }
+
   private handleMouseMove() {
     const { data, width, marginLeft, marginRight, onHover } = this.props as PropsWithDefaults;
 
     if (onHover) {
-      // TODO: don't regenerate data and scale on each handling
-      const allData = flatten(data.map(d => d.series));
+      // TODO: don't create scale on each handling
       const chartWidth = width - marginLeft - marginRight;
       const xScale = scaleTime<number, number>()
-        .domain(extent(allData, d => d.date) as [Date, Date])
+        .domain(extent(data.series, d => d.date) as [Date, Date])
         .range([0, chartWidth]);
       const lineGroup = select(this.svgRef!).select<SVGGElement>('g#line-group');
-
-      onHover(xScale.invert(mouse(lineGroup.node() as any)[0]));
+      const hoveredTime = xScale.invert(mouse(lineGroup.node() as any)[0]);
+      onHover(this.findClosestIndex(hoveredTime));
     }
   }
 
@@ -168,26 +203,26 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
-      annotationLine,
+      annotationLineIndex,
       data,
     } = this.props as PropsWithDefaults;
 
-    const allData = flatten(data.map(d => d.series));
-    const dataValueExtent = extent(allData, d => d.value) as [number, number];
+    const seriesData = data.series;
+    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(allData, d => d.date) as [Date, Date])
+      .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
-      .curve(curveBasis)
+      .curve(curveMonotoneX)
       .x(d => xScale(d.date))
       .y(d => yScale(d.value));
 
@@ -199,7 +234,7 @@ class LineChart extends React.Component<Props, void> {
       .call(axisLeft(yScale) as any);
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
-      .data(data);
+      .data([data]);
 
     lineGroup.select('path')
       .transition(t)
@@ -212,11 +247,17 @@ class LineChart extends React.Component<Props, void> {
         .text(d => d.label);
 
     // TODO: The following will break if annotationLine doesn't exist when the component is mounted
-    if (annotationLine) {
-      g.select(`path.${styles['annotation-line']}`)
-        .datum(dataValueExtent.map(d => ({ date: annotationLine, value: d })))
+    if (annotationLineIndex != null) {
+      const selectedData = seriesData[annotationLineIndex];
+      const annotationGroup = g.select('g#annotation-group');
+      annotationGroup.select('path')
+        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
         .transition(t)
           .attr('d', lineGenerator);
+      annotationGroup.select('text')
+        .transition(t)
+          .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+          .text(this.numberFormatter(selectedData.value));
     }
   }
 

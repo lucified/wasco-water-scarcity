@@ -1,4 +1,3 @@
-import { bisectRight } from 'd3-array';
 import some = require('lodash/some');
 import * as React from 'react';
 
@@ -28,31 +27,15 @@ export default function ShortageLineChart({
   selectedTimeIndex,
   onTimeIndexChange,
 }: Props) {
-  const chartData: Data[] = [
-    {
-      label: dataLabel,
-      color: dataColor,
-      series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
-    },
-  ];
-  const selectedData = data[selectedTimeIndex];
+  const chartData: Data = {
+    label: dataLabel,
+    color: dataColor,
+    series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
+  };
 
-  if (some<{ value?: number; date: Date }>(chartData[0].series, d => d.value == null)) {
+  if (some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)) {
     console.warn(`Missing ${dataType} data for selected region`);
     return null;
-  }
-
-  function handleHover(hoveredTime: Date) {
-    const dataDates = data.map(d => new Date(d.startYear, 0, 1));
-    // All earlier times are to the left of this index. It should never be 0.
-    const newTimeIndex = bisectRight(dataDates, hoveredTime);
-
-    if (newTimeIndex < 1) {
-      console.error('Error while setting new time!');
-      return;
-    }
-
-    onTimeIndexChange!(newTimeIndex - 1);
   }
 
   return (
@@ -61,8 +44,8 @@ export default function ShortageLineChart({
       width={500}
       height={400}
       yAxisLabel={yAxisLabel}
-      annotationLine={toMidpoint(selectedData.startYear, selectedData.endYear)}
-      onHover={onTimeIndexChange && handleHover}
+      annotationLineIndex={selectedTimeIndex}
+      onHover={onTimeIndexChange}
     />
   );
 }
