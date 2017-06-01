@@ -89,7 +89,7 @@ const devConfig = {
     ],
   },
 
-  devtool: 'source-map',
+  devtool: 'eval-source-map',
 
   plugins: [
     // For awesome-typescript-loader's async error reporting, i.e. watch mode
