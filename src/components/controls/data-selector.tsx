@@ -29,20 +29,22 @@ class DataTypeSelector extends React.Component<StateProps & DispatchProps & Pass
 
   public render() {
     const caseSelection = this.props.dataType;
+    const dataTypes: Array<[DataType, string]> = [
+      ['blueWaterStress', 'Blue Water Stress'],
+      ['blueWaterShortage', 'Blue Water Shortage'],
+    ];
+
     return (
       <div className={classNames(this.props.className, styles['button-group'], styles.root)}>
-        <a
-          onClick={this.generateCaseClickCallback('blueWaterStress')}
-          className={classNames(styles.button, { [styles.selected]: caseSelection === 'blueWaterStress' })}
-        >
-          Blue Water Stress
-        </a>
-        <a
-          onClick={this.generateCaseClickCallback('blueWaterShortage')}
-          className={classNames(styles.button, { [styles.selected]: caseSelection === 'blueWaterShortage' })}
-        >
-          Blue Water Shortage
-        </a>
+        {dataTypes.map(([dataType, description]) => (
+          <a
+            key={`selector-${dataType}`}
+            onClick={this.generateCaseClickCallback(dataType)}
+            className={classNames(styles.button, { [styles.selected]: caseSelection === dataType })}
+          >
+            {description}
+          </a>
+        ))}
       </div>
     );
   }
