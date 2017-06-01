@@ -29,7 +29,7 @@ class StressLineChart extends React.Component<Props, void> {
       },
     ];
 
-    return <LineChart data={chartData} width={500} height={400} />;
+    return <LineChart data={chartData} width={500} height={400} yAxisLabel="Consumption / Availability" />;
   }
 }
 

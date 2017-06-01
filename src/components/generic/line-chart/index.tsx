@@ -31,6 +31,7 @@ interface PassedProps {
   className?: string;
   maxY?: number;
   minY?: number;
+  yAxisLabel?: string;
 }
 
 interface DefaultProps {
@@ -118,13 +119,27 @@ class LineChart extends React.Component<Props, void> {
   }
 
   public render() {
-    const { width, height, marginLeft, marginTop, marginBottom, className } = this.props as PropsWithDefaults;
+    const {
+      width,
+      height,
+      marginLeft,
+      marginTop,
+      marginBottom,
+      yAxisLabel,
+      className,
+    } = this.props as PropsWithDefaults;
 
     return (
       <svg width={width} height={height} className={className} ref={this.storeSvgRef}>
         <g id="maingroup" transform={`translate(${marginLeft},${marginTop})`}>
           <g id="xaxis" className={styles['x-axis']} transform={`translate(0,${height - marginTop - marginBottom})`} />
-          <g id="yaxis" className={styles['y-axis']} />
+          <g id="yaxis" className={styles['y-axis']}>
+            {yAxisLabel && (
+              <text transform="rotate(-90)" y="6" dy="0.71em" className={styles['y-axis-label']}>
+                {yAxisLabel}
+              </text>
+            )}
+          </g>
         </g>
       </svg>
     );
