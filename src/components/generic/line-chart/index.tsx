@@ -1,5 +1,6 @@
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
+import { format } from 'd3-format';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
 import { curveMonotoneX, line } from 'd3-shape';
@@ -62,6 +63,7 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
+  private numberFormatter = format('.2g');
 
   public componentDidMount() {
     this.drawChart();
@@ -108,12 +110,21 @@ class LineChart extends React.Component<Props, void> {
     g.select('g#y-axis').call(axisLeft(yScale));
 
     if (annotationLineIndex != null) {
-      g.append('g')
-        .attr('id', 'annotation-group')
-        .append('path')
-          .datum(dataValueExtent.map(d => ({ date: seriesData[annotationLineIndex].date, value: d })))
-          .attr('d', lineGenerator)
-          .attr('class', styles['annotation-line']);
+      const selectedData = seriesData[annotationLineIndex];
+      const annotationGroup = g.append('g')
+        .attr('id', 'annotation-group');
+
+      annotationGroup.append('path')
+        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
+        .attr('d', lineGenerator)
+        .attr('class', styles['annotation-line']);
+
+      annotationGroup.append('text')
+        .attr('class', styles['annotation-label'])
+        .attr('x', 9)
+        .attr('dy', '.35em')
+        .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+        .text(this.numberFormatter(selectedData.value));
     }
 
     const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
@@ -237,11 +248,16 @@ class LineChart extends React.Component<Props, void> {
 
     // TODO: The following will break if annotationLine doesn't exist when the component is mounted
     if (annotationLineIndex != null) {
+      const selectedData = seriesData[annotationLineIndex];
       const annotationGroup = g.select('g#annotation-group');
       annotationGroup.select('path')
-        .datum(dataValueExtent.map(d => ({ date: seriesData[annotationLineIndex].date, value: d })))
+        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
         .transition(t)
           .attr('d', lineGenerator);
+      annotationGroup.select('text')
+        .transition(t)
+          .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+          .text(this.numberFormatter(selectedData.value));
     }
   }
 
