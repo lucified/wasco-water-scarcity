@@ -1,9 +1,5 @@
 @import './definitions.scss';
 
-body {
-  font-family: $fontFamily !important;
-}
-
 :global {
   @import '~normalize.css/normalize';
   @import '~flexboxgrid/dist/flexboxgrid.min';
@@ -13,15 +9,18 @@ body {
     box-sizing: border-box;
   }
 
+  body {
+    font-family: $fontFamily !important;
+    height: 100%;
+    margin: 0;
+    overflow-y: scroll; // Always show scrollbar
+  }
+
   #content {
     height: 100%;
   }
 }
 
-body {
-  height: 100%;
-  margin: 0;
-}
 
 .root {
   display: flex;
