@@ -4,7 +4,13 @@ import values = require('lodash/values');
 import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
-import { Action, SET_SELECTED_REGION, SET_TIME_INDEX, TOGGLE_SELECTED_REGION } from '../actions';
+import {
+  Action,
+  SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_REGION,
+  SET_TIME_INDEX,
+  TOGGLE_SELECTED_REGION,
+} from '../actions';
 import { RawWaterDatum, TimeAggregate, toWaterDatum } from '../types';
 import { StateTree } from './types';
 
@@ -22,6 +28,7 @@ const defaultState: StateTree = {
   })),
   selections: {
     timeIndex: 0,
+    dataType: 'blueWaterStress',
   },
 };
 
@@ -58,6 +65,11 @@ export function selectionsReducer(state = initialState.selections, action: Actio
       return {
         ...state,
         region: action.id,
+      };
+    case SET_SELECTED_DATA_TYPE:
+      return {
+        ...state,
+        dataType: action.dataType,
       };
   }
 

@@ -82,3 +82,5 @@ export function toWaterDatum({
     population,
   };
 }
+
+export type DataType = keyof WaterDatum;

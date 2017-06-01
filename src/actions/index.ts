@@ -1,6 +1,9 @@
+import { DataType } from '../types';
 import {
+  SET_SELECTED_DATA_TYPE,
   SET_SELECTED_REGION,
   SET_TIME_INDEX,
+  SetSelectedDataTypeAction,
   SetSelectedRegionAction,
   SetTimeIndexAction,
   TOGGLE_SELECTED_REGION,
@@ -25,6 +28,13 @@ export function setSelectedRegion(id?: number): SetSelectedRegionAction {
   return {
     type: SET_SELECTED_REGION,
     id,
+  };
+}
+
+export function setSelectedDataType(dataType: DataType): SetSelectedDataTypeAction {
+  return {
+    type: SET_SELECTED_DATA_TYPE,
+    dataType,
   };
 }
 

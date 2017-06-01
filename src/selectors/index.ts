@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { StateTree } from '../reducers';
-import { TimeAggregate } from '../types';
+import { DataType, TimeAggregate } from '../types';
 
 export function getWaterData(state: StateTree): TimeAggregate[] {
   return state.waterData;
@@ -17,6 +17,10 @@ export function getSelectedTimeIndex(state: StateTree): number {
 
 export function getSelectedRegion(state: StateTree): number | undefined {
   return state.selections.region;
+}
+
+export function getSelectedDataType(state: StateTree): DataType {
+  return state.selections.dataType;
 }
 
 export const getTimeSeriesForSelectedRegion = createSelector(

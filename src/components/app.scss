@@ -9,6 +9,10 @@ body {
   @import '~flexboxgrid/dist/flexboxgrid.min';
   @import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&amp;subset=latin-ext,cyrillic,latin");
 
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
   #content {
     height: 100%;
   }

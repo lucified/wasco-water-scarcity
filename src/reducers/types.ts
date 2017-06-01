@@ -1,6 +1,6 @@
 import { RouterState } from 'react-router-redux';
 
-import { TimeAggregate } from '../types';
+import { DataType, TimeAggregate } from '../types';
 
 export interface StateTree {
   waterData: TimeAggregate[];
@@ -8,6 +8,7 @@ export interface StateTree {
   routing: RouterState;
   selections: {
     timeIndex: number;
+    dataType: DataType;
     region?: number;
   };
 }
