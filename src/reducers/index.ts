@@ -4,8 +4,15 @@ import values = require('lodash/values');
 import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
-import { Action, SET_SELECTED_REGION, SET_TIME_INDEX, TOGGLE_SELECTED_REGION } from '../actions';
-import { RawWaterDatum, StateTree, TimeAggregate, toWaterDatum } from './types';
+import {
+  Action,
+  SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_REGION,
+  SET_TIME_INDEX,
+  TOGGLE_SELECTED_REGION,
+} from '../actions';
+import { RawWaterDatum, TimeAggregate, toWaterDatum } from '../types';
+import { StateTree } from './types';
 
 let rawWaterData: RawWaterDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
 let yearlyGroupedData: RawWaterDatum[][] | null =
@@ -21,6 +28,7 @@ const defaultState: StateTree = {
   })),
   selections: {
     timeIndex: 0,
+    dataType: 'blueWaterStress',
   },
 };
 
@@ -37,10 +45,14 @@ export function dataReducer(state = initialState.waterData, _action: Action): Ti
 export function selectionsReducer(state = initialState.selections, action: Action) {
   switch (action.type) {
     case SET_TIME_INDEX:
-      return {
-        ...state,
-        timeIndex: action.value,
-      };
+      if (action.value !== state.timeIndex) {
+        return {
+          ...state,
+          timeIndex: action.value,
+        };
+      }
+
+      return state;
     case TOGGLE_SELECTED_REGION:
       if (state.region === action.id) {
         return {
@@ -54,10 +66,23 @@ export function selectionsReducer(state = initialState.selections, action: Actio
         region: action.id,
       };
     case SET_SELECTED_REGION:
-      return {
-        ...state,
-        region: action.id,
-      };
+      if (action.id !== state.region) {
+        return {
+          ...state,
+          region: action.id,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_DATA_TYPE:
+      if (action.dataType !== state.dataType) {
+        return {
+          ...state,
+          dataType: action.dataType,
+        };
+      }
+
+      return state;
   }
 
   return state;

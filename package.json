@@ -10,6 +10,7 @@
     "@types/d3-scale": "^1.0.9",
     "@types/d3-scale-chromatic": "^1.0.2",
     "@types/d3-selection": "^1.1.0",
+    "@types/d3-shape": "^1.2.0",
     "@types/d3-transition": "^1.1.0",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
@@ -60,6 +61,7 @@
     "d3-scale": "^1.0.6",
     "d3-scale-chromatic": "^1.1.1",
     "d3-selection": "^1.1.0",
+    "d3-shape": "^1.2.0",
     "d3-transition": "^1.1.0",
     "flexboxgrid": "^6.3.1",
     "history": "^4.6.1",
@@ -73,7 +75,7 @@
     "react-router": "^4.1.1",
     "react-router-redux": "next",
     "redux": "^3.6.0",
-    "reselect": "^3.0.0",
+    "reselect": "^3.0.1",
     "topojson": "^3.0.0"
   },
   "scripts": {

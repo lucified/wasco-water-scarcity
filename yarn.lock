@@ -29,6 +29,10 @@
   dependencies:
     "@types/geojson" "*"
 
+"@types/d3-path@*":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.6.tgz#c1a7d2dc07b295fdd1c84dabe4404df991b48693"
+
 "@types/d3-scale-chromatic@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@types/d3-scale-chromatic/-/d3-scale-chromatic-1.0.2.tgz#dded12e731f4d2dcf0861c62364eefe7c8d720d7"
@@ -42,6 +46,12 @@
 "@types/d3-selection@*", "@types/d3-selection@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-1.1.0.tgz#59b88f10d2cff7d9ffd7fe986b3aaef3de048224"
+
+"@types/d3-shape@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-1.2.0.tgz#520a12d3867e61d1fd49c75a8ffa7ce596cab43e"
+  dependencies:
+    "@types/d3-path" "*"
 
 "@types/d3-time@*":
   version "1.0.6"
@@ -1533,6 +1543,10 @@ d3-interpolate@1:
   dependencies:
     d3-color "1"
 
+d3-path@1:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/d3-path/-/d3-path-1.0.5.tgz#241eb1849bd9e9e8021c0d0a799f8a0e8e441764"
+
 d3-scale-chromatic@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/d3-scale-chromatic/-/d3-scale-chromatic-1.1.1.tgz#811406e8e09dab78a49dac4a32047d5d3edd0c44"
@@ -1554,6 +1568,12 @@ d3-scale@^1.0.6:
 d3-selection@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-1.1.0.tgz#1998684896488f839ca0372123da34f1d318809c"
+
+d3-shape@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/d3-shape/-/d3-shape-1.2.0.tgz#45d01538f064bafd05ea3d6d2cb748fd8c41f777"
+  dependencies:
+    d3-path "1"
 
 d3-time-format@2:
   version "2.0.5"
@@ -4686,7 +4706,7 @@ requires-port@1.0.x, requires-port@1.x.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
 
-reselect@^3.0.0:
+reselect@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-3.0.1.tgz#efdaa98ea7451324d092b2b2163a6a1d7a9a2147"
 

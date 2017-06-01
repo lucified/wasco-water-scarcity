@@ -1,6 +1,6 @@
 export interface WaterRegionFeature {
   geometry: any;
-  id: number;
+  id: number; // not used
   properties: {
     featureid: number;
   };

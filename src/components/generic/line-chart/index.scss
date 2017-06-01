@@ -1,0 +1,28 @@
+.x-axis path {
+  display: none;
+}
+
+.y-axis-label {
+  fill: black;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.annotation-line {
+  fill: none;
+  stroke: gray;
+  stroke-width: 1px;
+}
+
+.line-label {
+  font-size: 10px;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}

@@ -1,23 +1,26 @@
 @import './definitions.scss';
 
-body {
-  font-family: $fontFamily !important;
-}
-
 :global {
   @import '~normalize.css/normalize';
   @import '~flexboxgrid/dist/flexboxgrid.min';
   @import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&amp;subset=latin-ext,cyrillic,latin");
+
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: $fontFamily !important;
+    height: 100%;
+    margin: 0;
+    overflow-y: scroll; // Always show scrollbar
+  }
 
   #content {
     height: 100%;
   }
 }
 
-body {
-  height: 100%;
-  margin: 0;
-}
 
 .root {
   display: flex;
