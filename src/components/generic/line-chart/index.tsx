@@ -1,4 +1,4 @@
-import { extent, max, min } from 'd3-array';
+import { extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { select } from 'd3-selection';
@@ -20,6 +20,7 @@ export interface Data {
 }
 
 interface PassedProps {
+  // Each Data is a separate line
   data: Data[];
   width: number;
   height: number;
@@ -27,8 +28,9 @@ interface PassedProps {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  showZeroYAxis?: boolean;
   className?: string;
+  maxY?: number;
+  minY?: number;
 }
 
 interface DefaultProps {
@@ -63,13 +65,16 @@ class LineChart extends React.Component<Props, void> {
       marginLeft,
       marginRight,
       marginTop,
+      maxY,
+      minY,
       width,
       height,
       data,
-      showZeroYAxis,
     } = this.props as PropsWithDefaults;
 
     const allData = flatten(data.map(d => d.series));
+    const dataValueExtent = extent(allData, d => d.value) as [number, number];
+
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#maingroup');
@@ -78,10 +83,7 @@ class LineChart extends React.Component<Props, void> {
       .domain(extent(allData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
-      .domain([
-        showZeroYAxis ? 0 : (min(allData, d => d.value) as number),
-        max(allData, d => d.value) as number,
-      ])
+      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
