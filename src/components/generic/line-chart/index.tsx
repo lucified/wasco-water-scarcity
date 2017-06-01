@@ -1,7 +1,7 @@
 import { extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { scaleLinear, scaleTime } from 'd3-scale';
-import { select } from 'd3-selection';
+import { mouse, select } from 'd3-selection';
 import { curveBasis, line } from 'd3-shape';
 import { transition } from 'd3-transition';
 import flatten = require('lodash/flatten');
@@ -34,6 +34,7 @@ interface PassedProps {
   minY?: number;
   yAxisLabel?: string;
   annotationLine?: Date;
+  onHover?: (hoveredDate: Date) => void;
 }
 
 interface DefaultProps {
@@ -58,6 +59,7 @@ class LineChart extends React.Component<Props, void> {
     super(props);
 
     this.storeSvgRef = this.storeSvgRef.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
   }
 
   private svgRef?: SVGElement;
@@ -131,6 +133,29 @@ class LineChart extends React.Component<Props, void> {
       .attr('dy', '0.35em')
       .attr('class', styles['line-label'])
       .text(d => d.label);
+
+    // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
+    lineGroup.append('rect')
+      .attr('class', styles.overlay)
+      .attr('width', chartWidth)
+      .attr('height', chartHeight)
+      .on('mousemove', this.handleMouseMove);
+  }
+
+  private handleMouseMove() {
+    const { data, width, marginLeft, marginRight, onHover } = this.props as PropsWithDefaults;
+
+    if (onHover) {
+      // TODO: don't regenerate data and scale on each handling
+      const allData = flatten(data.map(d => d.series));
+      const chartWidth = width - marginLeft - marginRight;
+      const xScale = scaleTime<number, number>()
+        .domain(extent(allData, d => d.date) as [Date, Date])
+        .range([0, chartWidth]);
+      const lineGroup = select(this.svgRef!).select<SVGGElement>('g#line-group');
+
+      onHover(xScale.invert(mouse(lineGroup.node() as any)[0]));
+    }
   }
 
   private redrawChart() {
