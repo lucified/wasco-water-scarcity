@@ -116,12 +116,12 @@ class LineChart extends React.Component<Props, void> {
   }
 
   public render() {
-    const { width, height, marginLeft, marginTop, className } = this.props as PropsWithDefaults;
+    const { width, height, marginLeft, marginTop, marginBottom, className } = this.props as PropsWithDefaults;
 
     return (
       <svg width={width} height={height} className={className} ref={this.storeSvgRef}>
         <g id="maingroup" transform={`translate(${marginLeft},${marginTop})`}>
-          <g id="xaxis" className={styles['x-axis']} transform={`translate(0,${height})`} />
+          <g id="xaxis" className={styles['x-axis']} transform={`translate(0,${height - marginTop - marginBottom})`} />
           <g id="yaxis" className={styles['y-axis']} />
         </g>
       </svg>
