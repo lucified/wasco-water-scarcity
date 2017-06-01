@@ -1,12 +1,13 @@
 declare module 'd3-scale-chromatic' {
   const schemeReds: string[][];
   const schemeBlues: string[][];
+  const schemePurples: string[][];
 }
 
 import { axisBottom } from 'd3-axis';
 import { geoGraticule, geoPath } from 'd3-geo';
-import { scaleLinear, scaleThreshold } from 'd3-scale';
-import { schemeReds } from 'd3-scale-chromatic';
+import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
+import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
@@ -16,8 +17,8 @@ import { feature, mesh } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
-import { getSelectedData, getSelectedRegion, getWaterData } from '../../selectors';
-import { TimeAggregate, WaterDatum } from '../../types';
+import { getSelectedData, getSelectedDataType, getSelectedRegion, getWaterData } from '../../selectors';
+import { DataType, TimeAggregate, WaterDatum } from '../../types';
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
@@ -33,6 +34,7 @@ interface GeneratedStateProps {
   selectedData: TimeAggregate;
   allData: TimeAggregate[];
   selectedRegion?: number;
+  selectedDataType: DataType;
 }
 
 interface GeneratedDispatchProps {
@@ -42,7 +44,35 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
-const waterPropertySelector = (d: WaterDatum): number | undefined => d.blueWaterStress;
+const waterPropertySelector = (d: WaterDatum, dataType: DataType): number | undefined => d[dataType];
+
+interface DataTypeParamter {
+  dataType: DataType;
+  label: string;
+  thresholds: number[];
+  colorScale: ScaleThreshold<number, string>;
+}
+
+const stressThresholds = [0.2, 0.4, 1];
+const shortageThresholds = [500, 1000, 1700]; // Note: higher is better. Colors are reversed below
+const allDataTypeParameters: DataTypeParamter[] = [
+  {
+    dataType: 'blueWaterStress',
+    label: 'Water Stress',
+    thresholds: stressThresholds,
+    colorScale: scaleThreshold<number, string>()
+      .domain(stressThresholds)
+      .range(['#D2E3E5', ...schemeReds[stressThresholds.length + 1].slice(1)]),
+  },
+  {
+    dataType: 'blueWaterShortage',
+    label: 'Water Shortage',
+    thresholds: shortageThresholds,
+    colorScale: scaleThreshold<number, string>()
+      .domain(shortageThresholds)
+      .range(['#D2E3E5', ...schemePurples[shortageThresholds.length + 1].slice(1)].reverse()),
+  },
+];
 
 class Map extends React.Component<Props, void> {
   constructor(props: Props) {
@@ -55,10 +85,6 @@ class Map extends React.Component<Props, void> {
   private svgRef?: SVGElement;
   private width = 1200;
   private height = this.width / 1.7;
-  private thresholds = [0.2, 0.4, 1];
-  private colorScale = scaleThreshold<number, string>()
-    .domain(this.thresholds)
-    .range(['#D2E3E5', ...schemeReds[this.thresholds.length + 1].slice(1)]);
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
@@ -117,18 +143,27 @@ class Map extends React.Component<Props, void> {
   }
 
   private drawLegend() {
+    const { selectedDataType } = this.props;
+    const dataTypeParameters = allDataTypeParameters.find(d => d.dataType === selectedDataType);
+    if (!dataTypeParameters) {
+      console.error('Unknown data type!', selectedDataType);
+      return;
+    }
+    const { colorScale, thresholds } = dataTypeParameters;
+
     // Based on https://bl.ocks.org/mbostock/4060606
     const width = 200;
     const svg = select<SVGElement, undefined>(this.svgRef!);
 
+    const maxThreshold = thresholds[thresholds.length - 1];
     const xScale = scaleLinear()
-      .domain([0, this.thresholds[this.thresholds.length - 1] + 1])
+      .domain([0, 2 * maxThreshold])
       .rangeRound([0, width]);
     const g = svg.select<SVGGElement>('g#legend');
 
     g.selectAll('rect')
-      .data(this.colorScale.range().map(d => {
-          const colorExtent = this.colorScale.invertExtent(d);
+      .data(colorScale.range().map(d => {
+          const colorExtent = colorScale.invertExtent(d);
           if (colorExtent[0] == null) {
             colorExtent[0] = xScale.domain()[0];
           }
@@ -142,11 +177,54 @@ class Map extends React.Component<Props, void> {
         .attr('height', 8)
         .attr('x', d => xScale(d[0]))
         .attr('width', d => xScale(d[1]) - xScale(d[0]))
-        .attr('fill', d => this.colorScale(d[0]));
+        .attr('fill', d => colorScale(d[0]));
 
     g.call(axisBottom(xScale)
         .tickSize(13)
-        .tickValues(this.colorScale.domain()))
+        .tickValues(colorScale.domain()))
+      .select('.domain')
+        .remove();
+  }
+
+  private redrawLegend() {
+    const { selectedDataType } = this.props;
+    const dataTypeParameters = allDataTypeParameters.find(d => d.dataType === selectedDataType);
+    if (!dataTypeParameters) {
+      console.error('Unknown data type!', selectedDataType);
+      return;
+    }
+    const { colorScale, thresholds } = dataTypeParameters;
+
+    // Based on https://bl.ocks.org/mbostock/4060606
+    const width = 200;
+    const svg = select<SVGElement, undefined>(this.svgRef!);
+
+    const maxThreshold = thresholds[thresholds.length - 1];
+    const xScale = scaleLinear()
+      .domain([0, 2 * maxThreshold])
+      .rangeRound([0, width]);
+    const g = svg.select<SVGGElement>('g#legend');
+
+    // TODO: things probably screw up if we have different amounts of thresholds
+    g.selectAll('rect')
+      .data(colorScale.range().map(d => {
+          const colorExtent = colorScale.invertExtent(d);
+          if (colorExtent[0] == null) {
+            colorExtent[0] = xScale.domain()[0];
+          }
+          if (colorExtent[1] == null) {
+            colorExtent[1] = xScale.domain()[1];
+          }
+
+          return colorExtent as [number, number];
+        }))
+      .attr('x', d => xScale(d[0]))
+      .attr('width', d => xScale(d[1]) - xScale(d[0]))
+      .attr('fill', d => colorScale(d[0]));
+
+    g.call(axisBottom(xScale)
+        .tickSize(13)
+        .tickValues(colorScale.domain()))
       .select('.domain')
         .remove();
   }
@@ -156,9 +234,11 @@ class Map extends React.Component<Props, void> {
   }
 
   private getColorForWaterRegion(featureId: number): string {
-    const { data } = this.props.selectedData;
-    const value = waterPropertySelector(data[featureId]);
-    return value != null ? this.colorScale(value) : '#807775';
+    const { selectedDataType, selectedData: { data } } = this.props;
+    const dataTypeParameters =
+      allDataTypeParameters.find(d => d.dataType === selectedDataType) || allDataTypeParameters[0];
+    const value = waterPropertySelector(data[featureId], selectedDataType);
+    return value != null ? dataTypeParameters.colorScale(value) : '#807775';
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -167,6 +247,11 @@ class Map extends React.Component<Props, void> {
       prevProps.selectedRegion !== this.props.selectedRegion
     ) {
       this.redrawFillsAndBorders();
+    }
+
+    if (prevProps.selectedDataType !== this.props.selectedDataType) {
+      this.redrawFillsAndBorders();
+      this.redrawLegend();
     }
   }
 
@@ -183,6 +268,13 @@ class Map extends React.Component<Props, void> {
   }
 
   public render() {
+    const { selectedDataType } = this.props;
+    const dataTypeParameters = allDataTypeParameters.find(d => d.dataType === selectedDataType);
+    if (!dataTypeParameters) {
+      console.error('Unknown data type!', selectedDataType);
+      return null;
+    }
+
     return (
       <div className="container">
         <svg ref={this.saveSvgRef}>
@@ -202,7 +294,7 @@ class Map extends React.Component<Props, void> {
           <g id="water-regions" clipPath="url(#clip)" />
           <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 80})`}>
             <text className={styles['legend-caption']} x="0" y="-6">
-              Water stress
+              {dataTypeParameters.label}
             </text>
           </g>
         </svg>
@@ -216,6 +308,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     allData: getWaterData(state),
     selectedData: getSelectedData(state),
     selectedRegion: getSelectedRegion(state),
+    selectedDataType: getSelectedDataType(state),
   };
 }
 
