@@ -26,8 +26,6 @@ export default function ShortageLineChart({
   yAxisLabel,
   selectedTimeIndex,
 }: Props) {
-  console.log('rendering DataLineChart for');
-
   const chartData: Data[] = [
     {
       label: dataLabel,
