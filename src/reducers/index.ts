@@ -45,10 +45,14 @@ export function dataReducer(state = initialState.waterData, _action: Action): Ti
 export function selectionsReducer(state = initialState.selections, action: Action) {
   switch (action.type) {
     case SET_TIME_INDEX:
-      return {
-        ...state,
-        timeIndex: action.value,
-      };
+      if (action.value !== state.timeIndex) {
+        return {
+          ...state,
+          timeIndex: action.value,
+        };
+      }
+
+      return state;
     case TOGGLE_SELECTED_REGION:
       if (state.region === action.id) {
         return {
@@ -62,15 +66,23 @@ export function selectionsReducer(state = initialState.selections, action: Actio
         region: action.id,
       };
     case SET_SELECTED_REGION:
-      return {
-        ...state,
-        region: action.id,
-      };
+      if (action.id !== state.region) {
+        return {
+          ...state,
+          region: action.id,
+        };
+      }
+
+      return state;
     case SET_SELECTED_DATA_TYPE:
-      return {
-        ...state,
-        dataType: action.dataType,
-      };
+      if (action.dataType !== state.dataType) {
+        return {
+          ...state,
+          dataType: action.dataType,
+        };
+      }
+
+      return state;
   }
 
   return state;
