@@ -1,3 +1,4 @@
+import { bisectRight } from 'd3-array';
 import some = require('lodash/some');
 import * as React from 'react';
 
@@ -25,6 +26,7 @@ export default function ShortageLineChart({
   dataColor,
   yAxisLabel,
   selectedTimeIndex,
+  onTimeIndexChange,
 }: Props) {
   const chartData: Data[] = [
     {
@@ -40,6 +42,19 @@ export default function ShortageLineChart({
     return null;
   }
 
+  function handleHover(hoveredTime: Date) {
+    const dataDates = data.map(d => new Date(d.startYear, 0, 1));
+    // All earlier times are to the left of this index. It should never be 0.
+    const newTimeIndex = bisectRight(dataDates, hoveredTime);
+
+    if (newTimeIndex < 1) {
+      console.error('Error while setting new time!');
+      return;
+    }
+
+    onTimeIndexChange!(newTimeIndex - 1);
+  }
+
   return (
     <LineChart
       data={chartData}
@@ -47,6 +62,7 @@ export default function ShortageLineChart({
       height={400}
       yAxisLabel={yAxisLabel}
       annotationLine={toMidpoint(selectedData.startYear, selectedData.endYear)}
+      onHover={onTimeIndexChange && handleHover}
     />
   );
 }
