@@ -287,7 +287,7 @@ class Map extends React.Component<Props, void> {
             <path className={styles.graticule} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
-          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 160})`}>
+          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - (this.height/4.5)})`}>
             <text className={styles['legend-caption']} x="0" y="-6">
               {dataTypeParameters.label}
             </text>
