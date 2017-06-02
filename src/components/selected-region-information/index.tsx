@@ -51,26 +51,28 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       <div className="col-xs-12 col-md-6 col-lg-3">
         <div className="column">
           <div>
-            <h4>Blue water stress</h4>
-            <p>Consumption / Availability</p>
+            <h4 className={styles.heading}>Blue water stress</h4>
+            <p className={styles.description}>Consumption / Availability</p>
             <DataLineChart
               dataType="blueWaterStress"
               dataColor="red"
               thresholds={stressThresholds}
               thresholdColors={['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]}
+              dataLabel=""
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
           <div>
-            <h4>Blue water shortage</h4>
-            <p>Availability per person (m³)</p>
+            <h4 className={styles.heading}>Blue water shortage</h4>
+            <p className={styles.description}>Availability per person (m³)</p>
             <DataLineChart
               dataType="blueWaterShortage"
               dataColor="purple"
               thresholds={shortageThresholds}
               thresholdColors={['none', ...schemePurples[shortageThresholds!.length + 1].slice(1)].reverse()}
+              dataLabel=""
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
