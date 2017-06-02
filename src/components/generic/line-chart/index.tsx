@@ -3,7 +3,7 @@ import { axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
 import { scaleLinear, ScaleThreshold, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
-import { curveMonotoneX, line } from 'd3-shape';
+import { curveLinear, line } from 'd3-shape';
 import { transition } from 'd3-transition';
 import * as React from 'react';
 
@@ -103,7 +103,7 @@ class LineChart extends React.Component<Props, void> {
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
-      .curve(curveMonotoneX)
+      .curve(curveLinear)
       .x(d => xScale(d.date))
       .y(d => yScale(d.value));
 
@@ -248,7 +248,7 @@ class LineChart extends React.Component<Props, void> {
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
-      .curve(curveMonotoneX)
+      .curve(curveLinear)
       .x(d => xScale(d.date))
       .y(d => yScale(d.value));
 
