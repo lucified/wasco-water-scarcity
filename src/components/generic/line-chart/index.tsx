@@ -63,7 +63,7 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private numberFormatter = format('.2g');
+  private numberFormatter = format('.3g');
 
   public componentDidMount() {
     this.drawChart();
