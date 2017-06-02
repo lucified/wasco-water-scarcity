@@ -13,6 +13,8 @@ import { getDataTypeThresholds, WaterDatum } from '../../types';
 // import PopulationChart from './population-chart';
 import DataLineChart from './data-line-chart';
 
+const styles = require('./index.scss');
+
 interface GeneratedStateProps {
   selectedTimeIndex: number;
   timeSeriesForSelectedRegion?: WaterDatum[];
@@ -46,29 +48,29 @@ class SelectedRegionInformation extends React.Component<Props, void> {
     const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
 
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-12 col-md-6">
+      <div className="col-xs-12 col-md-6 col-lg-3">
+        <div className="column">
+          <div>
+            <h4>Blue water stress</h4>
+            <p>Consumption / Availability</p>
             <DataLineChart
               dataType="blueWaterStress"
-              dataLabel="Stress"
               dataColor="red"
               thresholds={stressThresholds}
               thresholdColors={['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]}
-              yAxisLabel="Consumption / Availability"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
-          <div className="col-xs-12 col-md-6">
+          <div>
+            <h4>Blue water shortage</h4>
+            <p>Availability per person (m³)</p>
             <DataLineChart
               dataType="blueWaterShortage"
-              dataLabel="Shortage"
               dataColor="purple"
               thresholds={shortageThresholds}
               thresholdColors={['none', ...schemePurples[shortageThresholds!.length + 1].slice(1)].reverse()}
-              yAxisLabel="Availability per capita (m³)"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}

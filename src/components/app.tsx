@@ -18,9 +18,11 @@ class App extends React.Component<Props, void> {
       <div className={styles.root}>
         <Header />
         <Controls />
-        <div className={styles.content}>
-          <Map />
-          <SelectedRegionInformation />
+        <div className="container">
+          <div className="row">
+            <Map />
+            <SelectedRegionInformation />
+          </div>
         </div>
         <div className={styles.footer} />
       </div>

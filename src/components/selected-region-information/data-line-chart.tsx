@@ -52,12 +52,15 @@ export default function ShortageLineChart({
   return (
     <LineChart
       data={chartData}
-      width={500}
-      height={400}
+      width={270}
+      height={120}
       yAxisLabel={yAxisLabel}
       annotationLineIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
+      marginRight={0}
+      marginTop={5}
+      marginLeft={40}
     />
   );
 }
