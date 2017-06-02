@@ -1,7 +1,7 @@
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
-import { scaleLinear, scaleTime } from 'd3-scale';
+import { scaleLinear, ScaleThreshold, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
 import { curveMonotoneX, line } from 'd3-shape';
 import { transition } from 'd3-transition';
@@ -21,7 +21,6 @@ export interface Data {
 }
 
 interface PassedProps {
-  // Each Data is a separate line
   data: Data;
   width: number;
   height: number;
@@ -35,6 +34,7 @@ interface PassedProps {
   yAxisLabel?: string;
   annotationLineIndex?: number;
   onHover?: (hoveredIndex: number) => void;
+  backgroundColorScale?: ScaleThreshold<number, string>;
 }
 
 interface DefaultProps {
@@ -63,7 +63,7 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private numberFormatter = format('.2g');
+  private numberFormatter = format('.3g');
 
   public componentDidMount() {
     this.drawChart();
@@ -84,6 +84,7 @@ class LineChart extends React.Component<Props, void> {
       width,
       height,
       annotationLineIndex,
+      backgroundColorScale,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -105,6 +106,30 @@ class LineChart extends React.Component<Props, void> {
       .curve(curveMonotoneX)
       .x(d => xScale(d.date))
       .y(d => yScale(d.value));
+
+    if (backgroundColorScale) {
+      const backgroundColorsGroup = g.append('g')
+        .attr('id', 'background-colors');
+      const thresholds = backgroundColorScale.domain();
+      const colorAreaLowerBounds = [
+        dataValueExtent[0],
+        ...thresholds.filter(d => d > dataValueExtent[0] && d <= dataValueExtent[1]),
+      ];
+      const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
+        lowerBound,
+        upperBound: colorAreaLowerBounds[i + 1] || dataValueExtent[1],
+      }));
+      backgroundColorsGroup.selectAll('rect')
+        .data(colorAreas)
+        .enter()
+          .append('rect')
+          .attr('class', styles['background-colors'])
+          .attr('x', 0)
+          .attr('y', d => yScale(d.upperBound))
+          .attr('width', chartWidth)
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('fill', d => backgroundColorScale(d.lowerBound));
+    }
 
     g.select('g#x-axis').call(axisBottom(xScale));
     g.select('g#y-axis').call(axisLeft(yScale));
@@ -203,6 +228,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
+      backgroundColorScale,
       annotationLineIndex,
       data,
     } = this.props as PropsWithDefaults;
@@ -227,6 +253,35 @@ class LineChart extends React.Component<Props, void> {
       .y(d => yScale(d.value));
 
     const t = transition('linechart').duration(100);
+
+    if (backgroundColorScale) {
+      const backgroundColorsGroup = g.select('g#background-colors');
+      const thresholds = backgroundColorScale.domain();
+      const colorAreaLowerBounds = [
+        dataValueExtent[0],
+        ...thresholds.filter(d => d > dataValueExtent[0] && d <= dataValueExtent[1]),
+      ];
+      const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
+        lowerBound,
+        upperBound: colorAreaLowerBounds[i + 1] || dataValueExtent[1],
+      }));
+      const colorRects = backgroundColorsGroup.selectAll('rect')
+        .data(colorAreas);
+      colorRects.enter()
+          .append('rect')
+          .attr('class', styles['background-colors'])
+          .attr('x', 0)
+          .attr('y', d => yScale(d.upperBound))
+          .attr('width', chartWidth)
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('fill', d => backgroundColorScale(d.lowerBound));
+      colorRects
+        .transition(t)
+          .attr('y', d => yScale(d.upperBound))
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('fill', d => backgroundColorScale(d.lowerBound));
+      colorRects.exit().remove();
+    }
 
     g.select('g#x-axis').transition(t)
       .call(axisBottom(xScale) as any);

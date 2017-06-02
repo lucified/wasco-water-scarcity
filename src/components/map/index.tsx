@@ -1,9 +1,3 @@
-declare module 'd3-scale-chromatic' {
-  const schemeReds: string[][];
-  const schemeBlues: string[][];
-  const schemePurples: string[][];
-}
-
 import { axisBottom } from 'd3-axis';
 import { geoGraticule, geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
@@ -18,7 +12,7 @@ import { feature, mesh } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import { getSelectedData, getSelectedDataType, getSelectedRegion, getWaterData } from '../../selectors';
-import { DataType, TimeAggregate, WaterDatum } from '../../types';
+import { DataType, getDataTypeThresholds, TimeAggregate, WaterDatum } from '../../types';
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
@@ -53,8 +47,8 @@ interface DataTypeParamter {
   colorScale: ScaleThreshold<number, string>;
 }
 
-const stressThresholds = [0.2, 0.4, 1];
-const shortageThresholds = [500, 1000, 1700]; // Note: higher is better. Colors are reversed below
+const stressThresholds = getDataTypeThresholds('blueWaterStress')!;
+const shortageThresholds = getDataTypeThresholds('blueWaterShortage')!;
 const allDataTypeParameters: DataTypeParamter[] = [
   {
     dataType: 'blueWaterStress',
@@ -70,6 +64,7 @@ const allDataTypeParameters: DataTypeParamter[] = [
     thresholds: shortageThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(shortageThresholds)
+      // Note: higher is better. Colors are reversed.
       .range(['#D2E3E5', ...schemePurples[shortageThresholds.length + 1].slice(1)].reverse()),
   },
 ];
