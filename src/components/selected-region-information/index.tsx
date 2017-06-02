@@ -1,3 +1,4 @@
+import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -5,7 +6,7 @@ import { Dispatch } from 'redux';
 import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
 import { getSelectedTimeIndex, getTimeSeriesForSelectedRegion } from '../../selectors';
-import { WaterDatum } from '../../types';
+import { getDataTypeThresholds, WaterDatum } from '../../types';
 
 // import AvailabilityChart from './availability-chart';
 // import ConsumptionChart from './consumption-chart';
@@ -41,6 +42,9 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       return null;
     }
 
+    const stressThresholds = getDataTypeThresholds('blueWaterStress');
+    const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+
     return (
       <div className="container">
         <div className="row">
@@ -49,6 +53,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataType="blueWaterStress"
               dataLabel="Stress"
               dataColor="red"
+              thresholds={stressThresholds}
+              thresholdColors={['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]}
               yAxisLabel="Consumption / Availability"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
@@ -60,6 +66,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataType="blueWaterShortage"
               dataLabel="Shortage"
               dataColor="purple"
+              thresholds={shortageThresholds}
+              thresholdColors={['none', ...schemePurples[shortageThresholds!.length + 1].slice(1)].reverse()}
               yAxisLabel="Availability per capita (m³)"
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}

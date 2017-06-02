@@ -1,3 +1,4 @@
+import { scaleThreshold } from 'd3-scale';
 import some = require('lodash/some');
 import * as React from 'react';
 
@@ -10,6 +11,8 @@ interface PassedProps {
   dataType: DataType;
   dataLabel: string;
   dataColor: string;
+  thresholds?: number[];
+  thresholdColors?: string[];
   yAxisLabel: string;
   data: WaterDatum[];
   selectedTimeIndex: number;
@@ -23,6 +26,8 @@ export default function ShortageLineChart({
   dataLabel,
   dataType,
   dataColor,
+  thresholds,
+  thresholdColors,
   yAxisLabel,
   selectedTimeIndex,
   onTimeIndexChange,
@@ -32,6 +37,12 @@ export default function ShortageLineChart({
     color: dataColor,
     series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
   };
+  let backgroundColorScale;
+  if (thresholds && thresholdColors) {
+    backgroundColorScale = scaleThreshold<number, string>()
+      .domain(thresholds)
+      .range(thresholdColors);
+  }
 
   if (some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)) {
     console.warn(`Missing ${dataType} data for selected region`);
@@ -46,6 +57,7 @@ export default function ShortageLineChart({
       yAxisLabel={yAxisLabel}
       annotationLineIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
+      backgroundColorScale={backgroundColorScale}
     />
   );
 }

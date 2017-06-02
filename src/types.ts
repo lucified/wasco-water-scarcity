@@ -84,3 +84,14 @@ export function toWaterDatum({
 }
 
 export type DataType = keyof WaterDatum;
+export function getDataTypeThresholds(dataType: DataType) {
+  switch (dataType) {
+    case 'blueWaterStress':
+      return [0.2, 0.4, 1];
+    case 'blueWaterShortage':
+      return [500, 1000, 1700]; // Note: higher is better.
+  }
+
+  console.warn('No thresholds availables for', dataType);
+  return undefined;
+}
