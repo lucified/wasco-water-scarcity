@@ -7,6 +7,8 @@ import { toMidpoint } from '../../utils';
 
 import LineChart, { Data } from '../generic/line-chart';
 
+const styles = require('./data-line-chart.scss');
+
 interface PassedProps {
   dataType: DataType;
   dataLabel?: string;
@@ -51,6 +53,7 @@ export default function ShortageLineChart({
 
   return (
     <LineChart
+      className={styles.chart}
       data={chartData}
       width={270}
       height={120}
