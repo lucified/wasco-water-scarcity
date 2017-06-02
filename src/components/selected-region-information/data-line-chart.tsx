@@ -9,11 +9,11 @@ import LineChart, { Data } from '../generic/line-chart';
 
 interface PassedProps {
   dataType: DataType;
-  dataLabel: string;
+  dataLabel?: string;
   dataColor: string;
   thresholds?: number[];
   thresholdColors?: string[];
-  yAxisLabel: string;
+  yAxisLabel?: string;
   data: WaterDatum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;

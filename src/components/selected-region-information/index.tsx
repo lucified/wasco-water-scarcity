@@ -58,7 +58,6 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataColor="red"
               thresholds={stressThresholds}
               thresholdColors={['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]}
-              dataLabel=""
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
@@ -72,7 +71,6 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataColor="purple"
               thresholds={shortageThresholds}
               thresholdColors={['none', ...schemePurples[shortageThresholds!.length + 1].slice(1)].reverse()}
-              dataLabel=""
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
