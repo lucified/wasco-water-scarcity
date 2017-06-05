@@ -26,7 +26,7 @@ import {
 import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
-const geoNaturalEarth2 = require('d3-geo-projection').geoNaturalEarth2;
+const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 // From https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-50m.json
 const world = require('../../../data/world-50m.json');
