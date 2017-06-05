@@ -15,9 +15,9 @@ import { RawWaterDatum, TimeAggregate, toWaterDatum } from '../types';
 import { StateTree } from './types';
 
 let rawWaterData: RawWaterDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
-let yearlyGroupedData: RawWaterDatum[][] | null =
-  values(groupBy(rawWaterData!, ({ startYear }) => startYear))
-    .sort((a, b) => a[0].startYear - b[0].startYear);
+let yearlyGroupedData: RawWaterDatum[][] | null = values(
+  groupBy(rawWaterData!, ({ startYear }) => startYear),
+).sort((a, b) => a[0].startYear - b[0].startYear);
 
 const defaultState: StateTree = {
   routing: {} as any,
@@ -38,11 +38,17 @@ yearlyGroupedData = null;
 
 export const initialState = defaultState;
 
-export function dataReducer(state = initialState.waterData, _action: Action): TimeAggregate[] {
+export function dataReducer(
+  state = initialState.waterData,
+  _action: Action,
+): TimeAggregate[] {
   return state;
 }
 
-export function selectionsReducer(state = initialState.selections, action: Action) {
+export function selectionsReducer(
+  state = initialState.selections,
+  action: Action,
+) {
   switch (action.type) {
     case SET_TIME_INDEX:
       if (action.value !== state.timeIndex) {

@@ -25,7 +25,7 @@ export interface SetSelectedDataTypeAction {
 }
 
 export type Action =
-  SetSelectedDataTypeAction |
-  SetSelectedRegionAction |
-  SetTimeIndexAction |
-  ToggleSelectedRegionAction;
+  | SetSelectedDataTypeAction
+  | SetSelectedRegionAction
+  | SetTimeIndexAction
+  | ToggleSelectedRegionAction;

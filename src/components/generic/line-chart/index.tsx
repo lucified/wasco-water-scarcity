@@ -89,17 +89,22 @@ class LineChart extends React.Component<Props, void> {
     } = this.props as PropsWithDefaults;
 
     const seriesData = data.series;
-    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
+    const dataValueExtent = extent(seriesData, d => d.value) as [
+      number,
+      number
+    ];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
-    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
+    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+      'g#main-group',
+    );
 
     const xScale = scaleTime<number, number>()
       .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
-      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
+      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
@@ -108,18 +113,23 @@ class LineChart extends React.Component<Props, void> {
       .y(d => yScale(d.value));
 
     if (backgroundColorScale) {
-      const backgroundColorsGroup = g.append('g')
+      const backgroundColorsGroup = g
+        .append('g')
         .attr('id', 'background-colors');
       const thresholds = backgroundColorScale.domain();
       const colorAreaLowerBounds = [
         dataValueExtent[0],
-        ...thresholds.filter(d => d > dataValueExtent[0] && d <= dataValueExtent[1]),
+        ...thresholds.filter(
+          d => d > dataValueExtent[0] && d <= dataValueExtent[1],
+        ),
       ];
       const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
         lowerBound,
         upperBound: colorAreaLowerBounds[i + 1] || dataValueExtent[1],
       }));
-      backgroundColorsGroup.selectAll('rect')
+      // prettier-ignore
+      backgroundColorsGroup
+        .selectAll('rect')
         .data(colorAreas)
         .enter()
           .append('rect')
@@ -136,36 +146,61 @@ class LineChart extends React.Component<Props, void> {
 
     if (annotationLineIndex != null) {
       const selectedData = seriesData[annotationLineIndex];
-      const annotationGroup = g.append('g')
-        .attr('id', 'annotation-group');
+      const annotationGroup = g.append('g').attr('id', 'annotation-group');
 
-      annotationGroup.append('path')
-        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
+      annotationGroup
+        .append('path')
+        .datum(
+          dataValueExtent.map(d => ({ date: selectedData.date, value: d })),
+        )
         .attr('d', lineGenerator)
         .attr('class', styles['annotation-line']);
 
-      annotationGroup.append('text')
+      annotationGroup
+        .append('text')
         .attr('class', styles['annotation-label'])
         .attr('x', 9)
         .attr('dy', '.35em')
-        .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+        .attr(
+          'transform',
+          `translate(${xScale(selectedData.date)},${yScale(
+            selectedData.value,
+          )})`,
+        )
         .text(this.numberFormatter(selectedData.value));
     }
 
-    const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
+    // prettier-ignore
+    const lineGroup = g
+      .selectAll<
+        SVGGElement,
+        { label: string; color: string; series: Datum[] }
+      >('g#line-group')
       .data([data])
-      .enter().append('g')
+      .enter()
+        .append('g')
         .attr('id', 'line-group');
 
-    lineGroup.append('path')
+    lineGroup
+      .append('path')
       .attr('class', styles.line)
       .attr('d', d => lineGenerator(d.series))
       .style('stroke', d => d.color);
 
     if (data.label) {
-      lineGroup.append('text')
-        .datum(d => ({ label: d.label, lastDatum: d.series[d.series.length - 1] }))
-        .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
+      lineGroup
+        .append('text')
+        .datum(d => ({
+          label: d.label,
+          lastDatum: d.series[d.series.length - 1],
+        }))
+        .attr(
+          'transform',
+          d =>
+            `translate(${xScale(d.lastDatum.date)},${yScale(
+              d.lastDatum.value,
+            )}`,
+        )
         .attr('x', 3)
         .attr('dy', '0.35em')
         .attr('class', styles['line-label'])
@@ -173,7 +208,8 @@ class LineChart extends React.Component<Props, void> {
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
-    lineGroup.append('rect')
+    lineGroup
+      .append('rect')
       .attr('class', styles.overlay)
       .attr('width', chartWidth)
       .attr('height', chartHeight)
@@ -183,7 +219,7 @@ class LineChart extends React.Component<Props, void> {
   private findClosestIndex(date: Date) {
     const { data } = this.props as PropsWithDefaults;
 
-    // TODO: make this more efficient
+    // TODO: make this more efficient?
     const dataDates = data.series.map(d => d.date);
     // All earlier times are to the left of this index. It should never be 0.
     const indexOnRight = bisectRight(dataDates, date);
@@ -198,7 +234,10 @@ class LineChart extends React.Component<Props, void> {
 
     const dateOnLeft = dataDates[indexOnRight - 1];
     const dateOnRight = dataDates[indexOnRight];
-    if (date.getTime() - dateOnLeft.getTime() > dateOnRight.getTime() - date.getTime()) {
+    if (
+      date.getTime() - dateOnLeft.getTime() >
+      dateOnRight.getTime() - date.getTime()
+    ) {
       return indexOnRight;
     }
 
@@ -206,7 +245,8 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private handleMouseMove() {
-    const { data, width, marginLeft, marginRight, onHover } = this.props as PropsWithDefaults;
+    const { data, width, marginLeft, marginRight, onHover } = this
+      .props as PropsWithDefaults;
 
     if (onHover) {
       // TODO: don't create scale on each handling
@@ -214,7 +254,9 @@ class LineChart extends React.Component<Props, void> {
       const xScale = scaleTime<number, number>()
         .domain(extent(data.series, d => d.date) as [Date, Date])
         .range([0, chartWidth]);
-      const lineGroup = select(this.svgRef!).select<SVGGElement>('g#line-group');
+      const lineGroup = select(this.svgRef!).select<SVGGElement>(
+        'g#line-group',
+      );
       const hoveredTime = xScale.invert(mouse(lineGroup.node() as any)[0]);
       onHover(this.findClosestIndex(hoveredTime));
     }
@@ -236,17 +278,22 @@ class LineChart extends React.Component<Props, void> {
     } = this.props as PropsWithDefaults;
 
     const seriesData = data.series;
-    const dataValueExtent = extent(seriesData, d => d.value) as [number, number];
+    const dataValueExtent = extent(seriesData, d => d.value) as [
+      number,
+      number
+    ];
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
-    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>('g#main-group');
+    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+      'g#main-group',
+    );
 
     const xScale = scaleTime<number, number>()
       .domain(extent(seriesData, d => d.date) as [Date, Date])
       .range([0, chartWidth]);
     const yScale = scaleLinear()
-      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
+      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
       .range([chartHeight, 0]);
 
     const lineGenerator = line<Datum>()
@@ -261,15 +308,20 @@ class LineChart extends React.Component<Props, void> {
       const thresholds = backgroundColorScale.domain();
       const colorAreaLowerBounds = [
         dataValueExtent[0],
-        ...thresholds.filter(d => d > dataValueExtent[0] && d <= dataValueExtent[1]),
+        ...thresholds.filter(
+          d => d > dataValueExtent[0] && d <= dataValueExtent[1],
+        ),
       ];
       const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
         lowerBound,
         upperBound: colorAreaLowerBounds[i + 1] || dataValueExtent[1],
       }));
-      const colorRects = backgroundColorsGroup.selectAll('rect')
+      const colorRects = backgroundColorsGroup
+        .selectAll('rect')
         .data(colorAreas);
-      colorRects.enter()
+      // prettier-ignore
+      colorRects
+        .enter()
           .append('rect')
           .attr('class', styles['background-colors'])
           .attr('x', 0)
@@ -277,6 +329,7 @@ class LineChart extends React.Component<Props, void> {
           .attr('width', chartWidth)
           .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
+      // prettier-ignore
       colorRects
         .transition(t)
           .attr('y', d => yScale(d.upperBound))
@@ -285,35 +338,58 @@ class LineChart extends React.Component<Props, void> {
       colorRects.exit().remove();
     }
 
-    g.select('g#x-axis').transition(t)
-      .call(axisBottom(xScale) as any);
-    g.select('g#y-axis').transition(t)
-      .call(axisLeft(yScale) as any);
+    g.select('g#x-axis').transition(t).call(axisBottom(xScale) as any);
+    g.select('g#y-axis').transition(t).call(axisLeft(yScale) as any);
 
-    const lineGroup = g.selectAll<SVGGElement, { label: string; color: string; series: Datum[]; }>('g#line-group')
+    const lineGroup = g
+      .selectAll<
+        SVGGElement,
+        { label: string; color: string; series: Datum[] }
+      >('g#line-group')
       .data([data]);
 
-    lineGroup.select('path')
+    // prettier-ignore
+    lineGroup
+      .select('path')
       .transition(t)
         .attr('d', d => lineGenerator(d.series));
 
-    lineGroup.select('text')
-      .datum(d => ({ label: d.label, lastDatum: d.series[d.series.length - 1] }))
+    lineGroup
+      .select('text')
+      .datum(d => ({
+        label: d.label,
+        lastDatum: d.series[d.series.length - 1],
+      }))
       .transition(t)
-        .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
-        .text(d => d.label || '');
+      .attr(
+        'transform',
+        d =>
+          `translate(${xScale(d.lastDatum.date)},${yScale(d.lastDatum.value)}`,
+      )
+      .text(d => d.label || '');
 
     // TODO: The following will break if annotationLine doesn't exist when the component is mounted
     if (annotationLineIndex != null) {
       const selectedData = seriesData[annotationLineIndex];
       const annotationGroup = g.select('g#annotation-group');
-      annotationGroup.select('path')
-        .datum(dataValueExtent.map(d => ({ date: selectedData.date, value: d })))
+      // prettier-ignore
+      annotationGroup
+        .select('path')
+        .datum(
+          dataValueExtent.map(d => ({ date: selectedData.date, value: d })),
+        )
         .transition(t)
           .attr('d', lineGenerator);
-      annotationGroup.select('text')
+      // prettier-ignore
+      annotationGroup
+        .select('text')
         .transition(t)
-          .attr('transform', `translate(${xScale(selectedData.date)},${yScale(selectedData.value)})`)
+          .attr(
+            'transform',
+            `translate(${xScale(selectedData.date)},${yScale(
+              selectedData.value,
+            )})`,
+          )
           .text(this.numberFormatter(selectedData.value));
     }
   }
@@ -334,15 +410,28 @@ class LineChart extends React.Component<Props, void> {
     } = this.props as PropsWithDefaults;
 
     return (
-      <svg width={width} height={height} className={className} ref={this.storeSvgRef}>
+      <svg
+        width={width}
+        height={height}
+        className={className}
+        ref={this.storeSvgRef}
+      >
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <g id="x-axis" className={styles['x-axis']} transform={`translate(0,${height - marginTop - marginBottom})`} />
+          <g
+            id="x-axis"
+            className={styles['x-axis']}
+            transform={`translate(0,${height - marginTop - marginBottom})`}
+          />
           <g id="y-axis">
-            {yAxisLabel && (
-              <text transform="rotate(-90)" y="6" dy="0.71em" className={styles['y-axis-label']}>
+            {yAxisLabel &&
+              <text
+                transform="rotate(-90)"
+                y="6"
+                dy="0.71em"
+                className={styles['y-axis-label']}
+              >
                 {yAxisLabel}
-              </text>
-            )}
+              </text>}
           </g>
         </g>
       </svg>

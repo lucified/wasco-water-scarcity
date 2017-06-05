@@ -71,11 +71,16 @@ export function toWaterDatum({
     endYear,
     featureId: featureid,
     blueWaterAvailability,
-    blueWaterConsumptionDomestic: blueWaterConsumptionDomestic * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionElectric: blueWaterConsumptionElectric * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionIrrigation: blueWaterConsumptionIrrigation * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionLivestock: blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionManufacturing: blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionDomestic:
+      blueWaterConsumptionDomestic * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionElectric:
+      blueWaterConsumptionElectric * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionIrrigation:
+      blueWaterConsumptionIrrigation * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionLivestock:
+      blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionManufacturing:
+      blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
     blueWaterStress,
     blueWaterShortage,

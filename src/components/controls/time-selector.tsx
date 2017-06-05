@@ -66,7 +66,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
-    setIndex: (value: number) => { dispatch(setTimeIndex(value)); },
+    setIndex: (value: number) => {
+      dispatch(setTimeIndex(value));
+    },
   };
 }
 

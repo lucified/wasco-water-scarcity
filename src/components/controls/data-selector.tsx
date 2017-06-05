@@ -22,9 +22,13 @@ interface PassedProps {
   className?: string;
 }
 
-class DataTypeSelector extends React.Component<StateProps & DispatchProps & PassedProps, any> {
+class DataTypeSelector extends React.Component<
+  StateProps & DispatchProps & PassedProps,
+  void
+> {
   private generateCaseClickCallback(value: DataType) {
-    return (_e: React.MouseEvent<HTMLAnchorElement>) => (this.props.onChange(value));
+    return (_e: React.MouseEvent<HTMLAnchorElement>) =>
+      this.props.onChange(value);
   }
 
   public render() {
@@ -35,20 +39,27 @@ class DataTypeSelector extends React.Component<StateProps & DispatchProps & Pass
     ];
 
     return (
-      <div className={classNames(this.props.className, styles['button-group'], styles.root)}>
-        {dataTypes.map(([dataType, description]) => (
+      <div
+        className={classNames(
+          this.props.className,
+          styles['button-group'],
+          styles.root,
+        )}
+      >
+        {dataTypes.map(([dataType, description]) =>
           <a
             key={`selector-${dataType}`}
             onClick={this.generateCaseClickCallback(dataType)}
-            className={classNames(styles.button, { [styles.selected]: caseSelection === dataType })}
+            className={classNames(styles.button, {
+              [styles.selected]: caseSelection === dataType,
+            })}
           >
             {description}
-          </a>
-        ))}
+          </a>,
+        )}
       </div>
     );
   }
-
 }
 
 const mapStateToProps = (state: StateTree): StateProps => ({
