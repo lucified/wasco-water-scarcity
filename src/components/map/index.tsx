@@ -78,7 +78,7 @@ class Map extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private width = 1200;
+  private width = 893;
   private height = this.width / 1.7;
 
   private saveSvgRef(ref: SVGElement) {
@@ -271,7 +271,7 @@ class Map extends React.Component<Props, void> {
     }
 
     return (
-      <div className="container">
+      <div className="col-sm-12 col-md-12 col-lg-9">
         <svg ref={this.saveSvgRef}>
           <defs>
             <clipPath id="clip">
@@ -287,7 +287,7 @@ class Map extends React.Component<Props, void> {
             <path className={styles.graticule} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
-          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - 160})`}>
+          <g id="legend" className={styles.legend} transform={`translate(${this.width * 0.6}, ${this.height - (this.height/4.5)})`}>
             <text className={styles['legend-caption']} x="0" y="-6">
               {dataTypeParameters.label}
             </text>

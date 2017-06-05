@@ -7,13 +7,15 @@ import { toMidpoint } from '../../utils';
 
 import LineChart, { Data } from '../generic/line-chart';
 
+const styles = require('./data-line-chart.scss');
+
 interface PassedProps {
   dataType: DataType;
-  dataLabel: string;
+  dataLabel?: string;
   dataColor: string;
   thresholds?: number[];
   thresholdColors?: string[];
-  yAxisLabel: string;
+  yAxisLabel?: string;
   data: WaterDatum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
@@ -51,13 +53,17 @@ export default function ShortageLineChart({
 
   return (
     <LineChart
+      className={styles.chart}
       data={chartData}
-      width={500}
-      height={400}
+      width={270}
+      height={120}
       yAxisLabel={yAxisLabel}
       annotationLineIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
+      marginRight={0}
+      marginTop={5}
+      marginLeft={40}
     />
   );
 }

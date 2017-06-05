@@ -15,7 +15,7 @@ export interface Datum {
 }
 
 export interface Data {
-  label: string;
+  label?: string;
   color: string;
   series: Datum[];
 }
@@ -162,13 +162,15 @@ class LineChart extends React.Component<Props, void> {
       .attr('d', d => lineGenerator(d.series))
       .style('stroke', d => d.color);
 
-    lineGroup.append('text')
-      .datum(d => ({ label: d.label, lastDatum: d.series[d.series.length - 1] }))
-      .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
-      .attr('x', 3)
-      .attr('dy', '0.35em')
-      .attr('class', styles['line-label'])
-      .text(d => d.label);
+    if (data.label) {
+      lineGroup.append('text')
+        .datum(d => ({ label: d.label, lastDatum: d.series[d.series.length - 1] }))
+        .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
+        .attr('x', 3)
+        .attr('dy', '0.35em')
+        .attr('class', styles['line-label'])
+        .text(d => d.label!);
+    }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
     lineGroup.append('rect')
@@ -299,7 +301,7 @@ class LineChart extends React.Component<Props, void> {
       .datum(d => ({ label: d.label, lastDatum: d.series[d.series.length - 1] }))
       .transition(t)
         .attr('transform', d => 'translate(' + xScale(d.lastDatum.date) + ',' + yScale(d.lastDatum.value) + ')')
-        .text(d => d.label);
+        .text(d => d.label || '');
 
     // TODO: The following will break if annotationLine doesn't exist when the component is mounted
     if (annotationLineIndex != null) {
