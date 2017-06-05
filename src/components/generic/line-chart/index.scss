@@ -16,14 +16,18 @@
   opacity: 0.3;
 }
 
-.annotation-line {
-  fill: none;
-  stroke: gray;
-  stroke-width: 1px;
+.selected-area {
+  fill: black;
+  fill-opacity: 0.1;
+  stroke-width: 0;
 }
 
-.annotation-label {
+.selected-label {
   font-size: 12px;
+  color: black;
+  text-shadow:
+    -1px 1px 0 white,
+    1px 1px 0 white;
 }
 
 .line-label {

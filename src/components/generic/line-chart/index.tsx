@@ -5,13 +5,15 @@ import { scaleLinear, ScaleThreshold, scaleTime } from 'd3-scale';
 import { mouse, select } from 'd3-selection';
 import { curveLinear, line } from 'd3-shape';
 import { transition } from 'd3-transition';
+import flatMap = require('lodash/flatMap');
 import * as React from 'react';
 
 const styles = require('./index.scss');
 
 export interface Datum {
   value: number;
-  date: Date;
+  start: Date;
+  end: Date;
 }
 
 export interface Data {
@@ -32,7 +34,7 @@ interface PassedProps {
   maxY?: number;
   minY?: number;
   yAxisLabel?: string;
-  annotationLineIndex?: number;
+  selectedTimeIndex?: number;
   onHover?: (hoveredIndex: number) => void;
   backgroundColorScale?: ScaleThreshold<number, string>;
 }
@@ -46,6 +48,10 @@ interface DefaultProps {
 
 type Props = PassedProps;
 type PropsWithDefaults = Props & DefaultProps;
+
+function toMidpoint(start: Date, end: Date): Date {
+  return new Date((end.getTime() + start.getTime()) / 2);
+}
 
 class LineChart extends React.Component<Props, void> {
   public static defaultProps: DefaultProps = {
@@ -83,7 +89,7 @@ class LineChart extends React.Component<Props, void> {
       minY,
       width,
       height,
-      annotationLineIndex,
+      selectedTimeIndex,
       backgroundColorScale,
       data,
     } = this.props as PropsWithDefaults;
@@ -101,7 +107,11 @@ class LineChart extends React.Component<Props, void> {
     );
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(seriesData, d => d.date) as [Date, Date])
+      .domain(
+        extent(
+          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
+        ) as [Date, Date],
+      )
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
@@ -109,7 +119,7 @@ class LineChart extends React.Component<Props, void> {
 
     const lineGenerator = line<Datum>()
       .curve(curveLinear)
-      .x(d => xScale(d.date))
+      .x(d => xScale(toMidpoint(d.start, d.end)))
       .y(d => yScale(d.value));
 
     if (backgroundColorScale) {
@@ -144,30 +154,16 @@ class LineChart extends React.Component<Props, void> {
     g.select('g#x-axis').call(axisBottom(xScale));
     g.select('g#y-axis').call(axisLeft(yScale));
 
-    if (annotationLineIndex != null) {
-      const selectedData = seriesData[annotationLineIndex];
-      const annotationGroup = g.append('g').attr('id', 'annotation-group');
-
-      annotationGroup
-        .append('path')
-        .datum(
-          dataValueExtent.map(d => ({ date: selectedData.date, value: d })),
-        )
-        .attr('d', lineGenerator)
-        .attr('class', styles['annotation-line']);
-
-      annotationGroup
-        .append('text')
-        .attr('class', styles['annotation-label'])
-        .attr('x', 9)
-        .attr('dy', '.35em')
-        .attr(
-          'transform',
-          `translate(${xScale(selectedData.date)},${yScale(
-            selectedData.value,
-          )})`,
-        )
-        .text(this.numberFormatter(selectedData.value));
+    if (selectedTimeIndex != null) {
+      const selectedData = seriesData[selectedTimeIndex];
+      g
+        .append('rect')
+        .attr('id', 'selected-group')
+        .attr('x', xScale(selectedData.start))
+        .attr('y', 0)
+        .attr('height', chartHeight)
+        .attr('width', xScale(selectedData.end) - xScale(selectedData.start))
+        .attr('class', styles['selected-area']);
     }
 
     // prettier-ignore
@@ -197,14 +193,30 @@ class LineChart extends React.Component<Props, void> {
         .attr(
           'transform',
           d =>
-            `translate(${xScale(d.lastDatum.date)},${yScale(
-              d.lastDatum.value,
-            )}`,
+            `translate(${xScale(d.lastDatum.end)},${yScale(d.lastDatum.value)}`,
         )
         .attr('x', 3)
         .attr('dy', '0.35em')
         .attr('class', styles['line-label'])
         .text(d => d.label!);
+    }
+
+    if (selectedTimeIndex != null) {
+      const selectedData = seriesData[selectedTimeIndex];
+
+      g
+        .append('text')
+        .attr('id', 'selected-label')
+        .attr('class', styles['selected-label'])
+        .attr('x', 9)
+        .attr('dy', '.35em')
+        .attr(
+          'transform',
+          `translate(${xScale(
+            toMidpoint(selectedData.start, selectedData.end),
+          )},${yScale(selectedData.value)})`,
+        )
+        .text(this.numberFormatter(selectedData.value));
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
@@ -220,7 +232,7 @@ class LineChart extends React.Component<Props, void> {
     const { data } = this.props as PropsWithDefaults;
 
     // TODO: make this more efficient?
-    const dataDates = data.series.map(d => d.date);
+    const dataDates = data.series.map(d => toMidpoint(d.start, d.end));
     // All earlier times are to the left of this index. It should never be 0.
     const indexOnRight = bisectRight(dataDates, date);
 
@@ -252,7 +264,11 @@ class LineChart extends React.Component<Props, void> {
       // TODO: don't create scale on each handling
       const chartWidth = width - marginLeft - marginRight;
       const xScale = scaleTime<number, number>()
-        .domain(extent(data.series, d => d.date) as [Date, Date])
+        .domain(
+          extent(
+            flatMap<Date[], Date>(data.series.map(d => [d.start, d.end])),
+          ) as [Date, Date],
+        )
         .range([0, chartWidth]);
       const lineGroup = select(this.svgRef!).select<SVGGElement>(
         'g#line-group',
@@ -273,7 +289,7 @@ class LineChart extends React.Component<Props, void> {
       width,
       height,
       backgroundColorScale,
-      annotationLineIndex,
+      selectedTimeIndex,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -290,7 +306,11 @@ class LineChart extends React.Component<Props, void> {
     );
 
     const xScale = scaleTime<number, number>()
-      .domain(extent(seriesData, d => d.date) as [Date, Date])
+      .domain(
+        extent(
+          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
+        ) as [Date, Date],
+      )
       .range([0, chartWidth]);
     const yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
@@ -298,7 +318,7 @@ class LineChart extends React.Component<Props, void> {
 
     const lineGenerator = line<Datum>()
       .curve(curveLinear)
-      .x(d => xScale(d.date))
+      .x(d => xScale(toMidpoint(d.start, d.end)))
       .y(d => yScale(d.value));
 
     const t = transition('linechart').duration(100);
@@ -354,41 +374,42 @@ class LineChart extends React.Component<Props, void> {
       .transition(t)
         .attr('d', d => lineGenerator(d.series));
 
-    lineGroup
-      .select('text')
-      .datum(d => ({
-        label: d.label,
-        lastDatum: d.series[d.series.length - 1],
-      }))
-      .transition(t)
-      .attr(
-        'transform',
-        d =>
-          `translate(${xScale(d.lastDatum.date)},${yScale(d.lastDatum.value)}`,
-      )
-      .text(d => d.label || '');
-
-    // TODO: The following will break if annotationLine doesn't exist when the component is mounted
-    if (annotationLineIndex != null) {
-      const selectedData = seriesData[annotationLineIndex];
-      const annotationGroup = g.select('g#annotation-group');
-      // prettier-ignore
-      annotationGroup
-        .select('path')
-        .datum(
-          dataValueExtent.map(d => ({ date: selectedData.date, value: d })),
-        )
-        .transition(t)
-          .attr('d', lineGenerator);
-      // prettier-ignore
-      annotationGroup
+    if (data.label) {
+      lineGroup
         .select('text')
+        .datum(d => ({
+          label: d.label,
+          lastDatum: d.series[d.series.length - 1],
+        }))
+        .transition(t)
+        .attr(
+          'transform',
+          d =>
+            `translate(${xScale(d.lastDatum.end)},${yScale(d.lastDatum.value)}`,
+        )
+        .text(d => d.label || '');
+    }
+
+    // TODO: The following will break if selectedTimeIndex doesn't exist when the component is mounted
+    if (selectedTimeIndex != null) {
+      const selectedData = seriesData[selectedTimeIndex];
+
+      // prettier-ignore
+      g
+        .select('rect#selected-group')
+        .transition(t)
+          .attr('x', xScale(selectedData.start))
+          .attr('width', xScale(selectedData.end) - xScale(selectedData.start));
+
+      // prettier-ignore
+      g
+        .select('text#selected-label')
         .transition(t)
           .attr(
             'transform',
-            `translate(${xScale(selectedData.date)},${yScale(
-              selectedData.value,
-            )})`,
+            `translate(${xScale(
+              toMidpoint(selectedData.start, selectedData.end),
+            )},${yScale(selectedData.value)})`,
           )
           .text(this.numberFormatter(selectedData.value));
     }

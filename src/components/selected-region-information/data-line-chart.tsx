@@ -3,7 +3,6 @@ import some = require('lodash/some');
 import * as React from 'react';
 
 import { DataType, WaterDatum } from '../../types';
-import { toMidpoint } from '../../utils';
 
 import LineChart, { Data } from '../generic/line-chart';
 
@@ -39,7 +38,8 @@ export default function ShortageLineChart({
     color: dataColor,
     series: data.map(d => ({
       value: d[dataType],
-      date: toMidpoint(d.startYear, d.endYear),
+      start: new Date(d.startYear, 0, 1),
+      end: new Date(d.endYear, 11, 31),
     })),
   };
   let backgroundColorScale;
@@ -50,7 +50,10 @@ export default function ShortageLineChart({
   }
 
   if (
-    some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)
+    some<{ value?: number; start: Date; end: Date }>(
+      chartData.series,
+      d => d.value == null,
+    )
   ) {
     console.warn(`Missing ${dataType} data for selected region`);
     return null;
@@ -63,7 +66,7 @@ export default function ShortageLineChart({
       width={270}
       height={120}
       yAxisLabel={yAxisLabel}
-      annotationLineIndex={selectedTimeIndex}
+      selectedTimeIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
