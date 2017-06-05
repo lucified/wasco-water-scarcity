@@ -5,7 +5,10 @@ import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
-import { getSelectedTimeIndex, getTimeSeriesForSelectedRegion } from '../../selectors';
+import {
+  getSelectedTimeIndex,
+  getTimeSeriesForSelectedRegion,
+} from '../../selectors';
 import { getDataTypeThresholds, WaterDatum } from '../../types';
 
 // import AvailabilityChart from './availability-chart';
@@ -57,7 +60,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataType="blueWaterStress"
               dataColor="red"
               thresholds={stressThresholds}
-              thresholdColors={['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]}
+              thresholdColors={[
+                'none',
+                ...schemeReds[stressThresholds!.length + 1].slice(1),
+              ]}
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
@@ -70,7 +76,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               dataType="blueWaterShortage"
               dataColor="purple"
               thresholds={shortageThresholds}
-              thresholdColors={['none', ...schemePurples[shortageThresholds!.length + 1].slice(1)].reverse()}
+              thresholdColors={[
+                'none',
+                ...schemePurples[shortageThresholds!.length + 1].slice(1),
+              ].reverse()}
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
@@ -105,7 +114,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
-    setTimeIndex: (value: number) => { dispatch(setTimeIndex(value)); },
+    setTimeIndex: (value: number) => {
+      dispatch(setTimeIndex(value));
+    },
   };
 }
 

@@ -9,7 +9,7 @@ export default class Header extends React.Component<{}, void> {
       <div className={styles.root}>
         <div className="container">
           <div className="row">
-            <img src={aaltoLogo} className={styles.logo}/>
+            <img src={aaltoLogo} className={styles.logo} />
             <div className={styles.heading}>Water Scarcity Atlas</div>
           </div>
         </div>

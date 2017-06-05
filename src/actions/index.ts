@@ -31,7 +31,9 @@ export function setSelectedRegion(id?: number): SetSelectedRegionAction {
   };
 }
 
-export function setSelectedDataType(dataType: DataType): SetSelectedDataTypeAction {
+export function setSelectedDataType(
+  dataType: DataType,
+): SetSelectedDataTypeAction {
   return {
     type: SET_SELECTED_DATA_TYPE,
     dataType,

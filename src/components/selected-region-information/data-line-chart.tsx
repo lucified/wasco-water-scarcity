@@ -37,7 +37,10 @@ export default function ShortageLineChart({
   const chartData: Data = {
     label: dataLabel,
     color: dataColor,
-    series: data.map(d => ({ value: d[dataType], date: toMidpoint(d.startYear, d.endYear) })),
+    series: data.map(d => ({
+      value: d[dataType],
+      date: toMidpoint(d.startYear, d.endYear),
+    })),
   };
   let backgroundColorScale;
   if (thresholds && thresholdColors) {
@@ -46,7 +49,9 @@ export default function ShortageLineChart({
       .range(thresholdColors);
   }
 
-  if (some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)) {
+  if (
+    some<{ value?: number; date: Date }>(chartData.series, d => d.value == null)
+  ) {
     console.warn(`Missing ${dataType} data for selected region`);
     return null;
   }

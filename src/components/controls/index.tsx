@@ -10,7 +10,13 @@ export default function Controls() {
   return (
     <div className="container">
       <div className="row">
-        <div className={classNames('col-xs-12', 'col-md-6', styles['data-selector'])}>
+        <div
+          className={classNames(
+            'col-xs-12',
+            'col-md-6',
+            styles['data-selector'],
+          )}
+        >
           <DataSelector />
         </div>
         <div className="col-xs-12 col-md-6">
