@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import {
@@ -8,7 +9,7 @@ import {
   scaleTime,
 } from 'd3-scale';
 import { mouse, select, Selection } from 'd3-selection';
-import { transition } from 'd3-transition';
+import { transition, Transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import * as React from 'react';
@@ -50,7 +51,7 @@ interface PassedProps {
   ySelector: DataSeriesSelector;
   sizeSelector: DataSeriesSelector;
   selectedTimeIndex: number;
-  selectedRegion?: number;
+  selectedData?: string;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
@@ -93,7 +94,6 @@ function generateChartData(
 }
 
 function findClosestIndex(date: Date, data: Data) {
-  // TODO: make this more efficient?
   const dataDates = data.timeRanges.map(d => toMidpoint(d[0], d[1]));
   // All earlier times are to the left of this index. It should never be 0.
   const indexOnRight = bisectRight(dataDates, date);
@@ -132,7 +132,7 @@ class Gapminder extends React.Component<Props, void> {
     this.storeSvgRef = this.storeSvgRef.bind(this);
     this.enableInteraction = this.enableInteraction.bind(this);
     this.circleOrder = this.circleOrder.bind(this);
-    this.circlePosition = this.circlePosition.bind(this);
+    this.drawCircle = this.drawCircle.bind(this);
     this.chartData = generateChartData(
       props.data,
       props.xSelector,
@@ -196,7 +196,6 @@ class Gapminder extends React.Component<Props, void> {
       flatMap<number[], number>(regionDataArray.map(d => sizeSelector(d.data))),
     ) as [number, number];
 
-    // Various scales. These domains make assumptions of data, naturally.
     this.xScale = scaleLog().domain(xExtent).range([chartWidth, 0]);
     this.yScale = scaleLog().domain(yExtent).range([chartHeight, 0]);
     this.sizeScale = scaleSqrt().domain(sizeExtent).range([0, 40]);
@@ -210,11 +209,9 @@ class Gapminder extends React.Component<Props, void> {
       'g#main-group',
     );
 
-    // The x & y axes.
     g.select('g#x-axis').call(axisBottom(this.xScale!));
     g.select('g#y-axis').call(axisLeft(this.yScale!));
 
-    // Add the year label; the value is set on transition.
     const label = g
       .select('text#year-label')
       .attr('y', height - 60)
@@ -223,24 +220,20 @@ class Gapminder extends React.Component<Props, void> {
         data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
       );
 
-    // Add a dot per nation.
     // prettier-ignore
     g
-      .select('g.dots')
-      .selectAll<SVGGElement, ChartDatum>('.dot')
+      .selectAll<SVGGElement, ChartDatum>(`.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .enter()
-        .append('circle')
-        .attr('class', 'dot')
-        .style('fill', d => d.color)
-        .call(this.circlePosition)
+        .append<SVGCircleElement>('circle')
+        .attr('class', styles.dot)
+        .call(this.drawCircle)
         .sort(this.circleOrder);
 
     // Add an overlay for the year label.
     const box = (label.node() as any).getBBox();
-
     g
-      .select('rect.overlay')
+      .select<SVGRectElement>(`rect.${styles.overlay}`)
       .attr('x', box.x)
       .attr('y', box.y)
       .attr('width', box.width)
@@ -265,18 +258,18 @@ class Gapminder extends React.Component<Props, void> {
       .clamp(true);
 
     g
-      .select<SVGRectElement>('rect.overlay')
+      .select<SVGRectElement>(`rect.${styles.overlay}`)
       .on('mouseover', mouseover)
       .on('mouseout', mouseout)
       .on('mousemove', mousemove)
       .on('touchmove', mousemove);
 
     function mouseover() {
-      label.classed('active', true);
+      label.classed(styles.active, true);
     }
 
     function mouseout() {
-      label.classed('active', false);
+      label.classed(styles.active, false);
     }
 
     function mousemove(this: SVGRectElement) {
@@ -288,13 +281,18 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   // Positions the dots based on data.
-  private circlePosition(circle: Selection<any, ChartDatum, any, any>) {
-    const { selectedTimeIndex } = this.props;
+  private drawCircle(
+    circle:
+      | Selection<SVGCircleElement, ChartDatum, any, any>
+      | Transition<SVGCircleElement, ChartDatum, any, any>,
+  ) {
+    const { selectedTimeIndex, selectedData } = this.props;
     const { xScale, yScale, sizeScale } = this;
     circle
       .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
       .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
-      .attr('r', d => sizeScale!(d.size[selectedTimeIndex]));
+      .attr('r', d => sizeScale!(d.size[selectedTimeIndex]))
+      .attr('fill', d => (d.id === selectedData ? 'blue' : d.color));
   }
 
   // Defines a sort order so that the smallest dots are drawn on top.
@@ -312,11 +310,11 @@ class Gapminder extends React.Component<Props, void> {
 
     // prettier-ignore
     g
-      .selectAll<SVGCircleElement, ChartDatum>('circle.dot')
+      .selectAll<SVGCircleElement, ChartDatum>(`circle.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
       .transition(t)
-        .call(this.circlePosition as any);
+        .call(this.drawCircle as any);
     g
       .select('text#year-label')
       .text(
@@ -346,15 +344,19 @@ class Gapminder extends React.Component<Props, void> {
         ref={this.storeSvgRef}
       >
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <text id="year-label" className="year label" textAnchor="end" />
+          <text
+            id="year-label"
+            className={styles['year-label']}
+            textAnchor="end"
+          />
           <g
             id="x-axis"
-            className={styles['x-axis']}
+            className={classNames(styles.axis, styles.x)}
             transform={`translate(0,${height - marginTop - marginBottom})`}
           />
-          <g id="y-axis" />
+          <g id="y-axis" className={classNames(styles.axis, styles.y)} />
           <g className="dots" />
-          <rect className="overlay" />
+          <rect className={styles.overlay} />
         </g>
       </svg>
     );

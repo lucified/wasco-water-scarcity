@@ -78,7 +78,7 @@ export const getDataByRegion = createSelector<
 
       return {
         id,
-        color: 'blue', // TODO once we have region info
+        color: 'lightblue', // TODO once we have region info
         data: {
           blueWaterStress,
           blueWaterShortage,

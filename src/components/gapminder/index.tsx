@@ -4,12 +4,17 @@ import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
-import { getDataByRegion, getSelectedTimeIndex } from '../../selectors';
+import {
+  getDataByRegion,
+  getSelectedRegion,
+  getSelectedTimeIndex,
+} from '../../selectors';
 
 import Gapminder, { Data } from '../generic/gapminder';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
+  selectedRegion?: number;
   data: Data;
 }
 
@@ -31,7 +36,12 @@ function sizeSelector(data: { [dataType: string]: number[] }) {
   return data.population;
 }
 
-function GapminderWrapper({ selectedTimeIndex, data, setTimeIndex }: Props) {
+function GapminderWrapper({
+  selectedTimeIndex,
+  selectedRegion,
+  data,
+  setTimeIndex,
+}: Props) {
   return (
     <div className="col-xs-12">
       <Gapminder
@@ -39,6 +49,9 @@ function GapminderWrapper({ selectedTimeIndex, data, setTimeIndex }: Props) {
         height={500}
         data={data}
         selectedTimeIndex={selectedTimeIndex}
+        selectedData={
+          selectedRegion != null ? String(selectedRegion) : undefined
+        }
         onHover={setTimeIndex}
         xSelector={xSelector}
         ySelector={ySelector}
@@ -51,6 +64,7 @@ function GapminderWrapper({ selectedTimeIndex, data, setTimeIndex }: Props) {
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
+    selectedRegion: getSelectedRegion(state),
     data: getDataByRegion(state),
   };
 }

@@ -1,38 +1,34 @@
-.x-axis path {
-  display: none;
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+
+  &.x path {
+    display: none;
+  }
 }
 
-:global {
-  text {
-    font: 10px sans-serif;
-  }
+.dot {
+  stroke: #000;
 
-  .dot {
-    stroke: #000;
+  &.selected {
+    fill: blue;
+    stroke-width: 2px;
   }
+}
 
-  .axis path, .axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-  }
+.year-label {
+  font: 500 100px "Helvetica Neue";
+  fill: #ddd;
 
-  .label {
-    fill: #777;
-  }
-
-  .year.label {
-    font: 500 100px "Helvetica Neue";
-    fill: #ddd;
-  }
-
-  .year.label.active {
+  &.active {
     fill: #aaa;
   }
-
-  .overlay {
-    fill: none;
-    pointer-events: all;
-    cursor: ew-resize;
-  }
 }
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+
