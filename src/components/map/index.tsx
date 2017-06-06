@@ -53,7 +53,7 @@ const waterPropertySelector = (
   dataType: DataType,
 ): number | undefined => d[dataType];
 
-interface DataTypeParamter {
+interface DataTypeParameter {
   dataType: DataType;
   label: string;
   thresholds: number[];
@@ -62,10 +62,10 @@ interface DataTypeParamter {
 
 const stressThresholds = getDataTypeThresholds('blueWaterStress')!;
 const shortageThresholds = getDataTypeThresholds('blueWaterShortage')!;
-const allDataTypeParameters: DataTypeParamter[] = [
+const allDataTypeParameters: DataTypeParameter[] = [
   {
     dataType: 'blueWaterStress',
-    label: 'Water Stress',
+    label: 'Water stress',
     thresholds: stressThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(stressThresholds)
@@ -73,7 +73,7 @@ const allDataTypeParameters: DataTypeParamter[] = [
   },
   {
     dataType: 'blueWaterShortage',
-    label: 'Water Shortage',
+    label: 'Water shortage',
     thresholds: shortageThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(shortageThresholds)
@@ -97,7 +97,7 @@ class Map extends React.Component<Props, void> {
 
   private svgRef?: SVGElement;
   private width = 893;
-  private height = this.width / 1.7;
+  private height = this.width / 2;
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
@@ -113,10 +113,9 @@ class Map extends React.Component<Props, void> {
 
     // Based on https://gist.github.com/mbostock/4448587
     const projection = geoNaturalEarth2()
-      .scale(this.width / 5.35)
-      .translate([this.width / 2, this.height / 2])
+      .scale(this.width / 5)
+      .translate([this.width / 2.3, this.height / 1.75])
       .precision(0.1);
-    const graticule = geoGraticule();
     const path = geoPath().projection(projection);
 
     const svg = select<SVGElement, undefined>(this.svgRef!)
@@ -126,15 +125,10 @@ class Map extends React.Component<Props, void> {
 
     svg.select(`use.${styles['globe-fill']}`).on('click', clearSelectedRegion);
 
-    // Countries and graticule
-    svg.select(`path.${styles.graticule}`).datum(graticule).attr('d', path);
+    // Countries land mass
     svg
       .select(`path.${styles.land}`)
       .datum(feature(world, world.objects.land))
-      .attr('d', path);
-    svg
-      .select(`path.${styles.boundary}`)
-      .datum(mesh(world, world.objects.countries, (a: any, b: any) => a !== b))
       .attr('d', path);
 
     // Water regions
@@ -148,6 +142,7 @@ class Map extends React.Component<Props, void> {
         .append('path')
         .attr('class', styles['water-region'])
         .classed(styles.selected, d => selectedRegion === d.properties.featureid)
+        .classed(styles.unselected, d => selectedRegion !== undefined && selectedRegion !== d.properties.featureid)
         .attr('d', path as any)
         .attr('vector-effect', 'non-scaling-stroke')
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid))
@@ -286,6 +281,12 @@ class Map extends React.Component<Props, void> {
       .selectAll<SVGPathElement, WaterRegionFeature>('path')
       .data(features, d => String(d.properties.featureid))
       .classed(styles.selected, d => selectedRegion === d.properties.featureid)
+      .classed(
+        styles.unselected,
+        d =>
+          selectedRegion !== undefined &&
+          selectedRegion !== d.properties.featureid,
+      )
       .transition(t)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid));
   }
@@ -302,6 +303,9 @@ class Map extends React.Component<Props, void> {
 
     return (
       <div className="col-sm-12 col-md-12 col-lg-9">
+        <h3 className={styles['map-header']}>
+          {dataTypeParameters.label} across food production units
+        </h3>
         <svg ref={this.saveSvgRef}>
           <defs>
             <clipPath id="clip">
@@ -309,18 +313,16 @@ class Map extends React.Component<Props, void> {
             </clipPath>
             <path id="sphere" />
           </defs>
-          <use className={styles['globe-stroke']} xlinkHref="#sphere" />
           <use className={styles['globe-fill']} xlinkHref="#sphere" />
           <g>
             <path className={styles.land} clipPath="url(#clip)" />
-            <path className={styles.boundary} clipPath="url(#clip)" />
-            <path className={styles.graticule} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
+
           <g
             id="legend"
             className={styles.legend}
-            transform={`translate(${this.width * 0.6}, ${this.height * 7 / 9})`}
+            transform={`translate(${this.width * 0.6}, ${this.height - 40})`}
           >
             <text className={styles['legend-caption']} x="0" y="-6">
               {dataTypeParameters.label}

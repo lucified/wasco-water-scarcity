@@ -1,39 +1,29 @@
 @import '../definitions.scss';
 
-.globe-stroke {
-  fill: none;
-  stroke: $color-light-gray;
-  stroke-width: 3px;
+.map-header {
+  margin-top: 0;
 }
 
 .globe-fill {
   fill: white;
 }
 
-.graticule {
-  fill: none;
-  stroke: $color-light-gray;
-  stroke-width: .5px;
-  stroke-opacity: .5;
-}
-
 .land {
-  fill: $color-light-gray;
-}
-
-.boundary {
-  fill: none;
-  stroke: $color-gray;
-  stroke-width: .5px;
+  fill: $color-lighter-gray;
 }
 
 .water-region {
-  stroke: $color-gray;
-  stroke-width: 1px;
+  stroke-width: .5px;
+  stroke: #ccc;
+  transition: opacity .2s ease-in;
 
   &.selected {
-    stroke-width: 2px;
-    stroke: $color-darker-gray;
+    stroke: black;
+    transition: opacity .2s ease-out;
+  }
+  &.unselected {
+    opacity: 0.5;
+    transition: opacity .2s ease-out;
   }
 }
 

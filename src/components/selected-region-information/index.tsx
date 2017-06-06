@@ -54,6 +54,9 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       <div className="col-xs-12 col-md-6 col-lg-3">
         <div className="column">
           <div>
+            <h3 className={styles['section-heading']}>
+              Food production unit details
+            </h3>
             <h4 className={styles.heading}>Blue water stress</h4>
             <p className={styles.description}>Consumption / Availability</p>
             <DataLineChart
