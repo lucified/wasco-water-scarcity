@@ -228,13 +228,15 @@ class Gapminder extends React.Component<Props, void> {
       'g#main-group',
     );
 
+    const backgroundColorsGroup = g.select('g#background-colors');
+
+    // TODO: DRY up code for background colors
     if (xBackgroundColorScale) {
       const chartHeight = height - marginTop - marginBottom;
       const regionDataArray = values(data.regions);
       const xExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
       ) as [number, number];
-      const backgroundColorsGroup = g.select('g#background-colors');
       const thresholds = xBackgroundColorScale.domain();
       const colorAreaLowerBounds = [
         xExtent[0],
@@ -264,7 +266,6 @@ class Gapminder extends React.Component<Props, void> {
       const yExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
       ) as [number, number];
-      const backgroundColorsGroup = g.select('g#background-colors');
       const thresholds = yBackgroundColorScale.domain();
       const colorAreaLowerBounds = [
         yExtent[0],
