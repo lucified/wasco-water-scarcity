@@ -4,7 +4,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../../actions';
+import { setSelectedRegion, setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
@@ -23,6 +23,7 @@ interface GeneratedStateProps {
 
 interface GeneratedDispatchProps {
   setTimeIndex: (value: number) => void;
+  setSelectedRegion: (id: string) => void;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
@@ -59,6 +60,7 @@ function GapminderWrapper({
   selectedRegion,
   data,
   setTimeIndex,
+  setSelectedRegion,
 }: Props) {
   return (
     <div className="col-xs-12">
@@ -71,6 +73,7 @@ function GapminderWrapper({
           selectedRegion != null ? String(selectedRegion) : undefined
         }
         onHover={setTimeIndex}
+        onSelectData={setSelectedRegion}
         xSelector={shortageSelector}
         xBackgroundColorScale={shortageColorsScale}
         ySelector={stressSelector}
@@ -93,6 +96,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     setTimeIndex: (value: number) => {
       dispatch(setTimeIndex(value));
+    },
+    setSelectedRegion: (id: string) => {
+      dispatch(setSelectedRegion(Number(id)));
     },
   };
 }

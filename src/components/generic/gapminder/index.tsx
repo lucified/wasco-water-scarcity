@@ -61,6 +61,7 @@ interface PassedProps {
   marginBottom?: number;
   className?: string;
   onHover?: (hoveredIndex: number) => void;
+  onSelectData?: (id: string) => void;
   xBackgroundColorScale?: ScaleThreshold<number, string>;
   yBackgroundColorScale?: ScaleThreshold<number, string>;
 }
@@ -139,6 +140,7 @@ class Gapminder extends React.Component<Props, void> {
     this.circleOrder = this.circleOrder.bind(this);
     this.drawCircle = this.drawCircle.bind(this);
     this.drawSelectedPath = this.drawSelectedPath.bind(this);
+    this.handleCircleClick = this.handleCircleClick.bind(this);
     this.chartData = generateChartData(
       props.data,
       props.xSelector,
@@ -308,6 +310,7 @@ class Gapminder extends React.Component<Props, void> {
       .enter()
         .append<SVGCircleElement>('circle')
         .attr('class', styles.dot)
+        .on('click', this.handleCircleClick)
         .call(this.drawCircle)
         .sort(this.circleOrder);
 
@@ -332,6 +335,13 @@ class Gapminder extends React.Component<Props, void> {
       .attr('width', box.width)
       .attr('height', box.height)
       .on('mouseover', this.enableInteraction);
+  }
+
+  private handleCircleClick(d: ChartDatum) {
+    const { onSelectData } = this.props;
+    if (onSelectData) {
+      onSelectData(d.id);
+    }
   }
 
   private enableInteraction() {
