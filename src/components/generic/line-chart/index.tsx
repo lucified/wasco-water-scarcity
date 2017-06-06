@@ -220,7 +220,7 @@ class LineChart extends React.Component<Props, void> {
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
-    lineGroup
+    g
       .append('rect')
       .attr('class', styles.overlay)
       .attr('width', chartWidth)
