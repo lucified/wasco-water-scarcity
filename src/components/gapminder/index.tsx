@@ -1,3 +1,5 @@
+import { scaleThreshold } from 'd3-scale';
+import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -9,6 +11,7 @@ import {
   getSelectedRegion,
   getSelectedTimeIndex,
 } from '../../selectors';
+import { getDataTypeThresholds } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
 
@@ -24,17 +27,32 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
-function xSelector(data: { [dataType: string]: number[] }) {
+function shortageSelector(data: { [dataType: string]: number[] }) {
   return data.blueWaterShortage;
 }
 
-function ySelector(data: { [dataType: string]: number[] }) {
+function stressSelector(data: { [dataType: string]: number[] }) {
   return data.blueWaterStress;
 }
 
-function sizeSelector(data: { [dataType: string]: number[] }) {
+function populationSelector(data: { [dataType: string]: number[] }) {
   return data.population;
 }
+
+const stressThresholds = getDataTypeThresholds('blueWaterStress');
+const stressColorsScale = scaleThreshold<number, string>()
+  .domain(stressThresholds!)
+  .range(['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]);
+
+const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+const shortageColorsScale = scaleThreshold<number, string>()
+  .domain(shortageThresholds!)
+  .range(
+    [
+      'none',
+      ...schemePurples[shortageThresholds!.length + 1].slice(1),
+    ].reverse(),
+  );
 
 function GapminderWrapper({
   selectedTimeIndex,
@@ -53,9 +71,11 @@ function GapminderWrapper({
           selectedRegion != null ? String(selectedRegion) : undefined
         }
         onHover={setTimeIndex}
-        xSelector={xSelector}
-        ySelector={ySelector}
-        sizeSelector={sizeSelector}
+        xSelector={shortageSelector}
+        xBackgroundColorScale={shortageColorsScale}
+        ySelector={stressSelector}
+        yBackgroundColorScale={stressColorsScale}
+        sizeSelector={populationSelector}
       />
     </div>
   );

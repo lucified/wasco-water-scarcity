@@ -6,6 +6,7 @@ import {
   ScaleLogarithmic,
   ScalePower,
   scaleSqrt,
+  ScaleThreshold,
   scaleTime,
 } from 'd3-scale';
 import { mouse, select, Selection } from 'd3-selection';
@@ -60,6 +61,8 @@ interface PassedProps {
   marginBottom?: number;
   className?: string;
   onHover?: (hoveredIndex: number) => void;
+  xBackgroundColorScale?: ScaleThreshold<number, string>;
+  yBackgroundColorScale?: ScaleThreshold<number, string>;
 }
 
 interface DefaultProps {
@@ -210,14 +213,80 @@ class Gapminder extends React.Component<Props, void> {
       height,
       selectedTimeIndex,
       selectedData,
+      marginBottom,
+      marginLeft,
+      marginRight,
+      marginTop,
       data,
       xSelector,
       ySelector,
+      xBackgroundColorScale,
+      yBackgroundColorScale,
     } = this.props as PropsWithDefaults;
 
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
+
+    if (xBackgroundColorScale) {
+      const chartHeight = height - marginTop - marginBottom;
+      const regionDataArray = values(data.regions);
+      const xExtent = extent(
+        flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
+      ) as [number, number];
+      const backgroundColorsGroup = g.select('g#background-colors');
+      const thresholds = xBackgroundColorScale.domain();
+      const colorAreaLowerBounds = [
+        xExtent[0],
+        ...thresholds.filter(d => d > xExtent[0] && d <= xExtent[1]),
+      ];
+      const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
+        lowerBound,
+        upperBound: colorAreaLowerBounds[i + 1] || xExtent[1],
+      }));
+      // prettier-ignore
+      backgroundColorsGroup
+        .selectAll('rect.x-colors')
+        .data(colorAreas)
+        .enter()
+          .append('rect')
+          .attr('class', `${styles['background-colors']} x-colors`)
+          .attr('x', d => this.xScale!(d.upperBound))
+          .attr('y', 0)
+          .attr('height', chartHeight)
+          .attr('width', d => this.xScale!(d.lowerBound) - this.xScale!(d.upperBound))
+          .attr('fill', d => xBackgroundColorScale(d.lowerBound));
+    }
+
+    if (yBackgroundColorScale) {
+      const chartWidth = width - marginLeft - marginRight;
+      const regionDataArray = values(data.regions);
+      const yExtent = extent(
+        flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
+      ) as [number, number];
+      const backgroundColorsGroup = g.select('g#background-colors');
+      const thresholds = yBackgroundColorScale.domain();
+      const colorAreaLowerBounds = [
+        yExtent[0],
+        ...thresholds.filter(d => d > yExtent[0] && d <= yExtent[1]),
+      ];
+      const colorAreas = colorAreaLowerBounds.map((lowerBound, i) => ({
+        lowerBound,
+        upperBound: colorAreaLowerBounds[i + 1] || yExtent[1],
+      }));
+      // prettier-ignore
+      backgroundColorsGroup
+        .selectAll('rect.y-colors')
+        .data(colorAreas)
+        .enter()
+          .append('rect')
+          .attr('class', `${styles['background-colors']} y-colors`)
+          .attr('x', 0)
+          .attr('y', d => this.yScale!(d.upperBound))
+          .attr('width', chartWidth)
+          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
+          .attr('fill', d => yBackgroundColorScale(d.lowerBound));
+    }
 
     g.select('g#x-axis').call(axisBottom(this.xScale!));
     g.select('g#y-axis').call(axisLeft(this.yScale!));
@@ -409,6 +478,7 @@ class Gapminder extends React.Component<Props, void> {
         ref={this.storeSvgRef}
       >
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
+          <g id="background-colors" />
           <text
             id="year-label"
             className={styles['year-label']}
