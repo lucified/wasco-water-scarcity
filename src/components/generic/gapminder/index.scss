@@ -1,0 +1,41 @@
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+
+  &.x path {
+    display: none;
+  }
+}
+
+.background-colors {
+  opacity: 0.3;
+}
+
+.dot {
+  stroke: #000;
+  stroke-opacity: 0.4;
+}
+
+.selected-line {
+  fill: none;
+  stroke: darkcyan;
+  stroke-width: 1.5px;
+  stroke-dasharray: 3, 2;
+}
+
+.year-label {
+  font: 500 100px "Helvetica Neue";
+  fill: #ddd;
+
+  &.active {
+    fill: #aaa;
+  }
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+

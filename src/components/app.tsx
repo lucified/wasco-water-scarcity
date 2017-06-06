@@ -3,6 +3,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import Controls from './controls';
+import Gapminder from './gapminder';
 import Header from './header';
 import Map from './map';
 import SelectedRegionInformation from './selected-region-information';
@@ -23,6 +24,9 @@ class App extends React.Component<Props, void> {
           <div className={classNames(styles['map-content'], 'row')}>
             <Map />
             <SelectedRegionInformation />
+          </div>
+          <div className="row">
+            <Gapminder />
           </div>
         </div>
         <div className={styles.footer} />
