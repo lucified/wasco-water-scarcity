@@ -1,3 +1,5 @@
+// This is based on https://bost.ocks.org/mike/nations/
+
 import * as classNames from 'classnames';
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
@@ -145,6 +147,8 @@ class Gapminder extends React.Component<Props, void> {
     this.drawCircle = this.drawCircle.bind(this);
     this.drawSelectedPath = this.drawSelectedPath.bind(this);
     this.handleCircleClick = this.handleCircleClick.bind(this);
+    this.setYearLabel = this.setYearLabel.bind(this);
+
     this.chartData = generateChartData(
       props.data,
       props.xSelector,
@@ -229,7 +233,6 @@ class Gapminder extends React.Component<Props, void> {
     const {
       width,
       height,
-      selectedTimeIndex,
       selectedData,
       marginBottom,
       marginLeft,
@@ -315,9 +318,7 @@ class Gapminder extends React.Component<Props, void> {
       .select('text#year-label')
       .attr('y', chartHeight)
       .attr('x', chartWidth)
-      .text(
-        data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
-      );
+      .call(this.setYearLabel);
 
     // prettier-ignore
     g
@@ -352,6 +353,14 @@ class Gapminder extends React.Component<Props, void> {
       .attr('width', box.width)
       .attr('height', box.height)
       .on('mouseover', this.enableInteraction);
+  }
+
+  private setYearLabel(label: Selection<SVGTextElement, undefined, any, any>) {
+    const { data, selectedTimeIndex } = this.props;
+
+    label.text(
+      data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
+    );
   }
 
   private handleCircleClick(d: ChartDatum) {
@@ -441,13 +450,7 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private redrawChart() {
-    const {
-      data,
-      selectedTimeIndex,
-      selectedData,
-      xSelector,
-      ySelector,
-    } = this.props;
+    const { data, selectedData, xSelector, ySelector } = this.props;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
@@ -460,11 +463,8 @@ class Gapminder extends React.Component<Props, void> {
       .sort(this.circleOrder)
       .transition(t)
         .call(this.drawCircle as any);
-    g
-      .select('text#year-label')
-      .text(
-        data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
-      );
+
+    g.select('text#year-label').call(this.setYearLabel);
 
     if (selectedData) {
       const selectedDataSeries = data.regions[selectedData].data;
