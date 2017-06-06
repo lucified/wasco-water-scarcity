@@ -37,6 +37,8 @@ export const getTimeSeriesForSelectedRegion = createSelector(
   },
 );
 
+// Note: this function removes zero and negative values from the
+// stress and shortage data.
 // prettier-ignore
 export const getDataByRegion = createSelector<
   StateTree,
