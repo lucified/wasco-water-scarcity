@@ -23,10 +23,6 @@
   dependencies:
     "@types/d3-selection" "*"
 
-"@types/d3-color@*":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@types/d3-color/-/d3-color-1.0.5.tgz#cad755f0fc6de7b70fa6e5e08afa81ef4c2248de"
-
 "@types/d3-format@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/d3-format/-/d3-format-1.2.0.tgz#3e128efc9e6dd09df8fd21f1d981ab68e140a8a2"
@@ -36,12 +32,6 @@
   resolved "https://registry.yarnpkg.com/@types/d3-geo/-/d3-geo-1.6.3.tgz#21b501d1fe224d88877f39f84cb8c9dd8aa1bf28"
   dependencies:
     "@types/geojson" "*"
-
-"@types/d3-interpolate@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/@types/d3-interpolate/-/d3-interpolate-1.1.6.tgz#64041b15c9c032c348da1b22baabc59fa4d16136"
-  dependencies:
-    "@types/d3-color" "*"
 
 "@types/d3-path@*":
   version "1.0.6"
@@ -1597,7 +1587,7 @@ d3-geo@^1.1.0, d3-geo@^1.6.4:
   dependencies:
     d3-array "1"
 
-d3-interpolate@1, d3-interpolate@^1.1.5:
+d3-interpolate@1:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/d3-interpolate/-/d3-interpolate-1.1.5.tgz#69e099ff39214716e563c9aec3ea9d1ea4b8a79f"
   dependencies:

@@ -1,6 +1,5 @@
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
-// import { interpolateNumber } from 'd3-interpolate';
 import {
   scaleLog,
   ScaleLogarithmic,
@@ -9,7 +8,7 @@ import {
   scaleTime,
 } from 'd3-scale';
 import { mouse, select, Selection } from 'd3-selection';
-// import { transition } from 'd3-transition';
+import { transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import * as React from 'react';
@@ -247,29 +246,6 @@ class Gapminder extends React.Component<Props, void> {
       .attr('width', box.width)
       .attr('height', box.height)
       .on('mouseover', this.enableInteraction);
-
-    /*
-    // Tweens the entire chart by first tweening the year, and then the data.
-    // For the interpolated data, the dots and label are redrawn.
-    function tweenYear() {
-      const year = interpolateNumber(1800, 2009);
-      return t => {
-        displayYear(year(t));
-      };
-    }
-
-    // Finds (and possibly interpolates) the value for the specified year.
-    function interpolateValues(values, year: number) {
-      const i = bisectLeft(values, year, 0, values.length - 1);
-      const a = values[i];
-      if (i > 0) {
-        const b = values[i - 1];
-        const t = (year - a[0]) / (b[0] - a[0]);
-        return a[1] * (1 - t) + b[1] * t;
-      }
-      return a[1];
-    }
-    */
   }
 
   private enableInteraction() {
@@ -287,9 +263,6 @@ class Gapminder extends React.Component<Props, void> {
       .domain(timeExtent)
       .range([box.x + 10, box.x + box.width - 10])
       .clamp(true);
-
-    // Cancel the current transition, if any.
-    g.transition().duration(0);
 
     g
       .select<SVGRectElement>('rect.overlay')
@@ -335,12 +308,15 @@ class Gapminder extends React.Component<Props, void> {
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
+    const t = transition('gapminder').duration(100);
 
+    // prettier-ignore
     g
       .selectAll<SVGCircleElement, ChartDatum>('circle.dot')
       .data(this.chartData, d => d.id)
-      .call(this.circlePosition)
-      .sort(this.circleOrder);
+      .sort(this.circleOrder)
+      .transition(t)
+        .call(this.circlePosition as any);
     g
       .select('text#year-label')
       .text(
