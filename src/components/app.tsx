@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -19,7 +20,7 @@ class App extends React.Component<Props, void> {
         <Header />
         <Controls />
         <div className="container">
-          <div className="row">
+          <div className={classNames(styles['map-content'], 'row')}>
             <Map />
             <SelectedRegionInformation />
           </div>
