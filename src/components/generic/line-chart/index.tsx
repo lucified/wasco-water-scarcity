@@ -1,9 +1,15 @@
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
-import { scaleLinear, ScaleThreshold, scaleTime } from 'd3-scale';
+import {
+  scaleLinear,
+  ScaleLinear,
+  ScaleThreshold,
+  scaleTime,
+  ScaleTime,
+} from 'd3-scale';
 import { mouse, select } from 'd3-selection';
-import { curveLinear, line } from 'd3-shape';
+import { curveLinear, line, Line } from 'd3-shape';
 import { transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import * as React from 'react';
@@ -70,13 +76,55 @@ class LineChart extends React.Component<Props, void> {
 
   private svgRef?: SVGElement;
   private numberFormatter = format('.3g');
+  private xScale?: ScaleTime<number, number>;
+  private yScale?: ScaleLinear<number, number>;
+  private lineGenerator?: Line<Datum>;
 
   public componentDidMount() {
+    this.generateScales();
     this.drawChart();
   }
 
   public componentDidUpdate() {
+    this.generateScales();
     this.redrawChart();
+  }
+
+  private generateScales() {
+    const {
+      marginBottom,
+      marginLeft,
+      marginRight,
+      marginTop,
+      maxY,
+      minY,
+      width,
+      height,
+      data,
+    } = this.props as PropsWithDefaults;
+    const seriesData = data.series;
+    const dataValueExtent = extent(seriesData, d => d.value) as [
+      number,
+      number
+    ];
+
+    const chartWidth = width - marginLeft - marginRight;
+    const chartHeight = height - marginTop - marginBottom;
+
+    this.xScale = scaleTime<number, number>()
+      .domain(
+        extent(
+          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
+        ) as [Date, Date],
+      )
+      .range([0, chartWidth]);
+    this.yScale = scaleLinear()
+      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
+      .range([chartHeight, 0]);
+    this.lineGenerator = line<Datum>()
+      .curve(curveLinear)
+      .x(d => this.xScale!(toMidpoint(d.start, d.end)))
+      .y(d => this.yScale!(d.value));
   }
 
   private drawChart() {
@@ -85,8 +133,6 @@ class LineChart extends React.Component<Props, void> {
       marginLeft,
       marginRight,
       marginTop,
-      maxY,
-      minY,
       width,
       height,
       selectedTimeIndex,
@@ -105,22 +151,6 @@ class LineChart extends React.Component<Props, void> {
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
-
-    const xScale = scaleTime<number, number>()
-      .domain(
-        extent(
-          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
-        ) as [Date, Date],
-      )
-      .range([0, chartWidth]);
-    const yScale = scaleLinear()
-      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
-      .range([chartHeight, 0]);
-
-    const lineGenerator = line<Datum>()
-      .curve(curveLinear)
-      .x(d => xScale(toMidpoint(d.start, d.end)))
-      .y(d => yScale(d.value));
 
     if (backgroundColorScale) {
       const backgroundColorsGroup = g
@@ -145,24 +175,31 @@ class LineChart extends React.Component<Props, void> {
           .append('rect')
           .attr('class', styles['background-colors'])
           .attr('x', 0)
-          .attr('y', d => yScale(d.upperBound))
+          .attr('y', d => this.yScale!(d.upperBound))
           .attr('width', chartWidth)
-          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
     }
 
-    g.select('g#x-axis').call(axisBottom(xScale));
-    g.select('g#y-axis').call(axisLeft(yScale));
+    g
+      .select('g#x-axis')
+      .call(axisBottom(this.xScale!).ticks(Math.round(chartWidth / 50)));
+    g
+      .select('g#y-axis')
+      .call(axisLeft(this.yScale!).ticks(Math.round(chartHeight / 30)));
 
     if (selectedTimeIndex != null) {
       const selectedData = seriesData[selectedTimeIndex];
       g
         .append('rect')
         .attr('id', 'selected-group')
-        .attr('x', xScale(selectedData.start))
+        .attr('x', this.xScale!(selectedData.start))
         .attr('y', 0)
         .attr('height', chartHeight)
-        .attr('width', xScale(selectedData.end) - xScale(selectedData.start))
+        .attr(
+          'width',
+          this.xScale!(selectedData.end) - this.xScale!(selectedData.start),
+        )
         .attr('class', styles['selected-area']);
     }
 
@@ -180,7 +217,7 @@ class LineChart extends React.Component<Props, void> {
     lineGroup
       .append('path')
       .attr('class', styles.line)
-      .attr('d', d => lineGenerator(d.series))
+      .attr('d', d => this.lineGenerator!(d.series))
       .style('stroke', d => d.color);
 
     if (data.label) {
@@ -193,7 +230,9 @@ class LineChart extends React.Component<Props, void> {
         .attr(
           'transform',
           d =>
-            `translate(${xScale(d.lastDatum.end)},${yScale(d.lastDatum.value)}`,
+            `translate(${this.xScale!(d.lastDatum.end)},${this.yScale!(
+              d.lastDatum.value,
+            )}`,
         )
         .attr('x', 3)
         .attr('dy', '0.35em')
@@ -212,9 +251,9 @@ class LineChart extends React.Component<Props, void> {
         .attr('dy', '.35em')
         .attr(
           'transform',
-          `translate(${xScale(
+          `translate(${this.xScale!(
             toMidpoint(selectedData.start, selectedData.end),
-          )},${yScale(selectedData.value)})`,
+          )},${this.yScale!(selectedData.value)})`,
         )
         .text(this.numberFormatter(selectedData.value));
     }
@@ -257,35 +296,25 @@ class LineChart extends React.Component<Props, void> {
   }
 
   private handleMouseMove() {
-    const { data, width, marginLeft, marginRight, onHover } = this
-      .props as PropsWithDefaults;
+    const { onHover } = this.props as PropsWithDefaults;
 
     if (onHover) {
-      // TODO: don't create scale on each handling
-      const chartWidth = width - marginLeft - marginRight;
-      const xScale = scaleTime<number, number>()
-        .domain(
-          extent(
-            flatMap<Date[], Date>(data.series.map(d => [d.start, d.end])),
-          ) as [Date, Date],
-        )
-        .range([0, chartWidth]);
       const lineGroup = select(this.svgRef!).select<SVGGElement>(
         'g#line-group',
       );
-      const hoveredTime = xScale.invert(mouse(lineGroup.node() as any)[0]);
+      const hoveredTime = this.xScale!.invert(
+        mouse(lineGroup.node() as any)[0],
+      );
       onHover(this.findClosestIndex(hoveredTime));
     }
   }
 
   private redrawChart() {
     const {
-      marginBottom,
       marginLeft,
       marginRight,
+      marginBottom,
       marginTop,
-      maxY,
-      minY,
       width,
       height,
       backgroundColorScale,
@@ -304,22 +333,6 @@ class LineChart extends React.Component<Props, void> {
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
-
-    const xScale = scaleTime<number, number>()
-      .domain(
-        extent(
-          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
-        ) as [Date, Date],
-      )
-      .range([0, chartWidth]);
-    const yScale = scaleLinear()
-      .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
-      .range([chartHeight, 0]);
-
-    const lineGenerator = line<Datum>()
-      .curve(curveLinear)
-      .x(d => xScale(toMidpoint(d.start, d.end)))
-      .y(d => yScale(d.value));
 
     const t = transition('linechart').duration(100);
 
@@ -345,21 +358,29 @@ class LineChart extends React.Component<Props, void> {
           .append('rect')
           .attr('class', styles['background-colors'])
           .attr('x', 0)
-          .attr('y', d => yScale(d.upperBound))
+          .attr('y', d => this.yScale!(d.upperBound))
           .attr('width', chartWidth)
-          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
       // prettier-ignore
       colorRects
         .transition(t)
-          .attr('y', d => yScale(d.upperBound))
-          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
+          .attr('y', d => this.yScale!(d.upperBound))
+          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
       colorRects.exit().remove();
     }
 
-    g.select('g#x-axis').transition(t).call(axisBottom(xScale) as any);
-    g.select('g#y-axis').transition(t).call(axisLeft(yScale) as any);
+    // prettier-ignore
+    g
+      .select('g#x-axis')
+      .transition(t)
+        .call(axisBottom(this.xScale!).ticks(Math.round(chartWidth / 50)) as any);
+    // prettier-ignore
+    g
+      .select('g#y-axis')
+      .transition(t)
+        .call(axisLeft(this.yScale!).ticks(Math.round(chartHeight / 30)) as any);
 
     const lineGroup = g
       .selectAll<
@@ -372,7 +393,7 @@ class LineChart extends React.Component<Props, void> {
     lineGroup
       .select('path')
       .transition(t)
-        .attr('d', d => lineGenerator(d.series));
+        .attr('d', d => this.lineGenerator!(d.series));
 
     if (data.label) {
       lineGroup
@@ -385,7 +406,9 @@ class LineChart extends React.Component<Props, void> {
         .attr(
           'transform',
           d =>
-            `translate(${xScale(d.lastDatum.end)},${yScale(d.lastDatum.value)}`,
+            `translate(${this.xScale!(d.lastDatum.end)},${this.yScale!(
+              d.lastDatum.value,
+            )}`,
         )
         .text(d => d.label || '');
     }
@@ -398,8 +421,8 @@ class LineChart extends React.Component<Props, void> {
       g
         .select('rect#selected-group')
         .transition(t)
-          .attr('x', xScale(selectedData.start))
-          .attr('width', xScale(selectedData.end) - xScale(selectedData.start));
+          .attr('x', this.xScale!(selectedData.start))
+          .attr('width', this.xScale!(selectedData.end) - this.xScale!(selectedData.start));
 
       // prettier-ignore
       g
@@ -407,9 +430,9 @@ class LineChart extends React.Component<Props, void> {
         .transition(t)
           .attr(
             'transform',
-            `translate(${xScale(
+            `translate(${this.xScale!(
               toMidpoint(selectedData.start, selectedData.end),
-            )},${yScale(selectedData.value)})`,
+            )},${this.yScale!(selectedData.value)})`,
           )
           .text(this.numberFormatter(selectedData.value));
     }
