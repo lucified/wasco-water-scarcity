@@ -76,6 +76,10 @@ function GapminderWrapper({
         onSelectData={setSelectedRegion}
         xSelector={shortageSelector}
         xBackgroundColorScale={shortageColorsScale}
+        minX={100}
+        maxX={10000}
+        minY={0.01}
+        maxY={4}
         ySelector={stressSelector}
         yBackgroundColorScale={stressColorsScale}
         sizeSelector={populationSelector}

@@ -14,17 +14,14 @@
 
 .dot {
   stroke: #000;
-
-  &.selected {
-    fill: blue;
-    stroke-width: 2px;
-  }
+  stroke-opacity: 0.4;
 }
 
 .selected-line {
   fill: none;
-  stroke: darkblue;
+  stroke: darkcyan;
   stroke-width: 1.5px;
+  stroke-dasharray: 3, 2;
 }
 
 .year-label {

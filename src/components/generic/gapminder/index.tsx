@@ -54,6 +54,10 @@ interface PassedProps {
   ySelector: DataSeriesSelector;
   sizeSelector: DataSeriesSelector;
   selectedTimeIndex: number;
+  maxY?: number;
+  minY?: number;
+  maxX?: number;
+  minX?: number;
   selectedData?: string;
   marginLeft?: number;
   marginRight?: number;
@@ -127,7 +131,7 @@ function findClosestIndex(date: Date, data: Data) {
 class Gapminder extends React.Component<Props, void> {
   public static defaultProps: DefaultProps = {
     marginTop: 20,
-    marginRight: 80,
+    marginRight: 20,
     marginBottom: 30,
     marginLeft: 50,
   };
@@ -184,6 +188,10 @@ class Gapminder extends React.Component<Props, void> {
       marginTop,
       width,
       height,
+      maxY,
+      maxX,
+      minX,
+      minY,
       xSelector,
       ySelector,
       sizeSelector,
@@ -194,12 +202,20 @@ class Gapminder extends React.Component<Props, void> {
     const chartHeight = height - marginTop - marginBottom;
 
     const regionDataArray = values(data.regions);
-    const yExtent = extent(
-      flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
-    ) as [number, number];
-    const xExtent = extent(
-      flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
-    ) as [number, number];
+    const yExtent = minY && maxY
+      ? [minY, maxY]
+      : extent(
+          flatMap<number[], number>(
+            regionDataArray.map(d => ySelector(d.data)),
+          ),
+        ) as [number, number];
+    const xExtent = minX && maxX
+      ? [minX, maxX]
+      : extent(
+          flatMap<number[], number>(
+            regionDataArray.map(d => xSelector(d.data)),
+          ),
+        ) as [number, number];
     const sizeExtent = extent(
       flatMap<number[], number>(regionDataArray.map(d => sizeSelector(d.data))),
     ) as [number, number];
@@ -226,6 +242,9 @@ class Gapminder extends React.Component<Props, void> {
       yBackgroundColorScale,
     } = this.props as PropsWithDefaults;
 
+    const chartHeight = height - marginTop - marginBottom;
+    const chartWidth = width - marginLeft - marginRight;
+
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
@@ -234,7 +253,6 @@ class Gapminder extends React.Component<Props, void> {
 
     // TODO: DRY up code for background colors
     if (xBackgroundColorScale) {
-      const chartHeight = height - marginTop - marginBottom;
       const regionDataArray = values(data.regions);
       const xExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
@@ -263,7 +281,6 @@ class Gapminder extends React.Component<Props, void> {
     }
 
     if (yBackgroundColorScale) {
-      const chartWidth = width - marginLeft - marginRight;
       const regionDataArray = values(data.regions);
       const yExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
@@ -296,8 +313,8 @@ class Gapminder extends React.Component<Props, void> {
 
     const label = g
       .select('text#year-label')
-      .attr('y', height - 60)
-      .attr('x', width - 50)
+      .attr('y', chartHeight)
+      .attr('x', chartWidth)
       .text(
         data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
       );
@@ -394,7 +411,7 @@ class Gapminder extends React.Component<Props, void> {
       .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
       .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
       .attr('r', d => sizeScale!(d.size[selectedTimeIndex]))
-      .attr('fill', d => (d.id === selectedData ? 'blue' : d.color));
+      .attr('fill', d => (d.id === selectedData ? 'teal' : d.color));
   }
 
   private drawSelectedPath(
@@ -478,6 +495,7 @@ class Gapminder extends React.Component<Props, void> {
       marginLeft,
       marginTop,
       marginBottom,
+      marginRight,
       className,
     } = this.props as PropsWithDefaults;
 
@@ -488,8 +506,15 @@ class Gapminder extends React.Component<Props, void> {
         className={className}
         ref={this.storeSvgRef}
       >
+        <defs>
+          <clipPath id="chart-contents">
+            <rect
+              width={width - marginLeft - marginRight}
+              height={height - marginTop - marginBottom}
+            />
+          </clipPath>
+        </defs>
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <g id="background-colors" />
           <text
             id="year-label"
             className={styles['year-label']}
@@ -501,7 +526,10 @@ class Gapminder extends React.Component<Props, void> {
             transform={`translate(0,${height - marginTop - marginBottom})`}
           />
           <g id="y-axis" className={classNames(styles.axis, styles.y)} />
-          <g id="dots" />
+          <g clipPath="url(#chart-contents)">
+            <g id="background-colors" />
+            <g id="dots" />
+          </g>
           <path id="selected-data" className={styles['selected-line']} />
           <rect className={styles.overlay} />
         </g>
