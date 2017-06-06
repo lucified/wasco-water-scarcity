@@ -97,7 +97,7 @@ class Map extends React.Component<Props, void> {
 
   private svgRef?: SVGElement;
   private width = 893;
-  private height = this.width / 2;
+  private height = this.width / 1.9;
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
@@ -113,8 +113,8 @@ class Map extends React.Component<Props, void> {
 
     // Based on https://gist.github.com/mbostock/4448587
     const projection = geoNaturalEarth2()
-      .scale(this.width / 5)
-      .translate([this.width / 2.3, this.height / 1.75])
+      .scale(this.width / 4.6)
+      .translate([this.width / 2.2, this.height / 1.7])
       .precision(0.1);
     const path = geoPath().projection(projection);
 
