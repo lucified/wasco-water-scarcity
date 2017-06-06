@@ -222,6 +222,7 @@ class Gapminder extends React.Component<Props, void> {
 
     // prettier-ignore
     g
+      .select('g#dots')
       .selectAll<SVGGElement, ChartDatum>(`.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .enter()
@@ -355,7 +356,7 @@ class Gapminder extends React.Component<Props, void> {
             transform={`translate(0,${height - marginTop - marginBottom})`}
           />
           <g id="y-axis" className={classNames(styles.axis, styles.y)} />
-          <g className="dots" />
+          <g id="dots" />
           <rect className={styles.overlay} />
         </g>
       </svg>
