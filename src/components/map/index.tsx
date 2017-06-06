@@ -1,5 +1,5 @@
 import { axisBottom } from 'd3-axis';
-import { geoGraticule, geoPath } from 'd3-geo';
+import { geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
@@ -7,7 +7,7 @@ import { transition } from 'd3-transition';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { feature, mesh } from 'topojson';
+import { feature } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
