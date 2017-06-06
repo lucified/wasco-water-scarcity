@@ -12,6 +12,8 @@ import { mouse, select, Selection } from 'd3-selection';
 import { transition, Transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
+import zip = require('lodash/zip');
+import { curveLinear, line } from 'd3-shape';
 import * as React from 'react';
 
 const styles = require('./index.scss');
@@ -133,6 +135,7 @@ class Gapminder extends React.Component<Props, void> {
     this.enableInteraction = this.enableInteraction.bind(this);
     this.circleOrder = this.circleOrder.bind(this);
     this.drawCircle = this.drawCircle.bind(this);
+    this.drawSelectedPath = this.drawSelectedPath.bind(this);
     this.chartData = generateChartData(
       props.data,
       props.xSelector,
@@ -202,8 +205,15 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private drawChart() {
-    const { width, height, selectedTimeIndex, data } = this
-      .props as PropsWithDefaults;
+    const {
+      width,
+      height,
+      selectedTimeIndex,
+      selectedData,
+      data,
+      xSelector,
+      ySelector,
+    } = this.props as PropsWithDefaults;
 
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
@@ -230,6 +240,18 @@ class Gapminder extends React.Component<Props, void> {
         .attr('class', styles.dot)
         .call(this.drawCircle)
         .sort(this.circleOrder);
+
+    if (selectedData) {
+      const selectedDataSeries = data.regions[selectedData].data;
+      const pathData = zip(
+        xSelector(selectedDataSeries),
+        ySelector(selectedDataSeries),
+      );
+      g
+        .select<SVGPathElement>('path#selected-data')
+        .datum(pathData)
+        .call(this.drawSelectedPath);
+    }
 
     // Add an overlay for the year label.
     const box = (label.node() as any).getBBox();
@@ -281,7 +303,6 @@ class Gapminder extends React.Component<Props, void> {
     }
   }
 
-  // Positions the dots based on data.
   private drawCircle(
     circle:
       | Selection<SVGCircleElement, ChartDatum, any, any>
@@ -296,14 +317,40 @@ class Gapminder extends React.Component<Props, void> {
       .attr('fill', d => (d.id === selectedData ? 'blue' : d.color));
   }
 
+  private drawSelectedPath(
+    path: Selection<SVGPathElement, Array<[number, number]>, any, any>,
+  ) {
+    const lineGenerator = line<[number, number]>()
+      .curve(curveLinear)
+      .x(d => this.xScale!(d[0]))
+      .y(d => this.yScale!(d[1]));
+
+    path.attr('d', lineGenerator);
+  }
+
   // Defines a sort order so that the smallest dots are drawn on top.
+  // Selected data is always on top.
   private circleOrder(a: ChartDatum, b: ChartDatum) {
-    const { selectedTimeIndex } = this.props;
+    const { selectedTimeIndex, selectedData } = this.props;
+    if (a.id === selectedData) {
+      return 1;
+    }
+
+    if (b.id === selectedData) {
+      return -1;
+    }
+
     return b.size[selectedTimeIndex] - a.size[selectedTimeIndex];
   }
 
   private redrawChart() {
-    const { data, selectedTimeIndex } = this.props;
+    const {
+      data,
+      selectedTimeIndex,
+      selectedData,
+      xSelector,
+      ySelector,
+    } = this.props;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
@@ -321,6 +368,23 @@ class Gapminder extends React.Component<Props, void> {
       .text(
         data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
       );
+
+    if (selectedData) {
+      const selectedDataSeries = data.regions[selectedData].data;
+      const pathData = zip(
+        xSelector(selectedDataSeries),
+        ySelector(selectedDataSeries),
+      );
+      g
+        .select<SVGPathElement>('path#selected-data')
+        .datum(pathData)
+        .call(this.drawSelectedPath);
+    } else {
+      g
+        .select<SVGPathElement>('path#selected-data')
+        .datum(null)
+        .attr('d', null);
+    }
   }
 
   private storeSvgRef(el: SVGElement) {
@@ -357,6 +421,7 @@ class Gapminder extends React.Component<Props, void> {
           />
           <g id="y-axis" className={classNames(styles.axis, styles.y)} />
           <g id="dots" />
+          <path id="selected-data" className={styles['selected-line']} />
           <rect className={styles.overlay} />
         </g>
       </svg>

@@ -17,6 +17,12 @@
   }
 }
 
+.selected-line {
+  fill: none;
+  stroke: darkblue;
+  stroke-width: 1.5px;
+}
+
 .year-label {
   font: 500 100px "Helvetica Neue";
   fill: #ddd;
