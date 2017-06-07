@@ -1,3 +1,4 @@
+import { max } from 'd3-array';
 import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -11,9 +12,8 @@ import {
 } from '../../selectors';
 import { getDataTypeThresholds, StressShortageDatum } from '../../types';
 
-// import AvailabilityChart from './availability-chart';
-// import ConsumptionChart from './consumption-chart';
-// import PopulationChart from './population-chart';
+import AvailabilityChart from './availability-chart';
+import ConsumptionChart from './consumption-chart';
 import DataLineChart from './data-line-chart';
 
 const styles = require('./index.scss');
@@ -49,6 +49,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
 
     const stressThresholds = getDataTypeThresholds('blueWaterStress');
     const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+
+    const maxConsumptionOrAvailability = max(timeSeriesForSelectedRegion, d =>
+      Math.max(d.blueWaterAvailability, d.blueWaterConsumptionTotal),
+    );
 
     return (
       <div className="col-xs-12 col-md-6 col-lg-3">
@@ -88,20 +92,26 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
-          {/*<div className="col-xs-12 col-m-6">
+          <div>
+            <h4 className={styles.heading}>Blue water availability</h4>
+            <p className={styles.description}>Total availability (m³)</p>
             <AvailabilityChart
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
+              maxY={maxConsumptionOrAvailability}
             />
           </div>
-          <div className="col-xs-12 col-m-6">
+          <div>
+            <h4 className={styles.heading}>Blue water consumption</h4>
+            <p className={styles.description}>Consumption (m³)</p>
             <ConsumptionChart
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
+              maxY={maxConsumptionOrAvailability}
             />
-          </div> */}
+          </div>
         </div>
       </div>
     );
