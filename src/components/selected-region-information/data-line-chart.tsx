@@ -2,7 +2,7 @@ import { scaleThreshold } from 'd3-scale';
 import some = require('lodash/some');
 import * as React from 'react';
 
-import { DataType, WaterDatum } from '../../types';
+import { DataType, StressShortageDatum } from '../../types';
 
 import LineChart, { Data } from '../generic/line-chart';
 
@@ -15,7 +15,7 @@ interface PassedProps {
   thresholds?: number[];
   thresholdColors?: string[];
   yAxisLabel?: string;
-  data: WaterDatum[];
+  data: StressShortageDatum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
 }

@@ -20,8 +20,8 @@ import {
 import {
   DataType,
   getDataTypeThresholds,
+  StressShortageDatum,
   TimeAggregate,
-  WaterDatum,
 } from '../../types';
 import { WaterRegionFeature } from './types';
 
@@ -49,7 +49,7 @@ interface GeneratedDispatchProps {
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 const waterPropertySelector = (
-  d: WaterDatum,
+  d: StressShortageDatum,
   dataType: DataType,
 ): number | undefined => d[dataType];
 

@@ -9,7 +9,7 @@ import {
   getSelectedTimeIndex,
   getTimeSeriesForSelectedRegion,
 } from '../../selectors';
-import { getDataTypeThresholds, WaterDatum } from '../../types';
+import { getDataTypeThresholds, StressShortageDatum } from '../../types';
 
 // import AvailabilityChart from './availability-chart';
 // import ConsumptionChart from './consumption-chart';
@@ -20,7 +20,7 @@ const styles = require('./index.scss');
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  timeSeriesForSelectedRegion?: WaterDatum[];
+  timeSeriesForSelectedRegion?: StressShortageDatum[];
 }
 
 interface GeneratedDispatchProps {

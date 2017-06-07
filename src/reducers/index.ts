@@ -11,11 +11,15 @@ import {
   SET_TIME_INDEX,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
-import { RawWaterDatum, TimeAggregate, toWaterDatum } from '../types';
+import {
+  RawRegionStressShortageDatum,
+  TimeAggregate,
+  toStressShortageDatum,
+} from '../types';
 import { StateTree } from './types';
 
-let rawWaterData: RawWaterDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
-let yearlyGroupedData: RawWaterDatum[][] | null = values(
+let rawWaterData: RawRegionStressShortageDatum[] | null = require('../../data/FPU_decadal_bluewater.json');
+let yearlyGroupedData: RawRegionStressShortageDatum[][] | null = values(
   groupBy(rawWaterData!, ({ startYear }) => startYear),
 ).sort((a, b) => a[0].startYear - b[0].startYear);
 
@@ -24,7 +28,7 @@ const defaultState: StateTree = {
   waterData: yearlyGroupedData.map(group => ({
     startYear: group[0].startYear,
     endYear: group[0].endYear,
-    data: keyBy(group.map(toWaterDatum), d => d.featureId),
+    data: keyBy(group.map(toStressShortageDatum), d => d.featureId),
   })),
   selections: {
     timeIndex: 0,
