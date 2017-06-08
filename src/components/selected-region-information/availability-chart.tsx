@@ -40,8 +40,9 @@ export default function AvailabilityChart({
       maxYValue={maxY}
       height={120}
       marginBottom={20}
-      marginRight={10}
-      marginTop={10}
+      marginRight={0}
+      marginTop={5}
+      marginLeft={40}
       yTickFormat={yTickFormatter}
     />
   );
