@@ -76,7 +76,7 @@ class ConsumptionChart extends React.Component<Props, State> {
   }
 
   public render() {
-    const { data, maxY } = this.props;
+    const { data, maxY, selectedTimeIndex } = this.props;
     const { hoveredType } = this.state;
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
@@ -116,6 +116,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginTop={5}
           marginLeft={40}
           yTickFormat={yTickFormatter}
+          selectedIndex={selectedTimeIndex}
         />
       </div>
     );

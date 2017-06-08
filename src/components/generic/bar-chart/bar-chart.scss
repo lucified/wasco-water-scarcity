@@ -40,6 +40,11 @@ svg.chart {
   }
 }
 
+.selection-background {
+  fill: black;
+  opacity: 0.1;
+}
+
 .bar-group {
   // TODO: Having opacity 0.9 is maybe not the best choice color-wise, but we
   // can't set the color here because it overrides our proper colors

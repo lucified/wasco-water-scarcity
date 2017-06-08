@@ -34,6 +34,7 @@ export interface Props {
   maxYValue?: number;
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
+  selectedIndex?: number;
 }
 
 interface DefaultProps {
@@ -203,6 +204,29 @@ export default class BarChart extends React.Component<Props, {}> {
     });
   }
 
+  private getSelectionBackground() {
+    const { data, selectedIndex } = this.props;
+    if (selectedIndex == null) {
+      return null;
+    }
+
+    const selectedData = data[selectedIndex];
+    const xScale = this.getXScale();
+
+    return (
+      <rect
+        className={styles['selection-background']}
+        x={
+          xScale(String(selectedData.key))! -
+          xScale.paddingInner() * xScale.step() / 2
+        }
+        y={0}
+        width={xScale.step()}
+        height={this.getContentHeight()}
+      />
+    );
+  }
+
   private handleMouseOver(item: any) {
     const { onMouseOver } = this.props;
     if (onMouseOver) {
@@ -222,8 +246,14 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { className, marginLeft, marginTop, height, width } = this
-      .props as PropsWithDefaults;
+    const {
+      className,
+      marginLeft,
+      marginTop,
+      height,
+      width,
+      selectedIndex,
+    } = this.props as PropsWithDefaults;
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
     return (
@@ -238,6 +268,7 @@ export default class BarChart extends React.Component<Props, {}> {
             width={contentWidth}
             height={contentHeight}
           />
+          {selectedIndex != null && this.getSelectionBackground()}
           <AxisComponent
             axis={this.getXAxis()}
             className={`x ${styles.axis}`}

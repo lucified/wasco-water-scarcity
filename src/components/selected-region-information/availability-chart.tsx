@@ -18,7 +18,7 @@ const yTickFormatter = format('.2s');
 
 export default function AvailabilityChart({
   data,
-  // selectedTimeIndex,
+  selectedTimeIndex,
   // onTimeIndexChange,
   maxY,
 }: Props) {
@@ -44,6 +44,7 @@ export default function AvailabilityChart({
       marginTop={5}
       marginLeft={40}
       yTickFormat={yTickFormatter}
+      selectedIndex={selectedTimeIndex}
     />
   );
 }
