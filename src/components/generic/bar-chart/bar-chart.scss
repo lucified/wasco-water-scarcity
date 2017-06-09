@@ -1,0 +1,65 @@
+@import '../../definitions.scss';
+
+svg.chart {
+  overflow: visible;
+}
+
+.hide {
+  display: none;
+}
+
+.range-labels {
+  font-size: 0.8rem;
+}
+
+.background {
+  fill: transparent;
+}
+
+.axis {
+  font: 0.65rem sans-serif;
+
+  /* render tick marks */
+  line {
+    fill: none;
+    stroke: $color-darker-gray;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+  }
+
+  /* do not render axis */
+  path {
+    fill: none;
+    stroke: lighten(#000, 80);
+  }
+}
+
+.tick {
+  text {
+    font-size: 0.7rem;
+  }
+}
+
+.selection-background {
+  fill: black;
+  opacity: 0.1;
+}
+
+.selection-label {
+  font-size: 12px;
+  color: black;
+  text-shadow:
+    -1px 1px 0 white,
+    1px 1px 0 white;
+}
+
+.bar-group {
+  // TODO: Having opacity 0.9 is maybe not the best choice color-wise, but we
+  // can't set the color here because it overrides our proper colors
+  opacity: 0.9;
+  transition: opacity 0.25s;
+}
+
+.bar-group:hover {
+  opacity: 1;
+}
