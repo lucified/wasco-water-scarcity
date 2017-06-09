@@ -25,6 +25,9 @@ export default class Header extends React.Component<{}, void> {
               <div className={styles['navigation-item']}>
                 WATER SCARCITY
               </div>
+              <div className={styles['navigation-item']}>
+                FUTURE ACTIONS
+              </div>
             </div>
           </div>
         </div>
