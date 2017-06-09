@@ -251,14 +251,14 @@ export default class BarChart extends React.Component<Props, {}> {
     );
   }
 
-  private handleMouseOver(item: any) {
+  private handleMouseOver(item: BarChartDatum) {
     const { onMouseOver } = this.props;
     if (onMouseOver) {
       onMouseOver(item);
     }
   }
 
-  private handleMouseLeave(item: any) {
+  private handleMouseLeave(item: BarChartDatum) {
     const { onMouseLeave } = this.props;
     if (onMouseLeave) {
       setTimeout(() => {

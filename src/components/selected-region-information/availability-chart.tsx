@@ -19,7 +19,7 @@ const yTickFormatter = format('.2s');
 export default function AvailabilityChart({
   data,
   selectedTimeIndex,
-  // onTimeIndexChange,
+  onTimeIndexChange,
   maxY,
 }: Props) {
   const barChartData: BarChartDatum[] = data.map((d, i) => ({
@@ -34,6 +34,10 @@ export default function AvailabilityChart({
     ],
   }));
 
+  function handleHover(item: BarChartDatum) {
+    onTimeIndexChange(item.key);
+  }
+
   return (
     <BarChart
       data={barChartData}
@@ -45,6 +49,7 @@ export default function AvailabilityChart({
       marginLeft={40}
       yTickFormat={yTickFormatter}
       selectedIndex={selectedTimeIndex}
+      onMouseOver={handleHover}
     />
   );
 }

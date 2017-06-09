@@ -60,6 +60,7 @@ class ConsumptionChart extends React.Component<Props, State> {
     this.state = {};
 
     this.handleLegendHover = this.handleLegendHover.bind(this);
+    this.handleBarHover = this.handleBarHover.bind(this);
   }
 
   private handleLegendHover(title?: string) {
@@ -73,6 +74,10 @@ class ConsumptionChart extends React.Component<Props, State> {
         console.warn('Unknown type!', title);
       }
     }
+  }
+
+  private handleBarHover(item: BarChartDatum) {
+    this.props.onTimeIndexChange(item.key);
   }
 
   public render() {
@@ -117,6 +122,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginLeft={40}
           yTickFormat={yTickFormatter}
           selectedIndex={selectedTimeIndex}
+          onMouseOver={this.handleBarHover}
         />
       </div>
     );
