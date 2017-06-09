@@ -5,7 +5,9 @@
 }
 
 .logo {
-  margin: $default-margin $default-margin $default-margin 0;
+  margin-top: $default-margin;
+  margin-bottom: $default-margin;
+  margin-left: 0.5rem;
 }
 
 .heading {

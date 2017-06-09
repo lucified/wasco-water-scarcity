@@ -111,7 +111,6 @@ class ConsumptionChart extends React.Component<Props, State> {
 
     return (
       <div>
-        <Legend items={legendItems} onHover={this.handleLegendHover} />
         <BarChart
           data={barChartData}
           maxYValue={chartMaxValue}
@@ -124,6 +123,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           selectedIndex={selectedTimeIndex}
           onMouseOver={this.handleBarHover}
         />
+        <Legend items={legendItems} onHover={this.handleLegendHover} />
       </div>
     );
   }
