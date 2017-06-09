@@ -227,6 +227,33 @@ export default class BarChart extends React.Component<Props, {}> {
     );
   }
 
+  private getSelectionLabel() {
+    const { data, selectedIndex, yTickFormat } = this
+      .props as PropsWithDefaults;
+    if (selectedIndex == null) {
+      return null;
+    }
+
+    const selectedData = data[selectedIndex];
+    const xScale = this.getXScale();
+    const yScale = this.getYScale();
+
+    return (
+      <text
+        className={styles['selection-label']}
+        textAnchor="middle"
+        x={
+          xScale(String(selectedData.key))! +
+          (1 - xScale.paddingInner()) * xScale.step() / 2
+        }
+        y={yScale(selectedData.total)}
+        dy="-.35em"
+      >
+        {yTickFormat(selectedData.total)}
+      </text>
+    );
+  }
+
   private handleMouseOver(item: any) {
     const { onMouseOver } = this.props;
     if (onMouseOver) {
@@ -246,14 +273,8 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   public render() {
-    const {
-      className,
-      marginLeft,
-      marginTop,
-      height,
-      width,
-      selectedIndex,
-    } = this.props as PropsWithDefaults;
+    const { className, marginLeft, marginTop, height, width } = this
+      .props as PropsWithDefaults;
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
     return (
@@ -268,7 +289,7 @@ export default class BarChart extends React.Component<Props, {}> {
             width={contentWidth}
             height={contentHeight}
           />
-          {selectedIndex != null && this.getSelectionBackground()}
+          {this.getSelectionBackground()}
           <AxisComponent
             axis={this.getXAxis()}
             className={`x ${styles.axis}`}
@@ -279,6 +300,7 @@ export default class BarChart extends React.Component<Props, {}> {
             className={`y ${styles.axis}`}
           />
           {this.getBars()}
+          {this.getSelectionLabel()}
         </g>
       </svg>
     );

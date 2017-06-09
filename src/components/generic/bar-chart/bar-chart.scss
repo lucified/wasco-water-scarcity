@@ -45,6 +45,14 @@ svg.chart {
   opacity: 0.1;
 }
 
+.selection-label {
+  font-size: 12px;
+  color: black;
+  text-shadow:
+    -1px 1px 0 white,
+    1px 1px 0 white;
+}
+
 .bar-group {
   // TODO: Having opacity 0.9 is maybe not the best choice color-wise, but we
   // can't set the color here because it overrides our proper colors
