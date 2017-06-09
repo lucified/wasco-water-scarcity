@@ -242,10 +242,7 @@ export default class BarChart extends React.Component<Props, {}> {
       <text
         className={styles['selection-label']}
         textAnchor="middle"
-        x={
-          xScale(String(selectedData.key))! +
-          (1 - xScale.paddingInner()) * xScale.step() / 2
-        }
+        x={xScale(String(selectedData.key))! + xScale.bandwidth() / 2}
         y={yScale(selectedData.total)}
         dy="-.35em"
       >
