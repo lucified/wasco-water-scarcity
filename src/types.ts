@@ -229,6 +229,21 @@ export function getDataTypeThresholds(dataType: DataType) {
   return undefined;
 }
 
+export function getDataTypeColors(dataType: DataType) {
+  switch (dataType) {
+    case 'stress':
+      // From d3-scale-chromatic's schemePurple
+      return ['#cbc9e2', '#9e9ac8', '#6a51a3'];
+    case 'shortage':
+      return ['#f5f07f', '#e6dc4c', '#d7c919'];
+    case 'scarcity':
+      return ['#6a51a3', '#d7c919', 'rgb(203, 24, 29)'];
+  }
+
+  console.warn('Unknown data type', dataType);
+  return [];
+}
+
 export function waterPropertySelector(dataType: DataType) {
   switch (dataType) {
     case 'stress':

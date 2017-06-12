@@ -1,5 +1,4 @@
 import { scaleThreshold } from 'd3-scale';
-import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -11,7 +10,7 @@ import {
   getSelectedRegion,
   getSelectedTimeIndex,
 } from '../../selectors';
-import { getDataTypeThresholds } from '../../types';
+import { getDataTypeColors, getDataTypeThresholds } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
 
@@ -43,17 +42,12 @@ function populationSelector(data: { [dataType: string]: number[] }) {
 const stressThresholds = getDataTypeThresholds('stress');
 const stressColorsScale = scaleThreshold<number, string>()
   .domain(stressThresholds!)
-  .range(['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]);
+  .range(['none', ...getDataTypeColors('stress')]);
 
 const shortageThresholds = getDataTypeThresholds('shortage');
 const shortageColorsScale = scaleThreshold<number, string>()
   .domain(shortageThresholds!)
-  .range(
-    [
-      'none',
-      ...schemePurples[shortageThresholds!.length + 1].slice(1),
-    ].reverse(),
-  );
+  .range(['none', ...getDataTypeColors('shortage')].reverse());
 
 function GapminderWrapper({
   selectedTimeIndex,

@@ -1,7 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
-import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
@@ -19,6 +18,7 @@ import {
 } from '../../selectors';
 import {
   DataType,
+  getDataTypeColors,
   getDataTypeThresholds,
   StressShortageDatum,
   TimeAggregate,
@@ -59,6 +59,7 @@ interface DataTypeParameter {
 const stressThresholds = getDataTypeThresholds('stress')!;
 const shortageThresholds = getDataTypeThresholds('shortage')!;
 const scarcityThresholds = getDataTypeThresholds('scarcity')!;
+const emptyColor = '#D2E3E5';
 const allDataTypeParameters: DataTypeParameter[] = [
   {
     dataType: 'stress',
@@ -66,7 +67,7 @@ const allDataTypeParameters: DataTypeParameter[] = [
     thresholds: stressThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(stressThresholds)
-      .range(['#D2E3E5', ...schemeReds[stressThresholds.length + 1].slice(1)]),
+      .range([emptyColor, ...getDataTypeColors('stress')]),
   },
   {
     dataType: 'shortage',
@@ -75,12 +76,7 @@ const allDataTypeParameters: DataTypeParameter[] = [
     colorScale: scaleThreshold<number, string>()
       .domain(shortageThresholds)
       // Note: higher is better. Colors are reversed.
-      .range(
-        [
-          '#D2E3E5',
-          ...schemePurples[shortageThresholds.length + 1].slice(1),
-        ].reverse(),
-      ),
+      .range([emptyColor, ...getDataTypeColors('shortage')].reverse()),
   },
   {
     dataType: 'scarcity',
@@ -88,7 +84,7 @@ const allDataTypeParameters: DataTypeParameter[] = [
     thresholds: scarcityThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(scarcityThresholds)
-      .range(['#D2E3E5', 'purple', 'yellow', 'red']),
+      .range([emptyColor, ...getDataTypeColors('scarcity')]),
   },
 ];
 

@@ -10,7 +10,11 @@ import {
   getSelectedTimeIndex,
   getTimeSeriesForSelectedGlobalRegion,
 } from '../selectors';
-import { AggregateStressShortageDatum, DataType } from '../types';
+import {
+  AggregateStressShortageDatum,
+  DataType,
+  getDataTypeColors,
+} from '../types';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 import Legend, { LegendItem } from './generic/legend/index';
@@ -73,17 +77,7 @@ function getNotScarcePopulation(
 }
 
 function getScarceColor(dataType: DataType) {
-  switch (dataType) {
-    case 'stress':
-      return 'rgb(203, 24, 29)';
-    case 'shortage':
-      return 'rgb(106, 81, 163)';
-    case 'scarcity':
-      return 'purple';
-  }
-
-  console.warn('Unknown data type', dataType);
-  return 'black';
+  return getDataTypeColors(dataType)[2];
 }
 
 const yTickFormatter = format('.2s');
