@@ -115,7 +115,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginLeft={40}
           yTickFormat={yTickFormatter}
           selectedIndex={selectedTimeIndex}
-          onMouseOver={this.handleBarHover}
+          onMouseEnter={this.handleBarHover}
         />
         <Legend items={legendItems} onHover={this.handleLegendHover} />
       </div>

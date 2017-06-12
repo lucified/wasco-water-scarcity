@@ -147,7 +147,7 @@ function TimeSelector({
         yTickFormat={yTickFormatter}
         xTickFormat={xTickFormatter}
         selectedIndex={selectedIndex}
-        onMouseOver={handleHover}
+        onMouseEnter={handleHover}
         hideSelectedLabel
       />
       <Legend items={legendItems} />

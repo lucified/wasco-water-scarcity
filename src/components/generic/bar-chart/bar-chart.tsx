@@ -2,13 +2,7 @@ import * as classNames from 'classnames';
 import { max } from 'd3-array';
 import { Axis, axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
-import {
-  scaleBand,
-  ScaleBand,
-  ScaleLinear,
-  scaleLinear,
-  ScaleOrdinal,
-} from 'd3-scale';
+import { scaleBand, ScaleBand, ScaleLinear, scaleLinear } from 'd3-scale';
 import * as React from 'react';
 
 import AxisComponent from '../axis';
@@ -27,8 +21,8 @@ export interface Props {
   marginBottom?: number;
   xTickFormat?: (value: string) => string;
   yTickFormat?: (value: number) => string;
-  onMouseOver?: (item: BarChartDatum) => void;
-  onMouseLeave?: (item: BarChartDatum) => void;
+  onMouseEnter?: (item: BarChartDatum) => void;
+  onMouseOut?: (item: BarChartDatum) => void;
   maxYValue?: number;
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
@@ -49,6 +43,50 @@ interface DefaultProps {
 
 type PropsWithDefaults = Props & DefaultProps;
 
+interface HoverRectProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  data: BarChartDatum;
+  onMouseEnter: (item: BarChartDatum) => void;
+  onMouseOut: (item: BarChartDatum) => void;
+}
+
+class HoverRect extends React.PureComponent<HoverRectProps, void> {
+  constructor(props: HoverRectProps) {
+    super(props);
+
+    this.handleMouseOut = this.handleMouseOut.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+  }
+
+  private handleMouseOut() {
+    this.props.onMouseOut(this.props.data);
+  }
+
+  private handleMouseEnter() {
+    this.props.onMouseEnter(this.props.data);
+  }
+
+  public render() {
+    const { x, y, width, height } = this.props;
+
+    return (
+      <rect
+        className={styles['hover-area']}
+        x={x}
+        y={y}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseOut={this.handleMouseOut}
+        width={width}
+        height={height}
+      />
+    );
+  }
+}
+
+// tslint:disable:max-classes-per-file
 export default class BarChart extends React.Component<Props, {}> {
   public static defaultProps: DefaultProps = {
     height: 160,
@@ -66,6 +104,14 @@ export default class BarChart extends React.Component<Props, {}> {
   private _yAxis?: Axis<number> | null;
   private _xAxis?: Axis<string> | null;
   private _enrichedData?: BarChartDatum[] | null;
+  private _mouseOutTimer?: any;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.handleMouseOut = this.handleMouseOut.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+  }
 
   public componentWillReceiveProps(nextProps: Props) {
     if (nextProps.data !== this.props.data) {
@@ -83,6 +129,12 @@ export default class BarChart extends React.Component<Props, {}> {
 
     if (nextProps.yTickFormat !== this.props.yTickFormat) {
       this._yAxis = null;
+    }
+  }
+
+  public componentWillUnmount() {
+    if (this._mouseOutTimer) {
+      clearTimeout(this._mouseOutTimer);
     }
   }
 
@@ -247,33 +299,31 @@ export default class BarChart extends React.Component<Props, {}> {
     const xScale = this.getXScale();
 
     return data.map(d =>
-      <rect
+      <HoverRect
         key={`hover-${d.key}`}
-        className={styles['hover-area']}
-        x={xScale(String(d.key))}
+        x={xScale(String(d.key))!}
         y={0}
-        onMouseOver={() => this.handleMouseOver(d)}
-        onMouseOut={() => this.handleMouseLeave(d)}
         width={xScale.step()}
         height={this.getContentHeight()}
+        onMouseOut={this.handleMouseOut}
+        onMouseEnter={this.handleMouseEnter}
+        data={d}
       />,
     );
   }
 
-  private handleMouseOver(item: BarChartDatum) {
-    const { onMouseOver } = this.props;
-    if (onMouseOver) {
-      onMouseOver(item);
+  private handleMouseEnter(item: BarChartDatum) {
+    const { onMouseEnter } = this.props;
+    if (onMouseEnter) {
+      onMouseEnter(item);
     }
   }
 
-  private handleMouseLeave(item: BarChartDatum) {
-    const { onMouseLeave } = this.props;
-    if (onMouseLeave) {
-      setTimeout(() => {
-        if (onMouseLeave) {
-          onMouseLeave(item);
-        }
+  private handleMouseOut(item: BarChartDatum) {
+    const { onMouseOut } = this.props;
+    if (onMouseOut) {
+      this._mouseOutTimer = setTimeout(() => {
+        onMouseOut(item);
       }, 100);
     }
   }

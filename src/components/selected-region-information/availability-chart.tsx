@@ -49,7 +49,7 @@ export default function AvailabilityChart({
       marginLeft={40}
       yTickFormat={yTickFormatter}
       selectedIndex={selectedTimeIndex}
-      onMouseOver={handleHover}
+      onMouseEnter={handleHover}
     />
   );
 }
