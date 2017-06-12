@@ -13,6 +13,7 @@ import {
 import { AggregateStressShortageDatum, DataType } from '../types';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
+import Legend, { LegendItem } from './generic/legend/index';
 
 const styles = require('./time-selector.scss');
 
@@ -78,6 +79,17 @@ function getScarceColor(dataType: DataType) {
   return 'purple';
 }
 
+function getScarceTitle(dataType: DataType) {
+  switch (dataType) {
+    case 'blueWaterStress':
+      return 'stress';
+    case 'blueWaterShortage':
+      return 'shortage';
+  }
+  // TODO: be able to store scarcity into state
+  return 'scarcity';
+}
+
 const yTickFormatter = format('.2s');
 
 function TimeSelector({
@@ -86,6 +98,7 @@ function TimeSelector({
   selectedIndex,
   setSelectedTime,
 }: Props) {
+  // TODO: don't regenerate on each render
   const barChartData: BarChartDatum[] = data.map((d, i) => ({
     key: i,
     total: d.population,
@@ -102,6 +115,16 @@ function TimeSelector({
       },
     ],
   }));
+  const legendItems: LegendItem[] = [
+    {
+      color: getScarceColor(dataType),
+      title: `Population under ${getScarceTitle(dataType)}`,
+    },
+    {
+      color: 'lightgray',
+      title: `No ${getScarceTitle(dataType)}`,
+    },
+  ];
 
   function handleHover(item: BarChartDatum) {
     setSelectedTime(item.key);
@@ -113,19 +136,22 @@ function TimeSelector({
   }
 
   return (
-    <BarChart
-      data={barChartData}
-      height={120}
-      marginBottom={20}
-      marginRight={0}
-      marginTop={5}
-      marginLeft={40}
-      yTickFormat={yTickFormatter}
-      xTickFormat={xTickFormatter}
-      selectedIndex={selectedIndex}
-      onMouseOver={handleHover}
-      hideSelectedLabel
-    />
+    <div>
+      <BarChart
+        data={barChartData}
+        height={120}
+        marginBottom={20}
+        marginRight={0}
+        marginTop={5}
+        marginLeft={40}
+        yTickFormat={yTickFormatter}
+        xTickFormat={xTickFormatter}
+        selectedIndex={selectedIndex}
+        onMouseOver={handleHover}
+        hideSelectedLabel
+      />
+      <Legend items={legendItems} />
+    </div>
   );
 }
 
