@@ -89,6 +89,11 @@ export interface StressShortageDatum {
   blueWaterStress: number;
   blueWaterAvailability: number;
   blueWaterConsumptionTotal: number;
+  /**
+   * This is a sum of the consumptions. It may differ slightly from
+   * blueWaterConsumptionTotal due to rounding and floating numbers.
+   */
+  blueWaterConsumptionCalculatedTotal: number;
   blueWaterConsumptionIrrigation: number;
   blueWaterConsumptionDomestic: number;
   blueWaterConsumptionElectric: number;
@@ -113,6 +118,13 @@ export function toStressShortageDatum({
   blueWaterShortage,
   population,
 }: RawRegionStressShortageDatum): StressShortageDatum {
+  const calculatedTotal =
+    blueWaterConsumptionDomestic +
+    blueWaterConsumptionElectric +
+    blueWaterConsumptionIrrigation +
+    blueWaterConsumptionLivestock +
+    blueWaterConsumptionManufacturing;
+
   return {
     startYear,
     endYear,
@@ -129,6 +141,7 @@ export function toStressShortageDatum({
     blueWaterConsumptionManufacturing:
       blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionCalculatedTotal: calculatedTotal,
     blueWaterStress,
     blueWaterShortage,
     population,

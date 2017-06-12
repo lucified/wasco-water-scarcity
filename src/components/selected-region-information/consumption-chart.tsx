@@ -86,15 +86,9 @@ class ConsumptionChart extends React.Component<Props, State> {
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
     const barChartData: BarChartDatum[] = data.map((d, i) => {
-      const total =
-        d.blueWaterConsumptionDomestic +
-        d.blueWaterConsumptionElectric +
-        d.blueWaterConsumptionIrrigation +
-        d.blueWaterConsumptionLivestock +
-        d.blueWaterConsumptionManufacturing;
       return {
         key: i,
-        total,
+        total: d.blueWaterConsumptionCalculatedTotal,
         values: legendItems
           // Filter out fields with zero and if we're hovered, only the hovered type
           .filter(
