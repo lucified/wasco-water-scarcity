@@ -38,11 +38,9 @@ export default class Legend extends React.Component<Props, State> {
       styles.title,
     );
     const title = titleElements[0] && titleElements[0].textContent;
-    if (title) {
+    if (title && onHover) {
       this.setState({ hoveredItemTitle: title });
-      if (onHover) {
-        onHover(title);
-      }
+      onHover(title);
     } else {
       console.warn('Unknown title', titleElements);
     }
@@ -50,8 +48,8 @@ export default class Legend extends React.Component<Props, State> {
 
   private onHoverLeave() {
     const { onHover } = this.props;
-    this.setState({ hoveredItemTitle: undefined });
     if (onHover) {
+      this.setState({ hoveredItemTitle: undefined });
       onHover();
     }
   }
