@@ -1,9 +1,11 @@
 import { DataType } from '../types';
 import {
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_GLOBAL_REGION,
   SET_SELECTED_REGION,
   SET_TIME_INDEX,
   SetSelectedDataTypeAction,
+  SetSelectedGlobalRegionAction,
   SetSelectedRegionAction,
   SetTimeIndexAction,
   TOGGLE_SELECTED_REGION,
@@ -27,6 +29,15 @@ export function toggleSelectedRegion(id: number): ToggleSelectedRegionAction {
 export function setSelectedRegion(id?: number): SetSelectedRegionAction {
   return {
     type: SET_SELECTED_REGION,
+    id,
+  };
+}
+
+export function setSelectedGlobalRegion(
+  id: number,
+): SetSelectedGlobalRegionAction {
+  return {
+    type: SET_SELECTED_GLOBAL_REGION,
     id,
   };
 }

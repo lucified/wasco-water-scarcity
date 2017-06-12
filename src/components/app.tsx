@@ -2,11 +2,12 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-import Controls from './controls';
+import DataSelector from './data-selector';
 import Gapminder from './gapminder';
 import Header from './header';
 import Map from './map';
 import SelectedRegionInformation from './selected-region-information';
+import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
 
@@ -20,10 +21,27 @@ class App extends React.Component<Props, void> {
       <div className={styles.root}>
         <Header />
         <div className="container">
-          <h1>Water Scarcity</h1>
-          <p>Placeholder for information text about water scarcity</p>
+          <div className="row">
+            <div className="col-xs-12 col-md-6">
+              <h1>Water Scarcity</h1>
+              <p>Placeholder for information text about water scarcity</p>
+            </div>
+            <div
+              className={classNames(
+                'col-xs-12',
+                'col-md-6',
+                styles['data-selector'],
+              )}
+            >
+              <DataSelector />
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-xs-12">
+              <TimeSelector />
+            </div>
+          </div>
         </div>
-        <Controls />
         <div className="container">
           <div className={classNames(styles['map-content'], 'row')}>
             <Map />

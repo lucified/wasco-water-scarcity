@@ -61,6 +61,7 @@ class ConsumptionChart extends React.Component<Props, State> {
 
     this.handleLegendHover = this.handleLegendHover.bind(this);
     this.handleBarHover = this.handleBarHover.bind(this);
+    this.xTickFormatter = this.xTickFormatter.bind(this);
   }
 
   private handleLegendHover(title?: string) {
@@ -80,21 +81,24 @@ class ConsumptionChart extends React.Component<Props, State> {
     this.props.onTimeIndexChange(item.key);
   }
 
+  private xTickFormatter(index: string) {
+    const { data } = this.props;
+    const formatter = format('02d');
+    const i = Number(index);
+    return `${formatter(data[i].startYear % 100)}-${formatter(
+      data[i].endYear % 100,
+    )}`;
+  }
+
   public render() {
     const { data, maxY, selectedTimeIndex } = this.props;
     const { hoveredType } = this.state;
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
     const barChartData: BarChartDatum[] = data.map((d, i) => {
-      const total =
-        d.blueWaterConsumptionDomestic +
-        d.blueWaterConsumptionElectric +
-        d.blueWaterConsumptionIrrigation +
-        d.blueWaterConsumptionLivestock +
-        d.blueWaterConsumptionManufacturing;
       return {
         key: i,
-        total,
+        total: d.blueWaterConsumptionCalculatedTotal,
         values: legendItems
           // Filter out fields with zero and if we're hovered, only the hovered type
           .filter(
@@ -120,8 +124,9 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginTop={5}
           marginLeft={40}
           yTickFormat={yTickFormatter}
+          xTickFormat={this.xTickFormatter}
           selectedIndex={selectedTimeIndex}
-          onMouseOver={this.handleBarHover}
+          onMouseEnter={this.handleBarHover}
         />
         <Legend items={legendItems} onHover={this.handleLegendHover} />
       </div>

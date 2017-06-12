@@ -38,6 +38,14 @@ export default function AvailabilityChart({
     onTimeIndexChange(item.key);
   }
 
+  function xTickFormatter(index: string) {
+    const formatter = format('02d');
+    const i = Number(index);
+    return `${formatter(data[i].startYear % 100)}-${formatter(
+      data[i].endYear % 100,
+    )}`;
+  }
+
   return (
     <BarChart
       data={barChartData}
@@ -48,8 +56,9 @@ export default function AvailabilityChart({
       marginTop={5}
       marginLeft={40}
       yTickFormat={yTickFormatter}
+      xTickFormat={xTickFormatter}
       selectedIndex={selectedTimeIndex}
-      onMouseOver={handleHover}
+      onMouseEnter={handleHover}
     />
   );
 }

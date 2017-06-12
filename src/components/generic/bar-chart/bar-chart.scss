@@ -18,6 +18,7 @@ svg.chart {
 
 .axis {
   font: 0.65rem sans-serif;
+  overflow-y: none;
 
   /* render tick marks */
   line {
@@ -53,13 +54,7 @@ svg.chart {
     1px 1px 0 white;
 }
 
-.bar-group {
-  // TODO: Having opacity 0.9 is maybe not the best choice color-wise, but we
-  // can't set the color here because it overrides our proper colors
-  opacity: 0.9;
-  transition: opacity 0.25s;
-}
-
-.bar-group:hover {
-  opacity: 1;
+.hover-area {
+  fill: none;
+  pointer-events: all;
 }

@@ -1,8 +1,8 @@
-export interface TimeAggregate {
+export interface TimeAggregate<T> {
   startYear: number;
   endYear: number;
   data: {
-    [featureId: number]: StressShortageDatum;
+    [featureId: number]: T;
   };
 }
 
@@ -80,6 +80,32 @@ export interface RawAggregateStressShortageDatum {
 }
 
 // All units have been converted to m^3 from km^3
+export interface AggregateStressShortageDatum {
+  startYear: number;
+  endYear: number;
+  // The globalRegionID. Set to 0 for the globe.
+  featureId: number;
+
+  population: number;
+
+  // For scarcity
+  populationNoBlueWaterShortageAndStress: number;
+  populationOnlyBlueWaterShortage: number;
+  populationOnlyBlueWaterStress: number;
+  populationBlueWaterShortageAndStress: number;
+
+  // For shortage
+  populationNoBlueWaterShortage: number;
+  populationModerateBlueWaterShortage: number;
+  populationHighBlueWaterShortage: number;
+
+  // For stress
+  populationNoBlueWaterStress: number;
+  populationModerateBlueWaterStress: number;
+  populationHighBlueWaterStress: number;
+}
+
+// All units have been converted to m^3 from km^3
 export interface StressShortageDatum {
   startYear: number;
   endYear: number;
@@ -89,6 +115,11 @@ export interface StressShortageDatum {
   blueWaterStress: number;
   blueWaterAvailability: number;
   blueWaterConsumptionTotal: number;
+  /**
+   * This is a sum of the consumptions. It may differ slightly from
+   * blueWaterConsumptionTotal due to rounding and floating numbers.
+   */
+  blueWaterConsumptionCalculatedTotal: number;
   blueWaterConsumptionIrrigation: number;
   blueWaterConsumptionDomestic: number;
   blueWaterConsumptionElectric: number;
@@ -113,6 +144,14 @@ export function toStressShortageDatum({
   blueWaterShortage,
   population,
 }: RawRegionStressShortageDatum): StressShortageDatum {
+  const calculatedTotal =
+    (blueWaterConsumptionDomestic +
+      blueWaterConsumptionElectric +
+      blueWaterConsumptionIrrigation +
+      blueWaterConsumptionLivestock +
+      blueWaterConsumptionManufacturing) *
+    KM_3_TO_M_3_RATIO;
+
   return {
     startYear,
     endYear,
@@ -129,9 +168,44 @@ export function toStressShortageDatum({
     blueWaterConsumptionManufacturing:
       blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionCalculatedTotal: calculatedTotal,
     blueWaterStress,
     blueWaterShortage,
     population,
+  };
+}
+
+export function toAggregateStressShortageDatum({
+  startYear,
+  endYear,
+  featureId,
+  population,
+  populationBlueWaterShortageAndStress,
+  populationHighBlueWaterShortage,
+  populationHighBlueWaterStress,
+  populationModerateBlueWaterShortage,
+  populationModerateBlueWaterStress,
+  populationNoBlueWaterShortage,
+  populationNoBlueWaterShortageAndStress,
+  populationNoBlueWaterStress,
+  populationOnlyBlueWaterShortage,
+  populationOnlyBlueWaterStress,
+}: RawAggregateStressShortageDatum) {
+  return {
+    startYear,
+    endYear,
+    featureId,
+    population,
+    populationBlueWaterShortageAndStress,
+    populationHighBlueWaterShortage,
+    populationHighBlueWaterStress,
+    populationModerateBlueWaterShortage,
+    populationModerateBlueWaterStress,
+    populationNoBlueWaterShortage,
+    populationNoBlueWaterShortageAndStress,
+    populationNoBlueWaterStress,
+    populationOnlyBlueWaterShortage,
+    populationOnlyBlueWaterStress,
   };
 }
 
