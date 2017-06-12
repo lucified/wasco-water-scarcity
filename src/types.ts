@@ -145,11 +145,12 @@ export function toStressShortageDatum({
   population,
 }: RawRegionStressShortageDatum): StressShortageDatum {
   const calculatedTotal =
-    blueWaterConsumptionDomestic +
-    blueWaterConsumptionElectric +
-    blueWaterConsumptionIrrigation +
-    blueWaterConsumptionLivestock +
-    blueWaterConsumptionManufacturing;
+    (blueWaterConsumptionDomestic +
+      blueWaterConsumptionElectric +
+      blueWaterConsumptionIrrigation +
+      blueWaterConsumptionLivestock +
+      blueWaterConsumptionManufacturing) *
+    KM_3_TO_M_3_RATIO;
 
   return {
     startYear,
