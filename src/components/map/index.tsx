@@ -1,7 +1,7 @@
 import { axisBottom } from 'd3-axis';
 import { geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
-import { schemeOranges, schemePurples, schemeReds } from 'd3-scale-chromatic';
+import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
@@ -88,10 +88,7 @@ const allDataTypeParameters: DataTypeParameter[] = [
     thresholds: scarcityThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(scarcityThresholds)
-      .range([
-        '#D2E3E5',
-        ...schemeOranges[scarcityThresholds.length + 1].slice(1),
-      ]),
+      .range(['#D2E3E5', 'purple', 'yellow', 'red']),
   },
 ];
 

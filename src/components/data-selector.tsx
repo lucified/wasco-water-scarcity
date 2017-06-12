@@ -34,8 +34,9 @@ class DataTypeSelector extends React.Component<
   public render() {
     const caseSelection = this.props.dataType;
     const dataTypes: Array<[DataType, string]> = [
-      ['stress', 'Blue Water Stress'],
-      ['shortage', 'Blue Water Shortage'],
+      ['scarcity', 'Scarcity'],
+      ['stress', 'Stress'],
+      ['shortage', 'Shortage'],
     ];
 
     return (
