@@ -1,7 +1,12 @@
 import { axisBottom } from 'd3-axis';
 import { geoPath } from 'd3-geo';
-import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
-import { select } from 'd3-selection';
+import {
+  scaleLinear,
+  ScaleLinear,
+  scaleThreshold,
+  ScaleThreshold,
+} from 'd3-scale';
+import { select, Selection } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -94,19 +99,73 @@ class Map extends React.Component<Props, void> {
 
     this.saveSvgRef = this.saveSvgRef.bind(this);
     this.handleRegionClick = this.handleRegionClick.bind(this);
+    this.drawLegendRectangle = this.drawLegendRectangle.bind(this);
+    this.addLegendLabels = this.addLegendLabels.bind(this);
   }
 
   private svgRef?: SVGElement;
   private width = 1200;
   private height = this.width / 1.9;
+  private legendWidth = 200;
+  private colorScale?: ScaleThreshold<number, string>;
+  private legendXScale?: ScaleLinear<number, number>;
+  private legendExtentPairs?: Array<[number, number]>;
 
   private saveSvgRef(ref: SVGElement) {
     this.svgRef = ref;
   }
 
   public componentDidMount() {
+    this.generateScales();
     this.drawMap();
     this.drawLegend();
+  }
+
+  public componentDidUpdate(prevProps: Props) {
+    if (
+      prevProps.selectedData !== this.props.selectedData ||
+      prevProps.selectedRegion !== this.props.selectedRegion
+    ) {
+      this.redrawFillsAndBorders();
+    }
+
+    if (prevProps.selectedDataType !== this.props.selectedDataType) {
+      this.generateScales();
+      this.redrawFillsAndBorders();
+      this.redrawLegend();
+    }
+  }
+
+  private generateScales() {
+    const { selectedDataType } = this.props;
+    const dataTypeParameters = allDataTypeParameters.find(
+      d => d.dataType === selectedDataType,
+    );
+    if (!dataTypeParameters) {
+      console.error('Unknown data type!', selectedDataType);
+      return;
+    }
+
+    const { colorScale, thresholds } = dataTypeParameters;
+    // Based on https://bl.ocks.org/mbostock/4060606
+    const maxThreshold = thresholds[thresholds.length - 1];
+    const xScale = scaleLinear()
+      .domain([0, 2 * maxThreshold])
+      .rangeRound([0, this.legendWidth]);
+
+    this.legendExtentPairs = colorScale.range().map(d => {
+      const colorExtent = colorScale.invertExtent(d);
+      if (colorExtent[0] == null) {
+        colorExtent[0] = xScale.domain()[0];
+      }
+      if (colorExtent[1] == null) {
+        colorExtent[1] = xScale.domain()[1];
+      }
+
+      return colorExtent as [number, number];
+    });
+    this.colorScale = colorScale;
+    this.legendXScale = xScale;
   }
 
   private drawMap() {
@@ -151,54 +210,39 @@ class Map extends React.Component<Props, void> {
   }
 
   private drawLegend() {
-    const { selectedDataType } = this.props;
-    const dataTypeParameters = allDataTypeParameters.find(
-      d => d.dataType === selectedDataType,
+    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+      'g#legend',
     );
-    if (!dataTypeParameters) {
-      console.error('Unknown data type!', selectedDataType);
-      return;
-    }
-    const { colorScale, thresholds } = dataTypeParameters;
-
-    // Based on https://bl.ocks.org/mbostock/4060606
-    const width = 200;
-    const svg = select<SVGElement, undefined>(this.svgRef!);
-
-    const maxThreshold = thresholds[thresholds.length - 1];
-    const xScale = scaleLinear()
-      .domain([0, 2 * maxThreshold])
-      .rangeRound([0, width]);
-    const g = svg.select<SVGGElement>('g#legend');
 
     // prettier-ignore
     g
       .selectAll('rect')
-      .data(
-        colorScale.range().map(d => {
-          const colorExtent = colorScale.invertExtent(d);
-          if (colorExtent[0] == null) {
-            colorExtent[0] = xScale.domain()[0];
-          }
-          if (colorExtent[1] == null) {
-            colorExtent[1] = xScale.domain()[1];
-          }
-
-          return colorExtent as [number, number];
-        }),
-      )
+      .data(this.legendExtentPairs!)
       .enter()
         .append('rect')
         .attr('height', 8)
-        .attr('x', d => xScale(d[0]))
-        .attr('width', d => xScale(d[1]) - xScale(d[0]))
-        .attr('fill', d => colorScale(d[0]));
+        .call(this.drawLegendRectangle);
 
+    g.call(this.addLegendLabels);
+  }
+
+  private drawLegendRectangle(
+    rect: Selection<SVGCircleElement, [number, number], any, any>,
+  ) {
+    const { legendXScale, colorScale } = this;
+    rect
+      .attr('x', d => legendXScale!(d[0]))
+      .attr('width', d => legendXScale!(d[1]) - legendXScale!(d[0]))
+      .attr('fill', d => colorScale!(d[0]));
+  }
+
+  private addLegendLabels(g: Selection<SVGGElement, undefined, any, any>) {
+    const { selectedDataType } = this.props;
     if (selectedDataType === 'scarcity') {
       // TODO: fix this ugly hack
       g
         .call(
-          axisBottom(xScale)
+          axisBottom(this.legendXScale!)
             .tickSize(10)
             .tickValues([0, 0.75, 1.7])
             .tickFormat(
@@ -213,76 +257,28 @@ class Map extends React.Component<Props, void> {
       g.selectAll('.tick').select('line').remove();
     } else {
       g
-        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
+        .call(
+          axisBottom(this.legendXScale!)
+            .tickSize(13)
+            .tickValues(this.colorScale!.domain()),
+        )
         .select('.domain')
         .remove();
     }
   }
 
   private redrawLegend() {
-    const { selectedDataType } = this.props;
-    const dataTypeParameters = allDataTypeParameters.find(
-      d => d.dataType === selectedDataType,
+    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+      'g#legend',
     );
-    if (!dataTypeParameters) {
-      console.error('Unknown data type!', selectedDataType);
-      return;
-    }
-    const { colorScale, thresholds } = dataTypeParameters;
 
-    // Based on https://bl.ocks.org/mbostock/4060606
-    const width = 200;
-    const svg = select<SVGElement, undefined>(this.svgRef!);
-
-    const maxThreshold = thresholds[thresholds.length - 1];
-    const xScale = scaleLinear()
-      .domain([0, 2 * maxThreshold])
-      .rangeRound([0, width]);
-    const g = svg.select<SVGGElement>('g#legend');
-
-    // TODO: things probably screw up if we have different amounts of thresholds
+    // prettier-ignore
     g
       .selectAll('rect')
-      .data(
-        colorScale.range().map(d => {
-          const colorExtent = colorScale.invertExtent(d);
-          if (colorExtent[0] == null) {
-            colorExtent[0] = xScale.domain()[0];
-          }
-          if (colorExtent[1] == null) {
-            colorExtent[1] = xScale.domain()[1];
-          }
+      .data(this.legendExtentPairs!)
+      .call(this.drawLegendRectangle);
 
-          return colorExtent as [number, number];
-        }),
-      )
-      .attr('x', d => xScale(d[0]))
-      .attr('width', d => xScale(d[1]) - xScale(d[0]))
-      .attr('fill', d => colorScale(d[0]));
-
-    if (selectedDataType === 'scarcity') {
-      // TODO: fix this ugly hack
-      g
-        .call(
-          axisBottom(xScale)
-            .tickSize(10)
-            .tickValues([0, 0.75, 1.7])
-            .tickFormat(
-              d =>
-                d === 0
-                  ? 'High stress'
-                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
-            ),
-        )
-        .select('.domain')
-        .remove();
-      g.selectAll('.tick').select('line').remove();
-    } else {
-      g
-        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
-        .select('.domain')
-        .remove();
-    }
+    g.call(this.addLegendLabels);
   }
 
   private handleRegionClick(d: WaterRegionFeature) {
@@ -296,20 +292,6 @@ class Map extends React.Component<Props, void> {
       allDataTypeParameters[0];
     const value = waterPropertySelector(selectedDataType)(data[featureId]);
     return value != null ? dataTypeParameters.colorScale(value) : '#807775';
-  }
-
-  public componentDidUpdate(prevProps: Props) {
-    if (
-      prevProps.selectedData !== this.props.selectedData ||
-      prevProps.selectedRegion !== this.props.selectedRegion
-    ) {
-      this.redrawFillsAndBorders();
-    }
-
-    if (prevProps.selectedDataType !== this.props.selectedDataType) {
-      this.redrawFillsAndBorders();
-      this.redrawLegend();
-    }
   }
 
   private redrawFillsAndBorders() {
