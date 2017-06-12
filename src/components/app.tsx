@@ -22,22 +22,16 @@ class App extends React.Component<Props, void> {
         <Header />
         <div className="container">
           <div className="row">
-            <div className="col-xs-12 col-md-6">
+            <div className="col-xs-12">
               <h1>Water Scarcity</h1>
               <p>Placeholder for information text about water scarcity</p>
             </div>
-            <div
-              className={classNames(
-                'col-xs-12',
-                'col-md-6',
-                styles['data-selector'],
-              )}
-            >
+          </div>
+          <div className="row middle-xs">
+            <div className="col-xs-12 col-md-4">
               <DataSelector />
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs-12">
+            <div className="col-xs-12 col-md-8">
               <TimeSelector />
             </div>
           </div>
