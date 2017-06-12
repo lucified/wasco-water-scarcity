@@ -15,8 +15,6 @@ import { AggregateStressShortageDatum, DataType } from '../types';
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 import Legend, { LegendItem } from './generic/legend/index';
 
-const styles = require('./time-selector.scss');
-
 interface GeneratedStateProps {
   selectedIndex: number;
   currentIndexLabel: string;
