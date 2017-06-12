@@ -17,16 +17,16 @@ export default class Header extends React.Component<{}, void> {
           <div className="container">
             <div className="row">
               <div className={styles['navigation-item']}>
-                HEAVY WATER USAGE
+                Heave water usage
               </div>
               <div className={styles['navigation-item']}>
-                MEETING WATER NEEDS
+                Meeting water needs
               </div>
               <div className={styles['navigation-item']}>
-                WATER SCARCITY
+                Water scarcity
               </div>
               <div className={styles['navigation-item']}>
-                FUTURE ACTIONS
+                Future actions
               </div>
             </div>
           </div>
