@@ -40,12 +40,12 @@ function populationSelector(data: { [dataType: string]: number[] }) {
   return data.population;
 }
 
-const stressThresholds = getDataTypeThresholds('blueWaterStress');
+const stressThresholds = getDataTypeThresholds('stress');
 const stressColorsScale = scaleThreshold<number, string>()
   .domain(stressThresholds!)
   .range(['none', ...schemeReds[stressThresholds!.length + 1].slice(1)]);
 
-const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+const shortageThresholds = getDataTypeThresholds('shortage');
 const shortageColorsScale = scaleThreshold<number, string>()
   .domain(shortageThresholds!)
   .range(

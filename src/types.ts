@@ -114,12 +114,12 @@ export interface StressShortageDatum {
   blueWaterShortage: number;
   blueWaterStress: number;
   blueWaterAvailability: number;
-  blueWaterConsumptionTotal: number;
   /**
-   * This is a sum of the consumptions. It may differ slightly from
-   * blueWaterConsumptionTotal due to rounding and floating numbers.
+   * We calculate this by taking the sum of the different consumptions. It may
+   * differ slightly from the raw total value due to rounding and floating
+   * numbers.
    */
-  blueWaterConsumptionCalculatedTotal: number;
+  blueWaterConsumptionTotal: number;
   blueWaterConsumptionIrrigation: number;
   blueWaterConsumptionDomestic: number;
   blueWaterConsumptionElectric: number;
@@ -139,7 +139,6 @@ export function toStressShortageDatum({
   blueWaterConsumptionIrrigation,
   blueWaterConsumptionLivestock,
   blueWaterConsumptionManufacturing,
-  blueWaterConsumptionTotal,
   blueWaterStress,
   blueWaterShortage,
   population,
@@ -167,8 +166,7 @@ export function toStressShortageDatum({
       blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionManufacturing:
       blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionCalculatedTotal: calculatedTotal,
+    blueWaterConsumptionTotal: calculatedTotal,
     blueWaterStress,
     blueWaterShortage,
     population,
@@ -209,15 +207,32 @@ export function toAggregateStressShortageDatum({
   };
 }
 
-export type DataType = keyof StressShortageDatum;
+export type DataType = 'stress' | 'shortage' | 'scarcity';
 export function getDataTypeThresholds(dataType: DataType) {
   switch (dataType) {
-    case 'blueWaterStress':
+    case 'stress':
       return [0.2, 0.4, 1];
-    case 'blueWaterShortage':
+    case 'shortage':
       return [500, 1000, 1700]; // Note: higher is better.
+    case 'scarcity':
+      return [0.2, 0.4, 1];
   }
 
   console.warn('No thresholds availables for', dataType);
   return undefined;
+}
+
+export function waterPropertySelector(dataType: DataType) {
+  switch (dataType) {
+    case 'stress':
+      return (d: StressShortageDatum) => d.blueWaterStress;
+    case 'shortage':
+      return (d: StressShortageDatum) => d.blueWaterShortage;
+    case 'scarcity':
+      console.warn('TODO: calculate scarcity');
+      return (d: StressShortageDatum) => d.blueWaterStress;
+  }
+
+  console.warn('Unknown data type', dataType);
+  return (_d: StressShortageDatum) => undefined;
 }

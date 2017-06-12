@@ -53,7 +53,7 @@ const defaultState: StateTree = {
   })),
   selections: {
     timeIndex: 0,
-    dataType: 'blueWaterStress',
+    dataType: 'stress',
     globalRegion: 0, // 0 means global
   },
 };

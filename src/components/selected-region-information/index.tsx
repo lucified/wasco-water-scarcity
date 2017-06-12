@@ -47,8 +47,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       return null;
     }
 
-    const stressThresholds = getDataTypeThresholds('blueWaterStress');
-    const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+    const stressThresholds = getDataTypeThresholds('stress');
+    const shortageThresholds = getDataTypeThresholds('shortage');
 
     const maxConsumptionOrAvailability = max(timeSeriesForSelectedRegion, d =>
       Math.max(d.blueWaterAvailability, d.blueWaterConsumptionTotal),
@@ -64,7 +64,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
             <h4 className={styles.heading}>Blue water stress</h4>
             <p className={styles.description}>Consumption / Availability</p>
             <DataLineChart
-              dataType="blueWaterStress"
+              dataType="stress"
               dataColor="red"
               thresholds={stressThresholds}
               thresholdColors={[
@@ -80,7 +80,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
             <h4 className={styles.heading}>Blue water shortage</h4>
             <p className={styles.description}>Availability per person (m³)</p>
             <DataLineChart
-              dataType="blueWaterShortage"
+              dataType="shortage"
               dataColor="purple"
               thresholds={shortageThresholds}
               thresholdColors={[

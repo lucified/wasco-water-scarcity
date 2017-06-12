@@ -98,7 +98,7 @@ class ConsumptionChart extends React.Component<Props, State> {
     const barChartData: BarChartDatum[] = data.map((d, i) => {
       return {
         key: i,
-        total: d.blueWaterConsumptionCalculatedTotal,
+        total: d.blueWaterConsumptionTotal,
         values: legendItems
           // Filter out fields with zero and if we're hovered, only the hovered type
           .filter(
