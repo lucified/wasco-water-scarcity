@@ -194,10 +194,29 @@ class Map extends React.Component<Props, void> {
         .attr('width', d => xScale(d[1]) - xScale(d[0]))
         .attr('fill', d => colorScale(d[0]));
 
-    g
-      .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
-      .select('.domain')
-      .remove();
+    if (selectedDataType === 'scarcity') {
+      // TODO: fix this ugly hack
+      g
+        .call(
+          axisBottom(xScale)
+            .tickSize(10)
+            .tickValues([0, 0.75, 1.7])
+            .tickFormat(
+              d =>
+                d === 0
+                  ? 'High stress'
+                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
+            ),
+        )
+        .select('.domain')
+        .remove();
+      g.selectAll('.tick').select('line').remove();
+    } else {
+      g
+        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
+        .select('.domain')
+        .remove();
+    }
   }
 
   private redrawLegend() {
@@ -241,10 +260,29 @@ class Map extends React.Component<Props, void> {
       .attr('width', d => xScale(d[1]) - xScale(d[0]))
       .attr('fill', d => colorScale(d[0]));
 
-    g
-      .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
-      .select('.domain')
-      .remove();
+    if (selectedDataType === 'scarcity') {
+      // TODO: fix this ugly hack
+      g
+        .call(
+          axisBottom(xScale)
+            .tickSize(10)
+            .tickValues([0, 0.75, 1.7])
+            .tickFormat(
+              d =>
+                d === 0
+                  ? 'High stress'
+                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
+            ),
+        )
+        .select('.domain')
+        .remove();
+      g.selectAll('.tick').select('line').remove();
+    } else {
+      g
+        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
+        .select('.domain')
+        .remove();
+    }
   }
 
   private handleRegionClick(d: WaterRegionFeature) {
