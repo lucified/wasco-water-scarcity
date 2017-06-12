@@ -80,6 +80,32 @@ export interface RawAggregateStressShortageDatum {
 }
 
 // All units have been converted to m^3 from km^3
+export interface AggregateStressShortageDatum {
+  startYear: number;
+  endYear: number;
+  // The globalRegionID. Set to 0 for the globe.
+  featureId: number;
+
+  population: number;
+
+  // For scarcity
+  populationNoBlueWaterShortageAndStress: number;
+  populationOnlyBlueWaterShortage: number;
+  populationOnlyBlueWaterStress: number;
+  populationBlueWaterShortageAndStress: number;
+
+  // For shortage
+  populationNoBlueWaterShortage: number;
+  populationModerateBlueWaterShortage: number;
+  populationHighBlueWaterShortage: number;
+
+  // For stress
+  populationNoBlueWaterStress: number;
+  populationModerateBlueWaterStress: number;
+  populationHighBlueWaterStress: number;
+}
+
+// All units have been converted to m^3 from km^3
 export interface StressShortageDatum {
   startYear: number;
   endYear: number;
@@ -145,6 +171,40 @@ export function toStressShortageDatum({
     blueWaterStress,
     blueWaterShortage,
     population,
+  };
+}
+
+export function toAggregateStressShortageDatum({
+  startYear,
+  endYear,
+  featureId,
+  population,
+  populationBlueWaterShortageAndStress,
+  populationHighBlueWaterShortage,
+  populationHighBlueWaterStress,
+  populationModerateBlueWaterShortage,
+  populationModerateBlueWaterStress,
+  populationNoBlueWaterShortage,
+  populationNoBlueWaterShortageAndStress,
+  populationNoBlueWaterStress,
+  populationOnlyBlueWaterShortage,
+  populationOnlyBlueWaterStress,
+}: RawAggregateStressShortageDatum) {
+  return {
+    startYear,
+    endYear,
+    featureId,
+    population,
+    populationBlueWaterShortageAndStress,
+    populationHighBlueWaterShortage,
+    populationHighBlueWaterStress,
+    populationModerateBlueWaterShortage,
+    populationModerateBlueWaterStress,
+    populationNoBlueWaterShortage,
+    populationNoBlueWaterShortageAndStress,
+    populationNoBlueWaterStress,
+    populationOnlyBlueWaterShortage,
+    populationOnlyBlueWaterStress,
   };
 }
 
