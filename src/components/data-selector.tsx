@@ -3,10 +3,10 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setSelectedDataType } from '../../actions';
-import { StateTree } from '../../reducers';
-import { getSelectedDataType } from '../../selectors';
-import { DataType } from '../../types';
+import { setSelectedDataType } from '../actions';
+import { StateTree } from '../reducers';
+import { getSelectedDataType } from '../selectors';
+import { DataType } from '../types';
 
 const styles = require('./data-selector.scss');
 

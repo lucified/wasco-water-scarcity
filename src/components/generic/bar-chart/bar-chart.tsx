@@ -25,16 +25,15 @@ export interface Props {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  customColors?: any[][];
-  onChange?: (range: [number, number]) => void;
   xTickFormat?: (value: string) => string;
   yTickFormat?: (value: number) => string;
-  onMouseOver?: (item: any) => void;
-  onMouseLeave?: (item: any) => void;
+  onMouseOver?: (item: BarChartDatum) => void;
+  onMouseLeave?: (item: BarChartDatum) => void;
   maxYValue?: number;
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
   selectedIndex?: number;
+  hideSelectedLabel?: boolean;
 }
 
 interface DefaultProps {
@@ -62,7 +61,6 @@ export default class BarChart extends React.Component<Props, {}> {
     yTickFormat: (value: number) => String(value),
   };
 
-  private _colors?: ScaleOrdinal<any, any> | null;
   private _yScale?: ScaleLinear<number, number> | null;
   private _xScale?: ScaleBand<string> | null;
   private _yAxis?: Axis<number> | null;
@@ -70,10 +68,6 @@ export default class BarChart extends React.Component<Props, {}> {
   private _enrichedData?: BarChartDatum[] | null;
 
   public componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.customColors !== this.props.customColors) {
-      this._colors = null;
-    }
-
     if (nextProps.data !== this.props.data) {
       this._enrichedData = null;
       this._yScale = null;
@@ -193,10 +187,7 @@ export default class BarChart extends React.Component<Props, {}> {
       return (
         <g
           key={barData.key}
-          className={styles['bar-group']}
           transform={`translate(${xScale(String(barData.key))},0)`}
-          onMouseOver={this.handleMouseOver.bind(this, barData)}
-          onMouseLeave={this.handleMouseLeave.bind(this, barData)}
         >
           {bars}
         </g>
@@ -228,9 +219,9 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   private getSelectionLabel() {
-    const { data, selectedIndex, yTickFormat } = this
+    const { data, selectedIndex, yTickFormat, hideSelectedLabel } = this
       .props as PropsWithDefaults;
-    if (selectedIndex == null) {
+    if (selectedIndex == null || hideSelectedLabel) {
       return null;
     }
 
@@ -248,6 +239,24 @@ export default class BarChart extends React.Component<Props, {}> {
       >
         {yTickFormat(selectedData.total)}
       </text>
+    );
+  }
+
+  private getHoverAreas() {
+    const { data } = this.props;
+    const xScale = this.getXScale();
+
+    return data.map(d =>
+      <rect
+        key={`hover-${d.key}`}
+        className={styles['hover-area']}
+        x={xScale(String(d.key))}
+        y={0}
+        onMouseOver={() => this.handleMouseOver(d)}
+        onMouseOut={() => this.handleMouseLeave(d)}
+        width={xScale.step()}
+        height={this.getContentHeight()}
+      />,
     );
   }
 
@@ -298,6 +307,7 @@ export default class BarChart extends React.Component<Props, {}> {
           />
           {this.getBars()}
           {this.getSelectionLabel()}
+          {this.getHoverAreas()}
         </g>
       </svg>
     );
