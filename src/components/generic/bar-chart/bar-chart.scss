@@ -18,6 +18,7 @@ svg.chart {
 
 .axis {
   font: 0.65rem sans-serif;
+  overflow-y: none;
 
   /* render tick marks */
   line {
