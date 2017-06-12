@@ -4,18 +4,22 @@ import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
-import { getSelectedTimeIndex, getWaterData } from '../../selectors';
+import {
+  getSelectedTimeIndex,
+  getTimeSeriesForSelectedGlobalRegion,
+} from '../../selectors';
+import { AggregateStressShortageDatum } from '../../types';
 
 const styles = require('./time-selector.scss');
 
 interface GeneratedStateProps {
   selectedIndex: number;
-  maxIndex: number;
   currentIndexLabel: string;
+  data: AggregateStressShortageDatum[];
 }
 
 interface GeneratedDispatchProps {
-  setIndex: (value: number) => void;
+  setSelectedTime: (value: number) => void;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
@@ -28,23 +32,15 @@ class TimeSelector extends React.Component<Props, void> {
   }
 
   private handleIndexUpdate(e: any) {
-    this.props.setIndex(Number(e.target.value));
+    // TODO: fix
+    this.props.setSelectedTime(Number(e.target.value));
   }
 
   public render() {
-    const { selectedIndex, maxIndex, currentIndexLabel } = this.props;
+    const { currentIndexLabel } = this.props;
 
     return (
       <div className={styles.root}>
-        <input
-          className={styles.input}
-          type="range"
-          onChange={this.handleIndexUpdate}
-          value={selectedIndex}
-          min={0}
-          max={maxIndex}
-          step={1}
-        />
         <div>{currentIndexLabel}</div>
       </div>
     );
@@ -52,21 +48,23 @@ class TimeSelector extends React.Component<Props, void> {
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const data = getWaterData(state);
+  const data = getTimeSeriesForSelectedGlobalRegion(state);
   const selectedIndex = getSelectedTimeIndex(state);
   const currentSelectedData = data[selectedIndex];
-  const label = `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`;
+  const label = currentSelectedData.startYear !== currentSelectedData.endYear
+    ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
+    : String(currentSelectedData.startYear);
 
   return {
     selectedIndex,
-    maxIndex: data.length - 1,
     currentIndexLabel: label,
+    data,
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
-    setIndex: (value: number) => {
+    setSelectedTime: (value: number) => {
       dispatch(setTimeIndex(value));
     },
   };

@@ -12,10 +12,10 @@ import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedData,
   getSelectedDataType,
   getSelectedRegion,
-  getWaterData,
+  getSelectedStressShortageData,
+  getStressShortageData,
 } from '../../selectors';
 import {
   DataType,
@@ -35,8 +35,8 @@ const waterRegions = require('../../../data/FPU.json');
 const styles = require('./index.scss');
 
 interface GeneratedStateProps {
-  selectedData: TimeAggregate;
-  allData: TimeAggregate[];
+  selectedData: TimeAggregate<StressShortageDatum>;
+  allData: Array<TimeAggregate<StressShortageDatum>>;
   selectedRegion?: number;
   selectedDataType: DataType;
 }
@@ -333,8 +333,8 @@ class Map extends React.Component<Props, void> {
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
-    allData: getWaterData(state),
-    selectedData: getSelectedData(state),
+    allData: getStressShortageData(state),
+    selectedData: getSelectedStressShortageData(state),
     selectedRegion: getSelectedRegion(state),
     selectedDataType: getSelectedDataType(state),
   };

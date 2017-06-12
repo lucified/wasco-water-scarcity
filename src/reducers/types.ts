@@ -1,14 +1,20 @@
 import { RouterState } from 'react-router-redux';
 
-import { DataType, TimeAggregate } from '../types';
+import {
+  AggregateStressShortageDatum,
+  DataType,
+  StressShortageDatum,
+  TimeAggregate,
+} from '../types';
 
 export interface StateTree {
-  waterData: TimeAggregate[];
-  // TODO: Remove react-router if not used?
+  stressShortageData: Array<TimeAggregate<StressShortageDatum>>;
+  aggregateData: Array<TimeAggregate<AggregateStressShortageDatum>>;
   routing: RouterState;
   selections: {
     timeIndex: number;
     dataType: DataType;
+    globalRegion: number;
     region?: number;
   };
 }

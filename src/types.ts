@@ -1,8 +1,8 @@
-export interface TimeAggregate {
+export interface TimeAggregate<T> {
   startYear: number;
   endYear: number;
   data: {
-    [featureId: number]: StressShortageDatum;
+    [featureId: number]: T;
   };
 }
 
