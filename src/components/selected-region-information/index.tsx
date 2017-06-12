@@ -55,12 +55,12 @@ class SelectedRegionInformation extends React.Component<Props, void> {
     );
 
     return (
-      <div className="col-xs-12 col-md-6 col-lg-3">
-        <div className="column">
-          <div>
-            <h3 className={styles['section-heading']}>
-              Food production unit details
-            </h3>
+      <div className="col-xs-12 col-md-12 col-lg-12">
+        <h3 className={styles['section-heading']}>
+          Details for selected food production unit
+        </h3>
+        <div className="row">
+          <div className="col-xs-12 col-md-6 col-lg-3">
             <h4 className={styles.heading}>Blue water stress</h4>
             <p className={styles.description}>Consumption / Availability</p>
             <DataLineChart
@@ -76,7 +76,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
-          <div>
+          <div className="col-xs-12 col-md-6 col-lg-3">
             <h4 className={styles.heading}>Blue water shortage</h4>
             <p className={styles.description}>Availability per person (m³)</p>
             <DataLineChart
@@ -92,7 +92,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               onTimeIndexChange={this.handleTimeIndexChange}
             />
           </div>
-          <div>
+          <div className="col-xs-12 col-md-6 col-lg-3">
             <h4 className={styles.heading}>Blue water availability</h4>
             <p className={styles.description}>Total availability (m³)</p>
             <AvailabilityChart
@@ -102,7 +102,7 @@ class SelectedRegionInformation extends React.Component<Props, void> {
               maxY={maxConsumptionOrAvailability}
             />
           </div>
-          <div>
+          <div className="col-xs-12 col-md-6 col-lg-3">
             <h4 className={styles.heading}>Blue water consumption</h4>
             <p className={styles.description}>Consumption (m³)</p>
             <ConsumptionChart

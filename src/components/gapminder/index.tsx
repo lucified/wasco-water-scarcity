@@ -80,6 +80,8 @@ function GapminderWrapper({
         maxX={10000}
         minY={0.01}
         maxY={4}
+        marginLeft={38}
+        marginRight={0}
         ySelector={stressSelector}
         yBackgroundColorScale={stressColorsScale}
         sizeSelector={populationSelector}

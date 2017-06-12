@@ -13,6 +13,24 @@ export default class Header extends React.Component<{}, void> {
             <div className={styles.heading}>Water Scarcity Atlas</div>
           </div>
         </div>
+        <div className={styles.navigation}>
+          <div className="container">
+            <div className="row">
+              <div className={styles['navigation-item']}>
+                Heave water usage
+              </div>
+              <div className={styles['navigation-item']}>
+                Meeting water needs
+              </div>
+              <div className={styles['navigation-item']}>
+                Water scarcity
+              </div>
+              <div className={styles['navigation-item']}>
+                Future actions
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -19,10 +19,16 @@ class App extends React.Component<Props, void> {
     return (
       <div className={styles.root}>
         <Header />
+        <div className="container">
+          <h1>Water Scarcity</h1>
+          <p>Placeholder for information text about water scarcity</p>
+        </div>
         <Controls />
         <div className="container">
           <div className={classNames(styles['map-content'], 'row')}>
             <Map />
+          </div>
+          <div className="row">
             <SelectedRegionInformation />
           </div>
           <div className="row">

@@ -96,7 +96,7 @@ class Map extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private width = 893;
+  private width = 1200;
   private height = this.width / 1.9;
 
   private saveSvgRef(ref: SVGElement) {
@@ -302,10 +302,7 @@ class Map extends React.Component<Props, void> {
     }
 
     return (
-      <div className="col-sm-12 col-md-12 col-lg-9">
-        <h3 className={styles['map-header']}>
-          {dataTypeParameters.label} across food production units
-        </h3>
+      <div className="col-sm-12 col-md-12 col-lg-12">
         <svg ref={this.saveSvgRef}>
           <defs>
             <clipPath id="clip">

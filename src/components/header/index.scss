@@ -5,11 +5,30 @@
 }
 
 .logo {
-  margin: $default-margin $default-margin $default-margin 0;
+  margin-top: $default-margin;
+  margin-bottom: $default-margin;
+  margin-left: 0.5rem;
 }
 
 .heading {
   font-size: 48px;
   font-weight: 300;
   margin: $default-margin;
+}
+
+.navigation {
+  background-color: $color-lightest-gray;
+  width: 100%;
+}
+
+.navigation-item {
+  padding: $default-margin $default-margin $default-margin 0;
+  margin-left: 0.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  &:hover {
+    cursor: pointer;
+    color: #666;
+  }
 }
