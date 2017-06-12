@@ -1,7 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { geoPath } from 'd3-geo';
 import { scaleLinear, scaleThreshold, ScaleThreshold } from 'd3-scale';
-import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import * as React from 'react';
@@ -19,9 +18,11 @@ import {
 } from '../../selectors';
 import {
   DataType,
+  getDataTypeColors,
   getDataTypeThresholds,
   StressShortageDatum,
   TimeAggregate,
+  waterPropertySelector,
 } from '../../types';
 import { WaterRegionFeature } from './types';
 
@@ -48,11 +49,6 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
-const waterPropertySelector = (
-  d: StressShortageDatum,
-  dataType: DataType,
-): number | undefined => d[dataType];
-
 interface DataTypeParameter {
   dataType: DataType;
   label: string;
@@ -60,30 +56,35 @@ interface DataTypeParameter {
   colorScale: ScaleThreshold<number, string>;
 }
 
-const stressThresholds = getDataTypeThresholds('blueWaterStress')!;
-const shortageThresholds = getDataTypeThresholds('blueWaterShortage')!;
+const stressThresholds = getDataTypeThresholds('stress')!;
+const shortageThresholds = getDataTypeThresholds('shortage')!;
+const scarcityThresholds = getDataTypeThresholds('scarcity')!;
+const emptyColor = '#D2E3E5';
 const allDataTypeParameters: DataTypeParameter[] = [
   {
-    dataType: 'blueWaterStress',
+    dataType: 'stress',
     label: 'Water stress',
     thresholds: stressThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(stressThresholds)
-      .range(['#D2E3E5', ...schemeReds[stressThresholds.length + 1].slice(1)]),
+      .range([emptyColor, ...getDataTypeColors('stress')]),
   },
   {
-    dataType: 'blueWaterShortage',
+    dataType: 'shortage',
     label: 'Water shortage',
     thresholds: shortageThresholds,
     colorScale: scaleThreshold<number, string>()
       .domain(shortageThresholds)
       // Note: higher is better. Colors are reversed.
-      .range(
-        [
-          '#D2E3E5',
-          ...schemePurples[shortageThresholds.length + 1].slice(1),
-        ].reverse(),
-      ),
+      .range([emptyColor, ...getDataTypeColors('shortage')].reverse()),
+  },
+  {
+    dataType: 'scarcity',
+    label: 'Water scarcity',
+    thresholds: scarcityThresholds,
+    colorScale: scaleThreshold<number, string>()
+      .domain(scarcityThresholds)
+      .range([emptyColor, ...getDataTypeColors('scarcity')]),
   },
 ];
 
@@ -193,10 +194,29 @@ class Map extends React.Component<Props, void> {
         .attr('width', d => xScale(d[1]) - xScale(d[0]))
         .attr('fill', d => colorScale(d[0]));
 
-    g
-      .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
-      .select('.domain')
-      .remove();
+    if (selectedDataType === 'scarcity') {
+      // TODO: fix this ugly hack
+      g
+        .call(
+          axisBottom(xScale)
+            .tickSize(10)
+            .tickValues([0, 0.75, 1.7])
+            .tickFormat(
+              d =>
+                d === 0
+                  ? 'High stress'
+                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
+            ),
+        )
+        .select('.domain')
+        .remove();
+      g.selectAll('.tick').select('line').remove();
+    } else {
+      g
+        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
+        .select('.domain')
+        .remove();
+    }
   }
 
   private redrawLegend() {
@@ -240,10 +260,29 @@ class Map extends React.Component<Props, void> {
       .attr('width', d => xScale(d[1]) - xScale(d[0]))
       .attr('fill', d => colorScale(d[0]));
 
-    g
-      .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
-      .select('.domain')
-      .remove();
+    if (selectedDataType === 'scarcity') {
+      // TODO: fix this ugly hack
+      g
+        .call(
+          axisBottom(xScale)
+            .tickSize(10)
+            .tickValues([0, 0.75, 1.7])
+            .tickFormat(
+              d =>
+                d === 0
+                  ? 'High stress'
+                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
+            ),
+        )
+        .select('.domain')
+        .remove();
+      g.selectAll('.tick').select('line').remove();
+    } else {
+      g
+        .call(axisBottom(xScale).tickSize(13).tickValues(colorScale.domain()))
+        .select('.domain')
+        .remove();
+    }
   }
 
   private handleRegionClick(d: WaterRegionFeature) {
@@ -255,7 +294,7 @@ class Map extends React.Component<Props, void> {
     const dataTypeParameters =
       allDataTypeParameters.find(d => d.dataType === selectedDataType) ||
       allDataTypeParameters[0];
-    const value = waterPropertySelector(data[featureId], selectedDataType);
+    const value = waterPropertySelector(selectedDataType)(data[featureId]);
     return value != null ? dataTypeParameters.colorScale(value) : '#807775';
   }
 

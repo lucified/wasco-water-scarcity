@@ -114,12 +114,12 @@ export interface StressShortageDatum {
   blueWaterShortage: number;
   blueWaterStress: number;
   blueWaterAvailability: number;
-  blueWaterConsumptionTotal: number;
   /**
-   * This is a sum of the consumptions. It may differ slightly from
-   * blueWaterConsumptionTotal due to rounding and floating numbers.
+   * We calculate this by taking the sum of the different consumptions. It may
+   * differ slightly from the raw total value due to rounding and floating
+   * numbers.
    */
-  blueWaterConsumptionCalculatedTotal: number;
+  blueWaterConsumptionTotal: number;
   blueWaterConsumptionIrrigation: number;
   blueWaterConsumptionDomestic: number;
   blueWaterConsumptionElectric: number;
@@ -139,7 +139,6 @@ export function toStressShortageDatum({
   blueWaterConsumptionIrrigation,
   blueWaterConsumptionLivestock,
   blueWaterConsumptionManufacturing,
-  blueWaterConsumptionTotal,
   blueWaterStress,
   blueWaterShortage,
   population,
@@ -167,8 +166,7 @@ export function toStressShortageDatum({
       blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionManufacturing:
       blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionTotal: blueWaterConsumptionTotal * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionCalculatedTotal: calculatedTotal,
+    blueWaterConsumptionTotal: calculatedTotal,
     blueWaterStress,
     blueWaterShortage,
     population,
@@ -209,15 +207,72 @@ export function toAggregateStressShortageDatum({
   };
 }
 
-export type DataType = keyof StressShortageDatum;
+export type DataType = 'stress' | 'shortage' | 'scarcity';
 export function getDataTypeThresholds(dataType: DataType) {
   switch (dataType) {
-    case 'blueWaterStress':
+    case 'stress':
       return [0.2, 0.4, 1];
-    case 'blueWaterShortage':
+    case 'shortage':
       return [500, 1000, 1700]; // Note: higher is better.
+    case 'scarcity':
+      /**
+       * These numbers are arbitrary.
+       * x < 0 = No high stress or shortage
+       * 0 <= x < 0.5 = High stress only
+       * 0.5 <= x < 1.0 = High shortage only
+       * x >= 1.0 = High shortage and stress
+       */
+      return [0, 0.5, 1];
   }
 
   console.warn('No thresholds availables for', dataType);
   return undefined;
+}
+
+export function getDataTypeColors(dataType: DataType) {
+  switch (dataType) {
+    case 'stress':
+      // From d3-scale-chromatic's schemePurple
+      return ['#cbc9e2', '#9e9ac8', '#6a51a3'];
+    case 'shortage':
+      return ['#f5f07f', '#e6dc4c', '#d7c919'];
+    case 'scarcity':
+      return ['#6a51a3', '#d7c919', 'rgb(203, 24, 29)'];
+  }
+
+  console.warn('Unknown data type', dataType);
+  return [];
+}
+
+export function waterPropertySelector(dataType: DataType) {
+  switch (dataType) {
+    case 'stress':
+      return (d: StressShortageDatum) => d.blueWaterStress;
+    case 'shortage':
+      return (d: StressShortageDatum) => d.blueWaterShortage;
+    case 'scarcity':
+      const stressThresholds = getDataTypeThresholds('stress')!;
+      const shortageThresholds = getDataTypeThresholds('shortage')!;
+      const scarcityThresholds = getDataTypeThresholds('scarcity')!;
+      return (d: StressShortageDatum) => {
+        const highStress = d.blueWaterStress >= stressThresholds[2];
+        const highShortage = d.blueWaterShortage <= shortageThresholds[0];
+        if (highStress && highShortage) {
+          return scarcityThresholds[2] + 0.1;
+        }
+
+        if (highShortage) {
+          return scarcityThresholds[1] + 0.1;
+        }
+
+        if (highStress) {
+          return scarcityThresholds[0] + 0.1;
+        }
+
+        return scarcityThresholds[0] - 1;
+      };
+  }
+
+  console.warn('Unknown data type', dataType);
+  return (_d: StressShortageDatum) => undefined;
 }

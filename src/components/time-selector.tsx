@@ -10,7 +10,11 @@ import {
   getSelectedTimeIndex,
   getTimeSeriesForSelectedGlobalRegion,
 } from '../selectors';
-import { AggregateStressShortageDatum, DataType } from '../types';
+import {
+  AggregateStressShortageDatum,
+  DataType,
+  getDataTypeColors,
+} from '../types';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 import Legend, { LegendItem } from './generic/legend/index';
@@ -33,23 +37,26 @@ function getScarcePopulation(
   datum: AggregateStressShortageDatum,
 ) {
   switch (dataType) {
-    case 'blueWaterStress':
+    case 'stress':
       return (
         datum.populationModerateBlueWaterStress +
         datum.populationHighBlueWaterStress
       );
-    case 'blueWaterShortage':
+    case 'shortage':
       return (
         datum.populationModerateBlueWaterShortage +
         datum.populationHighBlueWaterShortage
       );
+    case 'scarcity':
+      return (
+        datum.populationOnlyBlueWaterShortage +
+        datum.populationOnlyBlueWaterStress +
+        datum.populationBlueWaterShortageAndStress
+      );
   }
-  // TODO: be able to store scarcity into state
-  return (
-    datum.populationOnlyBlueWaterShortage +
-    datum.populationOnlyBlueWaterStress +
-    datum.populationBlueWaterShortageAndStress
-  );
+
+  console.warn('Unknown data type', dataType);
+  return 0;
 }
 
 function getNotScarcePopulation(
@@ -57,35 +64,20 @@ function getNotScarcePopulation(
   datum: AggregateStressShortageDatum,
 ) {
   switch (dataType) {
-    case 'blueWaterStress':
+    case 'stress':
       return datum.populationNoBlueWaterStress;
-    case 'blueWaterShortage':
+    case 'shortage':
       return datum.populationNoBlueWaterShortage;
+    case 'scarcity':
+      return datum.populationNoBlueWaterShortageAndStress;
   }
-  // TODO: be able to store scarcity into state
-  return datum.populationNoBlueWaterShortageAndStress;
+
+  console.warn('Unknown data type', dataType);
+  return 0;
 }
 
 function getScarceColor(dataType: DataType) {
-  switch (dataType) {
-    case 'blueWaterStress':
-      return 'rgb(203, 24, 29)';
-    case 'blueWaterShortage':
-      return 'rgb(106, 81, 163)';
-  }
-  // TODO: be able to store scarcity into state
-  return 'purple';
-}
-
-function getScarceTitle(dataType: DataType) {
-  switch (dataType) {
-    case 'blueWaterStress':
-      return 'stress';
-    case 'blueWaterShortage':
-      return 'shortage';
-  }
-  // TODO: be able to store scarcity into state
-  return 'scarcity';
+  return getDataTypeColors(dataType)[2];
 }
 
 const yTickFormatter = format('.2s');
@@ -116,11 +108,11 @@ function TimeSelector({
   const legendItems: LegendItem[] = [
     {
       color: getScarceColor(dataType),
-      title: `Population under ${getScarceTitle(dataType)}`,
+      title: `Population under ${dataType}`,
     },
     {
       color: 'lightgray',
-      title: `No ${getScarceTitle(dataType)}`,
+      title: `No ${dataType}`,
     },
   ];
 

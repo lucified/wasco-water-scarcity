@@ -2,7 +2,11 @@ import { scaleThreshold } from 'd3-scale';
 import some = require('lodash/some');
 import * as React from 'react';
 
-import { DataType, StressShortageDatum } from '../../types';
+import {
+  DataType,
+  StressShortageDatum,
+  waterPropertySelector,
+} from '../../types';
 
 import LineChart, { Data } from '../generic/line-chart';
 
@@ -33,11 +37,12 @@ export default function ShortageLineChart({
   selectedTimeIndex,
   onTimeIndexChange,
 }: Props) {
+  const selector = waterPropertySelector(dataType);
   const chartData: Data = {
     label: dataLabel,
     color: dataColor,
     series: data.map(d => ({
-      value: d[dataType],
+      value: selector(d)!,
       start: new Date(d.startYear, 0, 1),
       end: new Date(d.endYear, 11, 31),
     })),

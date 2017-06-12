@@ -1,5 +1,4 @@
 import { max } from 'd3-array';
-import { schemePurples, schemeReds } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -10,7 +9,11 @@ import {
   getSelectedTimeIndex,
   getTimeSeriesForSelectedRegion,
 } from '../../selectors';
-import { getDataTypeThresholds, StressShortageDatum } from '../../types';
+import {
+  getDataTypeColors,
+  getDataTypeThresholds,
+  StressShortageDatum,
+} from '../../types';
 
 import AvailabilityChart from './availability-chart';
 import ConsumptionChart from './consumption-chart';
@@ -47,8 +50,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       return null;
     }
 
-    const stressThresholds = getDataTypeThresholds('blueWaterStress');
-    const shortageThresholds = getDataTypeThresholds('blueWaterShortage');
+    const stressThresholds = getDataTypeThresholds('stress');
+    const shortageThresholds = getDataTypeThresholds('shortage');
 
     const maxConsumptionOrAvailability = max(timeSeriesForSelectedRegion, d =>
       Math.max(d.blueWaterAvailability, d.blueWaterConsumptionTotal),
@@ -64,13 +67,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
             <h4 className={styles.heading}>Blue water stress</h4>
             <p className={styles.description}>Consumption / Availability</p>
             <DataLineChart
-              dataType="blueWaterStress"
+              dataType="stress"
               dataColor="red"
               thresholds={stressThresholds}
-              thresholdColors={[
-                'none',
-                ...schemeReds[stressThresholds!.length + 1].slice(1),
-              ]}
+              thresholdColors={['none', ...getDataTypeColors('stress')]}
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
@@ -80,12 +80,12 @@ class SelectedRegionInformation extends React.Component<Props, void> {
             <h4 className={styles.heading}>Blue water shortage</h4>
             <p className={styles.description}>Availability per person (m³)</p>
             <DataLineChart
-              dataType="blueWaterShortage"
+              dataType="shortage"
               dataColor="purple"
               thresholds={shortageThresholds}
               thresholdColors={[
                 'none',
-                ...schemePurples[shortageThresholds!.length + 1].slice(1),
+                ...getDataTypeColors('shortage'),
               ].reverse()}
               data={timeSeriesForSelectedRegion}
               selectedTimeIndex={selectedTimeIndex}

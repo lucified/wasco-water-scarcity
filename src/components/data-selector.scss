@@ -2,18 +2,21 @@
 
 .button-group {
   width: 100%;
+  display: flex;
 
   .button {
+    flex-basis: 0;
+    flex-grow: 1;
     font-weight: 600;
     font-size: 0.85rem;
     text-transform: uppercase;
     line-height: 46px;
 
-    width:50%;
     position: relative;
     text-decoration: none;
     display: inline-block;
     border: $border-width solid $color-border;
+    border-right: 0;
     cursor: pointer;
     height: 48px;
     padding-left: 48px;
@@ -57,14 +60,12 @@
       background-color: $color-light-gray;
     }
 
-    // FIXME: could update and use border-radius mixin for these
-
     &:first-child {
       border-radius: $border-radius 0 0 $border-radius;
-      border-right: 0;
     }
 
     &:last-child {
+      border: $border-width solid $color-border;
       border-radius: 0 $border-radius $border-radius 0;
     }
 
