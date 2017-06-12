@@ -61,6 +61,7 @@ class ConsumptionChart extends React.Component<Props, State> {
 
     this.handleLegendHover = this.handleLegendHover.bind(this);
     this.handleBarHover = this.handleBarHover.bind(this);
+    this.xTickFormatter = this.xTickFormatter.bind(this);
   }
 
   private handleLegendHover(title?: string) {
@@ -78,6 +79,15 @@ class ConsumptionChart extends React.Component<Props, State> {
 
   private handleBarHover(item: BarChartDatum) {
     this.props.onTimeIndexChange(item.key);
+  }
+
+  private xTickFormatter(index: string) {
+    const { data } = this.props;
+    const formatter = format('02d');
+    const i = Number(index);
+    return `${formatter(data[i].startYear % 100)}-${formatter(
+      data[i].endYear % 100,
+    )}`;
   }
 
   public render() {
@@ -114,6 +124,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginTop={5}
           marginLeft={40}
           yTickFormat={yTickFormatter}
+          xTickFormat={this.xTickFormatter}
           selectedIndex={selectedTimeIndex}
           onMouseEnter={this.handleBarHover}
         />
