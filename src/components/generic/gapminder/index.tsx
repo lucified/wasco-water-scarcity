@@ -67,7 +67,7 @@ interface PassedProps {
   marginBottom?: number;
   className?: string;
   onHover?: (hoveredIndex: number) => void;
-  onSelectData?: (id: string) => void;
+  onClick?: (id: string) => void;
   xBackgroundColorScale?: ScaleThreshold<number, string>;
   yBackgroundColorScale?: ScaleThreshold<number, string>;
 }
@@ -364,9 +364,9 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private handleCircleClick(d: ChartDatum) {
-    const { onSelectData } = this.props;
-    if (onSelectData) {
-      onSelectData(d.id);
+    const { onClick } = this.props;
+    if (onClick) {
+      onClick(d.id);
     }
   }
 
