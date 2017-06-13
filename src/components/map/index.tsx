@@ -257,12 +257,12 @@ class Map extends React.Component<Props, void> {
         .call(
           axisBottom(this.legendXScale!)
             .tickSize(10)
-            .tickValues([0, 0.75, 1.7])
+            .tickValues([0.25, 0.75, 1.5])
             .tickFormat(
               d =>
-                d === 0
-                  ? 'High stress'
-                  : d === 0.75 ? 'High shortage' : 'High stress+shortage',
+                d === 0.25
+                  ? 'Stress'
+                  : d === 0.75 ? 'Shortage' : 'Stress + Shortage',
             ),
         )
         .select('.domain')

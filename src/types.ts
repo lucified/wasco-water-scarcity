@@ -219,10 +219,10 @@ export function getDataTypeThresholds(dataType: DataType) {
     case 'scarcity':
       /**
        * These numbers are arbitrary.
-       * x < 0 = No high stress or shortage
-       * 0 <= x < 0.5 = High stress only
-       * 0.5 <= x < 1.0 = High shortage only
-       * x >= 1.0 = High shortage and stress
+       * x < 0 = No stress or shortage
+       * 0 <= x < 0.5 = stress only
+       * 0.5 <= x < 1.0 = shortage only
+       * x >= 1.0 = shortage and stress
        */
       return [0, 0.5, 1];
   }
@@ -257,21 +257,21 @@ export function waterPropertySelector(dataType: DataType) {
       const shortageThresholds = getDataTypeThresholds('shortage')!;
       const scarcityThresholds = getDataTypeThresholds('scarcity')!;
       return (d: StressShortageDatum) => {
-        const highStress = d.blueWaterStress >= stressThresholds[2];
-        const highShortage = d.blueWaterShortage <= shortageThresholds[0];
-        if (highStress && highShortage) {
+        const hasStress = d.blueWaterStress >= stressThresholds[0];
+        const hasShortage = d.blueWaterShortage <= shortageThresholds[2];
+        if (hasStress && hasShortage) {
           return scarcityThresholds[2] + 0.1;
         }
 
-        if (highShortage) {
+        if (hasShortage) {
           return scarcityThresholds[1] + 0.1;
         }
 
-        if (highStress) {
+        if (hasStress) {
           return scarcityThresholds[0] + 0.1;
         }
 
-        return scarcityThresholds[0] - 1;
+        return scarcityThresholds[0] - 0.1;
       };
   }
 
