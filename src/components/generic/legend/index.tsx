@@ -34,15 +34,17 @@ export default class Legend extends React.Component<Props, State> {
 
   private onHoverEnter(e: any) {
     const { onHover } = this.props;
-    const titleElements = e.target.parentElement.getElementsByClassName(
-      styles.title,
-    );
-    const title = titleElements[0] && titleElements[0].textContent;
-    if (title && onHover) {
-      this.setState({ hoveredItemTitle: title });
-      onHover(title);
-    } else {
-      console.warn('Unknown title', titleElements);
+    if (onHover) {
+      const titleElements = e.target.parentElement.getElementsByClassName(
+        styles.title,
+      );
+      const title = titleElements[0] && titleElements[0].textContent;
+      if (title) {
+        this.setState({ hoveredItemTitle: title });
+        onHover(title);
+      } else {
+        console.warn('Unknown title', titleElements);
+      }
     }
   }
 
