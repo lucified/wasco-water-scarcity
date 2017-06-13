@@ -1,56 +1,65 @@
+// tslint:disable:jsx-no-lambda
+
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { Redirect, Route, RouteComponentProps, Switch } from 'react-router';
 
 import DataSelector from './data-selector';
 import Gapminder from './gapminder';
 import Header from './header';
 import Map from './map';
+import FutureIntro from './pages/future/intro';
+import ScarcityIntro from './pages/scarcity/intro';
+import ShortageIntro from './pages/shortage/intro';
+import StressIntro from './pages/stress/intro';
 import SelectedRegionInformation from './selected-region-information';
 import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
 
 type PassedProps = RouteComponentProps<void>;
-
 type Props = PassedProps;
 
-class App extends React.Component<Props, void> {
-  public render() {
-    return (
-      <div className={styles.root}>
-        <Header />
-        <div className="container">
-          <div className="row">
-            <div className="col-xs-12">
-              <h1>Water Scarcity</h1>
-              <p>Placeholder for information text about water scarcity</p>
-            </div>
+export default function App(_props: Props) {
+  return (
+    <div className={styles.root}>
+      <Header />
+      <div className="container">
+        <Switch>
+          <Route path="/stress" component={StressIntro} />
+          <Route path="/shortage" component={ShortageIntro} />
+          <Route path="/scarcity" component={ScarcityIntro} />
+          <Route path="/future" component={FutureIntro} />
+          <Route render={() => <Redirect to="/stress" />} />
+        </Switch>
+        <div className="row middle-xs">
+          <div className="col-xs-12 col-md-8">
+            <TimeSelector />
           </div>
-          <div className="row middle-xs">
-            <div className="col-xs-12 col-md-4">
-              <DataSelector />
-            </div>
-            <div className="col-xs-12 col-md-8">
-              <TimeSelector />
-            </div>
-          </div>
+          <Route
+            path="/scarcity"
+            render={() =>
+              <div className="col-xs-12 col-md-4">
+                <DataSelector />
+              </div>}
+          />
         </div>
-        <div className="container">
-          <div className={classNames(styles['map-content'], 'row')}>
-            <Map />
-          </div>
-          <div className="row">
-            <SelectedRegionInformation />
-          </div>
-          <div className="row">
-            <Gapminder />
-          </div>
-        </div>
-        <div className={styles.footer} />
       </div>
-    );
-  }
+      <div className="container">
+        <div className={classNames(styles['map-content'], 'row')}>
+          <Map />
+        </div>
+        <div className="row">
+          <SelectedRegionInformation />
+        </div>
+        <Route
+          path="/scarcity"
+          render={() =>
+            <div className="row">
+              <Gapminder />
+            </div>}
+        />
+      </div>
+    </div>
+  );
 }
-
-export default App;

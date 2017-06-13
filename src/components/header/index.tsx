@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { NavLink } from 'react-router-dom';
 
 const aaltoLogo = require('../../images/aalto_logo.svg');
 const styles = require('./index.scss');
@@ -16,18 +17,34 @@ export default class Header extends React.Component<{}, void> {
         <div className={styles.navigation}>
           <div className="container">
             <div className="row">
-              <div className={styles['navigation-item']}>
-                Heave water usage
-              </div>
-              <div className={styles['navigation-item']}>
+              <NavLink
+                to="/stress"
+                activeClassName={styles.selected}
+                className={styles['navigation-item']}
+              >
+                Heavy water usage
+              </NavLink>
+              <NavLink
+                to="/shortage"
+                activeClassName={styles.selected}
+                className={styles['navigation-item']}
+              >
                 Meeting water needs
-              </div>
-              <div className={styles['navigation-item']}>
+              </NavLink>
+              <NavLink
+                to="/scarcity"
+                activeClassName={styles.selected}
+                className={styles['navigation-item']}
+              >
                 Water scarcity
-              </div>
-              <div className={styles['navigation-item']}>
+              </NavLink>
+              <NavLink
+                to="/future"
+                activeClassName={styles.selected}
+                className={styles['navigation-item']}
+              >
                 Future actions
-              </div>
+              </NavLink>
             </div>
           </div>
         </div>
