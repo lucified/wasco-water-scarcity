@@ -1,68 +1,38 @@
-import groupBy = require('lodash/groupBy');
-import keyBy = require('lodash/keyBy');
-import values = require('lodash/values');
 import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
 import {
   Action,
   SET_SELECTED_DATA_TYPE,
-  SET_SELECTED_GLOBAL_REGION,
   SET_SELECTED_REGION,
+  SET_SELECTED_WORLD_REGION,
   SET_TIME_INDEX,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
 import {
+  getAggregateStressShortageData,
+  getStressShortageData,
+  getWorldRegionsData,
+} from '../data';
+import {
   AggregateStressShortageDatum,
-  RawAggregateStressShortageDatum,
-  RawRegionStressShortageDatum,
   StressShortageDatum,
   TimeAggregate,
-  toAggregateStressShortageDatum,
-  toStressShortageDatum,
+  WorldRegion,
 } from '../types';
 import { StateTree } from './types';
 
-let rawStressShortageData:
-  | RawRegionStressShortageDatum[]
-  | null = require('../../data/FPU_decadal_bluewater.json');
-let yearlyGroupedData: RawRegionStressShortageDatum[][] | null = values(
-  groupBy(rawStressShortageData!, ({ startYear }) => startYear),
-).sort((a, b) => a[0].startYear - b[0].startYear);
-
-let rawAggregateData:
-  | RawAggregateStressShortageDatum[]
-  | null = require('../../data/worldRegion_decadal_bluewater.json');
-let yearlyGroupedAggregateData:
-  | RawAggregateStressShortageDatum[][]
-  | null = values(
-  groupBy(rawAggregateData!, ({ startYear }) => startYear),
-).sort((a, b) => a[0].startYear - b[0].startYear);
-
 const defaultState: StateTree = {
   routing: {} as any,
-  stressShortageData: yearlyGroupedData.map(group => ({
-    startYear: group[0].startYear,
-    endYear: group[0].endYear,
-    data: keyBy(group.map(toStressShortageDatum), d => d.featureId),
-  })),
-  aggregateData: yearlyGroupedAggregateData.map(group => ({
-    startYear: group[0].startYear,
-    endYear: group[0].endYear,
-    data: keyBy(group.map(toAggregateStressShortageDatum), d => d.featureId),
-  })),
+  stressShortageData: getStressShortageData(),
+  aggregateData: getAggregateStressShortageData(),
+  worldRegions: getWorldRegionsData(),
   selections: {
     timeIndex: 0,
     dataType: 'stress',
-    globalRegion: 0, // 0 means global
+    worldRegion: 0, // 0 means global
   },
 };
-
-// Don't keep raw and temporary data in memory
-rawStressShortageData = null;
-yearlyGroupedData = null;
-rawAggregateData = null;
-yearlyGroupedAggregateData = null;
 
 export const initialState = defaultState;
 
@@ -77,6 +47,13 @@ function aggregateDataReducer(
   state = initialState.aggregateData,
   _action: Action,
 ): Array<TimeAggregate<AggregateStressShortageDatum>> {
+  return state;
+}
+
+function worldRegionsReducer(
+  state = initialState.worldRegions,
+  _action: Action,
+): WorldRegion[] {
   return state;
 }
 
@@ -112,11 +89,11 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       }
 
       return state;
-    case SET_SELECTED_GLOBAL_REGION:
-      if (action.id !== state.globalRegion) {
+    case SET_SELECTED_WORLD_REGION:
+      if (action.id !== state.worldRegion) {
         return {
           ...state,
-          globalRegion: action.id,
+          worldRegion: action.id,
         };
       }
 
@@ -140,6 +117,7 @@ export default combineReducers<StateTree>({
   selections: selectionsReducer,
   stressShortageData: stressShortageDataReducer,
   aggregateData: aggregateDataReducer,
+  worldRegions: worldRegionsReducer,
 });
 
 export * from './types';

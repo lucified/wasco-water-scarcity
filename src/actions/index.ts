@@ -1,12 +1,12 @@
 import { DataType } from '../types';
 import {
   SET_SELECTED_DATA_TYPE,
-  SET_SELECTED_GLOBAL_REGION,
   SET_SELECTED_REGION,
+  SET_SELECTED_WORLD_REGION,
   SET_TIME_INDEX,
   SetSelectedDataTypeAction,
-  SetSelectedGlobalRegionAction,
   SetSelectedRegionAction,
+  SetSelectedWorldRegionAction,
   SetTimeIndexAction,
   TOGGLE_SELECTED_REGION,
   ToggleSelectedRegionAction,
@@ -33,11 +33,11 @@ export function setSelectedRegion(id?: number): SetSelectedRegionAction {
   };
 }
 
-export function setSelectedGlobalRegion(
+export function setSelectedWorldRegion(
   id: number,
-): SetSelectedGlobalRegionAction {
+): SetSelectedWorldRegionAction {
   return {
-    type: SET_SELECTED_GLOBAL_REGION,
+    type: SET_SELECTED_WORLD_REGION,
     id,
   };
 }

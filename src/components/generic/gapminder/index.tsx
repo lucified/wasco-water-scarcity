@@ -31,7 +31,7 @@ export interface CircleData {
 
 export interface Data {
   timeRanges: Array<[Date, Date]>;
-  regions: {
+  circles: {
     [id: string]: CircleData;
   };
 }
@@ -67,9 +67,10 @@ interface PassedProps {
   marginBottom?: number;
   className?: string;
   onHover?: (hoveredIndex: number) => void;
-  onSelectData?: (id: string) => void;
+  onClick?: (id: string) => void;
   xBackgroundColorScale?: ScaleThreshold<number, string>;
   yBackgroundColorScale?: ScaleThreshold<number, string>;
+  fadeOut?: (d: ChartDatum) => boolean;
 }
 
 interface DefaultProps {
@@ -87,20 +88,20 @@ function toMidpoint(start: Date, end: Date): Date {
 }
 
 function generateChartData(
-  data: Data,
+  allData: Data,
   xSelector: DataSeriesSelector,
   ySelector: DataSeriesSelector,
   sizeSelector: DataSeriesSelector,
 ): ChartDatum[] {
-  return Object.keys(data.regions).map(id => {
-    const { data: regionData, color } = data.regions[id];
+  return Object.keys(allData.circles).map(id => {
+    const { data, color } = allData.circles[id];
 
     return {
       id,
       color,
-      x: xSelector(regionData),
-      y: ySelector(regionData),
-      size: sizeSelector(regionData),
+      x: xSelector(data),
+      y: ySelector(data),
+      size: sizeSelector(data),
     };
   });
 }
@@ -205,7 +206,7 @@ class Gapminder extends React.Component<Props, void> {
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
 
-    const regionDataArray = values(data.regions);
+    const regionDataArray = values(data.circles);
     const yExtent = minY && maxY
       ? [minY, maxY]
       : extent(
@@ -243,6 +244,7 @@ class Gapminder extends React.Component<Props, void> {
       ySelector,
       xBackgroundColorScale,
       yBackgroundColorScale,
+      fadeOut,
     } = this.props as PropsWithDefaults;
 
     const chartHeight = height - marginTop - marginBottom;
@@ -256,7 +258,7 @@ class Gapminder extends React.Component<Props, void> {
 
     // TODO: DRY up code for background colors
     if (xBackgroundColorScale) {
-      const regionDataArray = values(data.regions);
+      const regionDataArray = values(data.circles);
       const xExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
       ) as [number, number];
@@ -284,7 +286,7 @@ class Gapminder extends React.Component<Props, void> {
     }
 
     if (yBackgroundColorScale) {
-      const regionDataArray = values(data.regions);
+      const regionDataArray = values(data.circles);
       const yExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
       ) as [number, number];
@@ -328,12 +330,13 @@ class Gapminder extends React.Component<Props, void> {
       .enter()
         .append<SVGCircleElement>('circle')
         .attr('class', styles.dot)
+        .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
         .on('click', this.handleCircleClick)
         .call(this.drawCircle)
         .sort(this.circleOrder);
 
     if (selectedData) {
-      const selectedDataSeries = data.regions[selectedData].data;
+      const selectedDataSeries = data.circles[selectedData].data;
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),
@@ -364,9 +367,9 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private handleCircleClick(d: ChartDatum) {
-    const { onSelectData } = this.props;
-    if (onSelectData) {
-      onSelectData(d.id);
+    const { onClick } = this.props;
+    if (onClick) {
+      onClick(d.id);
     }
   }
 
@@ -450,7 +453,7 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private redrawChart() {
-    const { data, selectedData, xSelector, ySelector } = this.props;
+    const { data, selectedData, xSelector, ySelector, fadeOut } = this.props;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
@@ -461,13 +464,14 @@ class Gapminder extends React.Component<Props, void> {
       .selectAll<SVGCircleElement, ChartDatum>(`circle.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
+      .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
       .transition(t)
         .call(this.drawCircle as any);
 
     g.select('text#year-label').call(this.setYearLabel);
 
     if (selectedData) {
-      const selectedDataSeries = data.regions[selectedData].data;
+      const selectedDataSeries = data.circles[selectedData].data;
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),

@@ -7,7 +7,9 @@ import {
   ScaleThreshold,
 } from 'd3-scale';
 import { select, Selection } from 'd3-selection';
+import { event } from 'd3-selection';
 import { transition } from 'd3-transition';
+import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -19,7 +21,9 @@ import {
   getSelectedDataType,
   getSelectedRegion,
   getSelectedStressShortageData,
+  getSelectedWorldRegion,
   getStressShortageData,
+  getWorldRegionData,
 } from '../../selectors';
 import {
   DataType,
@@ -28,8 +32,11 @@ import {
   StressShortageDatum,
   TimeAggregate,
   waterPropertySelector,
+  WorldRegion,
 } from '../../types';
 import { WaterRegionFeature } from './types';
+
+import WorldRegionSelector from './world-region-selector';
 
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
@@ -44,6 +51,8 @@ interface GeneratedStateProps {
   selectedData: TimeAggregate<StressShortageDatum>;
   allData: Array<TimeAggregate<StressShortageDatum>>;
   selectedRegion?: number;
+  selectedWorldRegion: number;
+  worldRegions: WorldRegion[];
   selectedDataType: DataType;
 }
 
@@ -134,6 +143,10 @@ class Map extends React.Component<Props, void> {
       this.redrawFillsAndBorders();
       this.redrawLegend();
     }
+
+    if (prevProps.selectedWorldRegion !== this.props.selectedWorldRegion) {
+      this.zoomToGlobalArea();
+    }
   }
 
   private generateScales() {
@@ -173,9 +186,9 @@ class Map extends React.Component<Props, void> {
 
     // Based on https://gist.github.com/mbostock/4448587
     const projection = geoNaturalEarth2()
+      .precision(0.1)
       .scale(this.width / 4.6)
-      .translate([this.width / 2.2, this.height / 1.7])
-      .precision(0.1);
+      .translate([this.width / 2.2, this.height / 1.7]);
     const path = geoPath().projection(projection);
 
     const svg = select<SVGElement, undefined>(this.svgRef!)
@@ -281,6 +294,58 @@ class Map extends React.Component<Props, void> {
     g.call(this.addLegendLabels);
   }
 
+  private zoomToGlobalArea() {
+    const { selectedWorldRegion, worldRegions } = this.props;
+
+    // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
+    const projection = geoNaturalEarth2()
+      .precision(0.1)
+      .scale(this.width / 4.6)
+      .translate([this.width / 2.2, this.height / 1.7]);
+
+    let bounds;
+    if (selectedWorldRegion !== 0) {
+      const worldRegion = worldRegions.find(r => r.id === selectedWorldRegion)!;
+      bounds = geoPath()
+        .projection(projection)
+        .bounds(worldRegion.feature as any);
+    } else {
+      bounds = [[0, 0], [this.width, this.height]];
+    }
+
+    const dx = bounds[1][0] - bounds[0][0];
+    const dy = bounds[1][1] - bounds[0][1];
+    const x = (bounds[0][0] + bounds[1][0]) / 2;
+    const y = (bounds[0][1] + bounds[1][1]) / 2;
+    const scale = Math.max(
+      1,
+      Math.min(8, 0.9 / Math.max(dx / this.width, dy / this.height)),
+    );
+    const translate = [this.width / 2 - scale * x, this.height / 2 - scale * y];
+
+    const ourZoom = zoom().on('zoom', zoomed);
+
+    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const t = transition('zoom').duration(750);
+    svg
+      .transition(t)
+      .call(
+        ourZoom.transform as any,
+        zoomIdentity.translate(translate[0], translate[1]).scale(scale),
+      );
+
+    function zoomed() {
+      select<SVGGElement, undefined>('g#water-regions').attr(
+        'transform',
+        event.transform,
+      );
+      select<SVGGElement, undefined>('g#countries').attr(
+        'transform',
+        event.transform,
+      );
+    }
+  }
+
   private handleRegionClick(d: WaterRegionFeature) {
     this.props.toggleSelectedRegion(d.properties.featureid);
   }
@@ -332,7 +397,7 @@ class Map extends React.Component<Props, void> {
             <path id="sphere" />
           </defs>
           <use className={styles['globe-fill']} xlinkHref="#sphere" />
-          <g>
+          <g id="countries">
             <path className={styles.land} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
@@ -347,6 +412,7 @@ class Map extends React.Component<Props, void> {
             </text>
           </g>
         </svg>
+        <WorldRegionSelector />
       </div>
     );
   }
@@ -358,6 +424,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedData: getSelectedStressShortageData(state),
     selectedRegion: getSelectedRegion(state),
     selectedDataType: getSelectedDataType(state),
+    selectedWorldRegion: getSelectedWorldRegion(state),
+    worldRegions: getWorldRegionData(state),
   };
 }
 

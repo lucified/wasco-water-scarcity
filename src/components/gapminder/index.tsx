@@ -3,10 +3,11 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setSelectedRegion, setTimeIndex } from '../../actions';
+import { setTimeIndex, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
+  getRegionsInSelectedWorldRegion,
   getSelectedRegion,
   getSelectedTimeIndex,
 } from '../../selectors';
@@ -16,13 +17,14 @@ import Gapminder, { Data } from '../generic/gapminder';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
+  regionsInSelectedWorldRegion: number[];
   selectedRegion?: number;
   data: Data;
 }
 
 interface GeneratedDispatchProps {
   setTimeIndex: (value: number) => void;
-  setSelectedRegion: (id: string) => void;
+  toggleSelectedRegion: (id: string) => void;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
@@ -52,10 +54,15 @@ const shortageColorsScale = scaleThreshold<number, string>()
 function GapminderWrapper({
   selectedTimeIndex,
   selectedRegion,
+  regionsInSelectedWorldRegion,
   data,
   setTimeIndex,
-  setSelectedRegion,
+  toggleSelectedRegion,
 }: Props) {
+  function shouldFadeOut(d: { id: string }) {
+    return regionsInSelectedWorldRegion.indexOf(Number(d.id)) < 0;
+  }
+
   return (
     <div className="col-xs-12">
       <Gapminder
@@ -67,7 +74,7 @@ function GapminderWrapper({
           selectedRegion != null ? String(selectedRegion) : undefined
         }
         onHover={setTimeIndex}
-        onSelectData={setSelectedRegion}
+        onClick={toggleSelectedRegion}
         xSelector={shortageSelector}
         xBackgroundColorScale={shortageColorsScale}
         minX={100}
@@ -79,6 +86,7 @@ function GapminderWrapper({
         ySelector={stressSelector}
         yBackgroundColorScale={stressColorsScale}
         sizeSelector={populationSelector}
+        fadeOut={shouldFadeOut}
       />
     </div>
   );
@@ -88,6 +96,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
     selectedRegion: getSelectedRegion(state),
+    regionsInSelectedWorldRegion: getRegionsInSelectedWorldRegion(state),
     data: getDataByRegion(state),
   };
 }
@@ -97,8 +106,8 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     setTimeIndex: (value: number) => {
       dispatch(setTimeIndex(value));
     },
-    setSelectedRegion: (id: string) => {
-      dispatch(setSelectedRegion(Number(id)));
+    toggleSelectedRegion: (id: string) => {
+      dispatch(toggleSelectedRegion(Number(id)));
     },
   };
 }

@@ -6,20 +6,32 @@ export interface TimeAggregate<T> {
   };
 }
 
-export interface RawRegionStressShortageDatum {
+export interface WorldRegionGeoJSONFeature {
+  geometry: any;
+  id: number;
+  type: 'Feature';
+  properties: {
+    featureId: number;
+    featureName: string;
+  };
+}
+
+export interface WorldRegion {
+  id: number;
+  name: string;
+  color: string;
+  feature: WorldRegionGeoJSONFeature;
+}
+
+export interface RawDatum {
   // Independent variables
-  featureid: number;
+  featureId: number; // The FPU ID or the world region ID for aggregates
   startYear: number;
   endYear: number;
 
-  // Dependent variabls
-  worldRegionID: number;
+  // Dependent variables
   // Average population
   population: number;
-  // Blue water availability per capita (m3/cap/year). Includes NAs where population=0
-  blueWaterShortage: number;
-  // Blue water consumption-to-availability ratio. Includes NAs where availability=0
-  blueWaterStress: number;
   // Blue water availability (m3/year)
   blueWaterAvailability: number;
   // Total blue water consumption (km3/year)
@@ -36,16 +48,18 @@ export interface RawRegionStressShortageDatum {
   blueWaterConsumptionManufacturing: number;
 }
 
-export interface RawAggregateStressShortageDatum {
-  // Independent variables
-  // This is the worldRegionId in RawRegionStressShortageDatum. Set to 0 for the whole world.
-  featureId: number;
-  startYear: number;
-  endYear: number;
+export interface RawRegionStressShortageDatum extends RawDatum {
+  // Dependent variabls
+  // What wolrd region the FPU belongs to
+  worldRegionID: number;
+  // Blue water availability per capita (m3/cap/year). Includes NAs where population=0
+  blueWaterShortage: number;
+  // Blue water consumption-to-availability ratio. Includes NAs where availability=0
+  blueWaterStress: number;
+}
 
+export interface RawAggregateStressShortageDatum extends RawDatum {
   // Dependent variables
-  // Average population
-  population: number;
   // aggregated from finer scale data: sum(population[blueWaterShortage<=1700 & blueWaterStress<0.2])
   populationOnlyBlueWaterShortage: number;
   // aggregated from finer scale data: sum(population[blueWaterShortage>1700 & blueWaterStress>=0.2])
@@ -63,31 +77,20 @@ export interface RawAggregateStressShortageDatum {
   populationNoBlueWaterShortageAndStress: number;
   populationNoBlueWaterShortage: number;
   populationNoBlueWaterStress: number;
-  // Blue water availability (m3/year)
-  blueWaterAvailability: number;
-  // Total blue water consumption (km3/year)
-  blueWaterConsumptionTotal: number;
-  // Blue water consumption for irrigation (km3/year)
-  blueWaterConsumptionIrrigation: number;
-  // Blue water consumption for households and small businesses (domestic )(km3/year)
-  blueWaterConsumptionDomestic: number;
-  // Blue water consumption for thermal electricity production (km3/year)
-  blueWaterConsumptionElectric: number;
-  // Blue water consumption for livestock farming (km3/year)
-  blueWaterConsumptionLivestock: number;
-  // Blue water consumption for manufacturing industries (km3/year)
-  blueWaterConsumptionManufacturing: number;
 }
 
-// All units have been converted to m^3 from km^3
-export interface AggregateStressShortageDatum {
+export interface Datum {
   startYear: number;
   endYear: number;
-  // The globalRegionID. Set to 0 for the globe.
+
+  // The globalRegionID in aggregates, regionID for FPUs. Set to 0 for the globe.
   featureId: number;
 
   population: number;
+}
 
+// All units have been converted to m^3 from km^3
+export interface AggregateStressShortageDatum extends Datum {
   // For scarcity
   populationNoBlueWaterShortageAndStress: number;
   populationOnlyBlueWaterShortage: number;
@@ -106,11 +109,8 @@ export interface AggregateStressShortageDatum {
 }
 
 // All units have been converted to m^3 from km^3
-export interface StressShortageDatum {
-  startYear: number;
-  endYear: number;
-  featureId: number;
-  population: number;
+export interface StressShortageDatum extends Datum {
+  worldRegionId: number;
   blueWaterShortage: number;
   blueWaterStress: number;
   blueWaterAvailability: number;
@@ -132,7 +132,7 @@ const KM_3_TO_M_3_RATIO = 1000000000;
 export function toStressShortageDatum({
   startYear,
   endYear,
-  featureid,
+  featureId,
   blueWaterAvailability,
   blueWaterConsumptionDomestic,
   blueWaterConsumptionElectric,
@@ -142,6 +142,7 @@ export function toStressShortageDatum({
   blueWaterStress,
   blueWaterShortage,
   population,
+  worldRegionID,
 }: RawRegionStressShortageDatum): StressShortageDatum {
   const calculatedTotal =
     (blueWaterConsumptionDomestic +
@@ -154,7 +155,8 @@ export function toStressShortageDatum({
   return {
     startYear,
     endYear,
-    featureId: featureid,
+    featureId,
+    worldRegionId: worldRegionID,
     blueWaterAvailability,
     blueWaterConsumptionDomestic:
       blueWaterConsumptionDomestic * KM_3_TO_M_3_RATIO,

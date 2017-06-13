@@ -15,6 +15,11 @@
 .dot {
   stroke: #000;
   stroke-opacity: 0.4;
+  transition: opacity 100ms;
+
+  &.fade-out {
+    opacity: 0.5;
+  }
 }
 
 .selected-line {
