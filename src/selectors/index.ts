@@ -8,6 +8,7 @@ import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  WorldRegion,
 } from '../types';
 
 export function getStressShortageData(
@@ -64,16 +65,22 @@ export const getTimeSeriesForSelectedGlobalRegion = createSelector(
   },
 );
 
+export function getWorldRegionData(state: StateTree) {
+  return state.worldRegions;
+}
+
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
 // prettier-ignore
 export const getDataByRegion = createSelector<
   StateTree,
   Array<TimeAggregate<StressShortageDatum>>,
+  { [id: string]: WorldRegion },
   GapminderData
 >(
   getStressShortageData,
-  stressShortageData => {
+  getWorldRegionData,
+  (stressShortageData, worldRegions) => {
     const timeRanges = stressShortageData.map(
       d =>
         [new Date(d.startYear, 0, 1), new Date(d.endYear, 11, 31)] as [
@@ -93,6 +100,7 @@ export const getDataByRegion = createSelector<
     // Note: this assums the first data object has all region IDs
     const regionObjects = Object.keys(stressShortageData[0].data).map(id => {
       const regionId = Number(id);
+      const worldRegionId = stressShortageData[0].data[regionId].worldRegionId;
       const blueWaterStress: number[] = [];
       const blueWaterShortage: number[] = [];
       const population: number[] = [];
@@ -107,7 +115,7 @@ export const getDataByRegion = createSelector<
 
       return {
         id,
-        color: 'lightblue', // TODO once we have region info
+        color: worldRegions[worldRegionId].color,
         data: {
           blueWaterStress,
           blueWaterShortage,
