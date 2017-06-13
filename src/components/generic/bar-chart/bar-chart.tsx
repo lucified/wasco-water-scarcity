@@ -79,6 +79,7 @@ class HoverRect extends React.PureComponent<HoverRectProps, void> {
         y={y}
         onMouseEnter={this.handleMouseEnter}
         onMouseOut={this.handleMouseOut}
+        onTouchStart={this.handleMouseEnter}
         width={width}
         height={height}
       />
