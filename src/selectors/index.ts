@@ -69,6 +69,34 @@ export function getWorldRegionData(state: StateTree) {
   return state.worldRegions;
 }
 
+export const getRegionsInSelectedWorldRegion = createSelector<
+  StateTree,
+  Array<TimeAggregate<StressShortageDatum>>,
+  number,
+  number[]
+>(
+  getStressShortageData,
+  getSelectedWorldRegion,
+  (data, selectedWorldRegion) => {
+    // We assume all regions are in the first time series data object
+    const regions = data[0].data;
+    const regionIds = Object.keys(regions).map(Number);
+
+    if (selectedWorldRegion === 0) {
+      return regionIds;
+    }
+
+    const regionsInSelectedWorldRegion: number[] = [];
+    regionIds.forEach(regionId => {
+      if (regions[regionId].worldRegionId === selectedWorldRegion) {
+        regionsInSelectedWorldRegion.push(regionId);
+      }
+    });
+
+    return regionsInSelectedWorldRegion;
+  },
+);
+
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
 // prettier-ignore

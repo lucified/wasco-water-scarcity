@@ -7,6 +7,7 @@ import { setTimeIndex, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
+  getRegionsInSelectedWorldRegion,
   getSelectedRegion,
   getSelectedTimeIndex,
 } from '../../selectors';
@@ -16,6 +17,7 @@ import Gapminder, { Data } from '../generic/gapminder';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
+  regionsInSelectedWorldRegion: number[];
   selectedRegion?: number;
   data: Data;
 }
@@ -52,10 +54,15 @@ const shortageColorsScale = scaleThreshold<number, string>()
 function GapminderWrapper({
   selectedTimeIndex,
   selectedRegion,
+  regionsInSelectedWorldRegion,
   data,
   setTimeIndex,
   toggleSelectedRegion,
 }: Props) {
+  function shouldFadeOut(d: { id: string }) {
+    return regionsInSelectedWorldRegion.indexOf(Number(d.id)) < 0;
+  }
+
   return (
     <div className="col-xs-12">
       <Gapminder
@@ -79,6 +86,7 @@ function GapminderWrapper({
         ySelector={stressSelector}
         yBackgroundColorScale={stressColorsScale}
         sizeSelector={populationSelector}
+        fadeOut={shouldFadeOut}
       />
     </div>
   );
@@ -88,6 +96,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
     selectedRegion: getSelectedRegion(state),
+    regionsInSelectedWorldRegion: getRegionsInSelectedWorldRegion(state),
     data: getDataByRegion(state),
   };
 }

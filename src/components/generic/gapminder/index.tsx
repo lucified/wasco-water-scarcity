@@ -70,6 +70,7 @@ interface PassedProps {
   onClick?: (id: string) => void;
   xBackgroundColorScale?: ScaleThreshold<number, string>;
   yBackgroundColorScale?: ScaleThreshold<number, string>;
+  fadeOut?: (d: ChartDatum) => boolean;
 }
 
 interface DefaultProps {
@@ -243,6 +244,7 @@ class Gapminder extends React.Component<Props, void> {
       ySelector,
       xBackgroundColorScale,
       yBackgroundColorScale,
+      fadeOut,
     } = this.props as PropsWithDefaults;
 
     const chartHeight = height - marginTop - marginBottom;
@@ -328,6 +330,7 @@ class Gapminder extends React.Component<Props, void> {
       .enter()
         .append<SVGCircleElement>('circle')
         .attr('class', styles.dot)
+        .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
         .on('click', this.handleCircleClick)
         .call(this.drawCircle)
         .sort(this.circleOrder);
@@ -450,7 +453,7 @@ class Gapminder extends React.Component<Props, void> {
   }
 
   private redrawChart() {
-    const { data, selectedData, xSelector, ySelector } = this.props;
+    const { data, selectedData, xSelector, ySelector, fadeOut } = this.props;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
@@ -461,6 +464,7 @@ class Gapminder extends React.Component<Props, void> {
       .selectAll<SVGCircleElement, ChartDatum>(`circle.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
+      .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
       .transition(t)
         .call(this.drawCircle as any);
 
