@@ -18,9 +18,9 @@ export interface SetSelectedRegionAction {
   id?: number;
 }
 
-export const SET_SELECTED_GLOBAL_REGION = 'SET_SELECTED_GLOBAL_REGION';
-export interface SetSelectedGlobalRegionAction {
-  type: 'SET_SELECTED_GLOBAL_REGION';
+export const SET_SELECTED_WORLD_REGION = 'SET_SELECTED_WORLD_REGION';
+export interface SetSelectedWorldRegionAction {
+  type: 'SET_SELECTED_WORLD_REGION';
   id: number;
 }
 
@@ -32,7 +32,7 @@ export interface SetSelectedDataTypeAction {
 
 export type Action =
   | SetSelectedDataTypeAction
-  | SetSelectedGlobalRegionAction
+  | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
   | SetTimeIndexAction
   | ToggleSelectedRegionAction;

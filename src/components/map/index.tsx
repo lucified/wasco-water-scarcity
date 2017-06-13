@@ -31,6 +31,8 @@ import {
 } from '../../types';
 import { WaterRegionFeature } from './types';
 
+import WorldRegionSelector from './world-region-selector';
+
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
 
@@ -347,6 +349,7 @@ class Map extends React.Component<Props, void> {
             </text>
           </g>
         </svg>
+        <WorldRegionSelector />
       </div>
     );
   }

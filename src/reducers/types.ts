@@ -11,14 +11,12 @@ import {
 export interface StateTree {
   stressShortageData: Array<TimeAggregate<StressShortageDatum>>;
   aggregateData: Array<TimeAggregate<AggregateStressShortageDatum>>;
-  worldRegions: {
-    [id: string]: WorldRegion;
-  };
+  worldRegions: WorldRegion[];
   routing: RouterState;
   selections: {
     timeIndex: number;
     dataType: DataType;
-    globalRegion: number;
+    worldRegion: number;
     region?: number;
   };
 }

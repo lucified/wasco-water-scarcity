@@ -37,8 +37,8 @@ export function getSelectedRegion(state: StateTree): number | undefined {
   return state.selections.region;
 }
 
-export function getSelectedGlobalRegion(state: StateTree): number {
-  return state.selections.globalRegion;
+export function getSelectedWorldRegion(state: StateTree): number {
+  return state.selections.worldRegion;
 }
 
 export function getSelectedDataType(state: StateTree): DataType {
@@ -58,7 +58,7 @@ export const getTimeSeriesForSelectedRegion = createSelector(
 );
 
 export const getTimeSeriesForSelectedGlobalRegion = createSelector(
-  getSelectedGlobalRegion,
+  getSelectedWorldRegion,
   getAggregateData,
   (selectedRegion, data) => {
     return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
@@ -75,7 +75,7 @@ export function getWorldRegionData(state: StateTree) {
 export const getDataByRegion = createSelector<
   StateTree,
   Array<TimeAggregate<StressShortageDatum>>,
-  { [id: string]: WorldRegion },
+  WorldRegion[],
   GapminderData
 >(
   getStressShortageData,
@@ -101,6 +101,8 @@ export const getDataByRegion = createSelector<
     const regionObjects = Object.keys(stressShortageData[0].data).map(id => {
       const regionId = Number(id);
       const worldRegionId = stressShortageData[0].data[regionId].worldRegionId;
+      const worldRegion = worldRegions.find(r => r.id === worldRegionId);
+      const color = worldRegion ? worldRegion.color : 'lightblue';
       const blueWaterStress: number[] = [];
       const blueWaterShortage: number[] = [];
       const population: number[] = [];
@@ -115,7 +117,7 @@ export const getDataByRegion = createSelector<
 
       return {
         id,
-        color: worldRegions[worldRegionId].color,
+        color,
         data: {
           blueWaterStress,
           blueWaterShortage,

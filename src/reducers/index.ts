@@ -1,12 +1,11 @@
-import keyBy = require('lodash/keyBy');
 import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
 import {
   Action,
   SET_SELECTED_DATA_TYPE,
-  SET_SELECTED_GLOBAL_REGION,
   SET_SELECTED_REGION,
+  SET_SELECTED_WORLD_REGION,
   SET_TIME_INDEX,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
@@ -27,11 +26,11 @@ const defaultState: StateTree = {
   routing: {} as any,
   stressShortageData: getStressShortageData(),
   aggregateData: getAggregateStressShortageData(),
-  worldRegions: keyBy(getWorldRegionsData(), d => d.id),
+  worldRegions: getWorldRegionsData(),
   selections: {
     timeIndex: 0,
     dataType: 'stress',
-    globalRegion: 0, // 0 means global
+    worldRegion: 0, // 0 means global
   },
 };
 
@@ -54,7 +53,7 @@ function aggregateDataReducer(
 function worldRegionsReducer(
   state = initialState.worldRegions,
   _action: Action,
-): { [id: string]: WorldRegion } {
+): WorldRegion[] {
   return state;
 }
 
@@ -90,11 +89,11 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       }
 
       return state;
-    case SET_SELECTED_GLOBAL_REGION:
-      if (action.id !== state.globalRegion) {
+    case SET_SELECTED_WORLD_REGION:
+      if (action.id !== state.worldRegion) {
         return {
           ...state,
-          globalRegion: action.id,
+          worldRegion: action.id,
         };
       }
 
