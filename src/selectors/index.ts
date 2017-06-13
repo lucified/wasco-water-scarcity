@@ -128,7 +128,7 @@ export const getDataByRegion = createSelector<
 
     return {
       timeRanges,
-      regions: keyBy(regionObjects, d => d.id),
+      circles: keyBy(regionObjects, d => d.id),
     };
   },
 );

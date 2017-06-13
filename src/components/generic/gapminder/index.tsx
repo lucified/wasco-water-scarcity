@@ -31,7 +31,7 @@ export interface CircleData {
 
 export interface Data {
   timeRanges: Array<[Date, Date]>;
-  regions: {
+  circles: {
     [id: string]: CircleData;
   };
 }
@@ -87,20 +87,20 @@ function toMidpoint(start: Date, end: Date): Date {
 }
 
 function generateChartData(
-  data: Data,
+  allData: Data,
   xSelector: DataSeriesSelector,
   ySelector: DataSeriesSelector,
   sizeSelector: DataSeriesSelector,
 ): ChartDatum[] {
-  return Object.keys(data.regions).map(id => {
-    const { data: regionData, color } = data.regions[id];
+  return Object.keys(allData.circles).map(id => {
+    const { data, color } = allData.circles[id];
 
     return {
       id,
       color,
-      x: xSelector(regionData),
-      y: ySelector(regionData),
-      size: sizeSelector(regionData),
+      x: xSelector(data),
+      y: ySelector(data),
+      size: sizeSelector(data),
     };
   });
 }
@@ -205,7 +205,7 @@ class Gapminder extends React.Component<Props, void> {
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
 
-    const regionDataArray = values(data.regions);
+    const regionDataArray = values(data.circles);
     const yExtent = minY && maxY
       ? [minY, maxY]
       : extent(
@@ -256,7 +256,7 @@ class Gapminder extends React.Component<Props, void> {
 
     // TODO: DRY up code for background colors
     if (xBackgroundColorScale) {
-      const regionDataArray = values(data.regions);
+      const regionDataArray = values(data.circles);
       const xExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => xSelector(d.data))),
       ) as [number, number];
@@ -284,7 +284,7 @@ class Gapminder extends React.Component<Props, void> {
     }
 
     if (yBackgroundColorScale) {
-      const regionDataArray = values(data.regions);
+      const regionDataArray = values(data.circles);
       const yExtent = extent(
         flatMap<number[], number>(regionDataArray.map(d => ySelector(d.data))),
       ) as [number, number];
@@ -333,7 +333,7 @@ class Gapminder extends React.Component<Props, void> {
         .sort(this.circleOrder);
 
     if (selectedData) {
-      const selectedDataSeries = data.regions[selectedData].data;
+      const selectedDataSeries = data.circles[selectedData].data;
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),
@@ -467,7 +467,7 @@ class Gapminder extends React.Component<Props, void> {
     g.select('text#year-label').call(this.setYearLabel);
 
     if (selectedData) {
-      const selectedDataSeries = data.regions[selectedData].data;
+      const selectedDataSeries = data.circles[selectedData].data;
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),
