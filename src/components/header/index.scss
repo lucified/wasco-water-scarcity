@@ -22,13 +22,18 @@
 }
 
 .navigation-item {
-  padding: $default-margin $default-margin $default-margin 0;
-  margin-left: 0.5rem;
+  padding: $default-margin 0;
+  margin-right: $default-margin;
   font-weight: 500;
   text-transform: uppercase;
+  text-decoration: none;
+  color: $color-text;
 
   &:hover {
-    cursor: pointer;
     color: #666;
+  }
+
+  &.selected {
+    border-bottom: 3px solid $color-dark-gray;
   }
 }
