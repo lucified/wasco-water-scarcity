@@ -16,6 +16,7 @@ import { Dispatch } from 'redux';
 import { feature } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
+import { defaultDataTypeThresholdMaxValues } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
@@ -141,11 +142,17 @@ class Map extends React.Component<Props, void> {
   }
 
   private generateScales() {
-    const { colorScale, thresholds } = this.props;
+    const { colorScale, thresholds, selectedDataType } = this.props;
     // Based on https://bl.ocks.org/mbostock/4060606
     const maxThreshold = thresholds[thresholds.length - 1];
     const xScale = scaleLinear()
-      .domain([0, 2 * maxThreshold])
+      .domain([
+        0,
+        Math.max(
+          maxThreshold * 1.1,
+          defaultDataTypeThresholdMaxValues[selectedDataType],
+        ),
+      ])
       .rangeRound([0, this.legendWidth]);
 
     this.legendExtentPairs = colorScale.range().map(d => {

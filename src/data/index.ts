@@ -85,3 +85,9 @@ export const defaultDataTypeThresholds = {
    */
   scarcity: [0, 0.5, 1],
 };
+
+export const defaultDataTypeThresholdMaxValues = {
+  stress: 2,
+  shortage: 4000,
+  scarcity: 2,
+};

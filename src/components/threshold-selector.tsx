@@ -1,9 +1,11 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as ReactSlider from 'react-slider';
 import { Dispatch } from 'redux';
 
 import { setThresholdsForDataType } from '../actions';
+import { defaultDataTypeThresholdMaxValues } from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
 
@@ -11,6 +13,7 @@ const styles = require('./threshold-selector.scss');
 
 interface PassedProps {
   dataType: 'stress' | 'shortage';
+  className?: string;
 }
 
 interface GeneratedStateProps {
@@ -23,22 +26,44 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
-function ThresholdSelector({ thresholds, setThresholds }: Props) {
+const configurations = {
+  stress: {
+    min: 0,
+    max: defaultDataTypeThresholdMaxValues.stress,
+    step: 0.01,
+  },
+  shortage: {
+    min: 0,
+    max: defaultDataTypeThresholdMaxValues.shortage,
+    step: 10,
+  },
+};
+
+// TODO: Replace react-slider with https://github.com/airbnb/rheostat ?
+
+function ThresholdSelector({
+  className,
+  thresholds,
+  dataType,
+  setThresholds,
+}: Props) {
+  const { step, min, max } = configurations[dataType];
+
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
     <ReactSlider
-      min={0}
-      max={Math.max(...thresholds) * 2}
+      min={min}
+      max={Math.max(thresholds[thresholds.length - 1] * 1.1, max)}
       value={thresholds.slice()}
-      minDistance={0.01}
+      minDistance={step}
       pearling
-      step={0.01}
+      step={step}
       withBars
       snapDragDisabled
       handleClassName={styles.handle}
       handleActiveClassName={styles.active}
       barClassName={styles.bar}
-      className={styles.slider}
+      className={classNames(styles.slider, className)}
       onChange={setThresholds}
     />
   );
