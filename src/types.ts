@@ -82,37 +82,9 @@ export interface RawAggregateStressShortageDatum extends RawDatum {
 export interface Datum {
   startYear: number;
   endYear: number;
-
   // The globalRegionID in aggregates, regionID for FPUs. Set to 0 for the globe.
   featureId: number;
-
   population: number;
-}
-
-// All units have been converted to m^3 from km^3
-export interface AggregateStressShortageDatum extends Datum {
-  // For scarcity
-  populationNoBlueWaterShortageAndStress: number;
-  populationOnlyBlueWaterShortage: number;
-  populationOnlyBlueWaterStress: number;
-  populationBlueWaterShortageAndStress: number;
-
-  // For shortage
-  populationNoBlueWaterShortage: number;
-  populationModerateBlueWaterShortage: number;
-  populationHighBlueWaterShortage: number;
-
-  // For stress
-  populationNoBlueWaterStress: number;
-  populationModerateBlueWaterStress: number;
-  populationHighBlueWaterStress: number;
-}
-
-// All units have been converted to m^3 from km^3
-export interface StressShortageDatum extends Datum {
-  worldRegionId: number;
-  blueWaterShortage: number;
-  blueWaterStress: number;
   blueWaterAvailability: number;
   /**
    * We calculate this by taking the sum of the different consumptions. It may
@@ -125,6 +97,34 @@ export interface StressShortageDatum extends Datum {
   blueWaterConsumptionElectric: number;
   blueWaterConsumptionLivestock: number;
   blueWaterConsumptionManufacturing: number;
+}
+
+// All units have been converted to m^3 from km^3
+export interface AggregateStressShortageDatum extends Datum {
+  // For scarcity
+  populationNoBlueWaterShortageAndStress: number;
+  populationOnlyBlueWaterShortage: number;
+  populationOnlyBlueWaterStress: number;
+  populationBlueWaterShortageAndStress: number;
+
+  // For shortage
+  populationNoBlueWaterShortage: number;
+  populationLowBlueWaterShortage: number;
+  populationModerateBlueWaterShortage: number;
+  populationHighBlueWaterShortage: number;
+
+  // For stress
+  populationNoBlueWaterStress: number;
+  populationLowBlueWaterStress: number;
+  populationModerateBlueWaterStress: number;
+  populationHighBlueWaterStress: number;
+}
+
+// All units have been converted to m^3 from km^3
+export interface StressShortageDatum extends Datum {
+  worldRegionId: number;
+  blueWaterShortage: number;
+  blueWaterStress: number;
 }
 
 const KM_3_TO_M_3_RATIO = 1000000000;
@@ -175,61 +175,7 @@ export function toStressShortageDatum({
   };
 }
 
-export function toAggregateStressShortageDatum({
-  startYear,
-  endYear,
-  featureId,
-  population,
-  populationBlueWaterShortageAndStress,
-  populationHighBlueWaterShortage,
-  populationHighBlueWaterStress,
-  populationModerateBlueWaterShortage,
-  populationModerateBlueWaterStress,
-  populationNoBlueWaterShortage,
-  populationNoBlueWaterShortageAndStress,
-  populationNoBlueWaterStress,
-  populationOnlyBlueWaterShortage,
-  populationOnlyBlueWaterStress,
-}: RawAggregateStressShortageDatum) {
-  return {
-    startYear,
-    endYear,
-    featureId,
-    population,
-    populationBlueWaterShortageAndStress,
-    populationHighBlueWaterShortage,
-    populationHighBlueWaterStress,
-    populationModerateBlueWaterShortage,
-    populationModerateBlueWaterStress,
-    populationNoBlueWaterShortage,
-    populationNoBlueWaterShortageAndStress,
-    populationNoBlueWaterStress,
-    populationOnlyBlueWaterShortage,
-    populationOnlyBlueWaterStress,
-  };
-}
-
 export type DataType = 'stress' | 'shortage' | 'scarcity';
-export function getDataTypeThresholds(dataType: DataType) {
-  switch (dataType) {
-    case 'stress':
-      return [0.2, 0.4, 1];
-    case 'shortage':
-      return [500, 1000, 1700]; // Note: higher is better.
-    case 'scarcity':
-      /**
-       * These numbers are arbitrary.
-       * x < 0 = No stress or shortage
-       * 0 <= x < 0.5 = stress only
-       * 0.5 <= x < 1.0 = shortage only
-       * x >= 1.0 = shortage and stress
-       */
-      return [0, 0.5, 1];
-  }
-
-  console.warn('No thresholds availables for', dataType);
-  return undefined;
-}
 
 export function getDataTypeColors(dataType: DataType) {
   switch (dataType) {
@@ -246,35 +192,35 @@ export function getDataTypeColors(dataType: DataType) {
   return [];
 }
 
-export function waterPropertySelector(dataType: DataType) {
+export function waterPropertySelector(dataType: 'stress' | 'shortage') {
   switch (dataType) {
     case 'stress':
       return (d: StressShortageDatum) => d.blueWaterStress;
     case 'shortage':
       return (d: StressShortageDatum) => d.blueWaterShortage;
-    case 'scarcity':
-      const stressThresholds = getDataTypeThresholds('stress')!;
-      const shortageThresholds = getDataTypeThresholds('shortage')!;
-      const scarcityThresholds = getDataTypeThresholds('scarcity')!;
-      return (d: StressShortageDatum) => {
-        const hasStress = d.blueWaterStress >= stressThresholds[0];
-        const hasShortage = d.blueWaterShortage <= shortageThresholds[2];
-        if (hasStress && hasShortage) {
-          return scarcityThresholds[2] + 0.1;
-        }
-
-        if (hasShortage) {
-          return scarcityThresholds[1] + 0.1;
-        }
-
-        if (hasStress) {
-          return scarcityThresholds[0] + 0.1;
-        }
-
-        return scarcityThresholds[0] - 0.1;
-      };
   }
+}
 
-  console.warn('Unknown data type', dataType);
-  return (_d: StressShortageDatum) => undefined;
+export function scarcitySelector(
+  scarcityThresholds: number[],
+  stressThresholds: number[],
+  shortageThresholds: number[],
+) {
+  return (d: StressShortageDatum) => {
+    const hasStress = d.blueWaterStress >= stressThresholds[0];
+    const hasShortage = d.blueWaterShortage <= shortageThresholds[2];
+    if (hasStress && hasShortage) {
+      return scarcityThresholds[2] + 0.1;
+    }
+
+    if (hasShortage) {
+      return scarcityThresholds[1] + 0.1;
+    }
+
+    if (hasStress) {
+      return scarcityThresholds[0] + 0.1;
+    }
+
+    return scarcityThresholds[0] - 0.1;
+  };
 }

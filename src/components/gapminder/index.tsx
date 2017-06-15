@@ -10,8 +10,9 @@ import {
   getRegionsInSelectedWorldRegion,
   getSelectedRegion,
   getSelectedTimeIndex,
+  getThresholdsForDataType,
 } from '../../selectors';
-import { getDataTypeColors, getDataTypeThresholds } from '../../types';
+import { getDataTypeColors } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
 
@@ -20,6 +21,8 @@ interface GeneratedStateProps {
   regionsInSelectedWorldRegion: number[];
   selectedRegion?: number;
   data: Data;
+  stressThresholds: number[];
+  shortageThresholds: number[];
 }
 
 interface GeneratedDispatchProps {
@@ -41,16 +44,6 @@ function populationSelector(data: { [dataType: string]: number[] }) {
   return data.population;
 }
 
-const stressThresholds = getDataTypeThresholds('stress');
-const stressColorsScale = scaleThreshold<number, string>()
-  .domain(stressThresholds!)
-  .range(['none', ...getDataTypeColors('stress')]);
-
-const shortageThresholds = getDataTypeThresholds('shortage');
-const shortageColorsScale = scaleThreshold<number, string>()
-  .domain(shortageThresholds!)
-  .range(['none', ...getDataTypeColors('shortage')].reverse());
-
 function GapminderWrapper({
   selectedTimeIndex,
   selectedRegion,
@@ -58,10 +51,19 @@ function GapminderWrapper({
   data,
   setTimeIndex,
   toggleSelectedRegion,
+  stressThresholds,
+  shortageThresholds,
 }: Props) {
   function shouldFadeOut(d: { id: string }) {
     return regionsInSelectedWorldRegion.indexOf(Number(d.id)) < 0;
   }
+
+  const stressColorsScale = scaleThreshold<number, string>()
+    .domain(stressThresholds!)
+    .range(['none', ...getDataTypeColors('stress')]);
+  const shortageColorsScale = scaleThreshold<number, string>()
+    .domain(shortageThresholds!)
+    .range(['none', ...getDataTypeColors('shortage')].reverse());
 
   return (
     <div className="col-xs-12">
@@ -98,6 +100,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedRegion: getSelectedRegion(state),
     regionsInSelectedWorldRegion: getRegionsInSelectedWorldRegion(state),
     data: getDataByRegion(state),
+    stressThresholds: getThresholdsForDataType(state, 'stress'),
+    shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   };
 }
 

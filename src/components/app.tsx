@@ -13,6 +13,7 @@ import ScarcityIntro from './pages/scarcity/intro';
 import ShortageIntro from './pages/shortage/intro';
 import StressIntro from './pages/stress/intro';
 import SelectedRegionInformation from './selected-region-information';
+import ThresholdSelector from './threshold-selector';
 import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
@@ -25,24 +26,45 @@ export default function App(_props: Props) {
     <div className={styles.root}>
       <Header />
       <div className="container">
-        <Switch>
-          <Route path="/stress" component={StressIntro} />
-          <Route path="/shortage" component={ShortageIntro} />
-          <Route path="/scarcity" component={ScarcityIntro} />
-          <Route path="/future" component={FutureIntro} />
-          <Route render={() => <Redirect to="/stress" />} />
-        </Switch>
+        <div className={classNames('row', styles.intro)}>
+          <Switch>
+            {/* These routes also handle any data loading or other onLoad trigger */}
+            <Route path="/stress" component={StressIntro} />
+            <Route path="/shortage" component={ShortageIntro} />
+            <Route path="/scarcity" component={ScarcityIntro} />
+            <Route path="/future" component={FutureIntro} />
+            <Route render={() => <Redirect to="/stress" />} />
+          </Switch>
+        </div>
         <div className="row middle-xs">
           <div className="col-xs-12 col-md-8">
             <TimeSelector />
           </div>
-          <Route
-            path="/scarcity"
-            render={() =>
-              <div className="col-xs-12 col-md-4">
-                <DataSelector />
-              </div>}
-          />
+          <div className="col-xs-12 col-md-4">
+            <Route
+              path="/stress"
+              render={() => <ThresholdSelector dataType="stress" />}
+            />
+            <Route
+              path="/shortage"
+              render={() => <ThresholdSelector dataType="shortage" />}
+            />
+            <Route
+              path="/scarcity"
+              render={() =>
+                <div className={styles.selectors}>
+                  <ThresholdSelector
+                    className={styles['threshold-selector']}
+                    dataType="stress"
+                  />
+                  <ThresholdSelector
+                    className={styles['threshold-selector']}
+                    dataType="shortage"
+                  />
+                  <DataSelector />
+                </div>}
+            />
+          </div>
         </div>
       </div>
       <div className="container">

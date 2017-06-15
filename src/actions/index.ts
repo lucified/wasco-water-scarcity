@@ -3,10 +3,12 @@ import {
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_REGION,
   SET_SELECTED_WORLD_REGION,
+  SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
   SetSelectedDataTypeAction,
   SetSelectedRegionAction,
   SetSelectedWorldRegionAction,
+  SetThresholdsForDataTypeAction,
   SetTimeIndexAction,
   TOGGLE_SELECTED_REGION,
   ToggleSelectedRegionAction,
@@ -48,6 +50,17 @@ export function setSelectedDataType(
   return {
     type: SET_SELECTED_DATA_TYPE,
     dataType,
+  };
+}
+
+export function setThresholdsForDataType(
+  dataType: DataType,
+  thresholds: number[],
+): SetThresholdsForDataTypeAction {
+  return {
+    type: SET_THRESHOLDS_FOR_DATA_TYPE,
+    dataType,
+    thresholds,
   };
 }
 

@@ -18,11 +18,9 @@ class ScarcityIntro extends React.Component<Props, void> {
 
   public render() {
     return (
-      <div className="row">
-        <div className="col-xs-12">
-          <h1>Water Scarcity</h1>
-          <p>Placeholder for information about water scarcity</p>
-        </div>
+      <div className="col-xs-12">
+        <h1>Water Scarcity</h1>
+        <p><em>Placeholder for information about water scarcity</em></p>
       </div>
     );
   }

@@ -18,11 +18,9 @@ class StressIntro extends React.Component<Props, void> {
 
   public render() {
     return (
-      <div className="row">
-        <div className="col-xs-12">
-          <h1>Water Stress</h1>
-          <p>Placeholder for information about water stress</p>
-        </div>
+      <div className="col-xs-12">
+        <h1>Water Stress</h1>
+        <p><em>Placeholder for information about water stress</em></p>
       </div>
     );
   }

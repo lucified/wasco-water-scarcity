@@ -1,4 +1,5 @@
 import { axisBottom } from 'd3-axis';
+import { format } from 'd3-format';
 import { geoPath } from 'd3-geo';
 import {
   scaleLinear,
@@ -16,19 +17,20 @@ import { Dispatch } from 'redux';
 import { feature } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
+import { defaultDataTypeThresholdMaxValues } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
   getSelectedRegion,
   getSelectedStressShortageData,
   getSelectedWorldRegion,
-  getStressShortageData,
+  getThresholdsForDataType,
   getWorldRegionData,
 } from '../../selectors';
 import {
   DataType,
   getDataTypeColors,
-  getDataTypeThresholds,
+  scarcitySelector,
   StressShortageDatum,
   TimeAggregate,
   waterPropertySelector,
@@ -49,11 +51,14 @@ const styles = require('./index.scss');
 
 interface GeneratedStateProps {
   selectedData: TimeAggregate<StressShortageDatum>;
-  allData: Array<TimeAggregate<StressShortageDatum>>;
   selectedRegion?: number;
   selectedWorldRegion: number;
   worldRegions: WorldRegion[];
   selectedDataType: DataType;
+  colorScale: ScaleThreshold<number, string>;
+  thresholds: number[];
+  stressThresholds: number[];
+  shortageThresholds: number[];
 }
 
 interface GeneratedDispatchProps {
@@ -63,44 +68,26 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
-interface DataTypeParameter {
-  dataType: DataType;
-  label: string;
-  thresholds: number[];
-  colorScale: ScaleThreshold<number, string>;
+function getColorScale(dataType: DataType, thresholds: number[]) {
+  const emptyColor = '#D2E3E5';
+
+  const colors = dataType === 'shortage'
+    ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
+    : [emptyColor, ...getDataTypeColors(dataType)];
+
+  return scaleThreshold<number, string>().domain(thresholds).range(colors);
 }
 
-const stressThresholds = getDataTypeThresholds('stress')!;
-const shortageThresholds = getDataTypeThresholds('shortage')!;
-const scarcityThresholds = getDataTypeThresholds('scarcity')!;
-const emptyColor = '#D2E3E5';
-const allDataTypeParameters: DataTypeParameter[] = [
-  {
-    dataType: 'stress',
-    label: 'Water stress',
-    thresholds: stressThresholds,
-    colorScale: scaleThreshold<number, string>()
-      .domain(stressThresholds)
-      .range([emptyColor, ...getDataTypeColors('stress')]),
-  },
-  {
-    dataType: 'shortage',
-    label: 'Water shortage',
-    thresholds: shortageThresholds,
-    colorScale: scaleThreshold<number, string>()
-      .domain(shortageThresholds)
-      // Note: higher is better. Colors are reversed.
-      .range([emptyColor, ...getDataTypeColors('shortage')].reverse()),
-  },
-  {
-    dataType: 'scarcity',
-    label: 'Water scarcity',
-    thresholds: scarcityThresholds,
-    colorScale: scaleThreshold<number, string>()
-      .domain(scarcityThresholds)
-      .range([emptyColor, ...getDataTypeColors('scarcity')]),
-  },
-];
+function getLabel(dataType: DataType) {
+  switch (dataType) {
+    case 'stress':
+      return 'Water stress';
+    case 'shortage':
+      return 'Water shortage';
+    case 'scarcity':
+      return 'Water scarcity';
+  }
+}
 
 class Map extends React.Component<Props, void> {
   constructor(props: Props) {
@@ -138,7 +125,13 @@ class Map extends React.Component<Props, void> {
       this.redrawFillsAndBorders();
     }
 
-    if (prevProps.selectedDataType !== this.props.selectedDataType) {
+    if (
+      prevProps.selectedDataType !== this.props.selectedDataType ||
+      prevProps.thresholds !== this.props.thresholds ||
+      (this.props.selectedDataType === 'scarcity' &&
+        (prevProps.stressThresholds !== this.props.stressThresholds ||
+          prevProps.shortageThresholds !== this.props.shortageThresholds))
+    ) {
       this.generateScales();
       this.redrawFillsAndBorders();
       this.redrawLegend();
@@ -150,20 +143,17 @@ class Map extends React.Component<Props, void> {
   }
 
   private generateScales() {
-    const { selectedDataType } = this.props;
-    const dataTypeParameters = allDataTypeParameters.find(
-      d => d.dataType === selectedDataType,
-    );
-    if (!dataTypeParameters) {
-      console.error('Unknown data type!', selectedDataType);
-      return;
-    }
-
-    const { colorScale, thresholds } = dataTypeParameters;
+    const { colorScale, thresholds, selectedDataType } = this.props;
     // Based on https://bl.ocks.org/mbostock/4060606
     const maxThreshold = thresholds[thresholds.length - 1];
     const xScale = scaleLinear()
-      .domain([0, 2 * maxThreshold])
+      .domain([
+        0,
+        Math.max(
+          maxThreshold * 1.1,
+          defaultDataTypeThresholdMaxValues[selectedDataType],
+        ),
+      ])
       .rangeRound([0, this.legendWidth]);
 
     this.legendExtentPairs = colorScale.range().map(d => {
@@ -273,7 +263,10 @@ class Map extends React.Component<Props, void> {
         .call(
           axisBottom(this.legendXScale!)
             .tickSize(13)
-            .tickValues(this.colorScale!.domain()),
+            .tickValues(this.colorScale!.domain())
+            .tickFormat(
+              selectedDataType === 'stress' ? format('.2f') : format('d'),
+            ),
         )
         .select('.domain')
         .remove();
@@ -351,12 +344,19 @@ class Map extends React.Component<Props, void> {
   }
 
   private getColorForWaterRegion(featureId: number): string {
-    const { selectedDataType, selectedData: { data } } = this.props;
-    const dataTypeParameters =
-      allDataTypeParameters.find(d => d.dataType === selectedDataType) ||
-      allDataTypeParameters[0];
-    const value = waterPropertySelector(selectedDataType)(data[featureId]);
-    return value != null ? dataTypeParameters.colorScale(value) : '#807775';
+    const {
+      selectedDataType,
+      colorScale,
+      thresholds,
+      stressThresholds,
+      shortageThresholds,
+      selectedData: { data },
+    } = this.props;
+    const selector = selectedDataType === 'scarcity'
+      ? scarcitySelector(thresholds, stressThresholds, shortageThresholds)
+      : waterPropertySelector(selectedDataType);
+    const value = selector(data[featureId]);
+    return value != null ? colorScale(value) : '#807775';
   }
 
   private redrawFillsAndBorders() {
@@ -379,13 +379,6 @@ class Map extends React.Component<Props, void> {
 
   public render() {
     const { selectedDataType } = this.props;
-    const dataTypeParameters = allDataTypeParameters.find(
-      d => d.dataType === selectedDataType,
-    );
-    if (!dataTypeParameters) {
-      console.error('Unknown data type!', selectedDataType);
-      return null;
-    }
 
     return (
       <div className="col-sm-12 col-md-12 col-lg-12">
@@ -408,7 +401,7 @@ class Map extends React.Component<Props, void> {
             transform={`translate(${this.width * 0.6}, ${this.height - 40})`}
           >
             <text className={styles['legend-caption']} x="0" y="-6">
-              {dataTypeParameters.label}
+              {getLabel(selectedDataType)}
             </text>
           </g>
         </svg>
@@ -419,13 +412,19 @@ class Map extends React.Component<Props, void> {
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
+  const selectedDataType = getSelectedDataType(state);
+  const thresholds = getThresholdsForDataType(state, selectedDataType);
+
   return {
-    allData: getStressShortageData(state),
     selectedData: getSelectedStressShortageData(state),
     selectedRegion: getSelectedRegion(state),
-    selectedDataType: getSelectedDataType(state),
+    selectedDataType,
     selectedWorldRegion: getSelectedWorldRegion(state),
     worldRegions: getWorldRegionData(state),
+    thresholds,
+    colorScale: getColorScale(selectedDataType, thresholds),
+    stressThresholds: getThresholdsForDataType(state, 'stress'),
+    shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   };
 }
 

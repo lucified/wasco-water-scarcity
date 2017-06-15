@@ -7,13 +7,10 @@ import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getSelectedTimeIndex,
+  getThresholdsForDataType,
   getTimeSeriesForSelectedRegion,
 } from '../../selectors';
-import {
-  getDataTypeColors,
-  getDataTypeThresholds,
-  StressShortageDatum,
-} from '../../types';
+import { getDataTypeColors, StressShortageDatum } from '../../types';
 
 import AvailabilityChart from './availability-chart';
 import ConsumptionChart from './consumption-chart';
@@ -24,6 +21,8 @@ const styles = require('./index.scss');
 interface GeneratedStateProps {
   selectedTimeIndex: number;
   timeSeriesForSelectedRegion?: StressShortageDatum[];
+  stressThresholds: number[];
+  shortageThresholds: number[];
 }
 
 interface GeneratedDispatchProps {
@@ -44,14 +43,16 @@ class SelectedRegionInformation extends React.Component<Props, void> {
   }
 
   public render() {
-    const { selectedTimeIndex, timeSeriesForSelectedRegion } = this.props;
+    const {
+      selectedTimeIndex,
+      timeSeriesForSelectedRegion,
+      stressThresholds,
+      shortageThresholds,
+    } = this.props;
 
     if (!timeSeriesForSelectedRegion) {
       return null;
     }
-
-    const stressThresholds = getDataTypeThresholds('stress');
-    const shortageThresholds = getDataTypeThresholds('shortage');
 
     const maxConsumptionOrAvailability = max(timeSeriesForSelectedRegion, d =>
       Math.max(d.blueWaterAvailability, d.blueWaterConsumptionTotal),
@@ -122,6 +123,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
     timeSeriesForSelectedRegion: getTimeSeriesForSelectedRegion(state),
+    stressThresholds: getThresholdsForDataType(state, 'stress'),
+    shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   };
 }
 

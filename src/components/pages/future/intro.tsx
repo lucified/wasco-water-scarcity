@@ -18,11 +18,9 @@ class FutureIntro extends React.Component<Props, void> {
 
   public render() {
     return (
-      <div className="row">
-        <div className="col-xs-12">
-          <h1>The future?</h1>
-          <p>Placeholder for information text about what to do next</p>
-        </div>
+      <div className="col-xs-12">
+        <h1>The future?</h1>
+        <p><em>Placeholder for information text about what to do next</em></p>
       </div>
     );
   }

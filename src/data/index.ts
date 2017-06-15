@@ -4,48 +4,27 @@ import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 
 import {
-  AggregateStressShortageDatum,
-  Datum,
-  RawDatum,
+  RawRegionStressShortageDatum,
   StressShortageDatum,
   TimeAggregate,
-  toAggregateStressShortageDatum,
   toStressShortageDatum,
   WorldRegion,
   WorldRegionGeoJSONFeature,
 } from '../types';
 
-function generateData<RawType extends RawDatum, OutputType extends Datum>(
-  rawContents: RawType[],
-  converter: (raw: RawType) => OutputType,
-): Array<TimeAggregate<OutputType>> {
-  const yearlyGroupedData: RawType[][] = values(
-    groupBy(rawContents, ({ startYear }) => startYear),
+export function getStressShortageData(): Array<
+  TimeAggregate<StressShortageDatum>
+> {
+  const rawData: RawRegionStressShortageDatum[] = require('../../data/FPU_decadal_bluewater.json');
+  const yearlyGroupedData = values(
+    groupBy(rawData, ({ startYear }) => startYear),
   ).sort((a, b) => a[0].startYear - b[0].startYear);
 
   return yearlyGroupedData.map(group => ({
     startYear: group[0].startYear,
     endYear: group[0].endYear,
-    data: keyBy(group.map(converter), d => d.featureId),
+    data: keyBy(group.map(toStressShortageDatum), d => d.featureId),
   }));
-}
-
-export function getStressShortageData(): Array<
-  TimeAggregate<StressShortageDatum>
-> {
-  return generateData(
-    require('../../data/FPU_decadal_bluewater.json'),
-    toStressShortageDatum,
-  );
-}
-
-export function getAggregateStressShortageData(): Array<
-  TimeAggregate<AggregateStressShortageDatum>
-> {
-  return generateData(
-    require('../../data/worldRegion_decadal_bluewater.json'),
-    toAggregateStressShortageDatum,
-  );
 }
 
 interface GeoJSON {
@@ -69,3 +48,25 @@ export function getWorldRegionsData(): WorldRegion[] {
     feature: region,
   }));
 }
+
+export const defaultDataTypeThresholds = {
+  stress: [0.2, 0.4, 1],
+  /**
+   * Note: higher is better.
+   */
+  shortage: [500, 1000, 1700],
+  /**
+   * These numbers are arbitrary.
+   * x < 0 = No stress or shortage
+   * 0 <= x < 0.5 = stress only
+   * 0.5 <= x < 1.0 = shortage only
+   * x >= 1.0 = shortage and stress
+   */
+  scarcity: [0, 0.5, 1],
+};
+
+export const defaultDataTypeThresholdMaxValues = {
+  stress: 2,
+  shortage: 4000,
+  scarcity: 2,
+};
