@@ -1,4 +1,4 @@
-import * as classNames from 'classnames';
+import { format } from 'd3-format';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as ReactSlider from 'react-slider';
@@ -31,13 +31,23 @@ const configurations = {
     min: 0,
     max: defaultDataTypeThresholdMaxValues.stress,
     step: 0.01,
+    formatter: format('.2f'),
   },
   shortage: {
     min: 0,
     max: defaultDataTypeThresholdMaxValues.shortage,
     step: 10,
+    formatter: format('d'),
   },
 };
+
+function getHeaderText(dataType: 'stress' | 'shortage') {
+  if (dataType === 'shortage') {
+    return 'Available water per capita (m³)';
+  }
+
+  return 'Consumption per availability';
+}
 
 // TODO: Replace react-slider with https://github.com/airbnb/rheostat ?
 
@@ -47,25 +57,42 @@ function ThresholdSelector({
   dataType,
   setThresholds,
 }: Props) {
-  const { step, min, max } = configurations[dataType];
+  const { step, min, max, formatter } = configurations[dataType];
+  const slidingMax = Math.max(thresholds[thresholds.length - 1] * 1.1, max);
 
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
-    <ReactSlider
-      min={min}
-      max={Math.max(thresholds[thresholds.length - 1] * 1.1, max)}
-      value={thresholds.slice()}
-      minDistance={step}
-      pearling
-      step={step}
-      withBars
-      snapDragDisabled
-      handleClassName={styles.handle}
-      handleActiveClassName={styles.active}
-      barClassName={styles.bar}
-      className={classNames(styles.slider, className)}
-      onChange={setThresholds}
-    />
+    <div className={className}>
+      <div className={styles.header}>
+        {getHeaderText(dataType)}
+      </div>
+      <ReactSlider
+        min={min}
+        max={slidingMax}
+        value={thresholds.slice()}
+        minDistance={10 * step}
+        pearling
+        step={step}
+        withBars
+        snapDragDisabled
+        handleClassName={styles.handle}
+        handleActiveClassName={styles.active}
+        barClassName={dataType === 'stress' ? 'bar-stress' : 'bar-shortage'}
+        className={styles.slider}
+        onChange={setThresholds}
+      />
+      <div className={styles.labels}>
+        {thresholds.map((d, i) =>
+          <span
+            className={styles.label}
+            style={{ left: `${(d - min) / (slidingMax - min) * 100}%` }}
+            key={`${dataType}-threshold-label-${i}`}
+          >
+            {formatter(d)}
+          </span>,
+        )}
+      </div>
+    </div>
   );
 }
 

@@ -1,37 +1,74 @@
+@import './definitions.scss';
+
+.header {
+  margin-bottom: 4px;
+}
+
 .slider {
   width: 100%;
-  height: 42px;
-  border: 2px solid #ff7200;
-  border-radius: 25px;
+  height: 26px;
+
+  // TODO: The below is ugly – the scale colors are duplicated here.
+  // Fix it somehow.
+  :global {
+    .bar-stress, .bar-shortage {
+      position: relative;
+      top: 2px;
+      background: #D2E3E5;
+      height: 16px;
+      border-radius: 8px;
+      margin: 0 6px;
+
+      &.bar-stress-1 {
+        background: #cbc9e2;
+      }
+
+      &.bar-stress-2 {
+        background: #9e9ac8;
+      }
+
+      &.bar-stress-3 {
+        background: #6a51a3;
+      }
+
+      &.bar-shortage-0 {
+        background: #d7c919;
+      }
+
+      &.bar-shortage-1 {
+        background: #e6dc4c;
+      }
+
+      &.bar-shortage-2 {
+        background: #f5f07f;
+      }
+    }
+  }
 }
 
 .handle {
-  font-size: 0.9em;
-  text-align: center;
-  background-color: #ff7200;
-  color: yellow;
+  background-color: #aaa;
   cursor: pointer;
-  top: 02px;
-  width: 34px;
-  height: 34px;
-  border-radius: 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
   border: 2px solid white;
 
   &.active {
-    border: 5px solid white;
+    border: 4px solid white;
   }
 }
 
-.bar {
+.labels {
   position: relative;
-  background: #ff7200;
-  top: 6px;
-  height: 26px;
-  border-radius: 16px;
-  margin: 0 6px;
-
-  &.bar-1 {
-    background: #a5a5a5;
-  }
+  font-size: 14px;
+  color: $color-darker-gray;
+  margin: 0 10px; // The slider controls don't go all the way to the sides
 }
 
+.label {
+  position: absolute;
+  top: -4px;
+  transform: translate(-50%);
+  padding-left: 2px;
+}

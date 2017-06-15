@@ -1,4 +1,5 @@
 import { axisBottom } from 'd3-axis';
+import { format } from 'd3-format';
 import { geoPath } from 'd3-geo';
 import {
   scaleLinear,
@@ -262,7 +263,10 @@ class Map extends React.Component<Props, void> {
         .call(
           axisBottom(this.legendXScale!)
             .tickSize(13)
-            .tickValues(this.colorScale!.domain()),
+            .tickValues(this.colorScale!.domain())
+            .tickFormat(
+              selectedDataType === 'stress' ? format('.2f') : format('d'),
+            ),
         )
         .select('.domain')
         .remove();

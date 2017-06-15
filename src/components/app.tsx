@@ -51,12 +51,10 @@ export default function App(_props: Props) {
               path="/scarcity"
               render={() =>
                 <div className={styles.selectors}>
-                  Stress
                   <ThresholdSelector
                     className={styles['threshold-selector']}
                     dataType="stress"
                   />
-                  Shortage
                   <ThresholdSelector
                     className={styles['threshold-selector']}
                     dataType="shortage"
