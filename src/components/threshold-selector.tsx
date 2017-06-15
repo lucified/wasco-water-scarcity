@@ -42,11 +42,17 @@ const configurations = {
 };
 
 function getHeaderText(dataType: 'stress' | 'shortage') {
-  if (dataType === 'shortage') {
-    return 'Available water per capita (m³)';
-  }
-
-  return 'Consumption per availability';
+  const text = dataType === 'shortage'
+    ? 'Available water per capita (m³)'
+    : 'Consumption relative to availability';
+  return (
+    <span>
+      <strong>
+        {dataType.charAt(0).toUpperCase() + dataType.slice(1)}:
+      </strong>{' '}
+      {text}
+    </span>
+  );
 }
 
 // TODO: Replace react-slider with https://github.com/airbnb/rheostat ?

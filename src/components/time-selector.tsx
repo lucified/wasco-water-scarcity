@@ -8,22 +8,25 @@ import { StateTree } from '../reducers';
 import {
   getSelectedDataType,
   getSelectedTimeIndex,
+  getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
+  getWorldRegionData,
 } from '../selectors';
 import {
   AggregateStressShortageDatum,
   DataType,
   getDataTypeColors,
+  WorldRegion,
 } from '../types';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
-import Legend, { LegendItem } from './generic/legend/index';
 
 interface GeneratedStateProps {
   selectedIndex: number;
   currentIndexLabel: string;
   data: AggregateStressShortageDatum[];
   dataType: DataType;
+  selectedWorldRegion: WorldRegion | undefined;
 }
 
 interface GeneratedDispatchProps {
@@ -32,52 +35,89 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
 
-function getScarcePopulation(
-  dataType: DataType,
-  datum: AggregateStressShortageDatum,
-) {
+function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
+  const emptyColor = '#D2E3E5';
+  const colors = [emptyColor, ...getDataTypeColors(dataType)];
+
   switch (dataType) {
     case 'stress':
-      return (
-        datum.populationModerateBlueWaterStress +
-        datum.populationHighBlueWaterStress
-      );
+      return [
+        {
+          key: 'Heavy stress',
+          total: datum.populationHighBlueWaterStress,
+          color: colors[3],
+        },
+        {
+          key: 'Moderate stress',
+          total: datum.populationModerateBlueWaterStress,
+          color: colors[2],
+        },
+        {
+          key: 'Low stress',
+          total: datum.populationLowBlueWaterStress,
+          color: colors[1],
+        },
+        {
+          key: 'No stress',
+          total: datum.populationNoBlueWaterStress,
+          color: colors[0],
+        },
+      ];
     case 'shortage':
-      return (
-        datum.populationModerateBlueWaterShortage +
-        datum.populationHighBlueWaterShortage
-      );
+      return [
+        {
+          key: 'Heavy shortage',
+          total: datum.populationHighBlueWaterShortage,
+          color: colors[3],
+        },
+        {
+          key: 'Moderate shortage',
+          total: datum.populationModerateBlueWaterShortage,
+          color: colors[2],
+        },
+        {
+          key: 'Low shortage',
+          total: datum.populationLowBlueWaterShortage,
+          color: colors[1],
+        },
+        {
+          key: 'No shortage',
+          total: datum.populationNoBlueWaterShortage,
+          color: colors[0],
+        },
+      ];
     case 'scarcity':
-      return (
-        datum.populationOnlyBlueWaterShortage +
-        datum.populationOnlyBlueWaterStress +
-        datum.populationBlueWaterShortageAndStress
-      );
+      return [
+        {
+          key: 'Stress and shortage',
+          total: datum.populationBlueWaterShortageAndStress,
+          color: colors[3],
+        },
+        {
+          key: 'Stress only',
+          total: datum.populationOnlyBlueWaterStress,
+          color: colors[2],
+        },
+        {
+          key: 'Shortage only',
+          total: datum.populationOnlyBlueWaterShortage,
+          color: colors[1],
+        },
+        {
+          key: 'No scarcity',
+          total: datum.populationNoBlueWaterShortageAndStress,
+          color: colors[0],
+        },
+      ];
   }
-
-  console.warn('Unknown data type', dataType);
-  return 0;
 }
 
-function getNotScarcePopulation(
-  dataType: DataType,
-  datum: AggregateStressShortageDatum,
-) {
-  switch (dataType) {
-    case 'stress':
-      return datum.populationNoBlueWaterStress;
-    case 'shortage':
-      return datum.populationNoBlueWaterShortage;
-    case 'scarcity':
-      return datum.populationNoBlueWaterShortageAndStress;
+function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
+  if (worldRegion == null) {
+    return `Global population living in water ${dataType}`;
   }
 
-  console.warn('Unknown data type', dataType);
-  return 0;
-}
-
-function getScarceColor(dataType: DataType) {
-  return getDataTypeColors(dataType)[2];
+  return `Population living in water ${dataType} in ${worldRegion.name}`;
 }
 
 const yTickFormatter = format('.2s');
@@ -86,35 +126,15 @@ function TimeSelector({
   data,
   dataType,
   selectedIndex,
+  selectedWorldRegion,
   setSelectedTime,
 }: Props) {
   // TODO: don't regenerate on each render
   const barChartData: BarChartDatum[] = data.map((d, i) => ({
     key: i,
     total: d.population,
-    values: [
-      {
-        key: 'Scarce',
-        total: getScarcePopulation(dataType, d),
-        color: getScarceColor(dataType),
-      },
-      {
-        key: 'Not scarce',
-        total: getNotScarcePopulation(dataType, d),
-        color: 'lightgray',
-      },
-    ],
+    values: getValues(dataType, d),
   }));
-  const legendItems: LegendItem[] = [
-    {
-      color: getScarceColor(dataType),
-      title: `Population under ${dataType}`,
-    },
-    {
-      color: 'lightgray',
-      title: `No ${dataType}`,
-    },
-  ];
 
   function handleHover(item: BarChartDatum) {
     setSelectedTime(item.key);
@@ -127,6 +147,7 @@ function TimeSelector({
 
   return (
     <div>
+      {getTitle(dataType, selectedWorldRegion)}
       <BarChart
         data={barChartData}
         height={120}
@@ -140,7 +161,6 @@ function TimeSelector({
         onMouseEnter={handleHover}
         hideSelectedLabel
       />
-      <Legend items={legendItems} />
     </div>
   );
 }
@@ -152,12 +172,16 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   const label = currentSelectedData.startYear !== currentSelectedData.endYear
     ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
     : String(currentSelectedData.startYear);
+  const selectedWorldRegionId = getSelectedWorldRegion(state);
 
   return {
     selectedIndex,
     currentIndexLabel: label,
     data,
     dataType: getSelectedDataType(state),
+    selectedWorldRegion: getWorldRegionData(state).find(
+      r => r.id === selectedWorldRegionId,
+    ),
   };
 }
 
