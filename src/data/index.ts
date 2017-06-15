@@ -69,3 +69,19 @@ export function getWorldRegionsData(): WorldRegion[] {
     feature: region,
   }));
 }
+
+export const defaultDataTypeThresholds = {
+  stress: [0.2, 0.4, 1],
+  /**
+   * Note: higher is better.
+   */
+  shortage: [500, 1000, 1700],
+  /**
+   * These numbers are arbitrary.
+   * x < 0 = No stress or shortage
+   * 0 <= x < 0.5 = stress only
+   * 0.5 <= x < 1.0 = shortage only
+   * x >= 1.0 = shortage and stress
+   */
+  scarcity: [0, 0.5, 1],
+};

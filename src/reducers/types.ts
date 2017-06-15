@@ -13,6 +13,11 @@ export interface StateTree {
   aggregateData: Array<TimeAggregate<AggregateStressShortageDatum>>;
   worldRegions: WorldRegion[];
   routing: RouterState;
+  thresholds: {
+    stress: number[];
+    shortage: number[];
+    scarcity: number[];
+  };
   selections: {
     timeIndex: number;
     dataType: DataType;

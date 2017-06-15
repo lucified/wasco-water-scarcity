@@ -27,6 +27,7 @@ export default function App(_props: Props) {
       <Header />
       <div className="container">
         <Switch>
+          {/* These routes also handle any data loading or other onLoad trigger */}
           <Route path="/stress" component={StressIntro} />
           <Route path="/shortage" component={ShortageIntro} />
           <Route path="/scarcity" component={ScarcityIntro} />

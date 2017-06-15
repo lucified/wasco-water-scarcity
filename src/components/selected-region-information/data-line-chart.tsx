@@ -2,22 +2,18 @@ import { scaleThreshold } from 'd3-scale';
 import some = require('lodash/some');
 import * as React from 'react';
 
-import {
-  DataType,
-  StressShortageDatum,
-  waterPropertySelector,
-} from '../../types';
+import { StressShortageDatum, waterPropertySelector } from '../../types';
 
 import LineChart, { Data } from '../generic/line-chart';
 
 const styles = require('./data-line-chart.scss');
 
 interface PassedProps {
-  dataType: DataType;
+  dataType: 'shortage' | 'stress';
   dataLabel?: string;
   dataColor: string;
-  thresholds?: number[];
-  thresholdColors?: string[];
+  thresholds: number[];
+  thresholdColors: string[];
   yAxisLabel?: string;
   data: StressShortageDatum[];
   selectedTimeIndex: number;
@@ -26,7 +22,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-export default function ShortageLineChart({
+export default function DataLineChart({
   data,
   dataLabel,
   dataType,
@@ -47,12 +43,9 @@ export default function ShortageLineChart({
       end: new Date(d.endYear, 11, 31),
     })),
   };
-  let backgroundColorScale;
-  if (thresholds && thresholdColors) {
-    backgroundColorScale = scaleThreshold<number, string>()
-      .domain(thresholds)
-      .range(thresholdColors);
-  }
+  const backgroundColorScale = scaleThreshold<number, string>()
+    .domain(thresholds)
+    .range(thresholdColors);
 
   if (
     some<{ value?: number; start: Date; end: Date }>(

@@ -30,9 +30,17 @@ export interface SetSelectedDataTypeAction {
   dataType: DataType;
 }
 
+export const SET_THRESHOLDS_FOR_DATA_TYPE = 'SET_THRESHOLDS_FOR_DATA_TYPE';
+export interface SetThresholdsForDataTypeAction {
+  type: 'SET_THRESHOLDS_FOR_DATA_TYPE';
+  dataType: DataType;
+  thresholds: number[];
+}
+
 export type Action =
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
+  | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
   | ToggleSelectedRegionAction;

@@ -69,6 +69,10 @@ export function getWorldRegionData(state: StateTree) {
   return state.worldRegions;
 }
 
+export function getThresholdsForDataType(state: StateTree, dataType: DataType) {
+  return state.thresholds[dataType];
+}
+
 export const getRegionsInSelectedWorldRegion = createSelector<
   StateTree,
   Array<TimeAggregate<StressShortageDatum>>,
