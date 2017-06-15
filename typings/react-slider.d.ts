@@ -28,10 +28,16 @@ interface ReactSliderProps {
    * the position of one handle. The values in the array must be sorted.
    * If the component has children, the length of the array must match the
    * number of children.
+   *
+   * NOTE! This modifies the array contents directly. Copy the array if you're
+   * passing in data from Redux.
    */
   defaultValue?: number | number[];
   /**
    * Like defaultValue but for controlled components.
+   *
+   * NOTE! This modifies the array contents directly. Copy the array if you're
+   * passing in data from Redux.
    */
   value?: number | number[];
   orientation?: 'horizontal' | 'vertical';
@@ -79,16 +85,22 @@ interface ReactSliderProps {
   onBeforeChange?: () => void;
   /**
    * Callback called on every value change.
+   *
+   * NOTE! The component modifies the contents of the passed in array. Copy the
+   * array if you're storing it in Redux.
    */
   onChange?: (val: number | number[]) => void;
   /**
    * Callback called only after moving a handle has ended or when a new value is
    * set by clicking on the slider.
    */
-  onAfterChange?: (val: number | number[]) => void;
+  onAfterChange?: () => void;
   /**
    * Callback called when the the slider is clicked (handle or bars). Receives
    * the value at the clicked position as argument.
+   *
+   * NOTE! The component modifies the contents of the passed in array. Copy the
+   * array if you're storing it in Redux.
    */
   onSliderClick?: (val: number | number[]) => void;
 }

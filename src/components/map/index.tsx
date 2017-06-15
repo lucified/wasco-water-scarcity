@@ -125,7 +125,10 @@ class Map extends React.Component<Props, void> {
 
     if (
       prevProps.selectedDataType !== this.props.selectedDataType ||
-      prevProps.thresholds !== this.props.thresholds
+      prevProps.thresholds !== this.props.thresholds ||
+      (this.props.selectedDataType === 'scarcity' &&
+        (prevProps.stressThresholds !== this.props.stressThresholds ||
+          prevProps.shortageThresholds !== this.props.shortageThresholds))
     ) {
       this.generateScales();
       this.redrawFillsAndBorders();
@@ -364,11 +367,10 @@ class Map extends React.Component<Props, void> {
   }
 
   public render() {
-    const { selectedDataType, thresholds } = this.props;
+    const { selectedDataType } = this.props;
 
     return (
       <div className="col-sm-12 col-md-12 col-lg-12">
-        Thresholds: {thresholds.join(', ')}
         <svg ref={this.saveSvgRef}>
           <defs>
             <clipPath id="clip">

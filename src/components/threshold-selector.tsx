@@ -24,11 +24,12 @@ interface GeneratedDispatchProps {
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 function ThresholdSelector({ thresholds, setThresholds }: Props) {
+  // ReactSlider modifies the contents of the values array. We need to clone it
   return (
     <ReactSlider
       min={0}
       max={Math.max(...thresholds) * 2}
-      defaultValue={thresholds}
+      value={thresholds.slice()}
       minDistance={0.01}
       pearling
       step={0.01}
@@ -58,7 +59,8 @@ function mapDispatchToProps(
 ): GeneratedDispatchProps {
   return {
     setThresholds: (values: number[]) => {
-      dispatch(setThresholdsForDataType(ownProps.dataType, values));
+      // ReactSlider modifies the contents of the values array
+      dispatch(setThresholdsForDataType(ownProps.dataType, values.slice()));
     },
   };
 }
