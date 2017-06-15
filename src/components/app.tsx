@@ -38,11 +38,24 @@ export default function App(_props: Props) {
           <div className="col-xs-12 col-md-8">
             <TimeSelector />
           </div>
-          <div
-            className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
-          >
-            <ThresholdSelector />
-            <Route path="/scarcity" render={() => <DataSelector />} />
+          <div className="col-xs-12 col-md-4">
+            <Route
+              path="/stress"
+              render={() => <ThresholdSelector dataType="stress" />}
+            />
+            <Route
+              path="/shortage"
+              render={() => <ThresholdSelector dataType="shortage" />}
+            />
+            <Route
+              path="/scarcity"
+              render={() =>
+                <div className={styles.selectors}>
+                  <ThresholdSelector dataType="stress" />
+                  <ThresholdSelector dataType="shortage" />
+                  <DataSelector />
+                </div>}
+            />
           </div>
         </div>
       </div>

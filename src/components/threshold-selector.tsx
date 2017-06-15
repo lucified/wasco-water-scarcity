@@ -3,74 +3,68 @@ import { connect } from 'react-redux';
 import * as ReactSlider from 'react-slider';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../actions';
+import { setThresholdsForDataType } from '../actions';
 import { StateTree } from '../reducers';
-import {
-  getSelectedDataType,
-  getSelectedTimeIndex,
-  getTimeSeriesForSelectedGlobalRegion,
-} from '../selectors';
-import { AggregateStressShortageDatum, DataType } from '../types';
+import { getThresholdsForDataType } from '../selectors';
 
 const styles = require('./threshold-selector.scss');
 
+interface PassedProps {
+  dataType: 'stress' | 'shortage';
+}
+
 interface GeneratedStateProps {
-  selectedIndex: number;
-  currentIndexLabel: string;
-  data: AggregateStressShortageDatum[];
-  dataType: DataType;
+  thresholds: number[];
 }
 
 interface GeneratedDispatchProps {
-  setSelectedTime: (value: number) => void;
+  setThresholds: (values: number[]) => void;
 }
 
-type Props = GeneratedDispatchProps & GeneratedStateProps;
+type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
-function ThresholdSelector(_props: Props) {
+function ThresholdSelector({ thresholds, setThresholds }: Props) {
   return (
     <ReactSlider
       min={0}
-      max={10}
-      defaultValue={[2, 5, 7]}
-      minDistance={1}
+      max={Math.max(...thresholds) * 2}
+      defaultValue={thresholds}
+      minDistance={0.01}
       pearling
-      step={1}
+      step={0.01}
       withBars
       snapDragDisabled
       handleClassName={styles.handle}
       handleActiveClassName={styles.active}
       barClassName={styles.bar}
       className={styles.slider}
+      onChange={setThresholds}
     />
   );
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const data = getTimeSeriesForSelectedGlobalRegion(state);
-  const selectedIndex = getSelectedTimeIndex(state);
-  const currentSelectedData = data[selectedIndex];
-  const label = currentSelectedData.startYear !== currentSelectedData.endYear
-    ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
-    : String(currentSelectedData.startYear);
-
+function mapStateToProps(
+  state: StateTree,
+  ownProps: PassedProps,
+): GeneratedStateProps {
   return {
-    selectedIndex,
-    currentIndexLabel: label,
-    data,
-    dataType: getSelectedDataType(state),
+    thresholds: getThresholdsForDataType(state, ownProps.dataType),
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
+function mapDispatchToProps(
+  dispatch: Dispatch<any>,
+  ownProps: PassedProps,
+): GeneratedDispatchProps {
   return {
-    setSelectedTime: (value: number) => {
-      dispatch(setTimeIndex(value));
+    setThresholds: (values: number[]) => {
+      dispatch(setThresholdsForDataType(ownProps.dataType, values));
     },
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ThresholdSelector);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps
+>(mapStateToProps, mapDispatchToProps)(ThresholdSelector);
