@@ -27,6 +27,11 @@
   height: 100%;
 }
 
+.selectors {
+  display: flex;
+  flex-direction: column;
+}
+
 .map-content {
   margin-top: $default-margin;
 }

@@ -13,6 +13,7 @@ import ScarcityIntro from './pages/scarcity/intro';
 import ShortageIntro from './pages/shortage/intro';
 import StressIntro from './pages/stress/intro';
 import SelectedRegionInformation from './selected-region-information';
+import ThresholdSelector from './threshold-selector';
 import TimeSelector from './time-selector';
 
 import * as styles from './app.scss';
@@ -36,13 +37,12 @@ export default function App(_props: Props) {
           <div className="col-xs-12 col-md-8">
             <TimeSelector />
           </div>
-          <Route
-            path="/scarcity"
-            render={() =>
-              <div className="col-xs-12 col-md-4">
-                <DataSelector />
-              </div>}
-          />
+          <div
+            className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
+          >
+            <ThresholdSelector />
+            <Route path="/scarcity" render={() => <DataSelector />} />
+          </div>
         </div>
       </div>
       <div className="container">
