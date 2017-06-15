@@ -13,22 +13,15 @@ import {
 } from '../actions';
 import {
   defaultDataTypeThresholds,
-  getAggregateStressShortageData,
   getStressShortageData,
   getWorldRegionsData,
 } from '../data';
-import {
-  AggregateStressShortageDatum,
-  StressShortageDatum,
-  TimeAggregate,
-  WorldRegion,
-} from '../types';
+import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import { StateTree } from './types';
 
 const defaultState: StateTree = {
   routing: {} as any,
   stressShortageData: getStressShortageData(),
-  aggregateData: getAggregateStressShortageData(),
   worldRegions: getWorldRegionsData(),
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
@@ -48,13 +41,6 @@ function stressShortageDataReducer(
   state = initialState.stressShortageData,
   _action: Action,
 ): Array<TimeAggregate<StressShortageDatum>> {
-  return state;
-}
-
-function aggregateDataReducer(
-  state = initialState.aggregateData,
-  _action: Action,
-): Array<TimeAggregate<AggregateStressShortageDatum>> {
   return state;
 }
 
@@ -141,7 +127,6 @@ export default combineReducers<StateTree>({
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
   stressShortageData: stressShortageDataReducer,
-  aggregateData: aggregateDataReducer,
   worldRegions: worldRegionsReducer,
 });
 

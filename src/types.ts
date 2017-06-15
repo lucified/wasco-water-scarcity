@@ -82,37 +82,9 @@ export interface RawAggregateStressShortageDatum extends RawDatum {
 export interface Datum {
   startYear: number;
   endYear: number;
-
   // The globalRegionID in aggregates, regionID for FPUs. Set to 0 for the globe.
   featureId: number;
-
   population: number;
-}
-
-// All units have been converted to m^3 from km^3
-export interface AggregateStressShortageDatum extends Datum {
-  // For scarcity
-  populationNoBlueWaterShortageAndStress: number;
-  populationOnlyBlueWaterShortage: number;
-  populationOnlyBlueWaterStress: number;
-  populationBlueWaterShortageAndStress: number;
-
-  // For shortage
-  populationNoBlueWaterShortage: number;
-  populationModerateBlueWaterShortage: number;
-  populationHighBlueWaterShortage: number;
-
-  // For stress
-  populationNoBlueWaterStress: number;
-  populationModerateBlueWaterStress: number;
-  populationHighBlueWaterStress: number;
-}
-
-// All units have been converted to m^3 from km^3
-export interface StressShortageDatum extends Datum {
-  worldRegionId: number;
-  blueWaterShortage: number;
-  blueWaterStress: number;
   blueWaterAvailability: number;
   /**
    * We calculate this by taking the sum of the different consumptions. It may
@@ -125,6 +97,34 @@ export interface StressShortageDatum extends Datum {
   blueWaterConsumptionElectric: number;
   blueWaterConsumptionLivestock: number;
   blueWaterConsumptionManufacturing: number;
+}
+
+// All units have been converted to m^3 from km^3
+export interface AggregateStressShortageDatum extends Datum {
+  // For scarcity
+  populationNoBlueWaterShortageAndStress: number;
+  populationOnlyBlueWaterShortage: number;
+  populationOnlyBlueWaterStress: number;
+  populationBlueWaterShortageAndStress: number;
+
+  // For shortage
+  populationNoBlueWaterShortage: number;
+  populationLowBlueWaterShortage: number;
+  populationModerateBlueWaterShortage: number;
+  populationHighBlueWaterShortage: number;
+
+  // For stress
+  populationNoBlueWaterStress: number;
+  populationLowBlueWaterStress: number;
+  populationModerateBlueWaterStress: number;
+  populationHighBlueWaterStress: number;
+}
+
+// All units have been converted to m^3 from km^3
+export interface StressShortageDatum extends Datum {
+  worldRegionId: number;
+  blueWaterShortage: number;
+  blueWaterStress: number;
 }
 
 const KM_3_TO_M_3_RATIO = 1000000000;
@@ -172,40 +172,6 @@ export function toStressShortageDatum({
     blueWaterStress,
     blueWaterShortage,
     population,
-  };
-}
-
-export function toAggregateStressShortageDatum({
-  startYear,
-  endYear,
-  featureId,
-  population,
-  populationBlueWaterShortageAndStress,
-  populationHighBlueWaterShortage,
-  populationHighBlueWaterStress,
-  populationModerateBlueWaterShortage,
-  populationModerateBlueWaterStress,
-  populationNoBlueWaterShortage,
-  populationNoBlueWaterShortageAndStress,
-  populationNoBlueWaterStress,
-  populationOnlyBlueWaterShortage,
-  populationOnlyBlueWaterStress,
-}: RawAggregateStressShortageDatum) {
-  return {
-    startYear,
-    endYear,
-    featureId,
-    population,
-    populationBlueWaterShortageAndStress,
-    populationHighBlueWaterShortage,
-    populationHighBlueWaterStress,
-    populationModerateBlueWaterShortage,
-    populationModerateBlueWaterStress,
-    populationNoBlueWaterShortage,
-    populationNoBlueWaterShortageAndStress,
-    populationNoBlueWaterStress,
-    populationOnlyBlueWaterShortage,
-    populationOnlyBlueWaterStress,
   };
 }
 

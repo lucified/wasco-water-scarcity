@@ -23,11 +23,143 @@ export function getSelectedStressShortageData(
   return getStressShortageData(state)[getSelectedTimeIndex(state)];
 }
 
-export function getAggregateData(
-  state: StateTree,
-): Array<TimeAggregate<AggregateStressShortageDatum>> {
-  return state.aggregateData;
-}
+export const getAggregateData = createSelector<
+  StateTree,
+  Array<TimeAggregate<StressShortageDatum>>,
+  { stress: number[]; shortage: number[]; scarcity: number[] },
+  Array<TimeAggregate<AggregateStressShortageDatum>>
+>(getStressShortageData, getThresholds, (allData, thresholds) => {
+  function createEmptyWorldRegionAggregate(
+    featureId: number,
+    startYear: number,
+    endYear: number,
+  ): AggregateStressShortageDatum {
+    return {
+      featureId,
+      startYear,
+      endYear,
+      population: 0,
+      populationNoBlueWaterShortageAndStress: 0,
+      populationOnlyBlueWaterShortage: 0,
+      populationOnlyBlueWaterStress: 0,
+      populationBlueWaterShortageAndStress: 0,
+      populationNoBlueWaterShortage: 0,
+      populationLowBlueWaterShortage: 0,
+      populationModerateBlueWaterShortage: 0,
+      populationHighBlueWaterShortage: 0,
+      populationNoBlueWaterStress: 0,
+      populationLowBlueWaterStress: 0,
+      populationModerateBlueWaterStress: 0,
+      populationHighBlueWaterStress: 0,
+      blueWaterAvailability: 0,
+      blueWaterConsumptionDomestic: 0,
+      blueWaterConsumptionElectric: 0,
+      blueWaterConsumptionIrrigation: 0,
+      blueWaterConsumptionLivestock: 0,
+      blueWaterConsumptionManufacturing: 0,
+      blueWaterConsumptionTotal: 0,
+    };
+  }
+
+  return allData.map(timeUnit => {
+    const data: { [id: number]: AggregateStressShortageDatum } = {};
+    const { startYear, endYear } = timeUnit;
+
+    // Global aggregate
+    const wholeGlobeRegion = (data[0] = createEmptyWorldRegionAggregate(
+      0,
+      startYear,
+      endYear,
+    ));
+
+    Object.keys(timeUnit.data).forEach(id => {
+      const region = timeUnit.data[Number(id)];
+      const { worldRegionId, population } = region;
+      const worldRegion =
+        data[worldRegionId] ||
+        (data[worldRegionId] = createEmptyWorldRegionAggregate(
+          worldRegionId,
+          startYear,
+          endYear,
+        ));
+
+      const fieldsToAdd: Array<keyof AggregateStressShortageDatum> = [
+        'population',
+        'blueWaterAvailability',
+        'blueWaterConsumptionTotal',
+        'blueWaterConsumptionIrrigation',
+        'blueWaterConsumptionDomestic',
+        'blueWaterConsumptionElectric',
+        'blueWaterConsumptionLivestock',
+        'blueWaterConsumptionManufacturing',
+      ];
+
+      fieldsToAdd.forEach(field => {
+        worldRegion[field] += (region as any)[field];
+        wholeGlobeRegion[field] += (region as any)[field];
+      });
+
+      // Stress
+      if (
+        region.blueWaterStress == null ||
+        region.blueWaterStress >= thresholds.stress[2]
+      ) {
+        worldRegion.populationHighBlueWaterStress += population;
+        wholeGlobeRegion.populationHighBlueWaterStress += population;
+      } else if (region.blueWaterStress >= thresholds.stress[1]) {
+        worldRegion.populationModerateBlueWaterStress += population;
+        wholeGlobeRegion.populationModerateBlueWaterStress += population;
+      } else if (region.blueWaterStress >= thresholds.stress[0]) {
+        worldRegion.populationLowBlueWaterStress += population;
+        wholeGlobeRegion.populationLowBlueWaterStress += population;
+      } else {
+        worldRegion.populationNoBlueWaterStress += population;
+        wholeGlobeRegion.populationNoBlueWaterStress += population;
+      }
+
+      // Shortage
+      if (region.blueWaterShortage <= thresholds.shortage[0]) {
+        worldRegion.populationHighBlueWaterShortage += population;
+        wholeGlobeRegion.populationHighBlueWaterShortage += population;
+      } else if (region.blueWaterShortage <= thresholds.shortage[1]) {
+        worldRegion.populationModerateBlueWaterShortage += population;
+        wholeGlobeRegion.populationModerateBlueWaterShortage += population;
+      } else if (region.blueWaterShortage <= thresholds.shortage[2]) {
+        worldRegion.populationLowBlueWaterShortage += population;
+        wholeGlobeRegion.populationLowBlueWaterShortage += population;
+      } else {
+        worldRegion.populationNoBlueWaterShortage += population;
+        wholeGlobeRegion.populationNoBlueWaterShortage += population;
+      }
+
+      // Scarcity
+      if (
+        region.blueWaterStress == null ||
+        region.blueWaterStress >= thresholds.stress[0]
+      ) {
+        if (region.blueWaterShortage <= thresholds.shortage[2]) {
+          worldRegion.populationBlueWaterShortageAndStress += population;
+          wholeGlobeRegion.populationBlueWaterShortageAndStress += population;
+        } else {
+          worldRegion.populationOnlyBlueWaterStress += population;
+          wholeGlobeRegion.populationOnlyBlueWaterStress += population;
+        }
+      } else if (region.blueWaterShortage <= thresholds.shortage[2]) {
+        worldRegion.populationOnlyBlueWaterShortage += population;
+        wholeGlobeRegion.populationOnlyBlueWaterShortage += population;
+      } else {
+        worldRegion.populationNoBlueWaterShortageAndStress += population;
+        wholeGlobeRegion.populationNoBlueWaterShortageAndStress += population;
+      }
+    });
+
+    return {
+      startYear: timeUnit.startYear,
+      endYear: timeUnit.endYear,
+      data,
+    };
+  });
+});
 
 export function getSelectedTimeIndex(state: StateTree): number {
   return state.selections.timeIndex;
@@ -45,17 +177,18 @@ export function getSelectedDataType(state: StateTree): DataType {
   return state.selections.dataType;
 }
 
-export const getTimeSeriesForSelectedRegion = createSelector(
-  getSelectedRegion,
-  getStressShortageData,
-  (selectedRegion, data) => {
-    if (selectedRegion === undefined) {
-      return undefined;
-    }
+export const getTimeSeriesForSelectedRegion = createSelector<
+  StateTree,
+  number | undefined,
+  Array<TimeAggregate<StressShortageDatum>>,
+  undefined | StressShortageDatum[]
+>(getSelectedRegion, getStressShortageData, (selectedRegion, data) => {
+  if (selectedRegion === undefined) {
+    return undefined;
+  }
 
-    return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
-  },
-);
+  return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
+});
 
 export const getTimeSeriesForSelectedGlobalRegion = createSelector(
   getSelectedWorldRegion,
@@ -69,8 +202,12 @@ export function getWorldRegionData(state: StateTree) {
   return state.worldRegions;
 }
 
+function getThresholds(state: StateTree) {
+  return state.thresholds;
+}
+
 export function getThresholdsForDataType(state: StateTree, dataType: DataType) {
-  return state.thresholds[dataType];
+  return getThresholds(state)[dataType];
 }
 
 export const getRegionsInSelectedWorldRegion = createSelector<

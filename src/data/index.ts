@@ -4,48 +4,27 @@ import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 
 import {
-  AggregateStressShortageDatum,
-  Datum,
-  RawDatum,
+  RawRegionStressShortageDatum,
   StressShortageDatum,
   TimeAggregate,
-  toAggregateStressShortageDatum,
   toStressShortageDatum,
   WorldRegion,
   WorldRegionGeoJSONFeature,
 } from '../types';
 
-function generateData<RawType extends RawDatum, OutputType extends Datum>(
-  rawContents: RawType[],
-  converter: (raw: RawType) => OutputType,
-): Array<TimeAggregate<OutputType>> {
-  const yearlyGroupedData: RawType[][] = values(
-    groupBy(rawContents, ({ startYear }) => startYear),
+export function getStressShortageData(): Array<
+  TimeAggregate<StressShortageDatum>
+> {
+  const rawData: RawRegionStressShortageDatum[] = require('../../data/FPU_decadal_bluewater.json');
+  const yearlyGroupedData = values(
+    groupBy(rawData, ({ startYear }) => startYear),
   ).sort((a, b) => a[0].startYear - b[0].startYear);
 
   return yearlyGroupedData.map(group => ({
     startYear: group[0].startYear,
     endYear: group[0].endYear,
-    data: keyBy(group.map(converter), d => d.featureId),
+    data: keyBy(group.map(toStressShortageDatum), d => d.featureId),
   }));
-}
-
-export function getStressShortageData(): Array<
-  TimeAggregate<StressShortageDatum>
-> {
-  return generateData(
-    require('../../data/FPU_decadal_bluewater.json'),
-    toStressShortageDatum,
-  );
-}
-
-export function getAggregateStressShortageData(): Array<
-  TimeAggregate<AggregateStressShortageDatum>
-> {
-  return generateData(
-    require('../../data/worldRegion_decadal_bluewater.json'),
-    toAggregateStressShortageDatum,
-  );
 }
 
 interface GeoJSON {
