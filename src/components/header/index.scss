@@ -4,6 +4,12 @@
   border-bottom: 1px solid #f2f2f2;
 }
 
+.left-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
 .logo {
   margin-top: $default-margin;
   margin-bottom: $default-margin;
@@ -14,6 +20,18 @@
   font-size: 48px;
   font-weight: 300;
   margin: $default-margin;
+}
+
+.menu {
+  margin-top: $default-margin;
+  margin-bottom: $default-margin;
+}
+
+.menu-text {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  text-decoration: none;
 }
 
 .navigation {
@@ -34,6 +52,15 @@
   }
 
   &.selected {
-    border-bottom: 3px solid $color-dark-gray;
+    border-bottom: 3px solid $color-aalto-blue;
   }
+}
+
+.navigation-theme {
+  padding: $default-margin 0;
+  margin-right: $default-margin;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: $color-gray;
 }
