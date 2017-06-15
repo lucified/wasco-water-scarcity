@@ -59,6 +59,7 @@ export default function AvailabilityChart({
       xTickFormat={xTickFormatter}
       selectedIndex={selectedTimeIndex}
       onMouseEnter={handleHover}
+      transitionDuration={100}
     />
   );
 }

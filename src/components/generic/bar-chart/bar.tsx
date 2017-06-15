@@ -11,9 +11,20 @@ interface Props {
   width: number;
   scale: ScaleLinear<number, number>;
   fill: string;
+  transitionDuration?: number;
 }
 
+interface DefaultProps {
+  transitionDuration: number;
+}
+
+type PropsWithDefaults = Props & DefaultProps;
+
 export default class Bar extends React.Component<Props, any> {
+  public static defaultProps: DefaultProps = {
+    transitionDuration: 250,
+  };
+
   private barRef: SVGElement;
   private groupRef: SVGElement;
 
@@ -29,7 +40,7 @@ export default class Bar extends React.Component<Props, any> {
   }
 
   public shouldComponentUpdate(nextProps: Props) {
-    const { y0, y1, scale, width, fill } = this.props;
+    const { y0, y1, scale, width, fill } = this.props as PropsWithDefaults;
 
     return (
       nextProps.y0 !== y0 ||
@@ -45,11 +56,12 @@ export default class Bar extends React.Component<Props, any> {
   }
 
   private updateHeight(initialDraw: boolean) {
-    const { scale, y0, y1 } = this.props;
+    const { scale, y0, y1, transitionDuration } = this
+      .props as PropsWithDefaults;
     const topY = scale(y1);
     const bottomY = scale(y0);
     const height = Math.max(bottomY - topY, 0);
-    const t = transition('bar-chart').duration(250);
+    const t = transition('bar-chart').duration(transitionDuration);
 
     // We scale by (1, -1) to invert the coordinates: positive becomes up and negative down.
     // This allows us to grow the bar from bottom to top instead of top to bottom.
@@ -77,7 +89,7 @@ export default class Bar extends React.Component<Props, any> {
   }
 
   public render() {
-    const { width, fill } = this.props;
+    const { width, fill } = this.props as PropsWithDefaults;
 
     return (
       <g ref={this.storeGroupRef}>

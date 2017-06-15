@@ -127,6 +127,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           xTickFormat={this.xTickFormatter}
           selectedIndex={selectedTimeIndex}
           onMouseEnter={this.handleBarHover}
+          transitionDuration={100}
         />
         <Legend items={legendItems} onHover={this.handleLegendHover} />
       </div>

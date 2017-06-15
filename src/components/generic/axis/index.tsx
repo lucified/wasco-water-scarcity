@@ -1,12 +1,13 @@
 import { Axis } from 'd3-axis';
 import { select } from 'd3-selection';
-import 'd3-transition'; // adds transition() to selections d3.select
+import { transition } from 'd3-transition'; // adds transition() to selections d3.select
 import * as React from 'react';
 
 interface Props {
   axis: Axis<any>;
   className?: string;
   transform?: string;
+  transitionDuration?: number;
 }
 
 export default class AxisComponent extends React.Component<Props, void> {
@@ -32,11 +33,14 @@ export default class AxisComponent extends React.Component<Props, void> {
   }
 
   private drawAxes(initialDraw: boolean) {
-    const { axis } = this.props;
+    const { axis, transitionDuration } = this.props;
     if (initialDraw) {
       select(this.axisRef).call(axis);
     } else {
-      select(this.axisRef).transition().call(axis as any);
+      const t = transition('axis-transition').duration(
+        transitionDuration || 250,
+      );
+      select(this.axisRef).transition(t).call(axis as any);
     }
   }
 

@@ -160,6 +160,7 @@ function TimeSelector({
         selectedIndex={selectedIndex}
         onMouseEnter={handleHover}
         hideSelectedLabel
+        transitionDuration={100}
       />
     </div>
   );

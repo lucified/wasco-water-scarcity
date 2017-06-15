@@ -28,6 +28,7 @@ export interface Props {
   xTickValues?: (xscale: ScaleBand<string>) => string[];
   selectedIndex?: number;
   hideSelectedLabel?: boolean;
+  transitionDuration?: number;
 }
 
 interface DefaultProps {
@@ -222,6 +223,7 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   private getBars() {
+    const { transitionDuration } = this.props;
     const data = this.getEnrichedData();
     const xScale = this.getXScale();
     const yScale = this.getYScale();
@@ -235,6 +237,7 @@ export default class BarChart extends React.Component<Props, {}> {
           y1={barSegmentData.y1!}
           scale={yScale}
           fill={barSegmentData.color!}
+          transitionDuration={transitionDuration}
         />,
       );
       return (
@@ -330,8 +333,14 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   public render() {
-    const { className, marginLeft, marginTop, height, width } = this
-      .props as PropsWithDefaults;
+    const {
+      className,
+      marginLeft,
+      marginTop,
+      height,
+      width,
+      transitionDuration,
+    } = this.props as PropsWithDefaults;
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
     return (
@@ -351,10 +360,12 @@ export default class BarChart extends React.Component<Props, {}> {
             axis={this.getXAxis()}
             className={`x ${styles.axis}`}
             transform={`translate(0,${contentHeight})`}
+            transitionDuration={transitionDuration}
           />
           <AxisComponent
             axis={this.getYAxis()}
             className={`y ${styles.axis}`}
+            transitionDuration={transitionDuration}
           />
           {this.getBars()}
           {this.getSelectionLabel()}
