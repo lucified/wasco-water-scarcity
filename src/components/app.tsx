@@ -26,14 +26,16 @@ export default function App(_props: Props) {
     <div className={styles.root}>
       <Header />
       <div className="container">
-        <Switch>
-          {/* These routes also handle any data loading or other onLoad trigger */}
-          <Route path="/stress" component={StressIntro} />
-          <Route path="/shortage" component={ShortageIntro} />
-          <Route path="/scarcity" component={ScarcityIntro} />
-          <Route path="/future" component={FutureIntro} />
-          <Route render={() => <Redirect to="/stress" />} />
-        </Switch>
+        <div className={classNames('row', styles.intro)}>
+          <Switch>
+            {/* These routes also handle any data loading or other onLoad trigger */}
+            <Route path="/stress" component={StressIntro} />
+            <Route path="/shortage" component={ShortageIntro} />
+            <Route path="/scarcity" component={ScarcityIntro} />
+            <Route path="/future" component={FutureIntro} />
+            <Route render={() => <Redirect to="/stress" />} />
+          </Switch>
+        </div>
         <div className="row middle-xs">
           <div className="col-xs-12 col-md-8">
             <TimeSelector />
