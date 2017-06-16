@@ -305,7 +305,8 @@ class Map extends React.Component<Props, void> {
         .select('g#selected-region')
         .append('path')
         .datum(selectedWorldRegion.feature)
-        .attr('d', path as any);
+        .attr('d', path as any)
+        .attr('stroke', selectedWorldRegion.color);
     } else {
       bounds = [[0, 0], [this.width, this.height]];
     }
