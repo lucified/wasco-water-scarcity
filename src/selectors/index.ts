@@ -78,7 +78,7 @@ export const getAggregateData = createSelector(
         const region = timeUnit.data[id];
         const worldRegionId = waterToWorldRegionMap[id];
         if (worldRegionId == null) {
-          console.error(`No world region ID available for region ${id}!`);
+          console.warn(`No world region ID available for region ${id}`);
           return;
         }
         const { population } = region;
