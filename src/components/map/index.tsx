@@ -39,8 +39,6 @@ import {
 } from '../../types';
 import { WaterRegionFeature } from './types';
 
-import WorldRegionSelector from './world-region-selector';
-
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
 
@@ -48,6 +46,10 @@ const { geoNaturalEarth2 } = require('d3-geo-projection');
 const world = require('../../../data/world-50m.json');
 
 const styles = require('./index.scss');
+
+interface PassedProps {
+  width: number;
+}
 
 interface GeneratedStateProps {
   selectedData: TimeAggregate<StressShortageDatum>;
@@ -66,7 +68,7 @@ interface GeneratedDispatchProps {
   clearSelectedRegion: () => void;
 }
 
-type Props = GeneratedStateProps & GeneratedDispatchProps;
+type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 function getColorScale(dataType: DataType, thresholds: number[]) {
   const emptyColor = '#D2E3E5';
@@ -93,6 +95,9 @@ class Map extends React.Component<Props, void> {
   constructor(props: Props) {
     super(props);
 
+    this.width = props.width;
+    this.height = this.width / 1.9;
+
     this.saveSvgRef = this.saveSvgRef.bind(this);
     this.handleRegionClick = this.handleRegionClick.bind(this);
     this.drawLegendRectangle = this.drawLegendRectangle.bind(this);
@@ -100,8 +105,8 @@ class Map extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private width = 1200;
-  private height = this.width / 1.9;
+  private width: number;
+  private height: number;
   private legendWidth = 200;
   private colorScale?: ScaleThreshold<number, string>;
   private legendXScale?: ScaleLinear<number, number>;
@@ -404,36 +409,33 @@ class Map extends React.Component<Props, void> {
     const { selectedDataType } = this.props;
 
     return (
-      <div className="col-sm-12 col-md-12 col-lg-12">
-        <svg ref={this.saveSvgRef}>
-          <defs>
-            <clipPath id="clip">
-              <use xlinkHref="#sphere" />
-            </clipPath>
-            <path id="sphere" />
-          </defs>
-          <use className={styles['globe-fill']} xlinkHref="#sphere" />
-          <g id="countries">
-            <path className={styles.land} clipPath="url(#clip)" />
-          </g>
-          <g id="water-regions" clipPath="url(#clip)" />
-          <g
-            id="selected-region"
-            className={styles['selected-region']}
-            clipPath="url(#clip)"
-          />
-          <g
-            id="legend"
-            className={styles.legend}
-            transform={`translate(${this.width * 0.6}, ${this.height - 40})`}
-          >
-            <text className={styles['legend-caption']} x="0" y="-6">
-              {getLabel(selectedDataType)}
-            </text>
-          </g>
-        </svg>
-        <WorldRegionSelector />
-      </div>
+      <svg ref={this.saveSvgRef}>
+        <defs>
+          <clipPath id="clip">
+            <use xlinkHref="#sphere" />
+          </clipPath>
+          <path id="sphere" />
+        </defs>
+        <use className={styles['globe-fill']} xlinkHref="#sphere" />
+        <g id="countries">
+          <path className={styles.land} clipPath="url(#clip)" />
+        </g>
+        <g id="water-regions" clipPath="url(#clip)" />
+        <g
+          id="selected-region"
+          className={styles['selected-region']}
+          clipPath="url(#clip)"
+        />
+        <g
+          id="legend"
+          className={styles.legend}
+          transform={`translate(${this.width * 0.6}, ${this.height - 40})`}
+        >
+          <text className={styles['legend-caption']} x="0" y="-6">
+            {getLabel(selectedDataType)}
+          </text>
+        </g>
+      </svg>
     );
   }
 }

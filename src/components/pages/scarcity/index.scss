@@ -1,0 +1,10 @@
+@import '../../definitions.scss';
+
+.selectors {
+  display: flex;
+  flex-direction: column;
+}
+
+.threshold-selector {
+  margin-bottom: $default-margin;
+}

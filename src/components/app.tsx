@@ -1,20 +1,12 @@
 // tslint:disable:jsx-no-lambda
-
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router';
 
-import DataSelector from './data-selector';
-import Gapminder from './gapminder';
 import Header from './header';
-import Map from './map';
-import FutureIntro from './pages/future/intro';
-import ScarcityIntro from './pages/scarcity/intro';
-import ShortageIntro from './pages/shortage/intro';
-import StressIntro from './pages/stress/intro';
-import SelectedRegionInformation from './selected-region-information';
-import ThresholdSelector from './threshold-selector';
-import TimeSelector from './time-selector';
+import Future from './pages/future';
+import Scarcity from './pages/scarcity';
+import Shortage from './pages/shortage';
+import Stress from './pages/stress';
 
 import * as styles from './app.scss';
 
@@ -26,61 +18,14 @@ export default function App(_props: Props) {
     <div className={styles.root}>
       <Header />
       <div className="container">
-        <div className={classNames('row', styles.intro)}>
-          <Switch>
-            {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={StressIntro} />
-            <Route path="/shortage" component={ShortageIntro} />
-            <Route path="/scarcity" component={ScarcityIntro} />
-            <Route path="/future" component={FutureIntro} />
-            <Route render={() => <Redirect to="/stress" />} />
-          </Switch>
-        </div>
-        <div className="row middle-xs">
-          <div className="col-xs-12 col-md-8">
-            <TimeSelector />
-          </div>
-          <div className="col-xs-12 col-md-4">
-            <Route
-              path="/stress"
-              render={() => <ThresholdSelector dataType="stress" />}
-            />
-            <Route
-              path="/shortage"
-              render={() => <ThresholdSelector dataType="shortage" />}
-            />
-            <Route
-              path="/scarcity"
-              render={() =>
-                <div className={styles.selectors}>
-                  <ThresholdSelector
-                    className={styles['threshold-selector']}
-                    dataType="stress"
-                  />
-                  <ThresholdSelector
-                    className={styles['threshold-selector']}
-                    dataType="shortage"
-                  />
-                  <DataSelector />
-                </div>}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="container">
-        <div className={classNames(styles['map-content'], 'row')}>
-          <Map />
-        </div>
-        <div className="row">
-          <SelectedRegionInformation />
-        </div>
-        <Route
-          path="/scarcity"
-          render={() =>
-            <div className="row">
-              <Gapminder />
-            </div>}
-        />
+        <Switch>
+          {/* These routes also handle any data loading or other onLoad trigger */}
+          <Route path="/stress" component={Stress} />
+          <Route path="/shortage" component={Shortage} />
+          <Route path="/scarcity" component={Scarcity} />
+          <Route path="/future" component={Future} />
+          <Route render={() => <Redirect to="/stress" />} />
+        </Switch>
       </div>
     </div>
   );
