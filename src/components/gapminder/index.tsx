@@ -7,8 +7,8 @@ import { setTimeIndex, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
-  getSelectedRegionId,
   getSelectedTimeIndex,
+  getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getThresholdsForDataType,
   getWaterToWorldRegionMap,
@@ -106,7 +106,7 @@ function GapminderWrapper({
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
-    selectedRegion: getSelectedRegionId(state),
+    selectedRegion: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
     waterToWorldRegionMap: getWaterToWorldRegionMap(state),
     data: getDataByRegion(state),

@@ -169,7 +169,7 @@ export function getSelectedTimeIndex(state: StateTree): number {
   return state.selections.timeIndex;
 }
 
-export function getSelectedRegionId(state: StateTree): number | undefined {
+export function getSelectedWaterRegionId(state: StateTree): number | undefined {
   return state.selections.region;
 }
 
@@ -193,8 +193,8 @@ export function getSelectedDataType(state: StateTree): DataType {
   return state.selections.dataType;
 }
 
-export const getTimeSeriesForSelectedRegion = createSelector(
-  getSelectedRegionId,
+export const getTimeSeriesForSelectedWaterRegion = createSelector(
+  getSelectedWaterRegionId,
   getStressShortageData,
   (selectedRegion, data) => {
     if (selectedRegion === undefined) {

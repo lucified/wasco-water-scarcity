@@ -6,10 +6,10 @@ import * as React from 'react';
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 import Legend, { LegendItem } from '../generic/legend';
 
-import { StressShortageDatum } from '../../types';
+import { Datum } from '../../types';
 
 interface PassedProps {
-  data: StressShortageDatum[];
+  data: Datum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
   maxY?: number;
@@ -18,14 +18,14 @@ interface PassedProps {
 type Props = PassedProps;
 
 interface State {
-  hoveredType?: keyof StressShortageDatum;
+  hoveredType?: keyof Datum;
 }
 
 const yTickFormatter = format('.2s');
 
 const colorScale = schemeBlues[9];
 
-const legendItems: Array<LegendItem & { field: keyof StressShortageDatum }> = [
+const legendItems: Array<LegendItem & { field: keyof Datum }> = [
   {
     title: 'Domestic',
     field: 'blueWaterConsumptionDomestic',
@@ -118,10 +118,10 @@ class ConsumptionChart extends React.Component<Props, State> {
         <BarChart
           data={barChartData}
           maxYValue={chartMaxValue}
-          height={120}
+          height={180}
           marginBottom={20}
           marginRight={0}
-          marginTop={5}
+          marginTop={15}
           marginLeft={40}
           yTickFormat={yTickFormatter}
           xTickFormat={this.xTickFormatter}
