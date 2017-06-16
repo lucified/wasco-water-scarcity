@@ -1,3 +1,13 @@
-.selected {
-  font-weight: bold;
+.regions-list {
+  line-height: 2;
+}
+
+.region {
+  font-size: 0.73rem;
+  padding: 0.3rem 0.3rem;
+  cursor: pointer;
+}
+
+.region-name {
+  white-space: nowrap;
 }
