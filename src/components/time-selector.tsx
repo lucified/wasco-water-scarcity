@@ -94,13 +94,13 @@ function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
           color: colors[3],
         },
         {
-          key: 'Stress only',
-          total: datum.populationOnlyBlueWaterStress,
+          key: 'Shortage only',
+          total: datum.populationOnlyBlueWaterShortage,
           color: colors[2],
         },
         {
-          key: 'Shortage only',
-          total: datum.populationOnlyBlueWaterShortage,
+          key: 'Stress only',
+          total: datum.populationOnlyBlueWaterStress,
           color: colors[1],
         },
         {
