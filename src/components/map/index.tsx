@@ -22,7 +22,7 @@ import { WaterRegionGeoJSON } from '../../data/types';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
-  getSelectedRegionId,
+  getSelectedWaterRegionId,
   getSelectedStressShortageData,
   getSelectedWorldRegion,
   getThresholdsForDataType,
@@ -446,7 +446,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   return {
     selectedData: getSelectedStressShortageData(state),
-    selectedRegionId: getSelectedRegionId(state),
+    selectedRegionId: getSelectedWaterRegionId(state),
     selectedDataType,
     selectedWorldRegion: getSelectedWorldRegion(state),
     waterRegions: getWaterRegionData(state),
