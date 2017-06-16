@@ -55,14 +55,14 @@ export default function DataLineChart({
     <LineChart
       className={styles.chart}
       data={chartData}
-      width={270}
-      height={120}
+      width={400}
+      height={180}
       yAxisLabel={yAxisLabel}
       selectedTimeIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
-      marginTop={5}
+      marginTop={15}
       marginLeft={40}
     />
   );

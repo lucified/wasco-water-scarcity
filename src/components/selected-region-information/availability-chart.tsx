@@ -3,10 +3,10 @@ import * as React from 'react';
 
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
-import { StressShortageDatum } from '../../types';
+import { Datum } from '../../types';
 
 interface PassedProps {
-  data: StressShortageDatum[];
+  data: Datum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
   maxY?: number;
@@ -50,10 +50,10 @@ export default function AvailabilityChart({
     <BarChart
       data={barChartData}
       maxYValue={maxY}
-      height={120}
+      height={180}
       marginBottom={20}
       marginRight={0}
-      marginTop={5}
+      marginTop={15}
       marginLeft={40}
       yTickFormat={yTickFormatter}
       xTickFormat={xTickFormatter}

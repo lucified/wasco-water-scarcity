@@ -124,6 +124,8 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       if (action.id !== state.worldRegion) {
         return {
           ...state,
+          // Clear selected region
+          region: undefined,
           worldRegion: action.id,
         };
       }

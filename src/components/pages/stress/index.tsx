@@ -45,7 +45,7 @@ class StressBody extends React.Component<Props, void> {
           </div>
         </div>
         <div className="row">
-          <SelectedRegionInformation />
+          <SelectedRegionInformation dataType="stress" />
         </div>
       </div>
     );
