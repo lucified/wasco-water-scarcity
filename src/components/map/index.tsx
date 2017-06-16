@@ -18,6 +18,7 @@ import { feature } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { defaultDataTypeThresholdMaxValues } from '../../data';
+import { WaterRegionGeoJSON } from '../../data/types';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
@@ -25,6 +26,7 @@ import {
   getSelectedStressShortageData,
   getSelectedWorldRegion,
   getThresholdsForDataType,
+  getWaterRegionData,
 } from '../../selectors';
 import {
   DataType,
@@ -44,14 +46,14 @@ const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 // From https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-50m.json
 const world = require('../../../data/world-50m.json');
-const waterRegions = require('../../../data/FPU.json');
 
 const styles = require('./index.scss');
 
 interface GeneratedStateProps {
   selectedData: TimeAggregate<StressShortageDatum>;
-  selectedRegion?: number;
+  selectedRegionId?: number;
   selectedWorldRegion?: WorldRegion;
+  waterRegions: WaterRegionGeoJSON;
   selectedDataType: DataType;
   colorScale: ScaleThreshold<number, string>;
   thresholds: number[];
@@ -118,7 +120,7 @@ class Map extends React.Component<Props, void> {
   public componentDidUpdate(prevProps: Props) {
     if (
       prevProps.selectedData !== this.props.selectedData ||
-      prevProps.selectedRegion !== this.props.selectedRegion
+      prevProps.selectedRegionId !== this.props.selectedRegionId
     ) {
       this.redrawFillsAndBorders();
     }
@@ -170,7 +172,11 @@ class Map extends React.Component<Props, void> {
   }
 
   private drawMap() {
-    const { clearSelectedRegion, selectedRegion } = this.props;
+    const {
+      clearSelectedRegion,
+      selectedRegionId,
+      waterRegions: { features },
+    } = this.props;
 
     // Based on https://gist.github.com/mbostock/4448587
     const projection = geoNaturalEarth2()
@@ -193,20 +199,27 @@ class Map extends React.Component<Props, void> {
       .attr('d', path);
 
     // Water regions
-    const features: WaterRegionFeature[] = waterRegions.features;
     // prettier-ignore
     svg
       .select<SVGGElement>('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionFeature>('path')
-      .data(features, d => String(d.properties.featureid))
+      .data(features, d => String(d.properties.featureId))
       .enter()
-        .append('path')
+      .append('path')
         .attr('class', styles['water-region'])
-        .classed(styles.selected, d => selectedRegion === d.properties.featureid)
-        .classed(styles.unselected, d => selectedRegion !== undefined && selectedRegion !== d.properties.featureid)
+        .classed(
+          styles.selected,
+          d => selectedRegionId === d.properties.featureId,
+        )
+        .classed(
+          styles.unselected,
+          d =>
+            selectedRegionId !== undefined &&
+            selectedRegionId !== d.properties.featureId,
+        )
         .attr('d', path as any)
         .attr('vector-effect', 'non-scaling-stroke')
-        .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid))
+        .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId))
         .on('click', this.handleRegionClick);
   }
 
@@ -348,7 +361,7 @@ class Map extends React.Component<Props, void> {
   }
 
   private handleRegionClick(d: WaterRegionFeature) {
-    this.props.toggleSelectedRegion(d.properties.featureid);
+    this.props.toggleSelectedRegion(d.properties.featureId);
   }
 
   private getColorForWaterRegion(featureId: number): string {
@@ -368,21 +381,23 @@ class Map extends React.Component<Props, void> {
   }
 
   private redrawFillsAndBorders() {
-    const { selectedRegion } = this.props;
-    const features: WaterRegionFeature[] = waterRegions.features;
+    const { selectedRegionId, waterRegions: { features } } = this.props;
     const t = transition('waterRegion').duration(100);
     select<SVGGElement, undefined>('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionFeature>('path')
-      .data(features, d => String(d.properties.featureid))
-      .classed(styles.selected, d => selectedRegion === d.properties.featureid)
+      .data(features, d => String(d.properties.featureId))
+      .classed(
+        styles.selected,
+        d => selectedRegionId === d.properties.featureId,
+      )
       .classed(
         styles.unselected,
         d =>
-          selectedRegion !== undefined &&
-          selectedRegion !== d.properties.featureid,
+          selectedRegionId !== undefined &&
+          selectedRegionId !== d.properties.featureId,
       )
       .transition(t)
-      .attr('fill', d => this.getColorForWaterRegion(d.properties.featureid));
+      .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
   }
 
   public render() {
@@ -429,9 +444,10 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   return {
     selectedData: getSelectedStressShortageData(state),
-    selectedRegion: getSelectedRegionId(state),
+    selectedRegionId: getSelectedRegionId(state),
     selectedDataType,
     selectedWorldRegion: getSelectedWorldRegion(state),
+    waterRegions: getWaterRegionData(state),
     thresholds,
     colorScale: getColorScale(selectedDataType, thresholds),
     stressThresholds: getThresholdsForDataType(state, 'stress'),

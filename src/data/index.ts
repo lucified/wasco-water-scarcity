@@ -3,14 +3,13 @@ import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 
+import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import {
   RawRegionStressShortageDatum,
-  StressShortageDatum,
-  TimeAggregate,
   toStressShortageDatum,
-  WorldRegion,
-  WorldRegionGeoJSONFeature,
-} from '../types';
+  WaterRegionGeoJSON,
+  WorldRegionGeoJSON,
+} from './types';
 
 export function getStressShortageData(): Array<
   TimeAggregate<StressShortageDatum>
@@ -27,14 +26,8 @@ export function getStressShortageData(): Array<
   }));
 }
 
-interface GeoJSON {
-  type: 'FeatureCollection';
-  features: WorldRegionGeoJSONFeature[];
-  crs: any;
-}
-
 export function getWorldRegionsData(): WorldRegion[] {
-  const geoJSON: GeoJSON = require('../../data/worldRegion.json');
+  const geoJSON: WorldRegionGeoJSON = require('../../data/worldRegion.json');
   const regionIDs = geoJSON.features.map(r => r.properties.featureId);
   // Note: we only have 20 unique colors
   const colorScale = scaleOrdinal<number, string>()
@@ -70,3 +63,17 @@ export const defaultDataTypeThresholdMaxValues = {
   shortage: 4000,
   scarcity: 2,
 };
+
+export function getWaterRegionsData(): WaterRegionGeoJSON {
+  return require('../../data/FPU.json');
+}
+
+export function generateWaterToWorldRegionsMap(
+  waterRegionsData: WaterRegionGeoJSON,
+) {
+  const map: { [waterRegionId: number]: number } = {};
+  waterRegionsData.features.forEach(feature => {
+    map[feature.properties.featureId] = feature.properties.worldRegionID;
+  });
+  return map;
+}

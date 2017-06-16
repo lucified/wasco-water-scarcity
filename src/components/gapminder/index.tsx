@@ -7,10 +7,11 @@ import { setTimeIndex, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
-  getRegionsInSelectedWorldRegion,
   getSelectedRegionId,
   getSelectedTimeIndex,
+  getSelectedWorldRegionId,
   getThresholdsForDataType,
+  getWaterToWorldRegionMap,
 } from '../../selectors';
 import { getDataTypeColors } from '../../types';
 
@@ -18,8 +19,9 @@ import Gapminder, { Data } from '../generic/gapminder';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  regionsInSelectedWorldRegion: number[];
+  waterToWorldRegionMap: { [waterRegionId: number]: number };
   selectedRegion?: number;
+  selectedWorldRegionId: number;
   data: Data;
   stressThresholds: number[];
   shortageThresholds: number[];
@@ -47,7 +49,8 @@ function populationSelector(data: { [dataType: string]: number[] }) {
 function GapminderWrapper({
   selectedTimeIndex,
   selectedRegion,
-  regionsInSelectedWorldRegion,
+  selectedWorldRegionId,
+  waterToWorldRegionMap,
   data,
   setTimeIndex,
   toggleSelectedRegion,
@@ -55,7 +58,13 @@ function GapminderWrapper({
   shortageThresholds,
 }: Props) {
   function shouldFadeOut(d: { id: string }) {
-    return regionsInSelectedWorldRegion.indexOf(Number(d.id)) < 0;
+    if (
+      selectedWorldRegionId === 0 ||
+      waterToWorldRegionMap[Number(d.id)] === selectedWorldRegionId
+    ) {
+      return false;
+    }
+    return true;
   }
 
   const stressColorsScale = scaleThreshold<number, string>()
@@ -98,7 +107,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedTimeIndex(state),
     selectedRegion: getSelectedRegionId(state),
-    regionsInSelectedWorldRegion: getRegionsInSelectedWorldRegion(state),
+    selectedWorldRegionId: getSelectedWorldRegionId(state),
+    waterToWorldRegionMap: getWaterToWorldRegionMap(state),
     data: getDataByRegion(state),
     stressThresholds: getThresholdsForDataType(state, 'stress'),
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),

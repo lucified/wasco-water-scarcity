@@ -2,7 +2,8 @@ export interface WaterRegionFeature {
   geometry: any;
   id: number; // not used
   properties: {
-    featureid: number;
+    featureId: number;
+    worldRegionID: number;
   };
   type: 'Feature';
 }
