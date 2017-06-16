@@ -58,7 +58,13 @@ function GapminderWrapper({
   shortageThresholds,
 }: Props) {
   function shouldFadeOut(d: { id: string }) {
-    return waterToWorldRegionMap[Number(d.id)] !== selectedWorldRegionId;
+    if (
+      selectedWorldRegionId === 0 ||
+      waterToWorldRegionMap[Number(d.id)] === selectedWorldRegionId
+    ) {
+      return false;
+    }
+    return true;
   }
 
   const stressColorsScale = scaleThreshold<number, string>()
