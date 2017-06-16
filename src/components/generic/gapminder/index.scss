@@ -18,7 +18,7 @@
   transition: opacity 100ms;
 
   &.fade-out {
-    opacity: 0.5;
+    opacity: 0.1;
   }
 }
 
@@ -30,7 +30,7 @@
 }
 
 .year-label {
-  font: 500 100px "Helvetica Neue";
+  font: 500 50px "Helvetica Neue";
   fill: #ddd;
 
   &.active {

@@ -8,7 +8,7 @@ import { StateTree } from '../../reducers';
 import { getSelectedWorldRegionId, getWorldRegionData } from '../../selectors';
 import { WorldRegion } from '../../types';
 
-const styles = require('./world-region-selector.scss');
+const styles = require('./index.scss');
 
 interface StateProps {
   selectedWorldRegionId: number;

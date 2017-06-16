@@ -75,10 +75,10 @@ function GapminderWrapper({
     .range(['none', ...getDataTypeColors('shortage')].reverse());
 
   return (
-    <div className="col-xs-12">
+    <div>
       <Gapminder
-        width={1200}
-        height={500}
+        width={400}
+        height={400}
         data={data}
         selectedTimeIndex={selectedTimeIndex}
         selectedData={
