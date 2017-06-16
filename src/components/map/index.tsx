@@ -95,6 +95,9 @@ class Map extends React.Component<Props, void> {
   constructor(props: Props) {
     super(props);
 
+    this.width = props.width;
+    this.height = this.width / 1.9;
+
     this.saveSvgRef = this.saveSvgRef.bind(this);
     this.handleRegionClick = this.handleRegionClick.bind(this);
     this.drawLegendRectangle = this.drawLegendRectangle.bind(this);
@@ -102,8 +105,8 @@ class Map extends React.Component<Props, void> {
   }
 
   private svgRef?: SVGElement;
-  private width = this.props.width;
-  private height = this.width / 1.9;
+  private width: number;
+  private height: number;
   private legendWidth = 200;
   private colorScale?: ScaleThreshold<number, string>;
   private legendXScale?: ScaleLinear<number, number>;

@@ -18,16 +18,14 @@ export default function App(_props: Props) {
     <div className={styles.root}>
       <Header />
       <div className="container">
-        <div className="row">
-          <Switch>
-            {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={Stress} />
-            <Route path="/shortage" component={Shortage} />
-            <Route path="/scarcity" component={Scarcity} />
-            <Route path="/future" component={Future} />
-            <Route render={() => <Redirect to="/stress" />} />
-          </Switch>
-        </div>
+        <Switch>
+          {/* These routes also handle any data loading or other onLoad trigger */}
+          <Route path="/stress" component={Stress} />
+          <Route path="/shortage" component={Shortage} />
+          <Route path="/scarcity" component={Scarcity} />
+          <Route path="/future" component={Future} />
+          <Route render={() => <Redirect to="/stress" />} />
+        </Switch>
       </div>
     </div>
   );

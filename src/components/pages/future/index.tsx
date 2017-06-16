@@ -30,8 +30,11 @@ class ScarcityBody extends React.Component<Props, void> {
             <p><em>What can we do about this in the future?</em></p>
           </div>
         </div>
-        <div className="row middle-xs">
-          Actions
+        <div className="row">
+          <div className="col-xs-12">
+            <h2>Actions</h2>
+            <p><em>Placeholder for actions</em></p>
+          </div>
         </div>
         <div className="row middle-xs">
           <div className="col-xs-12 col-md-6 col-lg-8">
