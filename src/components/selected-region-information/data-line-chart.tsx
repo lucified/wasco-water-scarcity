@@ -1,5 +1,4 @@
 import { scaleThreshold } from 'd3-scale';
-import some = require('lodash/some');
 import * as React from 'react';
 
 import { StressShortageDatum, waterPropertySelector } from '../../types';
@@ -47,12 +46,7 @@ export default function DataLineChart({
     .domain(thresholds)
     .range(thresholdColors);
 
-  if (
-    some<{ value?: number; start: Date; end: Date }>(
-      chartData.series,
-      d => d.value == null,
-    )
-  ) {
+  if (chartData.series.some(d => d.value == null)) {
     console.warn(`Missing ${dataType} data for selected region`);
     return null;
   }
