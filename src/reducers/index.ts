@@ -13,16 +13,23 @@ import {
 } from '../actions';
 import {
   defaultDataTypeThresholds,
+  generateWaterToWorldRegionsMap,
   getStressShortageData,
+  getWaterRegionsData,
   getWorldRegionsData,
 } from '../data';
+import { WaterRegionGeoJSON } from '../data/types';
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import { StateTree } from './types';
+
+const waterRegions: WaterRegionGeoJSON = getWaterRegionsData();
 
 const defaultState: StateTree = {
   routing: {} as any,
   stressShortageData: getStressShortageData(),
   worldRegions: getWorldRegionsData(),
+  waterRegions,
+  waterToWorldRegionsMap: generateWaterToWorldRegionsMap(waterRegions),
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
@@ -41,6 +48,20 @@ function stressShortageDataReducer(
   state = initialState.stressShortageData,
   _action: Action,
 ): Array<TimeAggregate<StressShortageDatum>> {
+  return state;
+}
+
+function waterRegionsReducer(
+  state = initialState.waterRegions,
+  _action: Action,
+): WaterRegionGeoJSON {
+  return state;
+}
+
+function waterToWorldRegionsMapReducer(
+  state = initialState.waterToWorldRegionsMap,
+  _action: Action,
+): { [waterRegionId: number]: number } {
   return state;
 }
 
@@ -128,6 +149,8 @@ export default combineReducers<StateTree>({
   thresholds: thresholdsReducer,
   stressShortageData: stressShortageDataReducer,
   worldRegions: worldRegionsReducer,
+  waterRegions: waterRegionsReducer,
+  waterToWorldRegionsMap: waterToWorldRegionsMapReducer,
 });
 
 export * from './types';

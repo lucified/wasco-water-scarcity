@@ -26,7 +26,8 @@ export function getSelectedStressShortageData(
 export const getAggregateData = createSelector(
   getStressShortageData,
   getThresholds,
-  (allData, thresholds) => {
+  getWaterToWorldRegionMap,
+  (allData, thresholds, waterToWorldRegionMap) => {
     function createEmptyWorldRegionAggregate(
       featureId: number,
       startYear: number,
@@ -73,9 +74,14 @@ export const getAggregateData = createSelector(
         endYear,
       ));
 
-      Object.keys(timeUnit.data).forEach(id => {
-        const region = timeUnit.data[Number(id)];
-        const { worldRegionId, population } = region;
+      Object.keys(timeUnit.data).map(Number).forEach(id => {
+        const region = timeUnit.data[id];
+        const worldRegionId = waterToWorldRegionMap[id];
+        if (worldRegionId == null) {
+          console.error(`No world region ID available for region ${id}!`);
+          return;
+        }
+        const { population } = region;
         const worldRegion =
           result.data[worldRegionId] ||
           (result.data[worldRegionId] = createEmptyWorldRegionAggregate(
@@ -207,8 +213,16 @@ export const getTimeSeriesForSelectedGlobalRegion = createSelector(
   },
 );
 
+export function getWaterRegionData(state: StateTree) {
+  return state.waterRegions;
+}
+
 export function getWorldRegionData(state: StateTree) {
   return state.worldRegions;
+}
+
+export function getWaterToWorldRegionMap(state: StateTree) {
+  return state.waterToWorldRegionsMap;
 }
 
 function getThresholds(state: StateTree) {
@@ -219,36 +233,13 @@ export function getThresholdsForDataType(state: StateTree, dataType: DataType) {
   return getThresholds(state)[dataType];
 }
 
-export const getRegionsInSelectedWorldRegion = createSelector(
-  getStressShortageData,
-  getSelectedWorldRegionId,
-  (data, selectedWorldRegion) => {
-    // We assume all regions are in the first time series data object
-    const regions = data[0].data;
-    const regionIds = Object.keys(regions).map(Number);
-
-    if (selectedWorldRegion === 0) {
-      return regionIds;
-    }
-
-    const regionsInSelectedWorldRegion: number[] = [];
-    regionIds.forEach(regionId => {
-      if (regions[regionId].worldRegionId === selectedWorldRegion) {
-        regionsInSelectedWorldRegion.push(regionId);
-      }
-    });
-
-    return regionsInSelectedWorldRegion;
-  },
-);
-
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
-// prettier-ignore
 export const getDataByRegion = createSelector(
   getStressShortageData,
   getWorldRegionData,
-  (stressShortageData, worldRegions) => {
+  getWaterRegionData,
+  (stressShortageData, worldRegions, waterRegions) => {
     const timeRanges = stressShortageData.map(
       d =>
         [new Date(d.startYear, 0, 1), new Date(d.endYear, 11, 31)] as [
@@ -265,10 +256,11 @@ export const getDataByRegion = createSelector(
       return 1e-7;
     }
 
-    // Note: this assums the first data object has all region IDs
-    const regionObjects = Object.keys(stressShortageData[0].data).map(id => {
-      const regionId = Number(id);
-      const worldRegionId = stressShortageData[0].data[regionId].worldRegionId;
+    const regionObjects = waterRegions.features.map(feature => {
+      const {
+        featureId: regionId,
+        worldRegionID: worldRegionId,
+      } = feature.properties;
       const worldRegion = worldRegions.find(r => r.id === worldRegionId);
       const color = worldRegion ? worldRegion.color : 'lightblue';
       const blueWaterStress: number[] = [];
@@ -284,7 +276,7 @@ export const getDataByRegion = createSelector(
       });
 
       return {
-        id,
+        id: String(regionId),
         color,
         data: {
           blueWaterStress,
