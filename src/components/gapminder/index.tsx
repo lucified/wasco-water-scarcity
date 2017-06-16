@@ -7,8 +7,8 @@ import { setTimeIndex, toggleSelectedRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
-  getSelectedWaterRegionId,
   getSelectedTimeIndex,
+  getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getThresholdsForDataType,
   getWaterToWorldRegionMap,

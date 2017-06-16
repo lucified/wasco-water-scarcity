@@ -18,12 +18,15 @@ import { feature } from 'topojson';
 
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { defaultDataTypeThresholdMaxValues } from '../../data';
-import { WaterRegionGeoJSON } from '../../data/types';
+import {
+  WaterRegionGeoJSON,
+  WaterRegionGeoJSONFeature,
+} from '../../data/types';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
-  getSelectedWaterRegionId,
   getSelectedStressShortageData,
+  getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
   getWaterRegionData,
@@ -37,7 +40,6 @@ import {
   waterPropertySelector,
   WorldRegion,
 } from '../../types';
-import { WaterRegionFeature } from './types';
 
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
@@ -207,7 +209,7 @@ class Map extends React.Component<Props, void> {
     // prettier-ignore
     svg
       .select<SVGGElement>('g#water-regions')
-      .selectAll<SVGPathElement, WaterRegionFeature>('path')
+      .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => String(d.properties.featureId))
       .enter()
       .append('path')
@@ -365,7 +367,7 @@ class Map extends React.Component<Props, void> {
     }
   }
 
-  private handleRegionClick(d: WaterRegionFeature) {
+  private handleRegionClick(d: WaterRegionGeoJSONFeature) {
     this.props.toggleSelectedRegion(d.properties.featureId);
   }
 
@@ -389,7 +391,7 @@ class Map extends React.Component<Props, void> {
     const { selectedRegionId, waterRegions: { features } } = this.props;
     const t = transition('waterRegion').duration(100);
     select<SVGGElement, undefined>('g#water-regions')
-      .selectAll<SVGPathElement, WaterRegionFeature>('path')
+      .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => String(d.properties.featureId))
       .classed(
         styles.selected,
