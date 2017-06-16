@@ -1,13 +1,11 @@
 .regions-list {
-  line-height: 1.5;
-}
-
-.selected {
-  font-weight: bold;
+  line-height: 2;
 }
 
 .region {
-  margin-right: 10px;
+  font-size: 0.73rem;
+  padding: 0.3rem 0.3rem;
+  cursor: pointer;
 }
 
 .region-name {

@@ -23,7 +23,10 @@ type Props = StateProps & DispatchProps;
 
 class WorldRegionSelector extends React.Component<Props, void> {
   private generateClickCallback(id: number) {
-    return () => this.props.onSetWorldRegion(id);
+    return () =>
+      this.props.onSetWorldRegion(
+        this.props.selectedWorldRegionId === id ? 0 : id,
+      );
   }
 
   public render() {
@@ -37,13 +40,22 @@ class WorldRegionSelector extends React.Component<Props, void> {
         ].map(({ id, color, name }) =>
           <a
             key={`world-region-selector-${id}`}
-            style={{ color }}
+            style={
+              selectedWorldRegionId === id
+                ? {
+                    color: 'white',
+                    backgroundColor: color,
+                  }
+                : {
+                    color,
+                  }
+            }
             onClick={this.generateClickCallback(id)}
             className={classNames(styles.region, {
               [styles.selected]: selectedWorldRegionId === id,
             })}
           >
-            <span className={styles['region-name']}>{name}</span>{' '}
+            <span className={styles['region-name']}>{name}</span>
           </a>,
         )}
       </div>
