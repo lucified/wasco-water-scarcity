@@ -8,6 +8,7 @@ import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  WorldRegion,
 } from '../types';
 
 export function getStressShortageData(
@@ -162,20 +163,32 @@ export function getSelectedTimeIndex(state: StateTree): number {
   return state.selections.timeIndex;
 }
 
-export function getSelectedRegion(state: StateTree): number | undefined {
+export function getSelectedRegionId(state: StateTree): number | undefined {
   return state.selections.region;
 }
 
-export function getSelectedWorldRegion(state: StateTree): number {
+export function getSelectedWorldRegionId(state: StateTree): number {
   return state.selections.worldRegion;
 }
+
+// prettier-ignore
+export const getSelectedWorldRegion = createSelector<
+  StateTree,
+  number,
+  WorldRegion[],
+  WorldRegion | undefined
+>(
+  getSelectedWorldRegionId,
+  getWorldRegionData,
+  (id, regions) => regions.find(r => r.id === id),
+);
 
 export function getSelectedDataType(state: StateTree): DataType {
   return state.selections.dataType;
 }
 
 export const getTimeSeriesForSelectedRegion = createSelector(
-  getSelectedRegion,
+  getSelectedRegionId,
   getStressShortageData,
   (selectedRegion, data) => {
     if (selectedRegion === undefined) {
@@ -187,7 +200,7 @@ export const getTimeSeriesForSelectedRegion = createSelector(
 );
 
 export const getTimeSeriesForSelectedGlobalRegion = createSelector(
-  getSelectedWorldRegion,
+  getSelectedWorldRegionId,
   getAggregateData,
   (selectedRegion, data) => {
     return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
@@ -208,7 +221,7 @@ export function getThresholdsForDataType(state: StateTree, dataType: DataType) {
 
 export const getRegionsInSelectedWorldRegion = createSelector(
   getStressShortageData,
-  getSelectedWorldRegion,
+  getSelectedWorldRegionId,
   (data, selectedWorldRegion) => {
     // We assume all regions are in the first time series data object
     const regions = data[0].data;

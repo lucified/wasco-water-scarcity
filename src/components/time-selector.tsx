@@ -10,7 +10,6 @@ import {
   getSelectedTimeIndex,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
-  getWorldRegionData,
 } from '../selectors';
 import {
   AggregateStressShortageDatum,
@@ -173,16 +172,13 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   const label = currentSelectedData.startYear !== currentSelectedData.endYear
     ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
     : String(currentSelectedData.startYear);
-  const selectedWorldRegionId = getSelectedWorldRegion(state);
 
   return {
     selectedIndex,
     currentIndexLabel: label,
     data,
     dataType: getSelectedDataType(state),
-    selectedWorldRegion: getWorldRegionData(state).find(
-      r => r.id === selectedWorldRegionId,
-    ),
+    selectedWorldRegion: getSelectedWorldRegion(state),
   };
 }
 

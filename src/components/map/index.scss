@@ -27,6 +27,12 @@
   }
 }
 
+.selected-region path {
+  stroke-width: 1px;
+  stroke: #aaa;
+  fill: none;
+}
+
 .legend {
   user-select: none;
 }

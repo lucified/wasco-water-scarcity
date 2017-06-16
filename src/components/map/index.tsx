@@ -21,11 +21,10 @@ import { defaultDataTypeThresholdMaxValues } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
-  getSelectedRegion,
+  getSelectedRegionId,
   getSelectedStressShortageData,
   getSelectedWorldRegion,
   getThresholdsForDataType,
-  getWorldRegionData,
 } from '../../selectors';
 import {
   DataType,
@@ -52,8 +51,7 @@ const styles = require('./index.scss');
 interface GeneratedStateProps {
   selectedData: TimeAggregate<StressShortageDatum>;
   selectedRegion?: number;
-  selectedWorldRegion: number;
-  worldRegions: WorldRegion[];
+  selectedWorldRegion?: WorldRegion;
   selectedDataType: DataType;
   colorScale: ScaleThreshold<number, string>;
   thresholds: number[];
@@ -288,7 +286,8 @@ class Map extends React.Component<Props, void> {
   }
 
   private zoomToGlobalArea() {
-    const { selectedWorldRegion, worldRegions } = this.props;
+    const { selectedWorldRegion } = this.props;
+    const svg = select<SVGElement, undefined>(this.svgRef!);
 
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
     const projection = geoNaturalEarth2()
@@ -297,11 +296,16 @@ class Map extends React.Component<Props, void> {
       .translate([this.width / 2.2, this.height / 1.7]);
 
     let bounds;
-    if (selectedWorldRegion !== 0) {
-      const worldRegion = worldRegions.find(r => r.id === selectedWorldRegion)!;
-      bounds = geoPath()
-        .projection(projection)
-        .bounds(worldRegion.feature as any);
+    svg.select('g#selected-region').select('path').remove();
+    if (selectedWorldRegion) {
+      const path = geoPath().projection(projection);
+      bounds = path.bounds(selectedWorldRegion.feature as any);
+      svg.select('g#selected-region').select('path').remove();
+      svg
+        .select('g#selected-region')
+        .append('path')
+        .datum(selectedWorldRegion.feature)
+        .attr('d', path as any);
     } else {
       bounds = [[0, 0], [this.width, this.height]];
     }
@@ -318,7 +322,6 @@ class Map extends React.Component<Props, void> {
 
     const ourZoom = zoom().on('zoom', zoomed);
 
-    const svg = select<SVGElement, undefined>(this.svgRef!);
     const t = transition('zoom').duration(750);
     svg
       .transition(t)
@@ -333,6 +336,10 @@ class Map extends React.Component<Props, void> {
         event.transform,
       );
       select<SVGGElement, undefined>('g#countries').attr(
+        'transform',
+        event.transform,
+      );
+      select<SVGGElement, undefined>('g#selected-region').attr(
         'transform',
         event.transform,
       );
@@ -394,7 +401,11 @@ class Map extends React.Component<Props, void> {
             <path className={styles.land} clipPath="url(#clip)" />
           </g>
           <g id="water-regions" clipPath="url(#clip)" />
-
+          <g
+            id="selected-region"
+            className={styles['selected-region']}
+            clipPath="url(#clip)"
+          />
           <g
             id="legend"
             className={styles.legend}
@@ -417,10 +428,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   return {
     selectedData: getSelectedStressShortageData(state),
-    selectedRegion: getSelectedRegion(state),
+    selectedRegion: getSelectedRegionId(state),
     selectedDataType,
     selectedWorldRegion: getSelectedWorldRegion(state),
-    worldRegions: getWorldRegionData(state),
     thresholds,
     colorScale: getColorScale(selectedDataType, thresholds),
     stressThresholds: getThresholdsForDataType(state, 'stress'),

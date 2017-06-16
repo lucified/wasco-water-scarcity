@@ -5,13 +5,13 @@ import { Dispatch } from 'redux';
 
 import { setSelectedWorldRegion } from '../../actions';
 import { StateTree } from '../../reducers';
-import { getSelectedWorldRegion, getWorldRegionData } from '../../selectors';
+import { getSelectedWorldRegionId, getWorldRegionData } from '../../selectors';
 import { WorldRegion } from '../../types';
 
 const styles = require('./world-region-selector.scss');
 
 interface StateProps {
-  selectedWorldRegion: number;
+  selectedWorldRegionId: number;
   worldRegions: WorldRegion[];
 }
 
@@ -27,10 +27,10 @@ class WorldRegionSelector extends React.Component<Props, void> {
   }
 
   public render() {
-    const { selectedWorldRegion, worldRegions } = this.props;
+    const { selectedWorldRegionId, worldRegions } = this.props;
 
     return (
-      <div>
+      <div className={styles['regions-list']}>
         {[
           { id: 0, name: 'Global', color: 'black' },
           ...worldRegions,
@@ -39,11 +39,11 @@ class WorldRegionSelector extends React.Component<Props, void> {
             key={`world-region-selector-${id}`}
             style={{ color }}
             onClick={this.generateClickCallback(id)}
-            className={classNames(styles.button, {
-              [styles.selected]: selectedWorldRegion === id,
+            className={classNames(styles.region, {
+              [styles.selected]: selectedWorldRegionId === id,
             })}
           >
-            {`${name} `}
+            <span className={styles['region-name']}>{name}</span>{' '}
           </a>,
         )}
       </div>
@@ -52,7 +52,7 @@ class WorldRegionSelector extends React.Component<Props, void> {
 }
 
 const mapStateToProps = (state: StateTree): StateProps => ({
-  selectedWorldRegion: getSelectedWorldRegion(state),
+  selectedWorldRegionId: getSelectedWorldRegionId(state),
   worldRegions: getWorldRegionData(state),
 });
 
