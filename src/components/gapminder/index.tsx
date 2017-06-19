@@ -16,7 +16,6 @@ import {
 import { getDataTypeColors } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
-import Spinner from '../generic/spinner';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
@@ -59,7 +58,7 @@ function GapminderWrapper({
   shortageThresholds,
 }: Props) {
   if (!waterToWorldRegionMap || !data) {
-    return <Spinner />;
+    return null;
   }
 
   function shouldFadeOut(d: { id: string }) {
@@ -134,4 +133,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
   mapStateToProps,
   mapDispatchToProps,
-)(GapminderWrapper);
+)(GapminderWrapper as any);
+// For some reason the typings don't allow for a function that can return null
+// even though it's allowed.
