@@ -44,8 +44,7 @@ import {
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
 
-// From https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-50m.json
-const world = require('../../../data/world-50m.json');
+const worldData = require('world-atlas/world/110m.json');
 
 const styles = require('./index.scss');
 
@@ -202,7 +201,7 @@ class Map extends React.Component<Props, void> {
     // Countries land mass
     svg
       .select(`path.${styles.land}`)
-      .datum(feature(world, world.objects.land))
+      .datum(feature(worldData, worldData.objects.land))
       .attr('d', path);
 
     // Water regions
