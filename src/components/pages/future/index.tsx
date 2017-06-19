@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
-import withPageData from '../data-loader';
+import withPageData from '../with-page-data';
 
 import DataSelector from '../../data-selector';
 import Spinner from '../../generic/spinner';
