@@ -3,7 +3,15 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setSelectedDataType } from '../../../actions/index';
-import { DataType } from '../../../types';
+import { WaterRegionGeoJSON } from '../../../data/types';
+import { StateTree } from '../../../reducers';
+import {
+  getSelectedStressShortageData,
+  getWaterRegionData,
+} from '../../../selectors';
+import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
+
+import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
@@ -14,7 +22,12 @@ interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
 }
 
-type Props = GeneratedDispatchProps;
+interface GeneratedStateProps {
+  selectedWaterData?: TimeAggregate<StressShortageDatum>;
+  waterRegions?: WaterRegionGeoJSON;
+}
+
+type Props = GeneratedDispatchProps & GeneratedStateProps;
 
 class ShortageBody extends React.Component<Props, void> {
   public componentDidMount() {
@@ -22,6 +35,8 @@ class ShortageBody extends React.Component<Props, void> {
   }
 
   public render() {
+    const { selectedWaterData, waterRegions } = this.props;
+
     return (
       <div>
         <div className="row">
@@ -30,26 +45,41 @@ class ShortageBody extends React.Component<Props, void> {
             <p><em>Placeholder for information about water shortage</em></p>
           </div>
         </div>
-        <div className="row middle-xs">
-          <div className="col-xs-12 col-md-8">
-            <TimeSelector />
-          </div>
-          <div className="col-xs-12 col-md-4">
-            <ThresholdSelector dataType="shortage" />
-          </div>
-        </div>
-        <div className="row middle-xs">
-          <div className="col-xs-12">
-            <Map width={1200} />
-            <WorldRegionSelector />
-          </div>
-        </div>
-        <div className="row">
-          <SelectedRegionInformation dataType="shortage" />
-        </div>
+        {!selectedWaterData || !waterRegions
+          ? <Spinner />
+          : <div>
+              <div className="row middle-xs">
+                <div className="col-xs-12 col-md-8">
+                  <TimeSelector />
+                </div>
+                <div className="col-xs-12 col-md-4">
+                  <ThresholdSelector dataType="shortage" />
+                </div>
+              </div>
+              <div className="row middle-xs">
+                <div className="col-xs-12">
+                  <Map
+                    width={1200}
+                    selectedData={selectedWaterData}
+                    waterRegions={waterRegions}
+                  />
+                  <WorldRegionSelector />
+                </div>
+              </div>
+              <div className="row">
+                <SelectedRegionInformation dataType="shortage" />
+              </div>
+            </div>}
       </div>
     );
   }
+}
+
+function mapStateToProps(state: StateTree): GeneratedStateProps {
+  return {
+    selectedWaterData: getSelectedStressShortageData(state),
+    waterRegions: getWaterRegionData(state),
+  };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
@@ -60,7 +90,7 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<{}, GeneratedDispatchProps, undefined>(
-  () => ({}),
+export default connect<GeneratedStateProps, GeneratedDispatchProps, undefined>(
+  mapStateToProps,
   mapDispatchToProps,
 )(ShortageBody);

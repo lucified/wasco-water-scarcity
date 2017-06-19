@@ -11,10 +11,9 @@ import {
   WorldRegionGeoJSON,
 } from './types';
 
-export function getStressShortageData(): Array<
-  TimeAggregate<StressShortageDatum>
-> {
-  const rawData: RawRegionStressShortageDatum[] = require('../../data/FPU_decadal_bluewater.json');
+function generateStressShortageData(
+  rawData: RawRegionStressShortageDatum[],
+): Array<TimeAggregate<StressShortageDatum>> {
   const yearlyGroupedData = values(
     groupBy(rawData, ({ startYear }) => startYear),
   ).sort((a, b) => a[0].startYear - b[0].startYear);
@@ -26,8 +25,20 @@ export function getStressShortageData(): Array<
   }));
 }
 
-export function getWorldRegionsData(): WorldRegion[] {
-  const geoJSON: WorldRegionGeoJSON = require('../../data/worldRegion.json');
+export async function fetchStressShortageData(
+  filename: string,
+): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
+  try {
+    const result = await fetch(filename);
+    const parsedData: RawRegionStressShortageDatum[] = await result.json();
+    return generateStressShortageData(parsedData);
+  } catch (error) {
+    console.error('Unable to fetch water data', filename, error);
+    return undefined;
+  }
+}
+
+function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   const regionIDs = geoJSON.features.map(r => r.properties.featureId);
   // Note: we only have 20 unique colors
   const colorScale = scaleOrdinal<number, string>()
@@ -40,6 +51,19 @@ export function getWorldRegionsData(): WorldRegion[] {
     color: colorScale(region.properties.featureId),
     feature: region,
   }));
+}
+
+export async function fetchWorldRegionsData(
+  filename: string,
+): Promise<WorldRegion[] | undefined> {
+  try {
+    const result = await fetch(filename);
+    const parsedData: WorldRegionGeoJSON = await result.json();
+    return generateWorldRegionsData(parsedData);
+  } catch (error) {
+    console.error('Unable to fetch world regions data', filename, error);
+    return undefined;
+  }
 }
 
 export const defaultDataTypeThresholds = {
@@ -64,10 +88,6 @@ export const defaultDataTypeThresholdMaxValues = {
   scarcity: 2,
 };
 
-export function getWaterRegionsData(): WaterRegionGeoJSON {
-  return require('../../data/FPU.json');
-}
-
 export function generateWaterToWorldRegionsMap(
   waterRegionsData: WaterRegionGeoJSON,
 ) {
@@ -76,4 +96,16 @@ export function generateWaterToWorldRegionsMap(
     map[feature.properties.featureId] = feature.properties.worldRegionID;
   });
   return map;
+}
+
+export async function fetchWaterRegionsData(
+  filename: string,
+): Promise<WaterRegionGeoJSON | undefined> {
+  try {
+    const result = await fetch(filename);
+    return (await result.json()) as WaterRegionGeoJSON;
+  } catch (error) {
+    console.error('Unable to fetch water regions data', filename, error);
+    return undefined;
+  }
 }

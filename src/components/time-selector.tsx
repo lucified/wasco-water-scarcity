@@ -23,9 +23,9 @@ import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 interface GeneratedStateProps {
   selectedIndex: number;
   currentIndexLabel: string;
-  data: AggregateStressShortageDatum[];
+  data?: AggregateStressShortageDatum[];
   dataType: DataType;
-  selectedWorldRegion: WorldRegion | undefined;
+  selectedWorldRegion?: WorldRegion;
 }
 
 interface GeneratedDispatchProps {
@@ -128,6 +128,10 @@ function TimeSelector({
   selectedWorldRegion,
   setSelectedTime,
 }: Props) {
+  if (!data) {
+    return null;
+  }
+
   // TODO: don't regenerate on each render
   const barChartData: BarChartDatum[] = data.map((d, i) => ({
     key: i,
@@ -141,7 +145,7 @@ function TimeSelector({
 
   function xTickFormatter(i: string) {
     const index = Number(i);
-    return `${data[index].startYear}-${data[index].endYear}`;
+    return `${data![index].startYear}-${data![index].endYear}`;
   }
 
   return (
@@ -168,10 +172,12 @@ function TimeSelector({
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   const data = getTimeSeriesForSelectedGlobalRegion(state);
   const selectedIndex = getSelectedTimeIndex(state);
-  const currentSelectedData = data[selectedIndex];
-  const label = currentSelectedData.startYear !== currentSelectedData.endYear
-    ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
-    : String(currentSelectedData.startYear);
+  const currentSelectedData = data && data[selectedIndex];
+  const label = currentSelectedData
+    ? currentSelectedData.startYear !== currentSelectedData.endYear
+      ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
+      : String(currentSelectedData.startYear)
+    : '';
 
   return {
     selectedIndex,
