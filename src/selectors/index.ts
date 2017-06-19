@@ -13,14 +13,15 @@ import {
 
 export function getStressShortageData(
   state: StateTree,
-): Array<TimeAggregate<StressShortageDatum>> {
-  return state.stressShortageData;
+): Array<TimeAggregate<StressShortageDatum>> | undefined {
+  return state.data.stressShortageData;
 }
 
 export function getSelectedStressShortageData(
   state: StateTree,
-): TimeAggregate<StressShortageDatum> {
-  return getStressShortageData(state)[getSelectedTimeIndex(state)];
+): TimeAggregate<StressShortageDatum> | undefined {
+  const data = getStressShortageData(state);
+  return data && data[getSelectedTimeIndex(state)];
 }
 
 export const getAggregateData = createSelector(
@@ -58,6 +59,10 @@ export const getAggregateData = createSelector(
         blueWaterConsumptionManufacturing: 0,
         blueWaterConsumptionTotal: 0,
       };
+    }
+
+    if (!allData || !waterToWorldRegionMap) {
+      return undefined;
     }
 
     return allData.map(timeUnit => {
@@ -181,12 +186,12 @@ export function getSelectedWorldRegionId(state: StateTree): number {
 export const getSelectedWorldRegion = createSelector<
   StateTree,
   number,
-  WorldRegion[],
+  WorldRegion[] | undefined,
   WorldRegion | undefined
 >(
   getSelectedWorldRegionId,
   getWorldRegionData,
-  (id, regions) => regions.find(r => r.id === id),
+  (id, regions) => regions && regions.find(r => r.id === id),
 );
 
 export function getSelectedDataType(state: StateTree): DataType {
@@ -197,7 +202,7 @@ export const getTimeSeriesForSelectedWaterRegion = createSelector(
   getSelectedWaterRegionId,
   getStressShortageData,
   (selectedRegion, data) => {
-    if (selectedRegion === undefined) {
+    if (!data || selectedRegion === undefined) {
       return undefined;
     }
 
@@ -209,20 +214,22 @@ export const getTimeSeriesForSelectedGlobalRegion = createSelector(
   getSelectedWorldRegionId,
   getAggregateData,
   (selectedRegion, data) => {
-    return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
+    return (
+      data && data.map(timeAggregate => timeAggregate.data[selectedRegion])
+    );
   },
 );
 
 export function getWaterRegionData(state: StateTree) {
-  return state.waterRegions;
+  return state.data.waterRegions;
 }
 
 export function getWorldRegionData(state: StateTree) {
-  return state.worldRegions;
+  return state.data.worldRegions;
 }
 
 export function getWaterToWorldRegionMap(state: StateTree) {
-  return state.waterToWorldRegionsMap;
+  return state.data.waterToWorldRegionsMap;
 }
 
 function getThresholds(state: StateTree) {
@@ -240,6 +247,10 @@ export const getDataByRegion = createSelector(
   getWorldRegionData,
   getWaterRegionData,
   (stressShortageData, worldRegions, waterRegions) => {
+    if (!stressShortageData || !worldRegions || !waterRegions) {
+      return undefined;
+    }
+
     const timeRanges = stressShortageData.map(
       d =>
         [new Date(d.startYear, 0, 1), new Date(d.endYear, 11, 31)] as [

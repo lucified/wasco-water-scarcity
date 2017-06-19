@@ -1,4 +1,10 @@
-import { DataType } from '../types';
+import { WaterRegionGeoJSON } from '../data/types';
+import {
+  DataType,
+  StressShortageDatum,
+  TimeAggregate,
+  WorldRegion,
+} from '../types';
 
 export const SET_TIME_INDEX = 'SET_TIME_INDEX';
 export interface SetTimeIndexAction {
@@ -37,10 +43,39 @@ export interface SetThresholdsForDataTypeAction {
   thresholds: number[];
 }
 
+export const STORE_WATER_DATA = 'STORE_WATER_DATA';
+export interface StoreWaterDataAction {
+  type: 'STORE_WATER_DATA';
+  data: Array<TimeAggregate<StressShortageDatum>>;
+}
+
+export const STORE_WATER_REGION_DATA = 'STORE_WATER_REGION_DATA';
+export interface StoreWaterRegionDataAction {
+  type: 'STORE_WATER_REGION_DATA';
+  data: WaterRegionGeoJSON;
+}
+
+export const STORE_WORLD_REGION_DATA = 'STORE_WORLD_REGION_DATA';
+export interface StoreWorldRegionDataAction {
+  type: 'STORE_WORLD_REGION_DATA';
+  data: WorldRegion[];
+}
+
+export const STORE_WATER_TO_WORLD_REGION_MAP =
+  'STORE_WATER_TO_WORLD_REGION_MAP';
+export interface StoreWaterToWorldRegionMapAction {
+  type: 'STORE_WATER_TO_WORLD_REGION_MAP';
+  map: { [waterRegionId: number]: number };
+}
+
 export type Action =
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | StoreWaterDataAction
+  | StoreWaterRegionDataAction
+  | StoreWorldRegionDataAction
+  | StoreWaterToWorldRegionMapAction
   | ToggleSelectedRegionAction;

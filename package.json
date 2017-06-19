@@ -84,8 +84,10 @@
     "react-router-redux": "next",
     "react-slider": "^0.8.0",
     "redux": "^3.7.0",
+    "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
-    "topojson": "^3.0.0"
+    "topojson": "^3.0.0",
+    "world-atlas": "^1.1.4"
   },
   "scripts": {
     "start": "webpack-dev-server --config=webpack.config.dev.js --port 3000 --host 0.0.0.0 --progress --colors",

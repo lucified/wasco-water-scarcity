@@ -16,13 +16,14 @@ import {
 import { getDataTypeColors } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
+import Spinner from '../generic/spinner';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  waterToWorldRegionMap: { [waterRegionId: number]: number };
+  waterToWorldRegionMap?: { [waterRegionId: number]: number };
   selectedRegion?: number;
   selectedWorldRegionId: number;
-  data: Data;
+  data?: Data;
   stressThresholds: number[];
   shortageThresholds: number[];
 }
@@ -57,10 +58,14 @@ function GapminderWrapper({
   stressThresholds,
   shortageThresholds,
 }: Props) {
+  if (!waterToWorldRegionMap || !data) {
+    return <Spinner />;
+  }
+
   function shouldFadeOut(d: { id: string }) {
     if (
       selectedWorldRegionId === 0 ||
-      waterToWorldRegionMap[Number(d.id)] === selectedWorldRegionId
+      waterToWorldRegionMap![Number(d.id)] === selectedWorldRegionId
     ) {
       return false;
     }

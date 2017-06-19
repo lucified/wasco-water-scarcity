@@ -9,27 +9,20 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  STORE_WATER_DATA,
+  STORE_WATER_REGION_DATA,
+  STORE_WATER_TO_WORLD_REGION_MAP,
+  STORE_WORLD_REGION_DATA,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
-import {
-  defaultDataTypeThresholds,
-  generateWaterToWorldRegionsMap,
-  getStressShortageData,
-  getWaterRegionsData,
-  getWorldRegionsData,
-} from '../data';
+import { defaultDataTypeThresholds } from '../data';
 import { WaterRegionGeoJSON } from '../data/types';
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import { StateTree } from './types';
 
-const waterRegions: WaterRegionGeoJSON = getWaterRegionsData();
-
 const defaultState: StateTree = {
   routing: {} as any,
-  stressShortageData: getStressShortageData(),
-  worldRegions: getWorldRegionsData(),
-  waterRegions,
-  waterToWorldRegionsMap: generateWaterToWorldRegionsMap(waterRegions),
+  data: {},
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
@@ -44,31 +37,37 @@ const defaultState: StateTree = {
 
 export const initialState = defaultState;
 
-function stressShortageDataReducer(
-  state = initialState.stressShortageData,
-  _action: Action,
-): Array<TimeAggregate<StressShortageDatum>> {
-  return state;
-}
-
-function waterRegionsReducer(
-  state = initialState.waterRegions,
-  _action: Action,
-): WaterRegionGeoJSON {
-  return state;
-}
-
-function waterToWorldRegionsMapReducer(
-  state = initialState.waterToWorldRegionsMap,
-  _action: Action,
-): { [waterRegionId: number]: number } {
-  return state;
-}
-
-function worldRegionsReducer(
-  state = initialState.worldRegions,
-  _action: Action,
-): WorldRegion[] {
+function dataReducer(
+  state = initialState.data,
+  action: Action,
+): {
+  stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+  worldRegions?: WorldRegion[];
+  waterRegions?: WaterRegionGeoJSON;
+  waterToWorldRegionsMap?: { [waterId: number]: number };
+} {
+  switch (action.type) {
+    case STORE_WATER_DATA:
+      return {
+        ...state,
+        stressShortageData: action.data,
+      };
+    case STORE_WATER_REGION_DATA:
+      return {
+        ...state,
+        waterRegions: action.data,
+      };
+    case STORE_WORLD_REGION_DATA:
+      return {
+        ...state,
+        worldRegions: action.data,
+      };
+    case STORE_WATER_TO_WORLD_REGION_MAP:
+      return {
+        ...state,
+        waterToWorldRegionsMap: action.map,
+      };
+  }
   return state;
 }
 
@@ -149,10 +148,7 @@ export default combineReducers<StateTree>({
   routing: routerReducer,
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
-  stressShortageData: stressShortageDataReducer,
-  worldRegions: worldRegionsReducer,
-  waterRegions: waterRegionsReducer,
-  waterToWorldRegionsMap: waterToWorldRegionsMapReducer,
+  data: dataReducer,
 });
 
 export * from './types';

@@ -9,10 +9,12 @@ import {
 } from '../types';
 
 export interface StateTree {
-  stressShortageData: Array<TimeAggregate<StressShortageDatum>>;
-  worldRegions: WorldRegion[];
-  waterRegions: WaterRegionGeoJSON;
-  waterToWorldRegionsMap: { [waterId: number]: number };
+  data: {
+    stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+    worldRegions?: WorldRegion[];
+    waterRegions?: WaterRegionGeoJSON;
+    waterToWorldRegionsMap?: { [waterId: number]: number };
+  };
   routing: RouterState;
   thresholds: {
     stress: number[];

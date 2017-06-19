@@ -1,6 +1,7 @@
 import { History } from 'history';
 import { routerMiddleware } from 'react-router-redux';
 import { applyMiddleware, compose, createStore } from 'redux';
+import thunkMiddleware from 'redux-thunk';
 
 import rootReducer, { StateTree } from './reducers';
 
@@ -16,7 +17,7 @@ function configureStore(initialState: StateTree, history: History) {
   const store = createStore(
     rootReducer,
     initialState,
-    composeEnhancers(applyMiddleware(routerMiddlewareObject)),
+    composeEnhancers(applyMiddleware(routerMiddlewareObject, thunkMiddleware)),
   );
 
   if (module.hot) {

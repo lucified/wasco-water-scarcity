@@ -12,7 +12,7 @@ const styles = require('./index.scss');
 
 interface StateProps {
   selectedWorldRegionId: number;
-  worldRegions: WorldRegion[];
+  worldRegions?: WorldRegion[];
 }
 
 interface DispatchProps {
@@ -36,7 +36,7 @@ class WorldRegionSelector extends React.Component<Props, void> {
       <div className={styles['regions-list']}>
         {[
           { id: 0, name: 'Global', color: 'black' },
-          ...worldRegions,
+          ...(worldRegions || []),
         ].map(({ id, color, name }) =>
           <a
             key={`world-region-selector-${id}`}

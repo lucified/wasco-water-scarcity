@@ -39,7 +39,7 @@ interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegion?: WorldRegion;
   timeSeriesForSelectedWaterRegion?: StressShortageDatum[];
-  timeSeriesForSelectedWorldRegion: AggregateStressShortageDatum[];
+  timeSeriesForSelectedWorldRegion?: AggregateStressShortageDatum[];
   stressThresholds: number[];
   shortageThresholds: number[];
 }
@@ -178,7 +178,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
         <p className={styles.description}>Total availability (m³)</p>
         <AvailabilityChart
           data={
-            timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion
+            timeSeriesForSelectedWaterRegion ||
+            timeSeriesForSelectedWorldRegion!
           }
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
@@ -206,7 +207,8 @@ class SelectedRegionInformation extends React.Component<Props, void> {
         <p className={styles.description}>Consumption (m³)</p>
         <ConsumptionChart
           data={
-            timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion
+            timeSeriesForSelectedWaterRegion ||
+            timeSeriesForSelectedWorldRegion!
           }
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
@@ -235,6 +237,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
     } = this.props as PropsWithDefaults;
+
+    if (!timeSeriesForSelectedWorldRegion) {
+      return null;
+    }
 
     const maxConsumptionOrAvailability = max<
       Datum,
