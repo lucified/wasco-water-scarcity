@@ -29,7 +29,7 @@ export async function fetchStressShortageData(
   filename: string,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
   try {
-    const result = await fetch(filename);
+    const result = await fetch(filename, { credentials: 'include' });
     const parsedData: RawRegionStressShortageDatum[] = await result.json();
     return generateStressShortageData(parsedData);
   } catch (error) {
@@ -57,7 +57,7 @@ export async function fetchWorldRegionsData(
   filename: string,
 ): Promise<WorldRegion[] | undefined> {
   try {
-    const result = await fetch(filename);
+    const result = await fetch(filename, { credentials: 'include' });
     const parsedData: WorldRegionGeoJSON = await result.json();
     return generateWorldRegionsData(parsedData);
   } catch (error) {
@@ -102,7 +102,7 @@ export async function fetchWaterRegionsData(
   filename: string,
 ): Promise<WaterRegionGeoJSON | undefined> {
   try {
-    const result = await fetch(filename);
+    const result = await fetch(filename, { credentials: 'include' });
     return (await result.json()) as WaterRegionGeoJSON;
   } catch (error) {
     console.error('Unable to fetch water regions data', filename, error);
