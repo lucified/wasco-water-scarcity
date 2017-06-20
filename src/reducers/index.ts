@@ -103,16 +103,12 @@ function selectionsReducer(state = initialState.selections, action: Action) {
 
       return state;
     case STORE_WATER_DATA:
-      // When we load the data, set the selected time index to the latest one
-      // if we haven't changed the time index
-      if (state.timeIndex === 0) {
-        return {
-          ...state,
-          timeIndex: action.data.length - 1,
-        };
-      }
-
-      return state;
+      // When we load a new data set, set the selected time index to the latest
+      // time period
+      return {
+        ...state,
+        timeIndex: action.data.length - 1,
+      };
     case TOGGLE_SELECTED_REGION:
       if (state.region === action.id) {
         return {
