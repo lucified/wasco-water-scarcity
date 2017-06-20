@@ -58,8 +58,10 @@ class ModelSelector extends React.Component<Props, void> {
   public render() {
     return (
       <div className="col-xs-12 col-md-12 col-lg-12">
-        <h3 className={styles.title}>Try different models</h3>
-        <div className={classNames('row', styles.model)}>
+        <div className="row">
+          <h3 className={styles.title}>Water scarcity model</h3>
+        </div>
+        <div className={classNames('row between-xs', styles.model)}>
           <span className={styles.label}>Impact model:</span>
           <Select
             className={styles.select}
@@ -71,7 +73,7 @@ class ModelSelector extends React.Component<Props, void> {
             clearable={false}
           />
         </div>
-        <div className={classNames('row', styles.model)}>
+        <div className={classNames('row between-xs', styles.model)}>
           <span className={styles.label}>Climate model:</span>
           <Select
             className={styles.select}

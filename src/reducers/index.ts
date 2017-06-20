@@ -143,15 +143,6 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       }
 
       return state;
-    case SET_SELECTED_DATA_TYPE:
-      if (action.dataType !== state.dataType) {
-        return {
-          ...state,
-          dataType: action.dataType,
-        };
-      }
-
-      return state;
     case SET_SELECTED_IMPACT_MODEL:
       if (action.impactModel !== state.impactModel) {
         return {

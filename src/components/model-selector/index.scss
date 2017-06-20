@@ -1,12 +1,12 @@
 @import '../definitions.scss';
 
 .title {
-  margin: 0.5rem;
+  margin-top: 0;
 }
 
 .model {
   align-items: center;
-  margin: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .label {
@@ -15,4 +15,5 @@
 
 .select {
   flex-grow: 1;
+  max-width: 250px;
 }
