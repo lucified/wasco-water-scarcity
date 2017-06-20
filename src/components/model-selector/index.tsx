@@ -28,37 +28,34 @@ interface PassedProps {
   className?: string;
 }
 
-class ModelSelector extends React.Component<
-  StateProps & DispatchProps & PassedProps,
-  void
-> {
-  // prettier-ignore
+type Props = StateProps & DispatchProps & PassedProps;
+
+const impactModels = [
+  { value: 'impactmodel1', label: 'Impact Model 1' },
+  { value: 'impactmodel2', label: 'Impact Model 2' },
+];
+
+const climateModels = [
+  { value: 'climatemodel1', label: 'Climate Model 1' },
+  { value: 'climatemodel2', label: 'Climate Model 2' },
+];
+
+class ModelSelector extends React.Component<Props, void> {
   private handleImpactModelChange = (value: {
-    value: string,
-    label: string,
+    value: string;
+    label: string;
   }) => {
     this.props.onImpactModelChange(value.value);
-  }
+  };
 
-  // prettier-ignore
   private handleClimateModelChange = (value: {
-    value: string,
-    label: string,
+    value: string;
+    label: string;
   }) => {
     this.props.onClimateModelChange(value.value);
-  }
+  };
 
   public render() {
-    const impactModels = [
-      { value: 'impactmodel1', label: 'Impact Model 1' },
-      { value: 'impactmodel2', label: 'Impact Model 2' },
-    ];
-
-    const climateModels = [
-      { value: 'climatemodel1', label: 'Climate Model 1' },
-      { value: 'climatemodel2', label: 'Climate Model 2' },
-    ];
-
     return (
       <div className="col-xs-12 col-md-12 col-lg-12">
         <h3 className={styles.title}>Try different models</h3>
