@@ -322,6 +322,9 @@ class Gapminder extends React.Component<Props, void> {
       .attr('x', chartWidth)
       .call(this.setYearLabel);
 
+    const shouldFadeOut = selectedData
+      ? (d: ChartDatum) => d.id !== selectedData
+      : !!fadeOut && fadeOut;
     // prettier-ignore
     g
       .select('g#dots')
@@ -330,7 +333,7 @@ class Gapminder extends React.Component<Props, void> {
       .enter()
         .append<SVGCircleElement>('circle')
         .attr('class', styles.dot)
-        .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
+        .classed(styles['fade-out'], shouldFadeOut as any)
         .on('click', this.handleCircleClick)
         .call(this.drawCircle)
         .sort(this.circleOrder);
@@ -417,13 +420,13 @@ class Gapminder extends React.Component<Props, void> {
       | Selection<SVGCircleElement, ChartDatum, any, any>
       | Transition<SVGCircleElement, ChartDatum, any, any>,
   ) {
-    const { selectedTimeIndex, selectedData } = this.props;
+    const { selectedTimeIndex } = this.props;
     const { xScale, yScale, sizeScale } = this;
     circle
       .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
       .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
       .attr('r', d => sizeScale!(d.size[selectedTimeIndex]))
-      .attr('fill', d => (d.id === selectedData ? 'teal' : d.color));
+      .attr('fill', d => d.color);
   }
 
   private drawSelectedPath(
@@ -458,13 +461,16 @@ class Gapminder extends React.Component<Props, void> {
       'g#main-group',
     );
     const t = transition('gapminder').duration(100);
+    const shouldFadeOut = selectedData
+      ? (d: ChartDatum) => d.id !== selectedData
+      : !!fadeOut && fadeOut;
 
     // prettier-ignore
     g
       .selectAll<SVGCircleElement, ChartDatum>(`circle.${styles.dot}`)
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
-      .classed(styles['fade-out'], !!fadeOut && fadeOut as any)
+      .classed(styles['fade-out'], shouldFadeOut as any)
       .transition(t)
         .call(this.drawCircle as any);
 
