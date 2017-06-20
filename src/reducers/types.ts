@@ -24,6 +24,8 @@ export interface StateTree {
   selections: {
     timeIndex: number;
     dataType: DataType;
+    impactModel: string;
+    climateModel: string;
     worldRegion: number;
     region?: number;
   };

@@ -150,7 +150,7 @@ function TimeSelector({
 
   return (
     <div>
-      {getTitle(dataType, selectedWorldRegion)}
+      <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
       <BarChart
         data={barChartData}
         height={120}

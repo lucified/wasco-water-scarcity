@@ -198,6 +198,14 @@ export function getSelectedDataType(state: StateTree): DataType {
   return state.selections.dataType;
 }
 
+export function getSelectedImpactModel(state: StateTree): string {
+  return state.selections.impactModel;
+}
+
+export function getSelectedClimateModel(state: StateTree): string {
+  return state.selections.climateModel;
+}
+
 export const getTimeSeriesForSelectedWaterRegion = createSelector(
   getSelectedWaterRegionId,
   getStressShortageData,

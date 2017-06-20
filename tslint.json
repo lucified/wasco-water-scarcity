@@ -18,7 +18,8 @@
     "member-ordering": [false],
     "object-literal-key-quotes": [false],
     "arrow-parens": false,
-    "no-empty-interface": false
+    "no-empty-interface": false,
+    "semicolon": [true, "always", "ignore-bound-class-methods"]
   },
   "jsRules": {
     "arrow-parens": false,
