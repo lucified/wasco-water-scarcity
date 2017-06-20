@@ -72,3 +72,21 @@
   transform: translate(-50%);
   padding-left: 2px;
 }
+
+.reset {
+  position: relative;
+}
+
+.reset-link {
+  position: absolute;
+  right: 5px;
+  top: -5px;
+  cursor: pointer;
+  color: $color-dark-gray;
+  font-size: 14px;
+  font-weight: lighter;
+
+  &:hover {
+    color: $color-darker-gray;
+  }
+}
