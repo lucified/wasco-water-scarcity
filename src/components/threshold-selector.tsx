@@ -5,7 +5,10 @@ import * as ReactSlider from 'react-slider';
 import { Dispatch } from 'redux';
 
 import { setThresholdsForDataType } from '../actions';
-import { defaultDataTypeThresholdMaxValues } from '../data';
+import {
+  defaultDataTypeThresholdMaxValues,
+  defaultDataTypeThresholds,
+} from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
 
@@ -97,6 +100,17 @@ function ThresholdSelector({
             {formatter(d)}
           </span>,
         )}
+      </div>
+      <div className={styles.reset}>
+        <span
+          className={styles['reset-link']}
+          /* tslint:disable-next-line:jsx-no-lambda */
+          onClick={() => {
+            setThresholds(defaultDataTypeThresholds[dataType]);
+          }}
+        >
+          Reset
+        </span>
       </div>
     </div>
   );
