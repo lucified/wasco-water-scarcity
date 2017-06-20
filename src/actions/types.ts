@@ -36,6 +36,18 @@ export interface SetSelectedDataTypeAction {
   dataType: DataType;
 }
 
+export const SET_SELECTED_IMPACT_MODEL = 'SET_SELECTED_IMPACT_MODEL';
+export interface SetSelectedImpactModelAction {
+  type: 'SET_SELECTED_IMPACT_MODEL';
+  impactModel: string;
+}
+
+export const SET_SELECTED_CLIMATE_MODEL = 'SET_SELECTED_CLIMATE_MODEL';
+export interface SetSelectedClimateModelAction {
+  type: 'SET_SELECTED_CLIMATE_MODEL';
+  climateModel: string;
+}
+
 export const SET_THRESHOLDS_FOR_DATA_TYPE = 'SET_THRESHOLDS_FOR_DATA_TYPE';
 export interface SetThresholdsForDataTypeAction {
   type: 'SET_THRESHOLDS_FOR_DATA_TYPE';
@@ -69,6 +81,8 @@ export interface StoreWaterToWorldRegionMapAction {
 }
 
 export type Action =
+  | SetSelectedImpactModelAction
+  | SetSelectedClimateModelAction
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction

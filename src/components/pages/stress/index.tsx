@@ -6,6 +6,7 @@ import withPageData from '../with-page-data';
 
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
+import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
@@ -29,10 +30,20 @@ class StressBody extends React.Component<Props, void> {
 
     return (
       <div>
+        <h1>Water Stress</h1>
         <div className="row">
-          <div className="col-xs-12">
-            <h1>Water Stress</h1>
-            <p><em>Placeholder for information about water stress</em></p>
+          <div className="col-xs-12 col-md-6 col-lg-8">
+            <p>
+              <em>
+                Placeholder for information about water stress. Placeholder for
+                information about water stress. Placeholder for information
+                about water stress. Placeholder for information about water
+                stress.
+              </em>
+            </p>
+          </div>
+          <div className="col-xs-12 col-md-6 col-lg-4">
+            <ModelSelector />
           </div>
         </div>
         {!selectedWaterData || !waterRegions

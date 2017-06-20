@@ -14,12 +14,16 @@ import {
   WorldRegion,
 } from '../types';
 import {
+  SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
+  SetSelectedImpactModelAction,
   SetSelectedRegionAction,
   SetSelectedWorldRegionAction,
   SetThresholdsForDataTypeAction,
@@ -72,6 +76,24 @@ export function setSelectedDataType(
   return {
     type: SET_SELECTED_DATA_TYPE,
     dataType,
+  };
+}
+
+export function setSelectedImpactModel(
+  impactModel: string,
+): SetSelectedImpactModelAction {
+  return {
+    type: SET_SELECTED_IMPACT_MODEL,
+    impactModel,
+  };
+}
+
+export function setSelectedClimateModel(
+  climateModel: string,
+): SetSelectedClimateModelAction {
+  return {
+    type: SET_SELECTED_CLIMATE_MODEL,
+    climateModel,
   };
 }
 

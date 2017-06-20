@@ -1,0 +1,18 @@
+@import '../definitions.scss';
+
+.title {
+  margin: 0.5rem;
+}
+
+.model {
+  align-items: center;
+  margin: 0.5rem;
+}
+
+.label {
+  margin-right: 0.5rem;
+}
+
+.select {
+  flex-grow: 1;
+}

@@ -4,7 +4,9 @@ import { combineReducers } from 'redux';
 
 import {
   Action,
+  SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
@@ -30,6 +32,8 @@ const defaultState: StateTree = {
   },
   selections: {
     timeIndex: 0,
+    impactModel: 'impactmodel1',
+    climateModel: 'climatemodel1',
     dataType: 'stress',
     worldRegion: 0, // 0 means global
   },
@@ -135,6 +139,33 @@ function selectionsReducer(state = initialState.selections, action: Action) {
         return {
           ...state,
           dataType: action.dataType,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_DATA_TYPE:
+      if (action.dataType !== state.dataType) {
+        return {
+          ...state,
+          dataType: action.dataType,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_IMPACT_MODEL:
+      if (action.impactModel !== state.impactModel) {
+        return {
+          ...state,
+          impactModel: action.impactModel,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_CLIMATE_MODEL:
+      if (action.climateModel !== state.climateModel) {
+        return {
+          ...state,
+          climateModel: action.climateModel,
         };
       }
 
