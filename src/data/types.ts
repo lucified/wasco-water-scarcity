@@ -60,15 +60,15 @@ export interface RawDatum {
   // Total blue water consumption (km3/year)
   blueWaterConsumptionTotal: number;
   // Blue water consumption for irrigation (km3/year)
-  blueWaterConsumptionIrrigation: number;
+  blueWaterConsumptionIrrigation?: number;
   // Blue water consumption for households and small businesses (domestic )(km3/year)
-  blueWaterConsumptionDomestic: number;
+  blueWaterConsumptionDomestic?: number;
   // Blue water consumption for thermal electricity production (km3/year)
-  blueWaterConsumptionElectric: number;
+  blueWaterConsumptionElectric?: number;
   // Blue water consumption for livestock farming (km3/year)
-  blueWaterConsumptionLivestock: number;
+  blueWaterConsumptionLivestock?: number;
   // Blue water consumption for manufacturing industries (km3/year)
-  blueWaterConsumptionManufacturing: number;
+  blueWaterConsumptionManufacturing?: number;
 }
 
 export interface RawRegionStressShortageDatum extends RawDatum {
@@ -115,12 +115,13 @@ export function toStressShortageDatum({
   blueWaterShortage,
   population,
 }: RawRegionStressShortageDatum): StressShortageDatum {
+  const domestic = blueWaterConsumptionDomestic || 0;
+  const electric = blueWaterConsumptionElectric || 0;
+  const irrigation = blueWaterConsumptionIrrigation || 0;
+  const livestock = blueWaterConsumptionLivestock || 0;
+  const manufacturing = blueWaterConsumptionManufacturing || 0;
   const calculatedTotal =
-    (blueWaterConsumptionDomestic +
-      blueWaterConsumptionElectric +
-      blueWaterConsumptionIrrigation +
-      blueWaterConsumptionLivestock +
-      blueWaterConsumptionManufacturing) *
+    (domestic + electric + irrigation + livestock + manufacturing) *
     KM_3_TO_M_3_RATIO;
 
   return {
@@ -128,16 +129,11 @@ export function toStressShortageDatum({
     endYear,
     featureId,
     blueWaterAvailability,
-    blueWaterConsumptionDomestic:
-      blueWaterConsumptionDomestic * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionElectric:
-      blueWaterConsumptionElectric * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionIrrigation:
-      blueWaterConsumptionIrrigation * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionLivestock:
-      blueWaterConsumptionLivestock * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionManufacturing:
-      blueWaterConsumptionManufacturing * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionDomestic: domestic * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionElectric: electric * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionIrrigation: irrigation * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionLivestock: livestock * KM_3_TO_M_3_RATIO,
+    blueWaterConsumptionManufacturing: manufacturing * KM_3_TO_M_3_RATIO,
     blueWaterConsumptionTotal: calculatedTotal,
     blueWaterStress,
     blueWaterShortage,
