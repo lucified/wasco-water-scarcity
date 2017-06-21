@@ -137,6 +137,7 @@
         "climateModel": "watch",
         "climateExperiment": "hist",
         "socialForcing": "pressoc",
+        "co2Forcing": "NA",
         "startYear": "1901",
         "endYear": "2010",
         "filename": "FPU_decadal_bluewater.json"
