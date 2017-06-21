@@ -1,0 +1,38 @@
+// Based on reselect's memoize function:
+// https://github.com/reactjs/reselect/blob/master/src/index.js#L5-L20
+
+function defaultEqualityCheck(oldArgs: any[], newArgs: any[]) {
+  return newArgs.every((val: any, index: number) => val === oldArgs[index]);
+}
+
+type EqualityChecker = (oldArgs: any[], newArgs: any[]) => boolean;
+type Memoizer = <TFunc extends (...args: any[]) => any>(
+  func: TFunc,
+  equalityCheck?: EqualityChecker,
+) => TFunc;
+
+/**
+ * A memoizer with a cache size of 1.
+ * By default, the equality checks for object equality using ===.
+ */
+const memoize: Memoizer = <TFunc extends (...args: any[]) => any>(
+  func: TFunc,
+  equalityCheck = defaultEqualityCheck,
+) => {
+  let lastArgs: any[] | null = null;
+  let lastResult: any = null;
+
+  return (...args: any[]) => {
+    if (
+      lastArgs === null ||
+      lastArgs.length !== args.length ||
+      !equalityCheck(lastArgs, args)
+    ) {
+      lastResult = func(...args);
+    }
+    lastArgs = args;
+    return lastResult;
+  };
+};
+
+export default memoize;
