@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setTimeIndex } from '../actions';
+import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
   getSelectedDataType,
@@ -121,52 +122,57 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
 
 const yTickFormatter = format('.2s');
 
-function TimeSelector({
-  data,
-  dataType,
-  selectedIndex,
-  selectedWorldRegion,
-  setSelectedTime,
-}: Props) {
-  if (!data) {
-    return null;
-  }
-
-  // TODO: don't regenerate on each render
-  const barChartData: BarChartDatum[] = data.map((d, i) => ({
-    key: i,
-    total: d.population,
-    values: getValues(dataType, d),
-  }));
-
-  function handleHover(item: BarChartDatum) {
-    setSelectedTime(item.key);
-  }
-
-  function xTickFormatter(i: string) {
-    const index = Number(i);
-    return `${data![index].startYear}-${data![index].endYear}`;
-  }
-
-  return (
-    <div>
-      <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
-      <BarChart
-        data={barChartData}
-        height={120}
-        marginBottom={20}
-        marginRight={0}
-        marginTop={5}
-        marginLeft={40}
-        yTickFormat={yTickFormatter}
-        xTickFormat={xTickFormatter}
-        selectedIndex={selectedIndex}
-        onMouseEnter={handleHover}
-        hideSelectedLabel
-        transitionDuration={100}
-      />
-    </div>
+class TimeSelector extends React.PureComponent<Props, void> {
+  private generateBarChartData = memoize(
+    (data: AggregateStressShortageDatum[], dataType: DataType) =>
+      data.map((d, i) => ({
+        key: i,
+        total: d.population,
+        values: getValues(dataType, d),
+      })),
   );
+
+  public render() {
+    const {
+      data,
+      dataType,
+      selectedIndex,
+      selectedWorldRegion,
+      setSelectedTime,
+    } = this.props;
+    if (!data) {
+      return null;
+    }
+
+    function handleHover(item: BarChartDatum) {
+      setSelectedTime(item.key);
+    }
+
+    function xTickFormatter(i: string) {
+      const index = Number(i);
+      return `${data![index].startYear}-${data![index].endYear}`;
+    }
+
+    return (
+      <div>
+        <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
+        <BarChart
+          data={this.generateBarChartData(data, dataType)}
+          height={120}
+          marginBottom={20}
+          marginRight={0}
+          marginTop={5}
+          marginLeft={40}
+          yTickFormat={yTickFormatter}
+          xTickFormat={xTickFormatter}
+          selectedIndex={selectedIndex}
+          onMouseEnter={handleHover}
+          hideSelectedLabel
+          transitionDuration={100}
+        />
+      </div>
+    );
+  }
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {

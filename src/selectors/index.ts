@@ -206,6 +206,10 @@ export function getSelectedClimateModel(state: StateTree): string {
   return state.selections.climateModel;
 }
 
+export function getSelectedTimeScale(state: StateTree): string {
+  return state.selections.timeScale;
+}
+
 export const getTimeSeriesForSelectedWaterRegion = createSelector(
   getSelectedWaterRegionId,
   getStressShortageData,

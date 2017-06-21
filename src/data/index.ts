@@ -2,8 +2,10 @@ import { scaleOrdinal, schemeCategory20 } from 'd3-scale';
 import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
+import uniq = require('lodash/uniq');
 
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import datasets from './datasets';
 import {
   RawRegionStressShortageDatum,
   toStressShortageDatum,
@@ -26,8 +28,23 @@ function generateStressShortageData(
 }
 
 export async function fetchStressShortageData(
-  filename: string,
+  climateModel: string,
+  impactModel: string,
+  timeScale: string,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
+  const dataset = datasets.find(
+    d =>
+      d.impactModel === impactModel &&
+      d.climateModel === climateModel &&
+      d.timeScale === timeScale &&
+      ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+  );
+  if (!dataset) {
+    console.error('Unable to find dataset for', climateModel, impactModel);
+    return undefined;
+  }
+  const { filename } = dataset;
+
   try {
     const result = await fetch(filename, { credentials: 'include' });
     const parsedData: RawRegionStressShortageDatum[] = await result.json();
@@ -36,6 +53,18 @@ export async function fetchStressShortageData(
     console.error('Unable to fetch water data', filename, error);
     return undefined;
   }
+}
+
+export function getClimateModels() {
+  return uniq(datasets.map(d => d.climateModel)).sort();
+}
+
+export function getImpactModels() {
+  return uniq(datasets.map(d => d.impactModel)).sort();
+}
+
+export function getTimeScales() {
+  return uniq(datasets.map(d => d.timeScale)).sort();
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
@@ -53,9 +82,10 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   }));
 }
 
-export async function fetchWorldRegionsData(
-  filename: string,
-): Promise<WorldRegion[] | undefined> {
+export async function fetchWorldRegionsData(): Promise<
+  WorldRegion[] | undefined
+> {
+  const filename = require('!!file-loader!../../data/worldRegion.json');
   try {
     const result = await fetch(filename, { credentials: 'include' });
     const parsedData: WorldRegionGeoJSON = await result.json();
@@ -98,9 +128,10 @@ export function generateWaterToWorldRegionsMap(
   return map;
 }
 
-export async function fetchWaterRegionsData(
-  filename: string,
-): Promise<WaterRegionGeoJSON | undefined> {
+export async function fetchWaterRegionsData(): Promise<
+  WaterRegionGeoJSON | undefined
+> {
+  const filename = require('!!file-loader!../../data/FPU.json');
   try {
     const result = await fetch(filename, { credentials: 'include' });
     return (await result.json()) as WaterRegionGeoJSON;

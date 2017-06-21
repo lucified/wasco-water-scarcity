@@ -6,6 +6,7 @@ import * as React from 'react';
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 import Legend, { LegendItem } from '../generic/legend';
 
+import memoize from '../../memoize';
 import { Datum } from '../../types';
 
 interface PassedProps {
@@ -64,6 +65,25 @@ class ConsumptionChart extends React.Component<Props, State> {
     this.xTickFormatter = this.xTickFormatter.bind(this);
   }
 
+  private generateBarChartData = memoize(
+    (data: Datum[], hoveredType?: keyof Datum) =>
+      data.map((d, i) => ({
+        key: i,
+        total: d.blueWaterConsumptionTotal,
+        values: legendItems
+          // Filter out fields with zero and if we're hovered, only the hovered type
+          .filter(
+            ({ field }) =>
+              d[field] > 0 && hoveredType ? field === hoveredType : true,
+          )
+          .map(({ title, field, color }) => ({
+            key: title,
+            total: d[field],
+            color,
+          })),
+      })),
+  );
+
   private handleLegendHover(title?: string) {
     if (!title) {
       this.setState({ hoveredType: undefined });
@@ -95,28 +115,10 @@ class ConsumptionChart extends React.Component<Props, State> {
     const { hoveredType } = this.state;
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
-    const barChartData: BarChartDatum[] = data.map((d, i) => {
-      return {
-        key: i,
-        total: d.blueWaterConsumptionTotal,
-        values: legendItems
-          // Filter out fields with zero and if we're hovered, only the hovered type
-          .filter(
-            ({ field }) =>
-              d[field] > 0 && hoveredType ? field === hoveredType : true,
-          )
-          .map(({ title, field, color }) => ({
-            key: title,
-            total: d[field],
-            color,
-          })),
-      };
-    });
-
     return (
       <div>
         <BarChart
-          data={barChartData}
+          data={this.generateBarChartData(data, hoveredType)}
           maxYValue={chartMaxValue}
           height={180}
           marginBottom={20}
