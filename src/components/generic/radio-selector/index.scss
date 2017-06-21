@@ -88,4 +88,25 @@
       }
     }
   }
+
+  &.disabled {
+    .button {
+      cursor: default;
+      color: $color-light-gray;
+
+      &.selected {
+        &:after {
+          background-color: $color-gray;
+        }
+
+        &:before {
+          border-color: $color-gray;
+        }
+      }
+
+      &:not(.selected):hover:after {
+        background-color: white;
+      }
+    }
+  }
 }

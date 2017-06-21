@@ -8,6 +8,7 @@ interface PassedProps {
   className?: string;
   onChange: (value: string) => void;
   selectedValue: string;
+  disabled?: boolean;
 }
 
 export default class RadioSelector extends React.Component<PassedProps, void> {
@@ -17,11 +18,16 @@ export default class RadioSelector extends React.Component<PassedProps, void> {
   }
 
   public render() {
-    const { selectedValue, values, className } = this.props;
+    const { selectedValue, values, disabled, className } = this.props;
 
     return (
       <div
-        className={classNames(styles['button-group'], styles.root, className)}
+        className={classNames(
+          styles['button-group'],
+          styles.root,
+          { [styles.disabled]: disabled },
+          className,
+        )}
       >
         {values.map(({ label, value }) =>
           <a

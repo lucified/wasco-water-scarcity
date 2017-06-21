@@ -81,14 +81,6 @@ class ModelSelector extends React.Component<Props, void> {
         <div className="row">
           <h3 className={styles.title}>Water scarcity model</h3>
         </div>
-        <div className="row between-xs">
-          <RadioSelector
-            className={styles['time-scale-selector']}
-            selectedValue={timeScale}
-            values={timeScaleOptions}
-            onChange={onTimeScaleChange}
-          />
-        </div>
         <div className={classNames('row', 'between-xs', styles.model)}>
           <span className={styles.label}>Impact model:</span>
           <Select
@@ -111,6 +103,15 @@ class ModelSelector extends React.Component<Props, void> {
             onChange={this.handleClimateModelChange}
             searchable={false}
             clearable={false}
+          />
+        </div>
+        <div className="row between-xs">
+          <RadioSelector
+            className={styles['time-scale-selector']}
+            selectedValue={timeScale}
+            values={timeScaleOptions}
+            onChange={onTimeScaleChange}
+            disabled={impactModel === 'watergap'}
           />
         </div>
       </div>
