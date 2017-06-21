@@ -10,6 +10,20 @@ export interface WorldRegionGeoJSONFeature {
   };
 }
 
+export interface Dataset {
+  spatialUnit: string;
+  timeScale: string;
+  dataType: string;
+  impactModel: string;
+  climateModel: string;
+  climateExperiment: string;
+  socialForcing: string;
+  co2Forcing: string;
+  startYear: string;
+  endYear: string;
+  filename: string;
+}
+
 export interface WorldRegionGeoJSON {
   type: 'FeatureCollection';
   features: WorldRegionGeoJSONFeature[];

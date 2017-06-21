@@ -2,8 +2,10 @@ import { scaleOrdinal, schemeCategory20 } from 'd3-scale';
 import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
+import uniq = require('lodash/uniq');
 
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import datasets from './datasets';
 import {
   RawRegionStressShortageDatum,
   toStressShortageDatum,
@@ -36,6 +38,14 @@ export async function fetchStressShortageData(
     console.error('Unable to fetch water data', filename, error);
     return undefined;
   }
+}
+
+export function getClimateModels() {
+  return uniq(datasets.map(d => d.climateModel));
+}
+
+export function getImpactModels() {
+  return uniq(datasets.map(d => d.impactModel));
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
