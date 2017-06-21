@@ -229,17 +229,19 @@ export default class BarChart extends React.Component<Props, {}> {
     const yScale = this.getYScale();
     const barWidth = xScale.bandwidth();
     return data.map(barData => {
-      const bars = barData.values.map(barSegmentData =>
-        <Bar
-          key={`${barData.key}-${barSegmentData.key}`}
-          width={barWidth}
-          y0={barSegmentData.y0!}
-          y1={barSegmentData.y1!}
-          scale={yScale}
-          fill={barSegmentData.color!}
-          transitionDuration={transitionDuration}
-        />,
-      );
+      const bars = barData.values
+        .filter(d => d.total > 0)
+        .map(barSegmentData =>
+          <Bar
+            key={`${barData.key}-${barSegmentData.key}`}
+            width={barWidth}
+            y0={barSegmentData.y0!}
+            y1={barSegmentData.y1!}
+            scale={yScale}
+            fill={barSegmentData.color!}
+            transitionDuration={transitionDuration}
+          />,
+        );
       return (
         <g
           key={barData.key}
