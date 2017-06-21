@@ -24,37 +24,39 @@ export default class Header extends React.Component<{}, void> {
         <div className={styles.navigation}>
           <div className="container">
             <div className="row">
-              <div className={styles['navigation-theme']}>
-                Water body:
+              <div className="col-xs-12">
+                <div className={styles['navigation-theme']}>
+                  Water body:
+                </div>
+                <NavLink
+                  to="/stress"
+                  activeClassName={styles.selected}
+                  className={styles['navigation-item']}
+                >
+                  Heavy water usage
+                </NavLink>
+                <NavLink
+                  to="/shortage"
+                  activeClassName={styles.selected}
+                  className={styles['navigation-item']}
+                >
+                  Meeting water needs
+                </NavLink>
+                <NavLink
+                  to="/scarcity"
+                  activeClassName={styles.selected}
+                  className={styles['navigation-item']}
+                >
+                  Water scarcity
+                </NavLink>
+                <NavLink
+                  to="/future"
+                  activeClassName={styles.selected}
+                  className={styles['navigation-item']}
+                >
+                  Future actions
+                </NavLink>
               </div>
-              <NavLink
-                to="/stress"
-                activeClassName={styles.selected}
-                className={styles['navigation-item']}
-              >
-                Heavy water usage
-              </NavLink>
-              <NavLink
-                to="/shortage"
-                activeClassName={styles.selected}
-                className={styles['navigation-item']}
-              >
-                Meeting water needs
-              </NavLink>
-              <NavLink
-                to="/scarcity"
-                activeClassName={styles.selected}
-                className={styles['navigation-item']}
-              >
-                Water scarcity
-              </NavLink>
-              <NavLink
-                to="/future"
-                activeClassName={styles.selected}
-                className={styles['navigation-item']}
-              >
-                Future actions
-              </NavLink>
             </div>
           </div>
         </div>

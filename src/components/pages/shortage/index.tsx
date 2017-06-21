@@ -4,6 +4,7 @@ import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
 import withPageData from '../with-page-data';
 
+import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
@@ -68,6 +69,9 @@ class ShortageBody extends React.Component<Props, void> {
                 <SelectedRegionInformation dataType="shortage" />
               </div>
             </div>}
+        <div className="row">
+          <CrossReferences fromPage="shortage" />
+        </div>
       </div>
     );
   }
