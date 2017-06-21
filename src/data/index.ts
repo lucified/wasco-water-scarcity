@@ -28,8 +28,22 @@ function generateStressShortageData(
 }
 
 export async function fetchStressShortageData(
-  filename: string,
+  climateModel: string,
+  impactModel: string,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
+  const dataset = datasets.find(
+    d =>
+      d.impactModel === impactModel &&
+      d.climateModel === climateModel &&
+      d.timeScale === 'decadal' &&
+      ['NA', 'co2'].indexOf(d.co2Forcing) > -1,
+  );
+  if (!dataset) {
+    console.error('Unable to find dataset for', climateModel, impactModel);
+    return undefined;
+  }
+  const { filename } = dataset;
+
   try {
     const result = await fetch(filename, { credentials: 'include' });
     const parsedData: RawRegionStressShortageDatum[] = await result.json();
@@ -41,11 +55,11 @@ export async function fetchStressShortageData(
 }
 
 export function getClimateModels() {
-  return uniq(datasets.map(d => d.climateModel));
+  return uniq(datasets.map(d => d.climateModel)).sort();
 }
 
 export function getImpactModels() {
-  return uniq(datasets.map(d => d.impactModel));
+  return uniq(datasets.map(d => d.impactModel)).sort();
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
@@ -63,9 +77,10 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   }));
 }
 
-export async function fetchWorldRegionsData(
-  filename: string,
-): Promise<WorldRegion[] | undefined> {
+export async function fetchWorldRegionsData(): Promise<
+  WorldRegion[] | undefined
+> {
+  const filename = require('!!file-loader!../../data/worldRegion.json');
   try {
     const result = await fetch(filename, { credentials: 'include' });
     const parsedData: WorldRegionGeoJSON = await result.json();
@@ -108,9 +123,10 @@ export function generateWaterToWorldRegionsMap(
   return map;
 }
 
-export async function fetchWaterRegionsData(
-  filename: string,
-): Promise<WaterRegionGeoJSON | undefined> {
+export async function fetchWaterRegionsData(): Promise<
+  WaterRegionGeoJSON | undefined
+> {
+  const filename = require('!!file-loader!../../data/FPU.json');
   try {
     const result = await fetch(filename, { credentials: 'include' });
     return (await result.json()) as WaterRegionGeoJSON;

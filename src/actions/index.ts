@@ -144,16 +144,25 @@ export function storeWaterToWorldRegionMap(map: {
   };
 }
 
-export function loadAppData() {
+export function loadModelData(climateModel: string, impactModel: string) {
+  return (dispatch: Dispatch<any>) => {
+    return fetchStressShortageData(
+      climateModel,
+      impactModel,
+    ).then(waterData => {
+      if (waterData) {
+        dispatch(storeWaterData(waterData));
+      }
+    });
+  };
+}
+
+export function loadAppData(climateModel: string, impactModel: string) {
   return (dispatch: Dispatch<any>) => {
     return Promise.all([
-      fetchStressShortageData(
-        require('!!file-loader!../../data/FPU_decadal_bluewater.json'),
-      ),
-      fetchWaterRegionsData(require('!!file-loader!../../data/FPU.json')),
-      fetchWorldRegionsData(
-        require('!!file-loader!../../data/worldRegion.json'),
-      ),
+      fetchStressShortageData(climateModel, impactModel),
+      fetchWaterRegionsData(),
+      fetchWorldRegionsData(),
     ]).then(([waterData, waterRegionData, worldRegionsData]) => {
       if (waterData) {
         dispatch(storeWaterData(waterData));

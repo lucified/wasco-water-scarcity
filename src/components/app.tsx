@@ -1,9 +1,10 @@
-// tslint:disable:jsx-no-lambda
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 
-import { loadAppData } from '../actions';
+import { loadAppData, loadModelData } from '../actions';
+import { StateTree } from '../reducers';
+import { getSelectedClimateModel, getSelectedImpactModel } from '../selectors';
 import Header from './header';
 import Future from './pages/future';
 import Scarcity from './pages/scarcity';
@@ -13,14 +14,46 @@ import Stress from './pages/stress';
 import * as styles from './app.scss';
 
 type PassedProps = RouteComponentProps<void>;
+
 interface GeneratedDispatchProps {
-  loadAppData: () => void;
+  loadAppData: (climateModel: string, impactModel: string) => void;
+  loadModelData: (climateModel: string, impactModel: string) => void;
 }
-type Props = PassedProps & GeneratedDispatchProps;
+
+interface GeneratedStateProps {
+  selectedImpactModel: string;
+  selectedClimateModel: string;
+}
+
+type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
 class App extends React.Component<Props, void> {
   public componentDidMount() {
-    this.props.loadAppData();
+    const {
+      loadAppData,
+      selectedClimateModel,
+      selectedImpactModel,
+    } = this.props;
+
+    loadAppData(selectedClimateModel, selectedImpactModel);
+  }
+
+  public componentWillReceiveProps(nextProps: Props) {
+    const {
+      selectedClimateModel,
+      selectedImpactModel,
+      loadModelData,
+    } = this.props;
+
+    if (
+      selectedClimateModel !== nextProps.selectedClimateModel ||
+      selectedImpactModel !== nextProps.selectedImpactModel
+    ) {
+      loadModelData(
+        nextProps.selectedClimateModel,
+        nextProps.selectedImpactModel,
+      );
+    }
   }
 
   public render() {
@@ -34,6 +67,7 @@ class App extends React.Component<Props, void> {
             <Route path="/shortage" component={Shortage} />
             <Route path="/scarcity" component={Scarcity} />
             <Route path="/future" component={Future} />
+            {/* tslint:disable-next-line:jsx-no-lambda */}
             <Route render={() => <Redirect to="/stress" />} />
           </Switch>
         </div>
@@ -42,6 +76,14 @@ class App extends React.Component<Props, void> {
   }
 }
 
-export default connect<{}, GeneratedDispatchProps, PassedProps>(() => ({}), {
-  loadAppData,
-})(App);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps
+>(
+  (state: StateTree) => ({
+    selectedClimateModel: getSelectedClimateModel(state),
+    selectedImpactModel: getSelectedImpactModel(state),
+  }),
+  { loadAppData, loadModelData },
+)(App);

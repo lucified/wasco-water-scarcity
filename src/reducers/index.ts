@@ -17,7 +17,11 @@ import {
   STORE_WORLD_REGION_DATA,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
-import { defaultDataTypeThresholds } from '../data';
+import {
+  defaultDataTypeThresholds,
+  getClimateModels,
+  getImpactModels,
+} from '../data';
 import { WaterRegionGeoJSON } from '../data/types';
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import { StateTree } from './types';
@@ -32,8 +36,8 @@ const defaultState: StateTree = {
   },
   selections: {
     timeIndex: 0,
-    impactModel: 'impactmodel1',
-    climateModel: 'climatemodel1',
+    impactModel: 'watergap',
+    climateModel: 'watch',
     dataType: 'stress',
     worldRegion: 0, // 0 means global
   },
@@ -152,8 +156,21 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       return state;
     case SET_SELECTED_IMPACT_MODEL:
       if (action.impactModel !== state.impactModel) {
+        let climateModel = state.climateModel;
+
+        if (action.impactModel === 'watergap') {
+          climateModel = 'watch';
+        } else {
+          // If watergap/watch was previously selected, we need to switch to a
+          // valid climateModel.
+          if (climateModel === 'watch') {
+            climateModel = getClimateModels().filter(m => m !== 'watch')[0];
+          }
+        }
+
         return {
           ...state,
+          climateModel,
           impactModel: action.impactModel,
         };
       }
@@ -161,8 +178,21 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       return state;
     case SET_SELECTED_CLIMATE_MODEL:
       if (action.climateModel !== state.climateModel) {
+        let impactModel = state.impactModel;
+
+        if (action.climateModel === 'watch') {
+          impactModel = 'watergap';
+        } else {
+          // If watergap/watch was previously selected, we need to switch to a
+          // valid impactModel.
+          if (impactModel === 'watergap') {
+            impactModel = getImpactModels().filter(m => m !== 'watergap')[0];
+          }
+        }
+
         return {
           ...state,
+          impactModel,
           climateModel: action.climateModel,
         };
       }
