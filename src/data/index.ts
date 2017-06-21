@@ -37,7 +37,7 @@ export async function fetchStressShortageData(
       d.impactModel === impactModel &&
       d.climateModel === climateModel &&
       d.timeScale === timeScale &&
-      ['NA', 'co2'].indexOf(d.co2Forcing) > -1,
+      ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
   );
   if (!dataset) {
     console.error('Unable to find dataset for', climateModel, impactModel);
