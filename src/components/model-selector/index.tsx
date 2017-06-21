@@ -4,13 +4,20 @@ import { connect } from 'react-redux';
 import * as Select from 'react-select';
 import { Dispatch } from 'redux';
 
-import { setSelectedClimateModel, setSelectedImpactModel } from '../../actions';
-import { getClimateModels, getImpactModels } from '../../data';
+import {
+  setSelectedClimateModel,
+  setSelectedImpactModel,
+  setSelectedTimeScale,
+} from '../../actions';
+import { getClimateModels, getImpactModels, getTimeScales } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedClimateModel,
   getSelectedImpactModel,
+  getSelectedTimeScale,
 } from '../../selectors';
+
+import RadioSelector from '../generic/radio-selector';
 
 import 'react-select/dist/react-select.css';
 import * as styles from './index.scss';
@@ -18,11 +25,13 @@ import * as styles from './index.scss';
 interface StateProps {
   impactModel: string;
   climateModel: string;
+  timeScale: string;
 }
 
 interface DispatchProps {
   onImpactModelChange: (value: string) => void;
   onClimateModelChange: (value: string) => void;
+  onTimeScaleChange: (value: string) => void;
 }
 
 interface PassedProps {
@@ -38,6 +47,10 @@ const impactModelOptions = getImpactModels().map(value => ({
 const climateModelOptions = getClimateModels().map(value => ({
   value,
   label: value,
+}));
+const timeScaleOptions = getTimeScales().map(value => ({
+  value,
+  label: value.charAt(0).toUpperCase() + value.slice(1),
 }));
 
 class ModelSelector extends React.Component<Props, void> {
@@ -56,12 +69,25 @@ class ModelSelector extends React.Component<Props, void> {
   };
 
   public render() {
-    const { impactModel, climateModel } = this.props;
+    const {
+      impactModel,
+      climateModel,
+      timeScale,
+      onTimeScaleChange,
+    } = this.props;
 
     return (
       <div className="col-xs-12 col-md-12 col-lg-12">
         <div className="row">
           <h3 className={styles.title}>Water scarcity model</h3>
+        </div>
+        <div className="row between-xs">
+          <RadioSelector
+            className={styles['time-scale-selector']}
+            selectedValue={timeScale}
+            values={timeScaleOptions}
+            onChange={onTimeScaleChange}
+          />
         </div>
         <div className={classNames('row', 'between-xs', styles.model)}>
           <span className={styles.label}>Impact model:</span>
@@ -95,6 +121,7 @@ class ModelSelector extends React.Component<Props, void> {
 const mapStateToProps = (state: StateTree): StateProps => ({
   impactModel: getSelectedImpactModel(state),
   climateModel: getSelectedClimateModel(state),
+  timeScale: getSelectedTimeScale(state),
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
@@ -103,6 +130,9 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   },
   onClimateModelChange: (value: string) => {
     dispatch(setSelectedClimateModel(value));
+  },
+  onTimeScaleChange: (value: string) => {
+    dispatch(setSelectedTimeScale(value));
   },
 });
 

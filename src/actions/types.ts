@@ -48,6 +48,12 @@ export interface SetSelectedClimateModelAction {
   climateModel: string;
 }
 
+export const SET_SELECTED_TIME_SCALE = 'SET_SELECTED_TIME_SCALE';
+export interface SetSelectedTimeScaleAction {
+  type: 'SET_SELECTED_TIME_SCALE';
+  timeScale: string;
+}
+
 export const SET_THRESHOLDS_FOR_DATA_TYPE = 'SET_THRESHOLDS_FOR_DATA_TYPE';
 export interface SetThresholdsForDataTypeAction {
   type: 'SET_THRESHOLDS_FOR_DATA_TYPE';
@@ -86,6 +92,7 @@ export type Action =
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
+  | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
   | StoreWaterDataAction

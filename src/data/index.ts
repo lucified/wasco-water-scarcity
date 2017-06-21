@@ -30,12 +30,13 @@ function generateStressShortageData(
 export async function fetchStressShortageData(
   climateModel: string,
   impactModel: string,
+  timeScale: string,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
   const dataset = datasets.find(
     d =>
       d.impactModel === impactModel &&
       d.climateModel === climateModel &&
-      d.timeScale === 'decadal' &&
+      d.timeScale === timeScale &&
       ['NA', 'co2'].indexOf(d.co2Forcing) > -1,
   );
   if (!dataset) {
@@ -60,6 +61,10 @@ export function getClimateModels() {
 
 export function getImpactModels() {
   return uniq(datasets.map(d => d.impactModel)).sort();
+}
+
+export function getTimeScales() {
+  return uniq(datasets.map(d => d.timeScale)).sort();
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {

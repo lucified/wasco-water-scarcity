@@ -1,4 +1,3 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -8,7 +7,7 @@ import { StateTree } from '../reducers';
 import { getSelectedDataType } from '../selectors';
 import { DataType } from '../types';
 
-const styles = require('./data-selector.scss');
+import RadioSelector from './generic/radio-selector';
 
 interface StateProps {
   dataType: DataType;
@@ -22,43 +21,34 @@ interface PassedProps {
   className?: string;
 }
 
-class DataTypeSelector extends React.Component<
-  StateProps & DispatchProps & PassedProps,
-  void
-> {
-  private generateCaseClickCallback(value: DataType) {
-    return (_e: React.MouseEvent<HTMLAnchorElement>) =>
-      this.props.onChange(value);
-  }
+const values = [
+  {
+    value: 'scarcity',
+    label: 'Scarcity',
+  },
+  {
+    value: 'stress',
+    label: 'Stress',
+  },
+  {
+    value: 'shortage',
+    label: 'Shortage',
+  },
+];
 
+type Props = StateProps & DispatchProps & PassedProps;
+
+class DataTypeSelector extends React.Component<Props, void> {
   public render() {
-    const caseSelection = this.props.dataType;
-    const dataTypes: Array<[DataType, string]> = [
-      ['scarcity', 'Scarcity'],
-      ['stress', 'Stress'],
-      ['shortage', 'Shortage'],
-    ];
+    const { className, dataType, onChange } = this.props;
 
     return (
-      <div
-        className={classNames(
-          this.props.className,
-          styles['button-group'],
-          styles.root,
-        )}
-      >
-        {dataTypes.map(([dataType, description]) =>
-          <a
-            key={`selector-${dataType}`}
-            onClick={this.generateCaseClickCallback(dataType)}
-            className={classNames(styles.button, {
-              [styles.selected]: caseSelection === dataType,
-            })}
-          >
-            {description}
-          </a>,
-        )}
-      </div>
+      <RadioSelector
+        onChange={onChange}
+        values={values}
+        selectedValue={dataType}
+        className={className}
+      />
     );
   }
 }

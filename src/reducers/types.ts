@@ -26,6 +26,7 @@ export interface StateTree {
     dataType: DataType;
     impactModel: string;
     climateModel: string;
+    timeScale: string;
     worldRegion: number;
     region?: number;
   };
