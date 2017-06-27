@@ -1,0 +1,134 @@
+{
+'shortage':[
+	{
+	  title: 'Explore the effect of uncertainty on shortage',
+	  url: '/shortage/uncertainty',
+	},
+	{
+	  title: 'Using green water to meet needs',
+	  url: '/green_water',
+	},	
+	{
+	  title: 'What can we do about water shortage?',
+	  url: '/future/shortage',
+	},
+	{
+	  title: 'Providing food security',
+	  url: '/food_security',
+	},	
+	{
+	  title: 'Providing drinking water',
+	  url: '/drinking_water',
+	},	
+	{
+	  title: 'Urban and household water supply',
+	  url: '/water_supply',
+	},	
+	{
+	   title: 'Stress: High resource use',
+	   url: '/stress',
+	},
+	{
+	   title: 'Stress+shortage: Efficiently meeting human needs',
+	   url: '/scarcity',
+	},
+	{
+	  title: 'Implications for transboundary basin relations',
+	  url: '/upstream_dependency/shortage',
+	},
+	{
+	  title: 'Implications for self-sufficiency and trade',
+	  url: '/virtual_water_dependency/shortage',
+	},
+	{
+	  title: 'Sustainability of water use',
+	  url: '/sustainability',
+	},
+],
+'stress':[
+	{
+	  title: 'Explore the effect of uncertainty on stress',
+	  url: '/stress/uncertainty',
+	},
+	{
+	  title: 'What can we do about water stress?',
+	  url: '/future/stress',
+	},
+	{
+	  title: 'Shortage: Meeting human needs',
+	  url: '/shortage',
+	},
+	{
+	  title: 'Stress+shortage: Efficiently meeting human needs',
+	  url: '/scarcity',
+	},
+	{
+	  title: 'Implications for transboundary basin relations',
+	  url: '/upstream_dependency/stress',
+	},
+	{
+	  title: 'Implications for self-sufficiency and trade',
+	  url: '/virtual_water_dependency/stress',
+	},
+	{
+	  title: 'Sustainability of water use',
+	  url: '/sustainability',
+	},
+	{
+	  title: 'Stress impacts on water levels',
+	  url: '/low_water',
+	},
+	{
+	  title: 'Stress impacts on navigation',
+	  url: '/navigation',
+	},	
+	{
+	  title: 'Meeting environmental water needs',
+	  url: '/environmental_flow',
+	},
+	{
+	  title: 'Stress impacts on access to water',
+	  url: '/access_to_water',
+	}
+],
+'scarcity':[
+	 {
+	   title: 'What can we do about water scarcity?',
+	   url: '/future/scarcity',
+	 },
+	 {
+	   title: 'Stress: High resource use',
+	   url: '/stress',
+	 },
+	 {
+	   title: 'Shortage: Meeting human needs',
+	   url: '/shortage',
+	 },
+	 {
+	   title: 'Water allocation',
+	   url: '/water_allocation',
+	 },
+	 {
+	   title: 'Water conflict',
+	   url: '/conflict',
+	 },	 
+	 {
+	   title: 'Water cooperation',
+	   url: '/cooperation',
+	 },
+ ],
+ future:[
+	 {
+	   title: 'Water availability',
+	   url: '/stress',
+	 },
+	 {
+	   title: 'Human water needs',
+	   url: '/shortage',
+	 },
+	 {
+	   title: 'Low availability + high demand = scarcity',
+	   url: '/scarcity',
+	 },
+ ]
+}
