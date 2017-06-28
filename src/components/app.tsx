@@ -83,12 +83,11 @@ class App extends React.Component<Props, void> {
         <div className="container">
           <Switch>
             {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={Stress} />
-            <Route path="/shortage" component={Shortage} />
-            <Route path="/scarcity" component={Scarcity} />
-            <Route path="/future" component={Future} />
+            <Route path="/stress" exact component={Stress} />
+            <Route path="/shortage" exact component={Shortage} />
+            <Route path="/scarcity" exact component={Scarcity} />
+            <Route path="/future" exact component={Future} />
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
-            <Route path="/tbd" render={() => <Redirect to="/stress" />} />
             <Route
               path="/stress/uncertainty"
               render={() => <Redirect to="/stress" />}
@@ -108,87 +107,6 @@ class App extends React.Component<Props, void> {
             <Route
               path="/future/scarcity"
               render={() => <Redirect to="/future" />}
-            />
-            <Route
-              path="/upstream_dependency"
-              render={() => <Redirect to="/tbd#upstream_dependency" />}
-            />
-            <Route
-              path="/upstream_dependency/stress"
-              render={() => <Redirect to="/tbd#upstream_dependency" />}
-            />
-            <Route
-              path="/upstream_dependency/shortage"
-              render={() => <Redirect to="/tbd#upstream_dependency" />}
-            />
-            <Route
-              path="/virtual_water_dependency"
-              render={() => <Redirect to="/tbd#virtual_water_dependency" />}
-            />
-            <Route
-              path="/virtual_water_dependency/stress"
-              render={() => <Redirect to="/tbd#virtual_water_dependency" />}
-            />
-            <Route
-              path="/virtual_water_dependency/shortage"
-              render={() => <Redirect to="/tbd#shortage" />}
-            />
-            <Route
-              path="/sustainability"
-              render={() => <Redirect to="/tbd#sustainability" />}
-            />
-            <Route
-              path="/navigation"
-              render={() => <Redirect to="/tbd#navigation" />}
-            />
-            <Route
-              path="/environmental_flow"
-              render={() => <Redirect to="/tbd#environmental_flow" />}
-            />
-            <Route
-              path="/access_to_water"
-              render={() => <Redirect to="/tbd#access_to_water" />}
-            />
-            <Route
-              path="/low_water"
-              render={() => <Redirect to="/tbd#low_water" />}
-            />
-            <Route
-              path="/food_security"
-              render={() => <Redirect to="/tbd#food_security" />}
-            />
-            <Route
-              path="/fossil_groundwater"
-              render={() => <Redirect to="/tbd#fossil_groundwater" />}
-            />
-            <Route
-              path="/interbasin_water_transfers"
-              render={() => <Redirect to="/tbd#interbasin_water_transfers" />}
-            />
-            <Route
-              path="/green_water"
-              render={() => <Redirect to="/tbd#green_water" />}
-            />
-            <Route
-              path="/drinking_water"
-              render={() => <Redirect to="/tbd#drinking_water" />}
-            />
-            <Route
-              path="/water_supply"
-              render={() => <Redirect to="/tbd#drinking_water" />}
-            />
-            <Route
-              path="/water_allocation"
-              render={() => <Redirect to="/tbd#water_allocation" />}
-            />
-            <Route
-              path="/transboundary_water_management"
-              render={() =>
-                <Redirect to="/tbd#transboundary_water_management" />}
-            />
-            <Route
-              path="/conflict_cooperation"
-              render={() => <Redirect to="/tbd#conflict_cooperation" />}
             />
             <Route component={NotFound} />
           </Switch>
