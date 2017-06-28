@@ -39,64 +39,55 @@ class ScarcityBody extends React.Component<Props, void> {
         <div className="row">
           <div className="col-xs-12 col-md-6 col-lg-8">
             <p>
-              <em>
-                Blue water scarcity is an umbrella concept for situations where
-                there is not enough water in rivers, lakes and aquifers to meet
-                all uses. Scarce water is shared among the uses by either{' '}
-                <a href="/conflict_cooperation">competition or cooperation</a>.
-                Negative impacts are seen when a use does not have access to
-                enough water. From a human perspective, two main categories of
-                impacts are:
-              </em>
+              Blue water scarcity is an umbrella concept for situations where
+              there is not enough water in rivers, lakes and aquifers to meet
+              all uses. Scarce water is shared among the uses by either{' '}
+              <a href="/conflict_cooperation">competition or cooperation</a>.
+              Negative impacts are seen when a use does not have access to
+              enough water. From a human perspective, two main categories of
+              impacts are:
             </p>
             <p>
-              <em>
-                <b><a href="/stress">Water stress</a></b>: a large share of
-                available water is used by humans, such that it becomes
-                increasingly difficult to satisfy various competing human and
-                environmental needs. This is demand-driven scarcity.
-              </em>
+              <b><a href="/stress">Water stress</a></b>: a large share of
+              available water is used by humans, such that it becomes
+              increasingly difficult to satisfy various competing human and
+              environmental needs. This is demand-driven scarcity.
             </p>
             <p>
-              <em>
-                <b><a href="/shortage">Water shortage</a></b>: a population's
-                water needs cannot be met using locally available water. This is
-                population-driven scarcity.
-              </em>
+              <b><a href="/shortage">Water shortage</a></b>: a population's
+              water needs cannot be met using locally available water. This is
+              population-driven scarcity.
             </p>
             <p>
-              <em>
-                Both concepts are explored in more detail on their own pages,
-                but it is also useful to see where stress and shortage occur by
-                themselves or together. If stress occurs, high demand is causing
-                impacts. If shortage occurs, needs cannot be met with current
-                availability. If both occur, a region is facing the need to both
-                reduce impacts from their current use, and to find other means
-                of meeting their needs.
-              </em>
+              Both concepts are explored in more detail on their own pages,
+              but it is also useful to see where stress and shortage occur by
+              themselves or together. If stress occurs, high demand is causing
+              impacts. If shortage occurs, needs cannot be met with current
+              availability. If both occur, a region is facing the need to both
+              reduce impacts from their current use, and to find other means
+              of meeting their needs.
             </p>
-            {/* This could become a stand-alone component, rather than making this component dependent on all these props?*/}
+            {/* This could become a stand-alone component, rather than making
+                this component dependent on all these props?*/}
             <p>
-              <em>
-                These estimates of blue water stress and shortage are produced
-                using{' '}
-                <span className={styles.assumption}>
-                  blue water availability
-                </span>{' '}
-                and <span className={styles.assumption}>consumption</span>{' '}
-                estimates from the water model{' '}
-                <span className={styles.assumption}>'watergap'</span>, driven by
-                climate data from{' '}
-                <span className={styles.assumption}>'WATCH'</span>, calculated
-                for{' '}
-                <span className={styles.assumption}>
-                  food production units
-                </span>{' '}
-                at a <span className={styles.assumption}>decadal</span>{' '}
-                timescale. Population estimates are from{' '}
-                <span className={styles.assumption}>HYDE</span>.{' '}
-                <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
-              </em>
+              These estimates of blue water stress and shortage are produced
+              using{' '}
+              <span className={styles.assumption}>
+                blue water availability
+              </span>{' '}
+              and <span className={styles.assumption}>consumption</span>{' '}
+              estimates from the water model{' '}
+              <span className={styles.assumption}>'watergap'</span>, driven by
+              climate data from{' '}
+              <span className={styles.assumption}>'WATCH'</span>, calculated
+              for{' '}
+              <span className={styles.assumption}>
+                food production units
+              </span>{' '}
+              at a <span className={styles.assumption}>decadal</span>{' '}
+              timescale. Population estimates are from{' '}
+              <span className={styles.assumption}>HYDE</span>.{' '}
+              <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
             </p>
           </div>
           <div className="col-xs-12 col-md-6 col-lg-4">
@@ -139,14 +130,12 @@ class ScarcityBody extends React.Component<Props, void> {
               <div className="row">
                 <WorldRegionSelector />
                 <p>
-                  <em>
-                    The separate drivers of <a href="/stress">stress</a> and{' '}
-                    <a href="/shortage">shortage</a> can be explored on their
-                    own pages. You can also{' '}
-                    <a href="/future/scarcity">
-                      explore how stress and shortage can be addressed in future
-                    </a>.
-                  </em>
+                  The separate drivers of <a href="/stress">stress</a> and{' '}
+                  <a href="/shortage">shortage</a> can be explored on their
+                  own pages. You can also{' '}
+                  <a href="/future/scarcity">
+                    explore how stress and shortage can be addressed in future
+                  </a>.
                 </p>
               </div>
               <div className="row">
