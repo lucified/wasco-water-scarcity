@@ -55,8 +55,7 @@ class StressBody extends React.Component<Props, void> {
               low, moderate and high stress are commonly used, but are only
               indicative.
             </p>
-            {/* This could become a stand-alone component, rather than
-                making this component dependent on all these props?*/}
+            {/* TODO: Make this its own component and use actual values */}
             <p>
               These estimates of blue water stress are produced using{' '}
               <span className={styles.assumption}>

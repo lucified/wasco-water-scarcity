@@ -70,8 +70,7 @@ class ScarcityBody extends React.Component<Props, void> {
               reduce impacts from their current use, and to find other means
               of meeting their needs.
             </p>
-            {/* This could become a stand-alone component, rather than making
-                this component dependent on all these props?*/}
+            {/* TODO: Make this its own component and use actual values */}
             <p>
               These estimates of blue water stress and shortage are produced
               using{' '}

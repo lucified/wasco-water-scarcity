@@ -65,8 +65,7 @@ class ShortageBody extends React.Component<Props, void> {
               Thresholds for low, moderate and high shortage are commonly
               used, but are only indicative.
             </p>
-            {/* This could become a stand-alone component, rather than making
-              this component dependent on all these props?*/}
+            {/* TODO: Make this its own component and use actual values */}
             <p>
               These estimates of blue water shortage are produced using{' '}
               <span className={styles.assumption}>
