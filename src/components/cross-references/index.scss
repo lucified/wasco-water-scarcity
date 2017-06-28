@@ -1,0 +1,21 @@
+@import '../definitions';
+
+.root {
+  margin-bottom: 2 * $default-margin;
+  width: 100%;
+}
+
+.link {
+  display: inline-block;
+  width: 100%;
+  min-height: 60px;
+  margin-right: $default-margin;
+  margin-bottom: $default-margin;
+  padding: $default-margin;
+  border: 1px solid $color-lightest-gray;
+  color: $color-darker-gray;
+
+  &:visited {
+    color: $color-dark-gray;
+  }
+}

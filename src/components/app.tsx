@@ -11,6 +11,7 @@ import {
 } from '../selectors';
 import Header from './header';
 import Future from './pages/future';
+import NotFound from './pages/not-found';
 import Scarcity from './pages/scarcity';
 import Shortage from './pages/shortage';
 import Stress from './pages/stress';
@@ -85,7 +86,8 @@ class App extends React.Component<Props, void> {
             <Route path="/scarcity" component={Scarcity} />
             <Route path="/future" component={Future} />
             {/* tslint:disable-next-line:jsx-no-lambda */}
-            <Route render={() => <Redirect to="/stress" />} />
+            <Route path="/" exact render={() => <Redirect to="/stress" />} />
+            <Route component={NotFound} />
           </Switch>
         </div>
       </div>

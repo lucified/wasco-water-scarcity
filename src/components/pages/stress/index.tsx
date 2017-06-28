@@ -4,6 +4,7 @@ import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
 import withPageData from '../with-page-data';
 
+import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
@@ -57,7 +58,7 @@ class StressBody extends React.Component<Props, void> {
                   <ThresholdSelector dataType="stress" />
                 </div>
               </div>
-              <div className="row middle-xs">
+              <div className="row">
                 <div className="col-xs-12">
                   <Map
                     width={1200}
@@ -71,6 +72,9 @@ class StressBody extends React.Component<Props, void> {
                 <SelectedRegionInformation dataType="stress" />
               </div>
             </div>}
+        <div className="row">
+          <CrossReferences fromPage="stress" />
+        </div>
       </div>
     );
   }

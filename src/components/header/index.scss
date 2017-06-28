@@ -40,6 +40,7 @@
 }
 
 .navigation-item {
+  display: inline-block;
   padding: $default-margin 0;
   margin-right: $default-margin;
   font-weight: 500;
@@ -57,6 +58,7 @@
 }
 
 .navigation-theme {
+  display: inline-block;
   padding: $default-margin 0;
   margin-right: $default-margin;
   font-weight: 500;
