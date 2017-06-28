@@ -16,6 +16,10 @@
     overflow-y: scroll; // Always show scrollbar
   }
 
+  a {
+    color: $color-blue-chill-darker;
+  }
+
   #content {
     height: 100%;
   }

@@ -75,6 +75,8 @@ class App extends React.Component<Props, void> {
   }
 
   public render() {
+    // tslint:disable:jsx-no-lambda
+
     return (
       <div className={styles.root}>
         <Header />
@@ -85,7 +87,6 @@ class App extends React.Component<Props, void> {
             <Route path="/shortage" component={Shortage} />
             <Route path="/scarcity" component={Scarcity} />
             <Route path="/future" component={Future} />
-            {/* tslint:disable-next-line:jsx-no-lambda */}
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
             <Route component={NotFound} />
           </Switch>

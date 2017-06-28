@@ -6,15 +6,19 @@ const styles = require('./index.scss');
 interface PassedProps {
   values: Array<{ value: string; label: string }>;
   className?: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   selectedValue: string;
   disabled?: boolean;
 }
 
 export default class RadioSelector extends React.Component<PassedProps, void> {
   private generateClickCallback(value: string) {
-    return (_e: React.MouseEvent<HTMLAnchorElement>) =>
-      this.props.onChange(value);
+    return (_e: React.MouseEvent<HTMLAnchorElement>) => {
+      const { onChange } = this.props;
+      if (onChange) {
+        onChange(value);
+      }
+    };
   }
 
   public render() {
