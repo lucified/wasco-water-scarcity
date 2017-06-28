@@ -83,36 +83,11 @@ class App extends React.Component<Props, void> {
         <div className="container">
           <Switch>
             {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" exact component={Stress} />
-            <Route path="/shortage" exact component={Shortage} />
-            <Route path="/scarcity" exact component={Scarcity} />
-            <Route path="/future" exact component={Future} />
+            <Route path="/stress" component={Stress} />
+            <Route path="/shortage" component={Shortage} />
+            <Route path="/scarcity" component={Scarcity} />
+            <Route path="/future" component={Future} />
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
-            <Route
-              path="/stress/uncertainty"
-              exact
-              render={() => <Redirect to="/stress" />}
-            />
-            <Route
-              path="/shortage/uncertainty"
-              exact
-              render={() => <Redirect to="/shortage" />}
-            />
-            <Route
-              path="/future/stress"
-              exact
-              render={() => <Redirect to="/future" />}
-            />
-            <Route
-              path="/future/shortage"
-              exact
-              render={() => <Redirect to="/future" />}
-            />
-            <Route
-              path="/future/scarcity"
-              exact
-              render={() => <Redirect to="/future" />}
-            />
             <Route component={NotFound} />
           </Switch>
         </div>
