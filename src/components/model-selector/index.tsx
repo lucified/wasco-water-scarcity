@@ -18,6 +18,7 @@ import {
 } from '../../selectors';
 
 import RadioSelector from '../generic/radio-selector';
+import Tooltip from '../generic/tooltip';
 
 import 'react-select/dist/react-select.css';
 import * as styles from './index.scss';
@@ -82,7 +83,15 @@ class ModelSelector extends React.Component<Props, void> {
           <h3 className={styles.title}>Water scarcity model</h3>
         </div>
         <div className={classNames('row', 'between-xs', styles.model)}>
-          <span className={styles.label}>Water model:</span>
+          <Tooltip
+            text={
+              'Water models provide a representation of a water system, ' +
+              'enabling internally consistent estimates of variables such as ' +
+              'availability and use.'
+            }
+          >
+            <span className={styles.label}>Water model:</span>
+          </Tooltip>
           <Select
             className={classNames(styles.select, styles.first)}
             name="Impact model"
@@ -92,17 +101,17 @@ class ModelSelector extends React.Component<Props, void> {
             searchable={false}
             clearable={false}
           />
-          <div className={styles.tooltip}>
-            ?
-            <span className={styles.tooltiptext}>
-              Water models provide a representation of a water system, enabling
-              internally consistent estimates of variables such as availability
-              and use.
-            </span>
-          </div>
         </div>
         <div className={classNames('row', 'between-xs', styles.model)}>
-          <span className={styles.label}>Climate model:</span>
+          <Tooltip
+            text={
+              'Climate models describe drivers of a water system, like ' +
+              'precipitation and temperature, filling measurement gaps and ' +
+              'enabling future scenarios.'
+            }
+          >
+            <span className={styles.label}>Climate model:</span>
+          </Tooltip>
           <Select
             className={styles.select}
             name="Climate model"
@@ -112,16 +121,18 @@ class ModelSelector extends React.Component<Props, void> {
             searchable={false}
             clearable={false}
           />
-          <div className={styles.tooltip}>
-            ?
-            <span className={styles.tooltiptext}>
-              Climate models describe drivers of a water system, like
-              precipitation and temperature, filling measurement gaps and
-              enabling future scenarios.
-            </span>
-          </div>
         </div>
-        <div className="row between-xs">
+        <div className={classNames('row', 'between-xs', styles.model)}>
+          <Tooltip
+            text={
+              'It is difficult to estimate scarcity at every instant. Water ' +
+              'can be stored, or use of water can be delayed. Estimating ' +
+              'scarcity for a period of time allows for shifts in timing ' +
+              'within the period.'
+            }
+          >
+            Time:
+          </Tooltip>
           <RadioSelector
             className={styles['time-scale-selector']}
             selectedValue={timeScale}
@@ -129,18 +140,19 @@ class ModelSelector extends React.Component<Props, void> {
             onChange={onTimeScaleChange}
             disabled={impactModel === 'watergap'}
           />
-          <div className={styles.tooltip}>
-            ?
-            <span className={styles.tooltiptext}>
-              It is difficult to estimate scarcity at every instant. Water can
-              be stored, or use of water can be delayed. Estimating scarcity for
-              a period of time allows for shifts in timing within the period.
-            </span>
-          </div>
         </div>
         {/*TODO: doesn't necessarily apply to all dataTypes */}
         {/*TODO: currently only visual */}
-        <div className="row between-xs">
+        <div className={classNames('row', 'between-xs', styles.model)}>
+          <Tooltip
+            text={
+              'Typically some water withdrawn returns to a water body, but ' +
+              "cannot necessarily be re-used. What counts as 'use' depends " +
+              'on how return flows are treated.'
+            }
+          >
+            Return flows:
+          </Tooltip>
           <RadioSelector
             className={styles['time-scale-selector']}
             selectedValue="consumption"
@@ -148,17 +160,8 @@ class ModelSelector extends React.Component<Props, void> {
               { value: 'consumption', label: 'Consumption' },
               { value: 'withdrawal', label: 'Withdrawals' },
             ]}
-            onChange={() => false}
             disabled={true}
           />
-          <div className={styles.tooltip}>
-            ?
-            <span className={styles.tooltiptext}>
-              Typically some water withdrawn returns to a water body, but cannot
-              necessarily be re-used. What counts as 'use' depends on how return
-              flows are treated.
-            </span>
-          </div>
         </div>
       </div>
     );
