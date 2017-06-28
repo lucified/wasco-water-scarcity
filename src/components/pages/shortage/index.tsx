@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -41,26 +42,26 @@ class ShortageBody extends React.Component<Props, void> {
               when a population's water needs cannot be met using locally
               available water. Water needs are complex. Products (and
               "virtual" water) can be imported (even{' '}
-              <a href="/drinking_water">drinking water</a>), leading to{' '}
-              <a href="/virtual_water_dependency/shortage">
+              <Link to="/drinking-water">drinking water</Link>), leading to{' '}
+              <Link to="/virtual-water-dependency/shortage">
                 virtual water dependency
-              </a>. In addition to water from rivers, lakes, and aquifers,
+              </Link>. In addition to water from rivers, lakes, and aquifers,
               rainfall and soil moisture (
-              <a href="/green_water">
+              <Link to="/green-water">
                 "green water"
-              </a>)
+              </Link>)
               may satisfy needs. And even if water is available locally, it
               may be{' '}
-              <a href="/upstream_dependency/shortage">
+              <Link to="/upstream-dependency/shortage">
                 dependent on upstream water use
-              </a>.{' '}
+              </Link>.{' '}
             </p>
             <p>
               Evaluating the volume of water available per person highlights
               potential blue water shortage hotspots, before addressing these
               more detailed issues or focussing on specific impacts, e.g.
-              related to <a href="/food_security">food security</a> or{' '}
-              <a href="/water_supply">urban water supply systems</a>.
+              related to <Link to="/food-security">food security</Link> or{' '}
+              <Link to="/water-supply">urban water supply systems</Link>.
               Thresholds for low, moderate and high shortage are commonly
               used, but are only indicative.
             </p>
@@ -82,7 +83,8 @@ class ShortageBody extends React.Component<Props, void> {
               at a <span className={styles.assumption}>decadal</span>{' '}
               timescale. Population estimates are from{' '}
               <span className={styles.assumption}>HYDE</span>.{' '}
-              <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
+              <a href="#">Read more</a>.{' '}
+              <a href="#">Explore alternatives</a>.
             </p>
           </div>
           <div className="col-xs-12 col-md-6 col-lg-4">
@@ -113,25 +115,24 @@ class ShortageBody extends React.Component<Props, void> {
                     Water needs are in question rather than water use more
                     generally. To calculate water availability, upstream
                     withdrawals need to be taken into account (also see{' '}
-                    <a href="/upstream_dependency/stress">
+                    <Link to="/upstream-dependency/stress">
                       upstream dependency
-                    </a>). In these results, we allocated more water to
-                    regions with high river flows (discharge) (<a href="#">
-                      Read
-                      more
-                    </a>). To focus on{' '}
-                    <a href="/sustainability">sustainability</a>, availability
+                    </Link>). In these results, we allocated more water to
+                    regions with high river flows (discharge) (
+                    <a href="#">Read more </a>). To focus on{' '}
+                    <Link to="/sustainability">sustainability</Link>,
+                    availability
                     typically only considers renewable freshwater, not{' '}
-                    <a href="/fossil_groundwater">fossil groundwater</a>.{' '}
-                    <a href="/interbasin_water_transfers">
+                    <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
+                    <Link to="/interbasin-water-transfers">
                       Interbasin water transfers
-                    </a>{' '}
+                    </Link>{' '}
                     are usually also analysed separately.{' '}
-                    <a href="/green_water">"Green water"</a> (rainfall and
+                    <Link to="/green-water">"Green water"</Link> (rainfall and
                     soil moisture) and{' '}
-                    <a href="/virtual_water_dependency/shortage">
+                    <Link to="/virtual-water-dependency/shortage">
                       "virtual water"
-                    </a>{' '}
+                    </Link>{' '}
                     (importing water-using products) can also increase the
                     effective availability of water.
                     These other sources of water could potentially decrease

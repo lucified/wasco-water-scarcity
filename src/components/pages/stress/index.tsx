@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -42,14 +43,14 @@ class StressBody extends React.Component<Props, void> {
               for human use. Water becomes scarce because increasing water use
               makes it difficult to satisfy various competing human and
               environmental needs.{' '}
-              <a href="/low_water">
+              <Link to="/low-water">
                 Low water levels
-              </a>{' '}
+              </Link>{' '}
               from increasing use can impact on{' '}
-              <a href="/navigation">navigation</a>,{' '}
-              <a href="/environmental_flow">environmental water needs</a>, and{' '}
-              <a href="/access_to_water">access to water</a>. Comparing use to
-              availability helps highlight potential blue water stress
+              <Link to="/navigation">navigation</Link>,{' '}
+              <Link to="/environmental-flow">environmental water needs</Link>,
+              and <Link to="/access-to-water">access to water</Link>. Comparing
+              use to availability helps highlight potential blue water stress
               hotspots before focussing on specific impacts. Thresholds for
               low, moderate and high stress are commonly used, but are only
               indicative.
@@ -65,14 +66,14 @@ class StressBody extends React.Component<Props, void> {
               estimates from the water model{' '}
               <span className={styles.assumption}>'watergap'</span>, driven by
               climate data from{' '}
-              <span className={styles.assumption}>'WATCH'</span>, calculated
-              for{' '}
+              <span className={styles.assumption}>'WATCH'</span>
+              , calculated for{' '}
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
               at a <span className={styles.assumption}>decadal</span>{' '}
               timescale. <a href="#">Read more</a>.{' '}
-              <a href="/stress/uncertainty">Explore alternatives</a>.
+              <Link to="/stress/uncertainty">Explore alternatives</Link>.
             </p>
           </div>
           <div className="col-xs-12 col-md-6 col-lg-4">
@@ -99,35 +100,30 @@ class StressBody extends React.Component<Props, void> {
                   />
                   <WorldRegionSelector />
                   <p>
-                    <em>
-                      Water stress is considered demand-driven scarcity. It can
-                      occur even with a small population if water use is
-                      sufficiently high and water availability sufficiently low.
-                      Irrigation is the largest water user globally, and in most
-                      regions, which links water stress to{' '}
-                      <a href="/food_security">food security</a>.
-                    </em>
+                    Water stress is considered demand-driven scarcity. It can
+                    occur even with a small population if water use is
+                    sufficiently high and water availability sufficiently low.
+                    Irrigation is the largest water user globally, and in most
+                    regions, which links water stress to{' '}
+                    <Link to="/food-security">food security</Link>.
                   </p>
                   <p>
-                    <em>
-                      To calculate water availability, upstream withdrawals need
-                      to be taken into account (also see{' '}
-                      <a href="/upstream_dependency/stress">
-                        upstream dependency
-                      </a>). In these results, we allocated more water to
-                      regions with high river flows (discharge) (<a href="#">
-                        Read
-                        more
-                      </a>). To focus on{' '}
-                      <a href="/sustainability">sustainability</a>, availability
-                      typically only considers renewable freshwater, not{' '}
-                      <a href="/fossil_groundwater">fossil groundwater</a>.{' '}
-                      <a href="/interbasin_water_transfers">
-                        Interbasin water transfers
-                      </a>{' '}
-                      are usually also analysed separately. This explains why
-                      water use can be higher than availability.
-                    </em>
+                    To calculate water availability, upstream withdrawals need
+                    to be taken into account (also see{' '}
+                    <Link to="/upstream-dependency/stress">
+                      upstream dependency
+                    </Link>). In these results, we allocated more water to
+                    regions with high river flows (discharge) (
+                    <a href="#">Read more </a>). To focus on{' '}
+                    <Link to="/sustainability">sustainability</Link>,
+                    availability typically only considers renewable
+                    freshwater, not{' '}
+                    <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
+                    <Link to="/interbasin-water-transfers">
+                      Interbasin water transfers
+                    </Link>{' '}
+                    are usually also analysed separately. This explains why
+                    water use can be higher than availability.
                   </p>
                 </div>
               </div>

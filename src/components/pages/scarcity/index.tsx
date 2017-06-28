@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -42,19 +43,21 @@ class ScarcityBody extends React.Component<Props, void> {
               Blue water scarcity is an umbrella concept for situations where
               there is not enough water in rivers, lakes and aquifers to meet
               all uses. Scarce water is shared among the uses by either{' '}
-              <a href="/conflict_cooperation">competition or cooperation</a>.
+              <Link to="/conflict_cooperation">
+                competition or cooperation
+              </Link>.
               Negative impacts are seen when a use does not have access to
               enough water. From a human perspective, two main categories of
               impacts are:
             </p>
             <p>
-              <b><a href="/stress">Water stress</a></b>: a large share of
+              <b><Link to="/stress">Water stress</Link></b>: a large share of
               available water is used by humans, such that it becomes
               increasingly difficult to satisfy various competing human and
               environmental needs. This is demand-driven scarcity.
             </p>
             <p>
-              <b><a href="/shortage">Water shortage</a></b>: a population's
+              <b><Link to="/shortage">Water shortage</Link></b>: a population's
               water needs cannot be met using locally available water. This is
               population-driven scarcity.
             </p>
@@ -87,7 +90,8 @@ class ScarcityBody extends React.Component<Props, void> {
               at a <span className={styles.assumption}>decadal</span>{' '}
               timescale. Population estimates are from{' '}
               <span className={styles.assumption}>HYDE</span>.{' '}
-              <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
+              <a href="#">Read more</a>.{' '}
+              <a href="#">Explore alternatives</a>.
             </p>
           </div>
           <div className="col-xs-12 col-md-6 col-lg-4">
@@ -130,12 +134,12 @@ class ScarcityBody extends React.Component<Props, void> {
               <div className="row">
                 <WorldRegionSelector />
                 <p>
-                  The separate drivers of <a href="/stress">stress</a> and{' '}
-                  <a href="/shortage">shortage</a> can be explored on their
+                  The separate drivers of <Link to="/stress">stress</Link> and{' '}
+                  <Link to="/shortage">shortage</Link> can be explored on their
                   own pages. You can also{' '}
-                  <a href="/future/scarcity">
+                  <Link to="/future/scarcity">
                     explore how stress and shortage can be addressed in future
-                  </a>.
+                  </Link>.
                 </p>
               </div>
               <div className="row">
