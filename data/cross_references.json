@@ -6,7 +6,7 @@
         },
         {
             "title": "Using green water to meet needs",
-            "url": "/green_water"
+            "url": "/green-water"
         },
         {
             "title": "What can we do about water shortage?",
@@ -14,15 +14,15 @@
         },
         {
             "title": "Providing food security",
-            "url": "/food_security"
+            "url": "/food-security"
         },
         {
             "title": "Providing drinking water",
-            "url": "/drinking_water"
+            "url": "/drinking-water"
         },
         {
             "title": "Urban and household water supply",
-            "url": "/water_supply"
+            "url": "/water-supply"
         },
         {
             "title": "Stress: High resource use",
@@ -34,11 +34,11 @@
         },
         {
             "title": "Implications for transboundary basin relations",
-            "url": "/upstream_dependency/shortage"
+            "url": "/upstream-dependency/shortage"
         },
         {
             "title": "Implications for self-sufficiency and trade",
-            "url": "/virtual_water_dependency/shortage"
+            "url": "/virtual-water-dependency/shortage"
         },
         {
             "title": "Sustainability of water use",
@@ -64,11 +64,11 @@
         },
         {
             "title": "Implications for transboundary basin relations",
-            "url": "/upstream_dependency/stress"
+            "url": "/upstream-dependency/stress"
         },
         {
             "title": "Implications for self-sufficiency and trade",
-            "url": "/virtual_water_dependency/stress"
+            "url": "/virtual-water-dependency/stress"
         },
         {
             "title": "Sustainability of water use",
@@ -76,7 +76,7 @@
         },
         {
             "title": "Stress impacts on water levels",
-            "url": "/low_water"
+            "url": "/low-water"
         },
         {
             "title": "Stress impacts on navigation",
@@ -84,11 +84,11 @@
         },
         {
             "title": "Meeting environmental water needs",
-            "url": "/environmental_flow"
+            "url": "/environmental-flow"
         },
         {
             "title": "Stress impacts on access to water",
-            "url": "/access_to_water"
+            "url": "/access-to-water"
         }
     ],
     "scarcity": [
@@ -106,7 +106,7 @@
         },
         {
             "title": "Water allocation",
-            "url": "/water_allocation"
+            "url": "/water-allocation"
         },
         {
             "title": "Water conflict",
