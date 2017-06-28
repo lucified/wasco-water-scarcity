@@ -90,22 +90,27 @@ class App extends React.Component<Props, void> {
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
             <Route
               path="/stress/uncertainty"
+              exact
               render={() => <Redirect to="/stress" />}
             />
             <Route
               path="/shortage/uncertainty"
+              exact
               render={() => <Redirect to="/shortage" />}
             />
             <Route
               path="/future/stress"
+              exact
               render={() => <Redirect to="/future" />}
             />
             <Route
               path="/future/shortage"
+              exact
               render={() => <Redirect to="/future" />}
             />
             <Route
               path="/future/scarcity"
+              exact
               render={() => <Redirect to="/future" />}
             />
             <Route component={NotFound} />
