@@ -1,0 +1,28 @@
+@import '../definitions.scss';
+
+.title {
+  margin-top: 0;
+}
+
+.time-scale-selector {
+  margin-bottom: $default-margin / 2;
+}
+
+.model {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  margin-right: 0.5rem;
+}
+
+.select {
+  z-index: 10;
+  flex-grow: 1;
+  max-width: 250px;
+
+  &.first {
+    z-index: 11;
+  }
+}
