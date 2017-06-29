@@ -1,9 +1,7 @@
 .spinner {
-  position: absolute;
   width: 44px;
   height: 44px;
-  top: calc(50% - 22px);
-  left: calc(50% - 22px);
+  margin: 0 auto;
 
   animation: spin 0.8s ease-in-out;
   animation-iteration-count: infinite;

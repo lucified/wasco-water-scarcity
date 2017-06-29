@@ -43,7 +43,9 @@ class ScarcityBody extends React.Component<Props, void> {
           </div>
         </div>
         {!selectedWaterData || !waterRegions
-          ? <Spinner />
+          ? <div className="row middle-xs">
+              <div className="col-xs-12"><Spinner /></div>
+            </div>
           : <div>
               <div className="row middle-xs">
                 <div className="col-xs-12 col-md-6 col-lg-8">

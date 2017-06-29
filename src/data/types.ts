@@ -14,6 +14,7 @@ export interface Dataset {
   spatialUnit: string;
   timeScale: string;
   dataType: string;
+  population: string;
   impactModel: string;
   climateModel: string;
   climateExperiment: string;
@@ -21,7 +22,7 @@ export interface Dataset {
   co2Forcing: string;
   startYear: string;
   endYear: string;
-  filename: string;
+  url: string;
 }
 
 export interface WorldRegionGeoJSON {
