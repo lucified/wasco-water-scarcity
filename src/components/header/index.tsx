@@ -25,9 +25,7 @@ export default class Header extends React.Component<{}, void> {
           <div className="container">
             <div className="row">
               <div className="col-xs-12">
-                <div className={styles['navigation-theme']}>
-                  Water body:
-                </div>
+                <div className={styles['navigation-theme']}>Water body:</div>
                 <NavLink
                   to="/stress"
                   activeClassName={styles.selected}

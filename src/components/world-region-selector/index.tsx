@@ -55,7 +55,9 @@ class WorldRegionSelector extends React.Component<Props, void> {
               [styles.selected]: selectedWorldRegionId === id,
             })}
           >
-            <span className={styles['region-name']}>{name}</span>
+            <span className={styles['region-name']}>
+              {name}
+            </span>
           </a>,
         )}
       </div>

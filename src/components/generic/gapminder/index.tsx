@@ -208,20 +208,22 @@ class Gapminder extends React.Component<Props, void> {
     const chartHeight = height - marginTop - marginBottom;
 
     const regionDataArray = values(data.circles);
-    const yExtent = minY && maxY
-      ? [minY, maxY]
-      : extent(
-          flatMap<number[], number>(
-            regionDataArray.map(d => ySelector(d.data)),
-          ),
-        ) as [number, number];
-    const xExtent = minX && maxX
-      ? [minX, maxX]
-      : extent(
-          flatMap<number[], number>(
-            regionDataArray.map(d => xSelector(d.data)),
-          ),
-        ) as [number, number];
+    const yExtent =
+      minY && maxY
+        ? [minY, maxY]
+        : extent(
+            flatMap<number[], number>(
+              regionDataArray.map(d => ySelector(d.data)),
+            ),
+          ) as [number, number];
+    const xExtent =
+      minX && maxX
+        ? [minX, maxX]
+        : extent(
+            flatMap<number[], number>(
+              regionDataArray.map(d => xSelector(d.data)),
+            ),
+          ) as [number, number];
     const sizeExtent = extent(
       flatMap<number[], number>(regionDataArray.map(d => sizeSelector(d.data))),
     ) as [number, number];

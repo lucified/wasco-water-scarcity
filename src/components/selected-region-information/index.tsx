@@ -103,10 +103,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{title}</h4>
-        <p className={styles.description}>
-          Consumption / Availability
-        </p>
+        <h4 className={styles.heading}>
+          {title}
+        </h4>
+        <p className={styles.description}>Consumption / Availability</p>
         {timeSeriesForSelectedWaterRegion
           ? <DataLineChart
               dataType="stress"
@@ -138,10 +138,10 @@ class SelectedRegionInformation extends React.Component<Props, void> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{title}</h4>
-        <p className={styles.description}>
-          Availability per person (m³)
-        </p>
+        <h4 className={styles.heading}>
+          {title}
+        </h4>
+        <p className={styles.description}>Availability per person (m³)</p>
         {timeSeriesForSelectedWaterRegion
           ? <DataLineChart
               dataType="shortage"
@@ -174,7 +174,9 @@ class SelectedRegionInformation extends React.Component<Props, void> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{this.getChartTitle('availability')}</h4>
+        <h4 className={styles.heading}>
+          {this.getChartTitle('availability')}
+        </h4>
         <p className={styles.description}>Total availability (m³)</p>
         <AvailabilityChart
           data={
@@ -203,7 +205,9 @@ class SelectedRegionInformation extends React.Component<Props, void> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{this.getChartTitle('consumption')}</h4>
+        <h4 className={styles.heading}>
+          {this.getChartTitle('consumption')}
+        </h4>
         <p className={styles.description}>Consumption (m³)</p>
         <ConsumptionChart
           data={
