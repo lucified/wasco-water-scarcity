@@ -56,6 +56,38 @@ export async function fetchHistoricalStressShortageData(
   }
 }
 
+export async function fetchAllFutureData(): Promise<
+  | Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>
+  | undefined
+> {
+  const futureDatasetURLs = datasets
+    .filter(
+      d =>
+        d.population !== 'hist' && ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+    )
+    .map(d => d.url);
+  if (futureDatasetURLs.length === 0) {
+    console.error('Unable to find future datasets');
+    return undefined;
+  }
+
+  try {
+    const results = await Promise.all(
+      futureDatasetURLs.map(url => fetch(url, { credentials: 'same-origin' })),
+    );
+    const parsedResults: RawRegionStressShortageDatum[][] = await Promise.all(
+      results.map(response => response.json()),
+    );
+    return parsedResults.map((data, i) => ({
+      id: futureDatasetURLs[i], // Use the URL as the ID
+      data: generateStressShortageData(data),
+    }));
+  } catch (error) {
+    console.error('Unable to fetch future data', error);
+    return undefined;
+  }
+}
+
 export function getClimateModels() {
   return uniq(datasets.map(d => d.climateModel)).sort();
 }

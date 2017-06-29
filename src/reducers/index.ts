@@ -12,6 +12,7 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  STORE_FUTURE_DATA,
   STORE_WATER_DATA,
   STORE_WATER_REGION_DATA,
   STORE_WATER_TO_WORLD_REGION_MAP,
@@ -52,6 +53,7 @@ function dataReducer(
   action: Action,
 ): {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+  futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -76,6 +78,17 @@ function dataReducer(
       return {
         ...state,
         waterToWorldRegionsMap: action.map,
+      };
+    case STORE_FUTURE_DATA:
+      const futureDataObject: {
+        [id: string]: Array<TimeAggregate<StressShortageDatum>>;
+      } = {};
+      action.data.forEach(d => {
+        futureDataObject[d.id] = d.data;
+      });
+      return {
+        ...state,
+        futureData: futureDataObject,
       };
   }
   return state;

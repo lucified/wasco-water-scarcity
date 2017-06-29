@@ -86,6 +86,12 @@ export interface StoreWaterToWorldRegionMapAction {
   map: { [waterRegionId: number]: number };
 }
 
+export const STORE_FUTURE_DATA = 'STORE_FUTURE_DATA';
+export interface StoreFutureDataAction {
+  type: 'STORE_FUTURE_DATA';
+  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>;
+}
+
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
@@ -95,6 +101,7 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | StoreFutureDataAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction

@@ -1,6 +1,7 @@
 import { Dispatch } from 'redux';
 
 import {
+  fetchAllFutureData,
   fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
@@ -30,10 +31,12 @@ import {
   SetSelectedWorldRegionAction,
   SetThresholdsForDataTypeAction,
   SetTimeIndexAction,
+  STORE_FUTURE_DATA,
   STORE_WATER_DATA,
   STORE_WATER_REGION_DATA,
   STORE_WATER_TO_WORLD_REGION_MAP,
   STORE_WORLD_REGION_DATA,
+  StoreFutureDataAction,
   StoreWaterDataAction,
   StoreWaterRegionDataAction,
   StoreWaterToWorldRegionMapAction,
@@ -155,6 +158,15 @@ export function storeWaterToWorldRegionMap(map: {
   };
 }
 
+export function storeFutureData(
+  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>,
+): StoreFutureDataAction {
+  return {
+    type: STORE_FUTURE_DATA,
+    data,
+  };
+}
+
 export function loadModelData(
   climateModel: string,
   impactModel: string,
@@ -168,6 +180,16 @@ export function loadModelData(
     ).then(waterData => {
       if (waterData) {
         dispatch(storeWaterData(waterData));
+      }
+    });
+  };
+}
+
+export function loadFutureData() {
+  return (dispatch: Dispatch<any>) => {
+    return fetchAllFutureData().then(futureData => {
+      if (futureData) {
+        dispatch(storeFutureData(futureData));
       }
     });
   };
