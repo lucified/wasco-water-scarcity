@@ -22,7 +22,7 @@ export interface Dataset {
   co2Forcing: string;
   startYear: string;
   endYear: string;
-  filename: string;
+  url: string;
 }
 
 export interface WorldRegionGeoJSON {

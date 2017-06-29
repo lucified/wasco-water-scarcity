@@ -17,6 +17,22 @@ yarn start
 Then open http://localhost:3000 in your web browser.
 
 
+## Using new datasets
+
+The datasets are defined in `src/data/datasets.ts`. The URL defined in the `url`
+field should be one that accepts AJAX requests, i.e. CORS should be configured
+appropriately.
+
+To upload new datasets to Lucify hostiung, assume the AWS admin role, place the
+data in the appropriate folder under `data-external/wasco` and run:
+```shell
+yarn run upload-data
+```
+
+These files will be available under
+`https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/`.
+
+
 ## Building deployment distributions
 
 All the following build commands should be executed in the project root folder.

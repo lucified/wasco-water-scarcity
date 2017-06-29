@@ -43,14 +43,14 @@ export async function fetchStressShortageData(
     console.error('Unable to find dataset for', climateModel, impactModel);
     return undefined;
   }
-  const { filename } = dataset;
+  const { url } = dataset;
 
   try {
-    const result = await fetch(filename, { credentials: 'include' });
+    const result = await fetch(url, { credentials: 'same-origin' });
     const parsedData: RawRegionStressShortageDatum[] = await result.json();
     return generateStressShortageData(parsedData);
   } catch (error) {
-    console.error('Unable to fetch water data', filename, error);
+    console.error('Unable to fetch water data', url, error);
     return undefined;
   }
 }
