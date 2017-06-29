@@ -24,7 +24,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class ShortageBody extends React.Component<Props, void> {
+class ShortageBody extends React.Component<Props> {
   public componentDidMount() {
     this.props.setSelectedDataType('shortage');
   }

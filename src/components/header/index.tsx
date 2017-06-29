@@ -5,7 +5,7 @@ const aaltoLogo = require('../../images/aalto_logo.svg');
 const menuIcon = require('../../images/hamburger.svg');
 const styles = require('./index.scss');
 
-export default class Header extends React.Component<{}, void> {
+export default class Header extends React.Component {
   public render() {
     return (
       <div className={styles.root}>

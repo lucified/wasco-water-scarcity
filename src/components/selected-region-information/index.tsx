@@ -55,7 +55,7 @@ interface DefaultProps {
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 type PropsWithDefaults = Props & DefaultProps;
 
-class SelectedRegionInformation extends React.Component<Props, void> {
+class SelectedRegionInformation extends React.Component<Props> {
   public static defaultProps: DefaultProps = {
     dataType: 'scarcity',
   };

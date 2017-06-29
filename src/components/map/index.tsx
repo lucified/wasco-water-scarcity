@@ -91,7 +91,7 @@ function getLabel(dataType: DataType) {
   }
 }
 
-class Map extends React.Component<Props, void> {
+class Map extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
 

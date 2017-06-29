@@ -20,7 +20,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class ScarcityBody extends React.Component<Props, void> {
+class ScarcityBody extends React.Component<Props> {
   public componentDidMount() {
     this.props.setSelectedDataType('scarcity');
   }

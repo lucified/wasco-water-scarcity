@@ -122,7 +122,7 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
 
 const yTickFormatter = format('.2s');
 
-class TimeSelector extends React.PureComponent<Props, void> {
+class TimeSelector extends React.PureComponent<Props> {
   private generateBarChartData = memoize(
     (data: AggregateStressShortageDatum[], dataType: DataType) =>
       data.map((d, i) => ({

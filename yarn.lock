@@ -129,8 +129,8 @@
     redux "^3.6.0"
 
 "@types/react-router@*":
-  version "4.0.11"
-  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-4.0.11.tgz#de631d00477081c24a4668c10287ea5f3cd51311"
+  version "4.0.12"
+  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-4.0.12.tgz#7ccf3433741393e22ede149b5cd733abfe594ffc"
   dependencies:
     "@types/history" "*"
     "@types/react" "*"
@@ -2842,17 +2842,7 @@ he@1.1.x:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
-history@^4.5.1, history@^4.6.0:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/history/-/history-4.6.2.tgz#716e863e1da0e97a028eed6da644061dd1e1ed1d"
-  dependencies:
-    invariant "^2.2.1"
-    loose-envify "^1.2.0"
-    resolve-pathname "^2.0.0"
-    value-equal "^0.2.0"
-    warning "^3.0.0"
-
-history@^4.6.3:
+history@^4.5.1, history@^4.6.0, history@^4.6.3:
   version "4.6.3"
   resolved "https://registry.yarnpkg.com/history/-/history-4.6.3.tgz#6d723a8712c581d6bef37e8c26f4aedc6eb86967"
   dependencies:

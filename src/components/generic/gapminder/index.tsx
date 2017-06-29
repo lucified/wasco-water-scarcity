@@ -131,7 +131,7 @@ function findClosestIndex(date: Date, data: Data) {
   return indexOnRight - 1;
 }
 
-class Gapminder extends React.Component<Props, void> {
+class Gapminder extends React.Component<Props> {
   public static defaultProps: DefaultProps = {
     marginTop: 20,
     marginRight: 20,

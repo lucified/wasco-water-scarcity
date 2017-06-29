@@ -54,7 +54,7 @@ const timeScaleOptions = getTimeScales().map(value => ({
   label: value.charAt(0).toUpperCase() + value.slice(1),
 }));
 
-class ModelSelector extends React.Component<Props, void> {
+class ModelSelector extends React.Component<Props> {
   private handleImpactModelChange = (option: {
     value: string;
     label: string;

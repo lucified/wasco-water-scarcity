@@ -21,7 +21,7 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-class WorldRegionSelector extends React.Component<Props, void> {
+class WorldRegionSelector extends React.Component<Props> {
   private generateClickCallback(id: number) {
     return () =>
       this.props.onSetWorldRegion(

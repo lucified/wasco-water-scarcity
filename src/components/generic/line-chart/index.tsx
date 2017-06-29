@@ -59,7 +59,7 @@ function toMidpoint(start: Date, end: Date): Date {
   return new Date((end.getTime() + start.getTime()) / 2);
 }
 
-class LineChart extends React.Component<Props, void> {
+class LineChart extends React.Component<Props> {
   public static defaultProps: DefaultProps = {
     marginTop: 20,
     marginRight: 80,

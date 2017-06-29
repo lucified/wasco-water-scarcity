@@ -21,7 +21,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-export default class Header extends React.Component<Props, void> {
+export default class Header extends React.Component<Props> {
   public render() {
     const { fromPage } = this.props;
 
