@@ -14,6 +14,7 @@ export interface Dataset {
   spatialUnit: string;
   timeScale: string;
   dataType: string;
+  population: string;
   impactModel: string;
   climateModel: string;
   climateExperiment: string;
