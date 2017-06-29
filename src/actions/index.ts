@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 
 import {
-  fetchStressShortageData,
+  fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
   generateWaterToWorldRegionsMap,
@@ -161,7 +161,7 @@ export function loadModelData(
   timeScale: string,
 ) {
   return (dispatch: Dispatch<any>) => {
-    return fetchStressShortageData(
+    return fetchHistoricalStressShortageData(
       climateModel,
       impactModel,
       timeScale,
@@ -180,7 +180,7 @@ export function loadAppData(
 ) {
   return (dispatch: Dispatch<any>) => {
     return Promise.all([
-      fetchStressShortageData(climateModel, impactModel, timeScale),
+      fetchHistoricalStressShortageData(climateModel, impactModel, timeScale),
       fetchWaterRegionsData(),
       fetchWorldRegionsData(),
     ]).then(([waterData, waterRegionData, worldRegionsData]) => {

@@ -27,7 +27,7 @@ function generateStressShortageData(
   }));
 }
 
-export async function fetchStressShortageData(
+export async function fetchHistoricalStressShortageData(
   climateModel: string,
   impactModel: string,
   timeScale: string,
@@ -37,6 +37,7 @@ export async function fetchStressShortageData(
       d.impactModel === impactModel &&
       d.climateModel === climateModel &&
       d.timeScale === timeScale &&
+      d.population === 'hist' &&
       ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
   );
   if (!dataset) {
