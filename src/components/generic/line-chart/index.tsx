@@ -23,13 +23,13 @@ export interface Datum {
 }
 
 export interface Data {
-  label?: string;
+  id: string;
   color: string;
   series: Datum[];
 }
 
 interface PassedProps {
-  data: Data;
+  data: Data | Data[];
   width: number;
   height: number;
   marginLeft?: number;
@@ -41,6 +41,7 @@ interface PassedProps {
   minY?: number;
   yAxisLabel?: string;
   selectedTimeIndex?: number;
+  selectedDataSeries?: string;
   onHover?: (hoveredIndex: number) => void;
   backgroundColorScale?: ScaleThreshold<number, string>;
 }
@@ -102,7 +103,9 @@ class LineChart extends React.Component<Props> {
       height,
       data,
     } = this.props as PropsWithDefaults;
-    const seriesData = data.series;
+    const seriesData = Array.isArray(data)
+      ? flatMap(data, d => d.series)
+      : data.series;
     const dataValueExtent = extent(seriesData, d => d.value) as [
       number,
       number
@@ -140,7 +143,9 @@ class LineChart extends React.Component<Props> {
       data,
     } = this.props as PropsWithDefaults;
 
-    const seriesData = data.series;
+    const seriesData = Array.isArray(data)
+      ? flatMap(data, d => d.series)
+      : data.series;
     const dataValueExtent = extent(seriesData, d => d.value) as [
       number,
       number
@@ -209,7 +214,7 @@ class LineChart extends React.Component<Props> {
         SVGGElement,
         { label: string; color: string; series: Datum[] }
       >('g#line-group')
-      .data([data])
+      .data(Array.isArray(data) ? data : [data])
       .enter()
         .append('g')
         .attr('id', 'line-group');
@@ -219,26 +224,6 @@ class LineChart extends React.Component<Props> {
       .attr('class', styles.line)
       .attr('d', d => this.lineGenerator!(d.series))
       .style('stroke', d => d.color);
-
-    if (data.label) {
-      lineGroup
-        .append('text')
-        .datum(d => ({
-          label: d.label,
-          lastDatum: d.series[d.series.length - 1],
-        }))
-        .attr(
-          'transform',
-          d =>
-            `translate(${this.xScale!(d.lastDatum.end)},${this.yScale!(
-              d.lastDatum.value,
-            )}`,
-        )
-        .attr('x', 3)
-        .attr('dy', '0.35em')
-        .attr('class', styles['line-label'])
-        .text(d => d.label!);
-    }
 
     if (selectedTimeIndex != null) {
       const selectedData = seriesData[selectedTimeIndex];
@@ -271,7 +256,9 @@ class LineChart extends React.Component<Props> {
     const { data } = this.props as PropsWithDefaults;
 
     // TODO: make this more efficient?
-    const dataDates = data.series.map(d => toMidpoint(d.start, d.end));
+    // TODO: This assumes the time index is the same for all series shown
+    const dataSeries = Array.isArray(data) ? data[0].series : data.series;
+    const dataDates = dataSeries.map(d => toMidpoint(d.start, d.end));
     // All earlier times are to the left of this index. It should never be 0.
     const indexOnRight = bisectRight(dataDates, date);
 
@@ -279,8 +266,8 @@ class LineChart extends React.Component<Props> {
       return 0;
     }
 
-    if (indexOnRight >= data.series.length) {
-      return data.series.length - 1;
+    if (indexOnRight >= dataSeries.length) {
+      return dataSeries.length - 1;
     }
 
     const dateOnLeft = dataDates[indexOnRight - 1];
@@ -322,7 +309,9 @@ class LineChart extends React.Component<Props> {
       data,
     } = this.props as PropsWithDefaults;
 
-    const seriesData = data.series;
+    const seriesData = Array.isArray(data)
+      ? flatMap(data, d => d.series)
+      : data.series;
     const dataValueExtent = extent(seriesData, d => d.value) as [
       number,
       number
@@ -387,31 +376,13 @@ class LineChart extends React.Component<Props> {
         SVGGElement,
         { label: string; color: string; series: Datum[] }
       >('g#line-group')
-      .data([data]);
+      .data(Array.isArray(data) ? data : [data]);
 
     // prettier-ignore
     lineGroup
       .select('path')
       .transition(t)
         .attr('d', d => this.lineGenerator!(d.series));
-
-    if (data.label) {
-      lineGroup
-        .select('text')
-        .datum(d => ({
-          label: d.label,
-          lastDatum: d.series[d.series.length - 1],
-        }))
-        .transition(t)
-        .attr(
-          'transform',
-          d =>
-            `translate(${this.xScale!(d.lastDatum.end)},${this.yScale!(
-              d.lastDatum.value,
-            )}`,
-        )
-        .text(d => d.label || '');
-    }
 
     // TODO: The following will break if selectedTimeIndex doesn't exist when the component is mounted
     if (selectedTimeIndex != null) {
