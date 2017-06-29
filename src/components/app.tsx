@@ -41,7 +41,7 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-class App extends React.Component<Props, void> {
+class App extends React.Component<Props> {
   public componentDidMount() {
     const {
       loadAppData,

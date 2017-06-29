@@ -10,7 +10,7 @@ interface Props {
   transitionDuration?: number;
 }
 
-export default class AxisComponent extends React.Component<Props, void> {
+export default class AxisComponent extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.storeAxisRef = this.storeAxisRef.bind(this);

@@ -24,7 +24,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class ShortageBody extends React.Component<Props, void> {
+class ShortageBody extends React.Component<Props> {
   public componentDidMount() {
     this.props.setSelectedDataType('shortage');
   }
@@ -38,20 +38,18 @@ class ShortageBody extends React.Component<Props, void> {
         <div className="row">
           <div className="col-xs-12 col-md-6 col-lg-8">
             <p>
-              <b>Blue water shortage</b> is a form of scarcity that occurs
-              when a population's water needs cannot be met using locally
-              available water. Water needs are complex. Products (and
-              "virtual" water) can be imported (even{' '}
-              <Link to="/drinking-water">drinking water</Link>), leading to{' '}
+              <b>Blue water shortage</b> is a form of scarcity that occurs when
+              a population's water needs cannot be met using locally available
+              water. Water needs are complex. Products (and "virtual" water) can
+              be imported (even <Link to="/drinking-water">
+                drinking water
+              </Link>), leading to{' '}
               <Link to="/virtual-water-dependency/shortage">
                 virtual water dependency
               </Link>. In addition to water from rivers, lakes, and aquifers,
               rainfall and soil moisture (
-              <Link to="/green-water">
-                "green water"
-              </Link>)
-              may satisfy needs. And even if water is available locally, it
-              may be{' '}
+              <Link to="/green-water">"green water"</Link>) may satisfy needs.
+              And even if water is available locally, it may be{' '}
               <Link to="/upstream-dependency/shortage">
                 dependent on upstream water use
               </Link>.{' '}
@@ -62,8 +60,8 @@ class ShortageBody extends React.Component<Props, void> {
               more detailed issues or focussing on specific impacts, e.g.
               related to <Link to="/food-security">food security</Link> or{' '}
               <Link to="/water-supply">urban water supply systems</Link>.
-              Thresholds for low, moderate and high shortage are commonly
-              used, but are only indicative.
+              Thresholds for low, moderate and high shortage are commonly used,
+              but are only indicative.
             </p>
             {/* TODO: Make this its own component and use actual values */}
             <p>
@@ -74,16 +72,14 @@ class ShortageBody extends React.Component<Props, void> {
               estimates from the water model{' '}
               <span className={styles.assumption}>'watergap'</span>, driven by
               climate data from{' '}
-              <span className={styles.assumption}>'WATCH'</span>, calculated
-              for{' '}
+              <span className={styles.assumption}>'WATCH'</span>, calculated for{' '}
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
-              at a <span className={styles.assumption}>decadal</span>{' '}
-              timescale. Population estimates are from{' '}
+              at a <span className={styles.assumption}>decadal</span> timescale.
+              Population estimates are from{' '}
               <span className={styles.assumption}>HYDE</span>.{' '}
-              <a href="#">Read more</a>.{' '}
-              <a href="#">Explore alternatives</a>.
+              <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
             </p>
           </div>
           <div className="col-xs-12 col-md-6 col-lg-4">
@@ -92,7 +88,9 @@ class ShortageBody extends React.Component<Props, void> {
         </div>
         {!selectedWaterData || !waterRegions
           ? <div className="row middle-xs">
-              <div className="col-xs-12"><Spinner /></div>
+              <div className="col-xs-12">
+                <Spinner />
+              </div>
             </div>
           : <div>
               <div className="row middle-xs">
@@ -122,9 +120,10 @@ class ShortageBody extends React.Component<Props, void> {
                     regions with high river flows (discharge) (
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
-                    availability
-                    typically only considers renewable freshwater, not{' '}
-                    <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
+                    availability typically only considers renewable freshwater,
+                    not <Link to="/fossil-groundwater">
+                      fossil groundwater
+                    </Link>.{' '}
                     <Link to="/interbasin-water-transfers">
                       Interbasin water transfers
                     </Link>{' '}
@@ -135,9 +134,9 @@ class ShortageBody extends React.Component<Props, void> {
                       "virtual water"
                     </Link>{' '}
                     (importing water-using products) can also increase the
-                    effective availability of water.
-                    These other sources of water could potentially decrease
-                    water shortage, but bring with them other side-effects.
+                    effective availability of water. These other sources of
+                    water could potentially decrease water shortage, but bring
+                    with them other side-effects.
                   </p>
                 </div>
               </div>

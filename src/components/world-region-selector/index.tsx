@@ -21,7 +21,7 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps;
 
-class WorldRegionSelector extends React.Component<Props, void> {
+class WorldRegionSelector extends React.Component<Props> {
   private generateClickCallback(id: number) {
     return () =>
       this.props.onSetWorldRegion(
@@ -55,7 +55,9 @@ class WorldRegionSelector extends React.Component<Props, void> {
               [styles.selected]: selectedWorldRegionId === id,
             })}
           >
-            <span className={styles['region-name']}>{name}</span>
+            <span className={styles['region-name']}>
+              {name}
+            </span>
           </a>,
         )}
       </div>

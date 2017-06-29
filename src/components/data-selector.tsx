@@ -38,7 +38,7 @@ const values = [
 
 type Props = StateProps & DispatchProps & PassedProps;
 
-class DataTypeSelector extends React.Component<Props, void> {
+class DataTypeSelector extends React.Component<Props> {
   public render() {
     const { className, dataType, onChange } = this.props;
 

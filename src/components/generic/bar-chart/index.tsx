@@ -5,7 +5,7 @@ import BarChart, { Props as BarChartProps } from './bar-chart';
 
 type Props = BarChartProps & { containerWidth: number };
 
-class ResponsiveBarChart extends React.Component<Props, void> {
+class ResponsiveBarChart extends React.Component<Props> {
   public render() {
     return (
       <BarChart

@@ -45,9 +45,10 @@ const configurations = {
 };
 
 function getHeaderText(dataType: 'stress' | 'shortage') {
-  const text = dataType === 'shortage'
-    ? 'Available water per capita (m³)'
-    : 'Consumption relative to availability';
+  const text =
+    dataType === 'shortage'
+      ? 'Available water per capita (m³)'
+      : 'Consumption relative to availability';
   return (
     <span>
       <strong>

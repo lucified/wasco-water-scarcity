@@ -24,7 +24,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class StressBody extends React.Component<Props, void> {
+class StressBody extends React.Component<Props> {
   public componentDidMount() {
     this.props.setSelectedDataType('stress');
   }
@@ -38,21 +38,18 @@ class StressBody extends React.Component<Props, void> {
         <div className="row">
           <div className="col-xs-12 col-md-6 col-lg-8">
             <p>
-              <b>Blue water stress</b> is a form of scarcity that occurs when
-              a large share of water in rivers, lakes and aquifers is taken
-              for human use. Water becomes scarce because increasing water use
-              makes it difficult to satisfy various competing human and
-              environmental needs.{' '}
-              <Link to="/low-water">
-                Low water levels
-              </Link>{' '}
-              from increasing use can impact on{' '}
+              <b>Blue water stress</b> is a form of scarcity that occurs when a
+              large share of water in rivers, lakes and aquifers is taken for
+              human use. Water becomes scarce because increasing water use makes
+              it difficult to satisfy various competing human and environmental
+              needs. <Link to="/low-water">Low water levels</Link> from
+              increasing use can impact on{' '}
               <Link to="/navigation">navigation</Link>,{' '}
               <Link to="/environmental-flow">environmental water needs</Link>,
               and <Link to="/access-to-water">access to water</Link>. Comparing
               use to availability helps highlight potential blue water stress
-              hotspots before focussing on specific impacts. Thresholds for
-              low, moderate and high stress are commonly used, but are only
+              hotspots before focussing on specific impacts. Thresholds for low,
+              moderate and high stress are commonly used, but are only
               indicative.
             </p>
             {/* TODO: Make this its own component and use actual values */}
@@ -70,8 +67,8 @@ class StressBody extends React.Component<Props, void> {
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
-              at a <span className={styles.assumption}>decadal</span>{' '}
-              timescale. <a href="#">Read more</a>.{' '}
+              at a <span className={styles.assumption}>decadal</span> timescale.{' '}
+              <a href="#">Read more</a>.{' '}
               <Link to="/stress/uncertainty">Explore alternatives</Link>.
             </p>
           </div>
@@ -81,7 +78,9 @@ class StressBody extends React.Component<Props, void> {
         </div>
         {!selectedWaterData || !waterRegions
           ? <div className="row middle-xs">
-              <div className="col-xs-12"><Spinner /></div>
+              <div className="col-xs-12">
+                <Spinner />
+              </div>
             </div>
           : <div>
               <div className="row middle-xs">
@@ -117,9 +116,10 @@ class StressBody extends React.Component<Props, void> {
                     regions with high river flows (discharge) (
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
-                    availability typically only considers renewable
-                    freshwater, not{' '}
-                    <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
+                    availability typically only considers renewable freshwater,
+                    not <Link to="/fossil-groundwater">
+                      fossil groundwater
+                    </Link>.{' '}
                     <Link to="/interbasin-water-transfers">
                       Interbasin water transfers
                     </Link>{' '}

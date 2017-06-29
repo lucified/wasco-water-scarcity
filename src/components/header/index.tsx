@@ -5,7 +5,7 @@ const aaltoLogo = require('../../images/aalto_logo.svg');
 const menuIcon = require('../../images/hamburger.svg');
 const styles = require('./index.scss');
 
-export default class Header extends React.Component<{}, void> {
+export default class Header extends React.Component {
   public render() {
     return (
       <div className={styles.root}>
@@ -25,9 +25,7 @@ export default class Header extends React.Component<{}, void> {
           <div className="container">
             <div className="row">
               <div className="col-xs-12">
-                <div className={styles['navigation-theme']}>
-                  Water body:
-                </div>
+                <div className={styles['navigation-theme']}>Water body:</div>
                 <NavLink
                   to="/stress"
                   activeClassName={styles.selected}

@@ -5,7 +5,7 @@ const styles = require('./index.scss');
 
 interface Props {}
 
-export default class Spinner extends React.Component<Props, void> {
+export default class Spinner extends React.Component<Props> {
   public render() {
     return (
       <div className={styles.spinner}>

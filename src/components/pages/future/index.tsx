@@ -20,7 +20,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class ScarcityBody extends React.Component<Props, void> {
+class ScarcityBody extends React.Component<Props> {
   public componentDidMount() {
     this.props.setSelectedDataType('scarcity');
   }
@@ -33,18 +33,24 @@ class ScarcityBody extends React.Component<Props, void> {
         <div className="row">
           <div className="col-xs-12">
             <h1>The Future?</h1>
-            <p><em>What can we do about this in the future?</em></p>
+            <p>
+              <em>What can we do about this in the future?</em>
+            </p>
           </div>
         </div>
         <div className="row">
           <div className="col-xs-12">
             <h2>Actions</h2>
-            <p><em>Placeholder for actions</em></p>
+            <p>
+              <em>Placeholder for actions</em>
+            </p>
           </div>
         </div>
         {!selectedWaterData || !waterRegions
           ? <div className="row middle-xs">
-              <div className="col-xs-12"><Spinner /></div>
+              <div className="col-xs-12">
+                <Spinner />
+              </div>
             </div>
           : <div>
               <div className="row middle-xs">
@@ -58,9 +64,7 @@ class ScarcityBody extends React.Component<Props, void> {
                 </div>
                 <div className="col-xs-12 col-md-6 col-lg-4">
                   <DataSelector />
-                  <div>
-                    Futures
-                  </div>
+                  <div>Futures</div>
                 </div>
               </div>
               <div className="row">

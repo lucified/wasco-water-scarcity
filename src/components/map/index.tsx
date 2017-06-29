@@ -72,9 +72,10 @@ type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 function getColorScale(dataType: DataType, thresholds: number[]) {
   const emptyColor = '#D2E3E5';
 
-  const colors = dataType === 'shortage'
-    ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
-    : [emptyColor, ...getDataTypeColors(dataType)];
+  const colors =
+    dataType === 'shortage'
+      ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
+      : [emptyColor, ...getDataTypeColors(dataType)];
 
   return scaleThreshold<number, string>().domain(thresholds).range(colors);
 }
@@ -90,7 +91,7 @@ function getLabel(dataType: DataType) {
   }
 }
 
-class Map extends React.Component<Props, void> {
+class Map extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
 
@@ -377,9 +378,10 @@ class Map extends React.Component<Props, void> {
       shortageThresholds,
       selectedData: { data },
     } = this.props;
-    const selector = selectedDataType === 'scarcity'
-      ? scarcitySelector(thresholds, stressThresholds, shortageThresholds)
-      : waterPropertySelector(selectedDataType);
+    const selector =
+      selectedDataType === 'scarcity'
+        ? scarcitySelector(thresholds, stressThresholds, shortageThresholds)
+        : waterPropertySelector(selectedDataType);
     const value = selector(data[featureId]);
     return value != null ? colorScale(value) : '#807775';
   }
