@@ -8,6 +8,7 @@ import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
+import InlineAssumptionSelector from '../../inline-assumption-selector';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
@@ -68,14 +69,25 @@ class StressBody extends React.Component<Props> {
               </span>{' '}
               and <span className={styles.assumption}>consumption</span>{' '}
               estimates from the water model{' '}
-              <span className={styles.assumption}>'watergap'</span>, driven by
+              <InlineAssumptionSelector
+                variable="impactModel"
+                className={styles.assumption}
+              />, driven by
               climate data from{' '}
-              <span className={styles.assumption}>'WATCH'</span>
+              <InlineAssumptionSelector
+                variable="climateModel"
+                className={styles.assumption}
+              />
               , calculated for{' '}
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
-              at a <span className={styles.assumption}>decadal</span> timescale.{' '}
+              at a{' '}
+              <InlineAssumptionSelector
+                variable="timeScale"
+                className={styles.assumption}
+              />{' '}
+              timescale.{' '}
               <a href="#">Read more</a>.{' '}
               <Link to="/stress/uncertainty">Explore alternatives</Link>.
             </p>
@@ -136,7 +148,8 @@ class StressBody extends React.Component<Props> {
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
                     availability typically only considers renewable freshwater,
-                    not <Link to="/fossil-groundwater">
+                    not{' '}
+                    <Link to="/fossil-groundwater">
                       fossil groundwater
                     </Link>.{' '}
                     <Link to="/interbasin-water-transfers">

@@ -10,6 +10,7 @@ import CrossReferences from '../../cross-references';
 import DataSelector from '../../data-selector';
 import GapMinder from '../../gapminder';
 import Spinner from '../../generic/spinner';
+import InlineAssumptionSelector from '../../inline-assumption-selector';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
@@ -89,13 +90,24 @@ class ScarcityBody extends React.Component<Props> {
               </span>{' '}
               and <span className={styles.assumption}>consumption</span>{' '}
               estimates from the water model{' '}
-              <span className={styles.assumption}>'watergap'</span>, driven by
+              <InlineAssumptionSelector
+                variable="impactModel"
+                className={styles.assumption}
+              />, driven by
               climate data from{' '}
-              <span className={styles.assumption}>'WATCH'</span>, calculated for{' '}
+              <InlineAssumptionSelector
+                variable="climateModel"
+                className={styles.assumption}
+              />, calculated for{' '}
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
-              at a <span className={styles.assumption}>decadal</span> timescale.
+              at a{' '}
+              <InlineAssumptionSelector
+                variable="timeScale"
+                className={styles.assumption}
+              />{' '}
+              timescale.
               Population estimates are from{' '}
               <span className={styles.assumption}>HYDE</span>.{' '}
               <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.

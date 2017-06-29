@@ -8,6 +8,7 @@ import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
+import InlineAssumptionSelector from '../../inline-assumption-selector';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
@@ -49,7 +50,8 @@ class ShortageBody extends React.Component<Props> {
               <b>Blue water shortage</b> is a form of scarcity that occurs when
               a population's water needs cannot be met using locally available
               water. Water needs are complex. Products (and "virtual" water) can
-              be imported (even <Link to="/drinking-water">
+              be imported (even{' '}
+              <Link to="/drinking-water">
                 drinking water
               </Link>), leading to{' '}
               <Link to="/virtual-water-dependency/shortage">
@@ -78,13 +80,24 @@ class ShortageBody extends React.Component<Props> {
                 blue water availability
               </span>{' '}
               estimates from the water model{' '}
-              <span className={styles.assumption}>'watergap'</span>, driven by
+              <InlineAssumptionSelector
+                variable="impactModel"
+                className={styles.assumption}
+              />, driven by
               climate data from{' '}
-              <span className={styles.assumption}>'WATCH'</span>, calculated for{' '}
+              <InlineAssumptionSelector
+                variable="climateModel"
+                className={styles.assumption}
+              />, calculated for{' '}
               <span className={styles.assumption}>
                 food production units
               </span>{' '}
-              at a <span className={styles.assumption}>decadal</span> timescale.
+              at a{' '}
+              <InlineAssumptionSelector
+                variable="timeScale"
+                className={styles.assumption}
+              />{' '}
+              timescale.
               Population estimates are from{' '}
               <span className={styles.assumption}>HYDE</span>.{' '}
               <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
@@ -140,7 +153,8 @@ class ShortageBody extends React.Component<Props> {
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
                     availability typically only considers renewable freshwater,
-                    not <Link to="/fossil-groundwater">
+                    not{' '}
+                    <Link to="/fossil-groundwater">
                       fossil groundwater
                     </Link>.{' '}
                     <Link to="/interbasin-water-transfers">
