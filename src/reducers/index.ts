@@ -80,9 +80,7 @@ function dataReducer(
         waterToWorldRegionsMap: action.map,
       };
     case STORE_FUTURE_DATA:
-      const futureDataObject: {
-        [id: string]: Array<TimeAggregate<StressShortageDatum>>;
-      } = {};
+      const futureDataObject = { ...state.futureData || {} };
       action.data.forEach(d => {
         futureDataObject[d.id] = d.data;
       });
