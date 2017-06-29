@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -12,7 +13,7 @@ import SelectedRegionInformation from '../../selected-region-information';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 
-interface PassedProps {
+interface PassedProps extends RouteComponentProps<void> {
   setSelectedDataType: (dataType: DataType) => void;
   selectedWaterData?: TimeAggregate<StressShortageDatum>;
   waterRegions?: WaterRegionGeoJSON;

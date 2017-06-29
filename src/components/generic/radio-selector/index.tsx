@@ -11,7 +11,7 @@ interface PassedProps {
   disabled?: boolean;
 }
 
-export default class RadioSelector extends React.Component<PassedProps, void> {
+export default class RadioSelector extends React.Component<PassedProps> {
   private generateClickCallback(value: string) {
     return (_e: React.MouseEvent<HTMLAnchorElement>) => {
       const { onChange } = this.props;

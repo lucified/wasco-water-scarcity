@@ -17,10 +17,7 @@ type Props = PassedProps;
 
 const yTickFormatter = format('.2s');
 
-export default class AvailabilityChart extends React.PureComponent<
-  Props,
-  void
-> {
+export default class AvailabilityChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
     data.map((d, i) => ({
       key: i,

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
 import { setSelectedDataType } from '../../actions/index';
@@ -20,7 +21,9 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type Props = GeneratedDispatchProps & GeneratedStateProps;
+type PassedProps = RouteComponentProps<void>;
+
+type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
@@ -38,7 +41,7 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 }
 
 export default function withPageData(Component: React.ComponentClass<Props>) {
-  return connect<GeneratedStateProps, GeneratedDispatchProps, undefined>(
+  return connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps>(
     mapStateToProps,
     mapDispatchToProps,
   )(Component);

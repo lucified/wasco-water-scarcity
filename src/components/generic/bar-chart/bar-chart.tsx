@@ -54,7 +54,7 @@ interface HoverRectProps {
   onMouseOut: (item: BarChartDatum) => void;
 }
 
-class HoverRect extends React.PureComponent<HoverRectProps, void> {
+class HoverRect extends React.PureComponent<HoverRectProps> {
   constructor(props: HoverRectProps) {
     super(props);
 

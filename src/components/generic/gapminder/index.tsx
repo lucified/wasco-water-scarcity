@@ -536,7 +536,7 @@ class Gapminder extends React.Component<Props> {
     }
   }
 
-  private storeSvgRef(el: SVGElement) {
+  private storeSvgRef(el: SVGSVGElement) {
     this.svgRef = el;
   }
 

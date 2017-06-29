@@ -112,7 +112,7 @@ class Map extends React.Component<Props> {
   private legendXScale?: ScaleLinear<number, number>;
   private legendExtentPairs?: Array<[number, number]>;
 
-  private saveSvgRef(ref: SVGElement) {
+  private saveSvgRef(ref: SVGSVGElement) {
     this.svgRef = ref;
   }
 

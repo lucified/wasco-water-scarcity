@@ -224,7 +224,7 @@ function selectionsReducer(state = initialState.selections, action: Action) {
 }
 
 export default combineReducers<StateTree>({
-  routing: routerReducer,
+  routing: routerReducer as any,
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
   data: dataReducer,

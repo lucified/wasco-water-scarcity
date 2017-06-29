@@ -5,8 +5,9 @@ function defaultEqualityCheck(oldArgs: any[], newArgs: any[]) {
   return newArgs.every((val: any, index: number) => val === oldArgs[index]);
 }
 
+type GenericFunction = (...args: any[]) => any;
 type EqualityChecker = (oldArgs: any[], newArgs: any[]) => boolean;
-type Memoizer = <TFunc extends (...args: any[]) => any>(
+type Memoizer = <TFunc extends GenericFunction>(
   func: TFunc,
   equalityCheck?: EqualityChecker,
 ) => TFunc;
@@ -15,14 +16,14 @@ type Memoizer = <TFunc extends (...args: any[]) => any>(
  * A memoizer with a cache size of 1.
  * By default, the equality checks for object equality using ===.
  */
-const memoize: Memoizer = <TFunc extends (...args: any[]) => any>(
+const memoize: Memoizer = <TFunc extends GenericFunction>(
   func: TFunc,
   equalityCheck = defaultEqualityCheck,
 ) => {
   let lastArgs: any[] | null = null;
   let lastResult: any = null;
 
-  return (...args: any[]) => {
+  return ((...args: any[]) => {
     if (
       lastArgs === null ||
       lastArgs.length !== args.length ||
@@ -32,7 +33,7 @@ const memoize: Memoizer = <TFunc extends (...args: any[]) => any>(
     }
     lastArgs = args;
     return lastResult;
-  };
+  }) as any; // TODO: fix this ugly hack
 };
 
 export default memoize;
