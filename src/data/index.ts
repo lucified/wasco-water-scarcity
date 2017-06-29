@@ -63,7 +63,9 @@ export async function fetchAllFutureData(): Promise<
   const futureDatasetURLs = datasets
     .filter(
       d =>
-        d.population !== 'hist' && ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+        d.population !== 'hist' &&
+        d.timeScale === 'decadal' && // TODO: remove
+        ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
     )
     .map(d => d.url);
   if (futureDatasetURLs.length === 0) {

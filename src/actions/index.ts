@@ -187,7 +187,9 @@ export function loadModelData(
 
 export function loadFutureData() {
   return (dispatch: Dispatch<any>) => {
+    console.log('started fetching future data');
     return fetchAllFutureData().then(futureData => {
+      console.log('finished fetching future data');
       if (futureData) {
         dispatch(storeFutureData(futureData));
       }

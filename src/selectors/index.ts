@@ -17,6 +17,12 @@ export function getStressShortageData(
   return state.data.stressShortageData;
 }
 
+export function getFutureData(
+  state: StateTree,
+): { [id: string]: Array<TimeAggregate<StressShortageDatum>> } | undefined {
+  return state.data.futureData;
+}
+
 export function getSelectedStressShortageData(
   state: StateTree,
 ): TimeAggregate<StressShortageDatum> | undefined {
@@ -219,6 +225,21 @@ export const getTimeSeriesForSelectedWaterRegion = createSelector(
     }
 
     return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
+  },
+);
+
+export const getAllFutureTimeSeriesForSelectedWaterRegion = createSelector(
+  getSelectedWaterRegionId,
+  getFutureData,
+  (selectedRegion, data) => {
+    if (!data || selectedRegion === undefined) {
+      return undefined;
+    }
+
+    return Object.keys(data).map(id => ({
+      id,
+      data: data[id].map(timeAggregate => timeAggregate.data[selectedRegion]),
+    }));
   },
 );
 

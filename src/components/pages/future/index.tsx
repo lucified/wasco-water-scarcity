@@ -13,6 +13,7 @@ import Map from '../../map';
 import SelectedRegionInformation from '../../selected-region-information';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import FutureLineChart from './future-line-chart';
 
 import * as styles from './index.scss';
 
@@ -26,7 +27,7 @@ type Props = PassedProps;
 
 class ScarcityBody extends React.Component<Props> {
   public componentDidMount() {
-    this.props.setSelectedDataType('scarcity');
+    this.props.setSelectedDataType('stress');
   }
 
   public render() {
@@ -51,10 +52,7 @@ class ScarcityBody extends React.Component<Props> {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <h2>Actions</h2>
-            <p>
-              <em>Placeholder for actions</em>
-            </p>
+            <FutureLineChart />
           </div>
         </div>
         {!selectedWaterData || !waterRegions
