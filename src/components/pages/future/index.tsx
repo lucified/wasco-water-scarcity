@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
@@ -12,6 +13,8 @@ import Map from '../../map';
 import SelectedRegionInformation from '../../selected-region-information';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+
+import * as styles from './index.scss';
 
 interface PassedProps extends RouteComponentProps<void> {
   setSelectedDataType: (dataType: DataType) => void;
@@ -32,7 +35,14 @@ class ScarcityBody extends React.Component<Props> {
     return (
       <div>
         <div className="row">
-          <div className="col-xs-12">
+          <div
+            className={classNames(
+              'col-xs-12',
+              'col-md-6',
+              'col-lg-8',
+              styles['body-text'],
+            )}
+          >
             <h1>The Future?</h1>
             <p>
               <em>What can we do about this in the future?</em>

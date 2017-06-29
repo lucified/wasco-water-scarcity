@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 
@@ -36,7 +37,14 @@ class ShortageBody extends React.Component<Props> {
       <div>
         <h1>Water Shortage</h1>
         <div className="row">
-          <div className="col-xs-12 col-md-6 col-lg-8">
+          <div
+            className={classNames(
+              'col-xs-12',
+              'col-md-6',
+              'col-lg-8',
+              styles['body-text'],
+            )}
+          >
             <p>
               <b>Blue water shortage</b> is a form of scarcity that occurs when
               a population's water needs cannot be met using locally available
@@ -109,6 +117,17 @@ class ShortageBody extends React.Component<Props> {
                     waterRegions={waterRegions}
                   />
                   <WorldRegionSelector />
+                </div>
+              </div>
+              <div className="row">
+                <div
+                  className={classNames(
+                    'col-xs-12',
+                    'col-md-6',
+                    'col-lg-8',
+                    styles['body-text'],
+                  )}
+                >
                   <p>
                     Water shortage is considered population-driven scarcity.
                     Water needs are in question rather than water use more
