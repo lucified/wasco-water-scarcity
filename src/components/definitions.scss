@@ -80,6 +80,15 @@ $default-margin: 20px;
   }
 }
 
+// REPEATING ELEMENTS
+
+.body-text {
+  font-family: $fontFamily;
+  font-size: $bodyFontSize;
+  line-height: 1.5;
+  color: $color-darker-gray;
+}
+
 // MISCELLANEOUS
 
 $golden: 61.803%;
