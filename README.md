@@ -16,6 +16,17 @@ yarn start
 
 Then open http://localhost:3000 in your web browser.
 
+### Linting & Prettier
+
+To lint the code, run:
+```shell
+yarn run lint
+```
+
+To prettify the whole code base, run:
+```shell
+yarn run prettify
+```
 
 ## Building deployment distributions
 
