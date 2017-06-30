@@ -8,6 +8,7 @@ import { StateTree } from '../../../reducers';
 import {
   getAllFutureTimeSeriesForSelectedWaterRegion,
   getSelectedDataType,
+  getSelectedFutureModel,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
@@ -29,6 +30,7 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
+  selectedFutureModel: string;
   selectedDataType?: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
   data?: Array<{
@@ -44,6 +46,7 @@ function FutureLineChart({
   data,
   selectedDataType,
   thresholds,
+  selectedFutureModel,
   selectedTimeIndex,
   selectedWaterRegionId,
   onTimeIndexChange,
@@ -83,6 +86,7 @@ function FutureLineChart({
       width={400}
       height={180}
       selectedTimeIndex={selectedTimeIndex}
+      selectedDataSeries={selectedFutureModel}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
@@ -97,6 +101,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
+    selectedFutureModel: getSelectedFutureModel(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,

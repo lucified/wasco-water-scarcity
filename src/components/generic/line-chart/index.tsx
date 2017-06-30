@@ -130,6 +130,26 @@ class LineChart extends React.Component<Props> {
       .y(d => this.yScale!(d.value));
   }
 
+  // We need to have a selectedTimeIndex and if the this.props.data is an array,
+  // also a selectedDataSeries
+  private getSelectedDataPoint() {
+    const { selectedTimeIndex, selectedDataSeries, data } = this.props;
+
+    if (
+      selectedTimeIndex == null ||
+      (Array.isArray(data) && selectedDataSeries == null)
+    ) {
+      return undefined;
+    }
+
+    if (Array.isArray(data)) {
+      const selectedData = data.find(d => d.id === selectedDataSeries);
+      return selectedData && selectedData.series[selectedTimeIndex];
+    }
+
+    return data.series[selectedTimeIndex];
+  }
+
   private drawChart() {
     const {
       marginBottom,
@@ -138,7 +158,7 @@ class LineChart extends React.Component<Props> {
       marginTop,
       width,
       height,
-      selectedTimeIndex,
+      selectedDataSeries,
       backgroundColorScale,
       data,
     } = this.props as PropsWithDefaults;
@@ -150,12 +170,15 @@ class LineChart extends React.Component<Props> {
       number,
       number
     ];
+    const selectedDataPoint = this.getSelectedDataPoint();
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
+    const yScale = this.yScale!;
+    const xScale = this.xScale!;
 
     if (backgroundColorScale) {
       const backgroundColorsGroup = g
@@ -180,30 +203,29 @@ class LineChart extends React.Component<Props> {
           .append('rect')
           .attr('class', styles['background-colors'])
           .attr('x', 0)
-          .attr('y', d => this.yScale!(d.upperBound))
+          .attr('y', d => yScale(d.upperBound))
           .attr('width', chartWidth)
-          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
     }
 
     g
       .select('g#x-axis')
-      .call(axisBottom(this.xScale!).ticks(Math.round(chartWidth / 50)));
+      .call(axisBottom(xScale).ticks(Math.round(chartWidth / 50)));
     g
       .select('g#y-axis')
-      .call(axisLeft(this.yScale!).ticks(Math.round(chartHeight / 30)));
+      .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)));
 
-    if (selectedTimeIndex != null) {
-      const selectedData = seriesData[selectedTimeIndex];
+    if (selectedDataPoint) {
       g
         .append('rect')
         .attr('id', 'selected-group')
-        .attr('x', this.xScale!(selectedData.start))
+        .attr('x', xScale(selectedDataPoint.start))
         .attr('y', 0)
         .attr('height', chartHeight)
         .attr(
           'width',
-          this.xScale!(selectedData.end) - this.xScale!(selectedData.start),
+          xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start),
         )
         .attr('class', styles['selected-area']);
     }
@@ -223,11 +245,13 @@ class LineChart extends React.Component<Props> {
       .append('path')
       .attr('class', styles.line)
       .attr('d', d => this.lineGenerator!(d.series))
+      .style(
+        'opacity',
+        d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.05 : 1),
+      )
       .style('stroke', d => d.color);
 
-    if (selectedTimeIndex != null) {
-      const selectedData = seriesData[selectedTimeIndex];
-
+    if (selectedDataPoint) {
       g
         .append('text')
         .attr('id', 'selected-label')
@@ -236,11 +260,11 @@ class LineChart extends React.Component<Props> {
         .attr('dy', '.35em')
         .attr(
           'transform',
-          `translate(${this.xScale!(
-            toMidpoint(selectedData.start, selectedData.end),
-          )},${this.yScale!(selectedData.value)})`,
+          `translate(${xScale(
+            toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
+          )},${yScale(selectedDataPoint.value)})`,
         )
-        .text(this.numberFormatter(selectedData.value));
+        .text(this.numberFormatter(selectedDataPoint.value));
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
@@ -305,7 +329,7 @@ class LineChart extends React.Component<Props> {
       width,
       height,
       backgroundColorScale,
-      selectedTimeIndex,
+      selectedDataSeries,
       data,
     } = this.props as PropsWithDefaults;
 
@@ -316,12 +340,15 @@ class LineChart extends React.Component<Props> {
       number,
       number
     ];
+    const selectedDataPoint = this.getSelectedDataPoint();
 
     const chartWidth = width - marginLeft - marginRight;
     const chartHeight = height - marginTop - marginBottom;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
     );
+    const xScale = this.xScale!;
+    const yScale = this.yScale!;
 
     const t = transition('linechart').duration(100);
 
@@ -347,15 +374,15 @@ class LineChart extends React.Component<Props> {
           .append('rect')
           .attr('class', styles['background-colors'])
           .attr('x', 0)
-          .attr('y', d => this.yScale!(d.upperBound))
+          .attr('y', d => yScale(d.upperBound))
           .attr('width', chartWidth)
-          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
       // prettier-ignore
       colorRects
         .transition(t)
-          .attr('y', d => this.yScale!(d.upperBound))
-          .attr('height', d => this.yScale!(d.lowerBound) - this.yScale!(d.upperBound))
+          .attr('y', d => yScale(d.upperBound))
+          .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
       colorRects.exit().remove();
     }
@@ -364,12 +391,12 @@ class LineChart extends React.Component<Props> {
     g
       .select('g#x-axis')
       .transition(t)
-        .call(axisBottom(this.xScale!).ticks(Math.round(chartWidth / 50)) as any);
+        .call(axisBottom(xScale).ticks(Math.round(chartWidth / 50)) as any);
     // prettier-ignore
     g
       .select('g#y-axis')
       .transition(t)
-        .call(axisLeft(this.yScale!).ticks(Math.round(chartHeight / 30)) as any);
+        .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)) as any);
 
     const lineGroup = g
       .selectAll<
@@ -382,18 +409,17 @@ class LineChart extends React.Component<Props> {
     lineGroup
       .select('path')
       .transition(t)
+        .style('opacity', d => selectedDataSeries && d.id !== selectedDataSeries ? 0.05 : 1)
         .attr('d', d => this.lineGenerator!(d.series));
 
     // TODO: The following will break if selectedTimeIndex doesn't exist when the component is mounted
-    if (selectedTimeIndex != null) {
-      const selectedData = seriesData[selectedTimeIndex];
-
+    if (selectedDataPoint) {
       // prettier-ignore
       g
         .select('rect#selected-group')
         .transition(t)
-          .attr('x', this.xScale!(selectedData.start))
-          .attr('width', this.xScale!(selectedData.end) - this.xScale!(selectedData.start));
+          .attr('x', xScale(selectedDataPoint.start))
+          .attr('width', xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start));
 
       // prettier-ignore
       g
@@ -401,11 +427,11 @@ class LineChart extends React.Component<Props> {
         .transition(t)
           .attr(
             'transform',
-            `translate(${this.xScale!(
-              toMidpoint(selectedData.start, selectedData.end),
-            )},${this.yScale!(selectedData.value)})`,
+            `translate(${xScale(
+              toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
+            )},${yScale(selectedDataPoint.value)})`,
           )
-          .text(this.numberFormatter(selectedData.value));
+          .text(this.numberFormatter(selectedDataPoint.value));
     }
   }
 
