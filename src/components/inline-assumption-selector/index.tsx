@@ -1,4 +1,3 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as Select from 'react-select';
@@ -26,7 +25,6 @@ interface StateProps {
   impactModel: string;
   climateModel: string;
   timeScale: string;
-  [key: string]: string;
 }
 
 interface DispatchProps {
@@ -36,7 +34,7 @@ interface DispatchProps {
 }
 
 interface PassedProps {
-  variable: string;
+  variable: 'impactModel' | 'climateModel' | 'timeScale';
   className?: string;
 }
 
@@ -93,7 +91,7 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
   private selectors: AssumptionSelectorUIs = {
     impactModel: () =>
       <Select
-        className={classNames(styles.select, styles.first)}
+        className={styles.select}
         name="Impact model"
         options={impactModelOptions}
         value={this.props.impactModel}
@@ -121,24 +119,19 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
       />,
   };
 
-  private showAssumptionSelector(): void {
+  private showAssumptionSelector = () => {
     this.setState({ editing: true });
-  }
+  };
 
   public render() {
-    const { variable } = this.props;
-
-    this.showAssumptionSelector = this.showAssumptionSelector.bind(this);
+    const { variable, className } = this.props;
 
     if (this.state.editing) {
-      return this.selectors[this.props.variable]();
+      return this.selectors[variable]();
     }
 
     return (
-      <span
-        onClick={this.showAssumptionSelector}
-        className={this.props.className}
-      >
+      <span onClick={this.showAssumptionSelector} className={className}>
         {this.props[variable]}
       </span>
     );
