@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as Select from 'react-select';
@@ -110,13 +111,14 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
         clearable={false}
       />,
     timeScale: () =>
-      <RadioSelector
-        className={styles['time-scale-selector']}
-        selectedValue={this.props.timeScale}
-        values={timeScaleOptions}
-        onChange={this.handleTimeScaleChange}
-        disabled={this.props.impactModel === 'watergap'}
-      />,
+      <div className={styles['time-scale-selector']}>
+        <RadioSelector
+          selectedValue={this.props.timeScale}
+          values={timeScaleOptions}
+          onChange={this.handleTimeScaleChange}
+          disabled={this.props.impactModel === 'watergap'}
+        />
+      </div>,
   };
 
   private showAssumptionSelector = () => {
@@ -131,7 +133,10 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
     }
 
     return (
-      <span onClick={this.showAssumptionSelector} className={className}>
+      <span
+        onClick={this.showAssumptionSelector}
+        className={classNames(styles.link, className)}
+      >
         {this.props[variable]}
       </span>
     );

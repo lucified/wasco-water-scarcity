@@ -6,6 +6,8 @@
 
 .time-scale-selector {
   margin-bottom: $default-margin / 2;
+  display: inline-block;
+  width: 250px;
 }
 
 .model {
@@ -17,8 +19,14 @@
   margin-right: 0.5rem;
 }
 
+.link {
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
 .select {
   z-index: 10;
   flex-grow: 1;
-  max-width: 250px;
+  width: 150px;
+  display: inline-block;
 }
