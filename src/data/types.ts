@@ -125,8 +125,7 @@ export function toStressShortageDatum({
   const livestock = consLiv || 0;
   const manufacturing = consMfg || 0;
   const calculatedTotal =
-    (domestic + electric + irrigation + livestock + manufacturing) *
-    KM_3_TO_M_3_RATIO;
+    domestic + electric + irrigation + livestock + manufacturing;
 
   return {
     startYear: y0,
@@ -138,8 +137,8 @@ export function toStressShortageDatum({
     consumptionIrrigation: irrigation * KM_3_TO_M_3_RATIO,
     consumptionLivestock: livestock * KM_3_TO_M_3_RATIO,
     consumptionManufacturing: manufacturing * KM_3_TO_M_3_RATIO,
-    consumptionTotal: calculatedTotal,
-    stress: stress,
+    consumptionTotal: calculatedTotal * KM_3_TO_M_3_RATIO,
+    stress,
     shortage: short,
     population: pop,
   };
