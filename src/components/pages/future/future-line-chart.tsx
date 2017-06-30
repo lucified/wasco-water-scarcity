@@ -3,12 +3,12 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../../../actions';
+import { setFutureTimeIndex } from '../../../actions';
 import { StateTree } from '../../../reducers';
 import {
   getAllFutureTimeSeriesForSelectedWaterRegion,
   getSelectedDataType,
-  getSelectedTimeIndex,
+  getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
 } from '../../../selectors';
@@ -49,7 +49,7 @@ function FutureLineChart({
   onTimeIndexChange,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
-    return null;
+    return <div className={styles.empty}>Select a unit</div>;
   }
 
   if (!data) {
@@ -96,7 +96,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   const selectedDataType = getSelectedDataType(state);
 
   return {
-    selectedTimeIndex: getSelectedTimeIndex(state),
+    selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
@@ -108,7 +108,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     onTimeIndexChange: (value: number) => {
-      dispatch(setTimeIndex(value));
+      dispatch(setFutureTimeIndex(value));
     },
   };
 }
