@@ -1,6 +1,6 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -15,6 +15,7 @@ import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import Description from './description';
+import MoreInformation from './more-information';
 
 import * as styles from './index.scss';
 
@@ -75,45 +76,18 @@ class StressBody extends React.Component<Props> {
                 </div>
               </div>
               <div className="row">
+                <SelectedRegionInformation dataType="stress" />
+              </div>
+              <div className="row">
                 <div
                   className={classNames(
                     'col-xs-12',
                     'col-md-6',
-                    'col-lg-8',
                     styles['body-text'],
                   )}
                 >
-                  <p>
-                    Water stress is considered demand-driven scarcity. It can
-                    occur even with a small population if water use is
-                    sufficiently high and water availability sufficiently low.
-                    Irrigation is the largest water user globally, and in most
-                    regions, which links water stress to{' '}
-                    <Link to="/food-security">food security</Link>.
-                  </p>
-                  <p>
-                    To calculate water availability, upstream withdrawals need
-                    to be taken into account (also see{' '}
-                    <Link to="/upstream-dependency/stress">
-                      upstream dependency
-                    </Link>). In these results, we allocated more water to
-                    regions with high river flows (discharge) (
-                    <a href="#">Read more </a>). To focus on{' '}
-                    <Link to="/sustainability">sustainability</Link>,
-                    availability typically only considers renewable freshwater,
-                    not <Link to="/fossil-groundwater">
-                      fossil groundwater
-                    </Link>.{' '}
-                    <Link to="/interbasin-water-transfers">
-                      Interbasin water transfers
-                    </Link>{' '}
-                    are usually also analysed separately. This explains why
-                    water use can be higher than availability.
-                  </p>
+                  <MoreInformation />
                 </div>
-              </div>
-              <div className="row">
-                <SelectedRegionInformation dataType="stress" />
               </div>
             </div>}
         <div className="row">

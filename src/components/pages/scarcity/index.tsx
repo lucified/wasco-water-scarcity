@@ -1,6 +1,6 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
@@ -17,6 +17,7 @@ import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import Description from './description';
+import MoreInformation from './more-information';
 
 import * as styles from './index.scss';
 
@@ -95,26 +96,18 @@ class ScarcityBody extends React.Component<Props> {
                 <WorldRegionSelector />
               </div>
               <div className="row">
+                <SelectedRegionInformation />
+              </div>
+              <div className="row">
                 <div
                   className={classNames(
                     'col-xs-12',
                     'col-md-6',
-                    'col-lg-8',
                     styles['body-text'],
                   )}
                 >
-                  <p>
-                    The separate drivers of <Link to="/stress">stress</Link> and{' '}
-                    <Link to="/shortage">shortage</Link> can be explored on
-                    their own pages. You can also{' '}
-                    <Link to="/future/scarcity">
-                      explore how stress and shortage can be addressed in future
-                    </Link>.
-                  </p>
+                  <MoreInformation />
                 </div>
-              </div>
-              <div className="row">
-                <SelectedRegionInformation />
               </div>
             </div>}
         <div className="row">
