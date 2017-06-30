@@ -1,0 +1,32 @@
+@import '../definitions.scss';
+
+.title {
+  margin-top: 0;
+}
+
+.time-scale-selector {
+  margin-bottom: $default-margin / 2;
+  display: inline-block;
+  width: 250px;
+}
+
+.model {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  margin-right: 0.5rem;
+}
+
+.link {
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.select {
+  z-index: 10;
+  flex-grow: 1;
+  width: 150px;
+  display: inline-block;
+}
