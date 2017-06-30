@@ -8,13 +8,13 @@ import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
-import InlineAssumptionSelector from '../../inline-assumption-selector';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import Description from './description';
 
 import * as styles from './index.scss';
 
@@ -39,71 +39,13 @@ class ShortageBody extends React.Component<Props> {
         <h1>Water Shortage</h1>
         <div className="row">
           <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-6',
-              'col-lg-8',
-              styles['body-text'],
-            )}
+            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
-            <p>
-              <b>Blue water shortage</b> is a form of scarcity that occurs when
-              a population's water needs cannot be met using locally available
-              water. Water needs are complex. Products (and "virtual" water) can
-              be imported (even{' '}
-              <Link to="/drinking-water">
-                drinking water
-              </Link>), leading to{' '}
-              <Link to="/virtual-water-dependency/shortage">
-                virtual water dependency
-              </Link>. In addition to water from rivers, lakes, and aquifers,
-              rainfall and soil moisture (
-              <Link to="/green-water">"green water"</Link>) may satisfy needs.
-              And even if water is available locally, it may be{' '}
-              <Link to="/upstream-dependency/shortage">
-                dependent on upstream water use
-              </Link>.{' '}
-            </p>
-            <p>
-              Evaluating the volume of water available per person highlights
-              potential blue water shortage hotspots, before addressing these
-              more detailed issues or focussing on specific impacts, e.g.
-              related to <Link to="/food-security">food security</Link> or{' '}
-              <Link to="/water-supply">urban water supply systems</Link>.
-              Thresholds for low, moderate and high shortage are commonly used,
-              but are only indicative.
-            </p>
-            {/* TODO: Make this its own component and use actual values */}
-            <p>
-              These estimates of blue water shortage are produced using{' '}
-              <span className={styles.assumption}>
-                blue water availability
-              </span>{' '}
-              estimates from the water model{' '}
-              <InlineAssumptionSelector
-                variable="impactModel"
-                className={styles.assumption}
-              />, driven by
-              climate data from{' '}
-              <InlineAssumptionSelector
-                variable="climateModel"
-                className={styles.assumption}
-              />, calculated for{' '}
-              <span className={styles.assumption}>
-                food production units
-              </span>{' '}
-              at a{' '}
-              <InlineAssumptionSelector
-                variable="timeScale"
-                className={styles.assumption}
-              />{' '}
-              timescale.
-              Population estimates are from{' '}
-              <span className={styles.assumption}>HYDE</span>.{' '}
-              <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
-            </p>
+            <Description />
           </div>
-          <div className="col-xs-12 col-md-6 col-lg-4">
+          <div
+            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
+          >
             <ModelSelector />
           </div>
         </div>
@@ -153,8 +95,7 @@ class ShortageBody extends React.Component<Props> {
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
                     availability typically only considers renewable freshwater,
-                    not{' '}
-                    <Link to="/fossil-groundwater">
+                    not <Link to="/fossil-groundwater">
                       fossil groundwater
                     </Link>.{' '}
                     <Link to="/interbasin-water-transfers">

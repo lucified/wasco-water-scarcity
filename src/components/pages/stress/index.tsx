@@ -8,13 +8,13 @@ import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
-import InlineAssumptionSelector from '../../inline-assumption-selector';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import Description from './description';
 
 import * as styles from './index.scss';
 
@@ -39,60 +39,13 @@ class StressBody extends React.Component<Props> {
         <h1>Water Stress</h1>
         <div className="row">
           <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-6',
-              'col-lg-8',
-              styles['body-text'],
-            )}
+            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
-            <p>
-              <b>Blue water stress</b> is a form of scarcity that occurs when a
-              large share of water in rivers, lakes and aquifers is taken for
-              human use. Water becomes scarce because increasing water use makes
-              it difficult to satisfy various competing human and environmental
-              needs. <Link to="/low-water">Low water levels</Link> from
-              increasing use can impact on{' '}
-              <Link to="/navigation">navigation</Link>,{' '}
-              <Link to="/environmental-flow">environmental water needs</Link>,
-              and <Link to="/access-to-water">access to water</Link>. Comparing
-              use to availability helps highlight potential blue water stress
-              hotspots before focussing on specific impacts. Thresholds for low,
-              moderate and high stress are commonly used, but are only
-              indicative.
-            </p>
-            {/* TODO: Make this its own component and use actual values */}
-            <p>
-              These estimates of blue water stress are produced using{' '}
-              <span className={styles.assumption}>
-                blue water availability
-              </span>{' '}
-              and <span className={styles.assumption}>consumption</span>{' '}
-              estimates from the water model{' '}
-              <InlineAssumptionSelector
-                variable="impactModel"
-                className={styles.assumption}
-              />, driven by
-              climate data from{' '}
-              <InlineAssumptionSelector
-                variable="climateModel"
-                className={styles.assumption}
-              />
-              , calculated for{' '}
-              <span className={styles.assumption}>
-                food production units
-              </span>{' '}
-              at a{' '}
-              <InlineAssumptionSelector
-                variable="timeScale"
-                className={styles.assumption}
-              />{' '}
-              timescale.{' '}
-              <a href="#">Read more</a>.{' '}
-              <Link to="/stress/uncertainty">Explore alternatives</Link>.
-            </p>
+            <Description />
           </div>
-          <div className="col-xs-12 col-md-6 col-lg-4">
+          <div
+            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
+          >
             <ModelSelector />
           </div>
         </div>
@@ -148,8 +101,7 @@ class StressBody extends React.Component<Props> {
                     <a href="#">Read more </a>). To focus on{' '}
                     <Link to="/sustainability">sustainability</Link>,
                     availability typically only considers renewable freshwater,
-                    not{' '}
-                    <Link to="/fossil-groundwater">
+                    not <Link to="/fossil-groundwater">
                       fossil groundwater
                     </Link>.{' '}
                     <Link to="/interbasin-water-transfers">
