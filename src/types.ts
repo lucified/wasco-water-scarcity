@@ -21,45 +21,45 @@ export interface Datum {
   // The globalRegionID in aggregates, regionID for FPUs. Set to 0 for the globe.
   featureId: number;
   population: number;
-  blueWaterAvailability: number;
+  availability: number;
   /**
    * We calculate this by taking the sum of the different consumptions. It may
    * differ slightly from the raw total value due to rounding and floating
    * numbers.
    */
-  blueWaterConsumptionTotal: number;
-  blueWaterConsumptionIrrigation: number;
-  blueWaterConsumptionDomestic: number;
-  blueWaterConsumptionElectric: number;
-  blueWaterConsumptionLivestock: number;
-  blueWaterConsumptionManufacturing: number;
+  consumptionTotal: number;
+  consumptionIrrigation: number;
+  consumptionDomestic: number;
+  consumptionElectric: number;
+  consumptionLivestock: number;
+  consumptionManufacturing: number;
 }
 
 // All units have been converted to m^3 from km^3
 export interface AggregateStressShortageDatum extends Datum {
   // For scarcity
-  populationNoBlueWaterShortageAndStress: number;
-  populationOnlyBlueWaterShortage: number;
-  populationOnlyBlueWaterStress: number;
-  populationBlueWaterShortageAndStress: number;
+  populationNoShortageAndStress: number;
+  populationOnlyShortage: number;
+  populationOnlyStress: number;
+  populationShortageAndStress: number;
 
   // For shortage
-  populationNoBlueWaterShortage: number;
-  populationLowBlueWaterShortage: number;
-  populationModerateBlueWaterShortage: number;
-  populationHighBlueWaterShortage: number;
+  populationNoShortage: number;
+  populationLowShortage: number;
+  populationModerateShortage: number;
+  populationHighShortage: number;
 
   // For stress
-  populationNoBlueWaterStress: number;
-  populationLowBlueWaterStress: number;
-  populationModerateBlueWaterStress: number;
-  populationHighBlueWaterStress: number;
+  populationNoStress: number;
+  populationLowStress: number;
+  populationModerateStress: number;
+  populationHighStress: number;
 }
 
 // All units have been converted to m^3 from km^3
 export interface StressShortageDatum extends Datum {
-  blueWaterShortage: number;
-  blueWaterStress: number;
+  shortage: number;
+  stress: number;
 }
 
 export type DataType = 'stress' | 'shortage' | 'scarcity';
@@ -82,9 +82,9 @@ export function getDataTypeColors(dataType: DataType) {
 export function waterPropertySelector(dataType: 'stress' | 'shortage') {
   switch (dataType) {
     case 'stress':
-      return (d: StressShortageDatum) => d.blueWaterStress;
+      return (d: StressShortageDatum) => d.stress;
     case 'shortage':
-      return (d: StressShortageDatum) => d.blueWaterShortage;
+      return (d: StressShortageDatum) => d.shortage;
   }
 }
 
@@ -94,8 +94,8 @@ export function scarcitySelector(
   shortageThresholds: number[],
 ) {
   return (d: StressShortageDatum) => {
-    const hasStress = d.blueWaterStress >= stressThresholds[0];
-    const hasShortage = d.blueWaterShortage <= shortageThresholds[2];
+    const hasStress = d.stress >= stressThresholds[0];
+    const hasShortage = d.shortage <= shortageThresholds[2];
     if (hasStress && hasShortage) {
       return scarcityThresholds[2] + 0.1;
     }

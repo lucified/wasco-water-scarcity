@@ -45,25 +45,25 @@ export const getAggregateData = createSelector(
         startYear,
         endYear,
         population: 0,
-        populationNoBlueWaterShortageAndStress: 0,
-        populationOnlyBlueWaterShortage: 0,
-        populationOnlyBlueWaterStress: 0,
-        populationBlueWaterShortageAndStress: 0,
-        populationNoBlueWaterShortage: 0,
-        populationLowBlueWaterShortage: 0,
-        populationModerateBlueWaterShortage: 0,
-        populationHighBlueWaterShortage: 0,
-        populationNoBlueWaterStress: 0,
-        populationLowBlueWaterStress: 0,
-        populationModerateBlueWaterStress: 0,
-        populationHighBlueWaterStress: 0,
-        blueWaterAvailability: 0,
-        blueWaterConsumptionDomestic: 0,
-        blueWaterConsumptionElectric: 0,
-        blueWaterConsumptionIrrigation: 0,
-        blueWaterConsumptionLivestock: 0,
-        blueWaterConsumptionManufacturing: 0,
-        blueWaterConsumptionTotal: 0,
+        populationNoShortageAndStress: 0,
+        populationOnlyShortage: 0,
+        populationOnlyStress: 0,
+        populationShortageAndStress: 0,
+        populationNoShortage: 0,
+        populationLowShortage: 0,
+        populationModerateShortage: 0,
+        populationHighShortage: 0,
+        populationNoStress: 0,
+        populationLowStress: 0,
+        populationModerateStress: 0,
+        populationHighStress: 0,
+        availability: 0,
+        consumptionDomestic: 0,
+        consumptionElectric: 0,
+        consumptionIrrigation: 0,
+        consumptionLivestock: 0,
+        consumptionManufacturing: 0,
+        consumptionTotal: 0,
       };
     }
 
@@ -103,13 +103,13 @@ export const getAggregateData = createSelector(
 
         const fieldsToAdd: Array<keyof AggregateStressShortageDatum> = [
           'population',
-          'blueWaterAvailability',
-          'blueWaterConsumptionTotal',
-          'blueWaterConsumptionIrrigation',
-          'blueWaterConsumptionDomestic',
-          'blueWaterConsumptionElectric',
-          'blueWaterConsumptionLivestock',
-          'blueWaterConsumptionManufacturing',
+          'availability',
+          'consumptionTotal',
+          'consumptionIrrigation',
+          'consumptionDomestic',
+          'consumptionElectric',
+          'consumptionLivestock',
+          'consumptionManufacturing',
         ];
 
         fieldsToAdd.forEach(field => {
@@ -118,56 +118,50 @@ export const getAggregateData = createSelector(
         });
 
         // Stress
-        if (
-          region.blueWaterStress == null ||
-          region.blueWaterStress >= thresholds.stress[2]
-        ) {
-          worldRegion.populationHighBlueWaterStress += population;
-          wholeGlobeRegion.populationHighBlueWaterStress += population;
-        } else if (region.blueWaterStress >= thresholds.stress[1]) {
-          worldRegion.populationModerateBlueWaterStress += population;
-          wholeGlobeRegion.populationModerateBlueWaterStress += population;
-        } else if (region.blueWaterStress >= thresholds.stress[0]) {
-          worldRegion.populationLowBlueWaterStress += population;
-          wholeGlobeRegion.populationLowBlueWaterStress += population;
+        if (region.stress == null || region.stress >= thresholds.stress[2]) {
+          worldRegion.populationHighStress += population;
+          wholeGlobeRegion.populationHighStress += population;
+        } else if (region.stress >= thresholds.stress[1]) {
+          worldRegion.populationModerateStress += population;
+          wholeGlobeRegion.populationModerateStress += population;
+        } else if (region.stress >= thresholds.stress[0]) {
+          worldRegion.populationLowStress += population;
+          wholeGlobeRegion.populationLowStress += population;
         } else {
-          worldRegion.populationNoBlueWaterStress += population;
-          wholeGlobeRegion.populationNoBlueWaterStress += population;
+          worldRegion.populationNoStress += population;
+          wholeGlobeRegion.populationNoStress += population;
         }
 
         // Shortage
-        if (region.blueWaterShortage <= thresholds.shortage[0]) {
-          worldRegion.populationHighBlueWaterShortage += population;
-          wholeGlobeRegion.populationHighBlueWaterShortage += population;
-        } else if (region.blueWaterShortage <= thresholds.shortage[1]) {
-          worldRegion.populationModerateBlueWaterShortage += population;
-          wholeGlobeRegion.populationModerateBlueWaterShortage += population;
-        } else if (region.blueWaterShortage <= thresholds.shortage[2]) {
-          worldRegion.populationLowBlueWaterShortage += population;
-          wholeGlobeRegion.populationLowBlueWaterShortage += population;
+        if (region.shortage <= thresholds.shortage[0]) {
+          worldRegion.populationHighShortage += population;
+          wholeGlobeRegion.populationHighShortage += population;
+        } else if (region.shortage <= thresholds.shortage[1]) {
+          worldRegion.populationModerateShortage += population;
+          wholeGlobeRegion.populationModerateShortage += population;
+        } else if (region.shortage <= thresholds.shortage[2]) {
+          worldRegion.populationLowShortage += population;
+          wholeGlobeRegion.populationLowShortage += population;
         } else {
-          worldRegion.populationNoBlueWaterShortage += population;
-          wholeGlobeRegion.populationNoBlueWaterShortage += population;
+          worldRegion.populationNoShortage += population;
+          wholeGlobeRegion.populationNoShortage += population;
         }
 
         // Scarcity
-        if (
-          region.blueWaterStress == null ||
-          region.blueWaterStress >= thresholds.stress[0]
-        ) {
-          if (region.blueWaterShortage <= thresholds.shortage[2]) {
-            worldRegion.populationBlueWaterShortageAndStress += population;
-            wholeGlobeRegion.populationBlueWaterShortageAndStress += population;
+        if (region.stress == null || region.stress >= thresholds.stress[0]) {
+          if (region.shortage <= thresholds.shortage[2]) {
+            worldRegion.populationShortageAndStress += population;
+            wholeGlobeRegion.populationShortageAndStress += population;
           } else {
-            worldRegion.populationOnlyBlueWaterStress += population;
-            wholeGlobeRegion.populationOnlyBlueWaterStress += population;
+            worldRegion.populationOnlyStress += population;
+            wholeGlobeRegion.populationOnlyStress += population;
           }
-        } else if (region.blueWaterShortage <= thresholds.shortage[2]) {
-          worldRegion.populationOnlyBlueWaterShortage += population;
-          wholeGlobeRegion.populationOnlyBlueWaterShortage += population;
+        } else if (region.shortage <= thresholds.shortage[2]) {
+          worldRegion.populationOnlyShortage += population;
+          wholeGlobeRegion.populationOnlyShortage += population;
         } else {
-          worldRegion.populationNoBlueWaterShortageAndStress += population;
-          wholeGlobeRegion.populationNoBlueWaterShortageAndStress += population;
+          worldRegion.populationNoShortageAndStress += population;
+          wholeGlobeRegion.populationNoShortageAndStress += population;
         }
       });
 
@@ -307,15 +301,15 @@ export const getDataByRegion = createSelector(
       } = feature.properties;
       const worldRegion = worldRegions.find(r => r.id === worldRegionId);
       const color = worldRegion ? worldRegion.color : 'lightblue';
-      const blueWaterStress: number[] = [];
-      const blueWaterShortage: number[] = [];
+      const stress: number[] = [];
+      const shortage: number[] = [];
       const population: number[] = [];
 
       stressShortageData.forEach(d => {
         const regionData = d.data[regionId];
         // The log scales can't have numbers at or below 0
-        blueWaterStress.push(toPositiveNumber(regionData.blueWaterStress));
-        blueWaterShortage.push(toPositiveNumber(regionData.blueWaterShortage));
+        stress.push(toPositiveNumber(regionData.stress));
+        shortage.push(toPositiveNumber(regionData.shortage));
         population.push(regionData.population || 0);
       });
 
@@ -323,8 +317,8 @@ export const getDataByRegion = createSelector(
         id: String(regionId),
         color,
         data: {
-          blueWaterStress,
-          blueWaterShortage,
+          stress,
+          shortage,
           population,
         },
       };

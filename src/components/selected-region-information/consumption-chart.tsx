@@ -29,27 +29,27 @@ const colorScale = schemeBlues[9];
 const legendItems: Array<LegendItem & { field: keyof Datum }> = [
   {
     title: 'Domestic',
-    field: 'blueWaterConsumptionDomestic',
+    field: 'consumptionDomestic',
     color: colorScale[8],
   },
   {
     title: 'Electric',
-    field: 'blueWaterConsumptionElectric',
+    field: 'consumptionElectric',
     color: colorScale[7],
   },
   {
     title: 'Irrigation',
-    field: 'blueWaterConsumptionIrrigation',
+    field: 'consumptionIrrigation',
     color: colorScale[5],
   },
   {
     title: 'Livestock',
-    field: 'blueWaterConsumptionLivestock',
+    field: 'consumptionLivestock',
     color: colorScale[3],
   },
   {
     title: 'Manufacturing',
-    field: 'blueWaterConsumptionManufacturing',
+    field: 'consumptionManufacturing',
     color: colorScale[2],
   },
 ];
@@ -69,7 +69,7 @@ class ConsumptionChart extends React.Component<Props, State> {
     (data: Datum[], hoveredType?: keyof Datum) =>
       data.map((d, i) => ({
         key: i,
-        total: d.blueWaterConsumptionTotal,
+        total: d.consumptionTotal,
         values: legendItems
           // Filter out fields with zero and if we're hovered, only the hovered type
           .filter(

@@ -25,6 +25,31 @@ export interface Dataset {
   url: string;
 }
 
+// Note: not yet used
+export type FutureData = Array<{
+  modelId: string;
+  featureId: string; // e.g. stress, shortage
+  default?: boolean;
+  spatialUnit: string;
+  timeScale: 'decadal' | 'annual';
+  dataType: string;
+  population: string;
+  impactModel: string;
+  climateModel: string;
+  climateExperiment: string;
+  socialForcing: string;
+  co2Forcing: string;
+  startYear: string;
+  endYear: string;
+  data: Array<{
+    y0: number; // start year
+    y1: number; // end year
+    regions: {
+      [regionId: number]: number;
+    };
+  }>;
+}>;
+
 export interface WorldRegionGeoJSON {
   type: 'FeatureCollection';
   features: WorldRegionGeoJSONFeature[];
@@ -47,97 +72,74 @@ export interface WaterRegionGeoJSON {
   crs: any;
 }
 
-export interface RawDatum {
+export interface RawRegionStressShortageDatum {
   // Independent variables
-  featureId: number; // The FPU ID or the world region ID for aggregates
-  startYear: number;
-  endYear: number;
+  id: number; // The FPU ID or the world region ID for aggregates
+  y0: number; // start year
+  y1: number; // end year
 
   // Dependent variables
   // Average population
-  population: number;
+  pop: number;
+
   // Blue water availability (m3/year)
-  blueWaterAvailability: number;
-  // Total blue water consumption (km3/year)
-  blueWaterConsumptionTotal: number;
+  avail: number;
+
   // Blue water consumption for irrigation (km3/year)
-  blueWaterConsumptionIrrigation?: number;
+  consIrr?: number;
   // Blue water consumption for households and small businesses (domestic )(km3/year)
-  blueWaterConsumptionDomestic?: number;
+  consDom?: number;
   // Blue water consumption for thermal electricity production (km3/year)
-  blueWaterConsumptionElectric?: number;
+  consEle?: number;
   // Blue water consumption for livestock farming (km3/year)
-  blueWaterConsumptionLivestock?: number;
+  consLiv?: number;
   // Blue water consumption for manufacturing industries (km3/year)
-  blueWaterConsumptionManufacturing?: number;
-}
+  consMfg?: number;
 
-export interface RawRegionStressShortageDatum extends RawDatum {
   // Blue water availability per capita (m3/cap/year). Includes NAs where population=0
-  blueWaterShortage: number;
+  short: number;
   // Blue water consumption-to-availability ratio. Includes NAs where availability=0
-  blueWaterStress: number;
-}
-
-export interface RawAggregateStressShortageDatum extends RawDatum {
-  // Dependent variables
-  // aggregated from finer scale data: sum(population[blueWaterShortage<=1700 & blueWaterStress<0.2])
-  populationOnlyBlueWaterShortage: number;
-  // aggregated from finer scale data: sum(population[blueWaterShortage>1700 & blueWaterStress>=0.2])
-  populationOnlyBlueWaterStress: number;
-  // aggregated from finer scale data: sum(population[blueWaterShortage<=1700 & blueWaterStress>=0.2])
-  populationBlueWaterShortageAndStress: number;
-  // aggregated from finer scale data: sum(population[blueWaterShortage<=1700 & blueWaterShortage>1000])
-  populationModerateBlueWaterShortage: number;
-  // aggregated from finer scale data: sum(population[blueWaterShortage<=1000])
-  populationHighBlueWaterShortage: number;
-  // aggregated from finer scale data: sum(population[blueWaterStress>=0.2 & blueWaterStress<0.4])
-  populationModerateBlueWaterStress: number;
-  // aggregated from finer scale data: sum(population[blueWaterStress>=0.4])
-  populationHighBlueWaterStress: number;
-  populationNoBlueWaterShortageAndStress: number;
-  populationNoBlueWaterShortage: number;
-  populationNoBlueWaterStress: number;
+  stress: number;
 }
 
 const KM_3_TO_M_3_RATIO = 1000000000;
 
 export function toStressShortageDatum({
-  startYear,
-  endYear,
-  featureId,
-  blueWaterAvailability,
-  blueWaterConsumptionDomestic,
-  blueWaterConsumptionElectric,
-  blueWaterConsumptionIrrigation,
-  blueWaterConsumptionLivestock,
-  blueWaterConsumptionManufacturing,
-  blueWaterStress,
-  blueWaterShortage,
-  population,
+  y0,
+  y1,
+  id,
+  avail,
+  consDom,
+  consEle,
+  consIrr,
+  consLiv,
+  consMfg,
+  stress,
+  short,
+  pop,
 }: RawRegionStressShortageDatum): StressShortageDatum {
-  const domestic = blueWaterConsumptionDomestic || 0;
-  const electric = blueWaterConsumptionElectric || 0;
-  const irrigation = blueWaterConsumptionIrrigation || 0;
-  const livestock = blueWaterConsumptionLivestock || 0;
-  const manufacturing = blueWaterConsumptionManufacturing || 0;
+  const domestic = consDom || 0;
+  const electric = consEle || 0;
+  const irrigation = consIrr || 0;
+  const livestock = consLiv || 0;
+  const manufacturing = consMfg || 0;
   const calculatedTotal =
     (domestic + electric + irrigation + livestock + manufacturing) *
     KM_3_TO_M_3_RATIO;
 
   return {
-    startYear,
-    endYear,
-    featureId,
-    blueWaterAvailability,
-    blueWaterConsumptionDomestic: domestic * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionElectric: electric * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionIrrigation: irrigation * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionLivestock: livestock * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionManufacturing: manufacturing * KM_3_TO_M_3_RATIO,
-    blueWaterConsumptionTotal: calculatedTotal,
-    blueWaterStress,
-    blueWaterShortage,
-    population,
+    startYear: y0,
+    endYear: y1,
+    featureId: id,
+    availability: avail,
+    consumptionDomestic: domestic * KM_3_TO_M_3_RATIO,
+    consumptionElectric: electric * KM_3_TO_M_3_RATIO,
+    consumptionIrrigation: irrigation * KM_3_TO_M_3_RATIO,
+    consumptionLivestock: livestock * KM_3_TO_M_3_RATIO,
+    consumptionManufacturing: manufacturing * KM_3_TO_M_3_RATIO,
+    consumptionTotal: calculatedTotal,
+    stress: stress,
+    shortage: short,
+    population: pop,
   };
 }

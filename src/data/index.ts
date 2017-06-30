@@ -16,13 +16,13 @@ import {
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
 ): Array<TimeAggregate<StressShortageDatum>> {
-  const yearlyGroupedData = values(
-    groupBy(rawData, ({ startYear }) => startYear),
-  ).sort((a, b) => a[0].startYear - b[0].startYear);
+  const yearlyGroupedData = values(groupBy(rawData, ({ y0 }) => y0)).sort(
+    (a, b) => a[0].y0 - b[0].y0,
+  );
 
   return yearlyGroupedData.map(group => ({
-    startYear: group[0].startYear,
-    endYear: group[0].endYear,
+    startYear: group[0].y0,
+    endYear: group[0].y1,
     data: keyBy(group.map(toStressShortageDatum), d => d.featureId),
   }));
 }
