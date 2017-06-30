@@ -46,7 +46,7 @@ class ShortageBody extends React.Component<Props> {
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
-            <ModelSelector />
+            <ModelSelector estimateLabel="shortage" />
           </div>
         </div>
         {!selectedWaterData || !waterRegions

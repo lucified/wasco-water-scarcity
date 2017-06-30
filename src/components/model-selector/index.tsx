@@ -10,18 +10,27 @@ import * as styles from './index.scss';
 
 interface PassedProps {
   className?: string;
+  estimateLabel: string;
+  includeConsumption?: boolean;
 }
 
 type Props = PassedProps;
 
-export default function ModelSelector({ className }: Props) {
+export default function ModelSelector({
+  className,
+  estimateLabel,
+  includeConsumption,
+}: Props) {
   return (
     <div className={className}>
       <p>
-        These estimates of blue water stress and shortage are produced using{' '}
-        <span className={styles.assumption}>blue water availability</span> and{' '}
-        <span className={styles.assumption}>consumption</span> estimates from
-        the water model{' '}
+        These estimates of blue water {estimateLabel} are produced using{' '}
+        <span className={styles.assumption}>blue water availability</span>
+        {includeConsumption &&
+          <span>
+            {' '}and <span className={styles.assumption}>consumption</span>
+          </span>}{' '}
+        estimates from the water model{' '}
         <InlineAssumptionSelector
           variable="impactModel"
           className={styles.assumption}
