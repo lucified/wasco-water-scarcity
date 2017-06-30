@@ -11,6 +11,7 @@ export interface WorldRegionGeoJSONFeature {
 }
 
 export interface Dataset {
+  default?: boolean;
   spatialUnit: string;
   timeScale: 'decadal' | 'annual';
   dataType: string;

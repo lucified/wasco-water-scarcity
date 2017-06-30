@@ -4,6 +4,8 @@ import { combineReducers } from 'redux';
 
 import {
   Action,
+  SET_FUTURE_MODEL,
+  SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_IMPACT_MODEL,
@@ -22,6 +24,9 @@ import {
 import {
   defaultDataTypeThresholds,
   getClimateModels,
+  getDefaultClimateModel,
+  getDefaultFutureModel,
+  getDefaultImpactModel,
   getImpactModels,
 } from '../data';
 import { WaterRegionGeoJSON } from '../data/types';
@@ -38,8 +43,10 @@ const defaultState: StateTree = {
   },
   selections: {
     timeIndex: 0,
-    impactModel: 'watergap',
-    climateModel: 'watch',
+    futureTimeIndex: 0,
+    futureModelId: getDefaultFutureModel(),
+    impactModel: getDefaultImpactModel(),
+    climateModel: getDefaultClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
     worldRegion: 0, // 0 means global
@@ -225,6 +232,24 @@ function selectionsReducer(state = initialState.selections, action: Action) {
         return {
           ...state,
           timeScale: action.timeScale,
+        };
+      }
+
+      return state;
+    case SET_FUTURE_MODEL:
+      if (action.id !== state.futureModelId) {
+        return {
+          ...state,
+          futureModelId: action.id,
+        };
+      }
+
+      return state;
+    case SET_FUTURE_TIME_INDEX:
+      if (action.index !== state.futureTimeIndex) {
+        return {
+          ...state,
+          futureTimeIndex: action.index,
         };
       }
 

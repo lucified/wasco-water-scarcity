@@ -30,6 +30,23 @@ export function getSelectedStressShortageData(
   return data && data[getSelectedTimeIndex(state)];
 }
 
+export function getSelectedFutureModel(state: StateTree): string {
+  return state.selections.futureModelId;
+}
+
+export function getSelectedFutureTimeIndex(state: StateTree): number {
+  return state.selections.futureTimeIndex;
+}
+
+export function getSelectedFutureStressShortageData(
+  state: StateTree,
+): TimeAggregate<StressShortageDatum> | undefined {
+  const selectedModel = getSelectedFutureModel(state);
+  const selectedTimeIndex = getSelectedFutureTimeIndex(state);
+  const data = getFutureData(state);
+  return data && data[selectedModel] && data[selectedModel][selectedTimeIndex];
+}
+
 export const getAggregateData = createSelector(
   getStressShortageData,
   getThresholds,

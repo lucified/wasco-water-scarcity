@@ -102,6 +102,33 @@ export function getTimeScales() {
   return uniq(datasets.map(d => d.timeScale)).sort();
 }
 
+export function getDefaultFutureModel() {
+  const defaultDataset = datasets.find(
+    d =>
+      d.population !== 'hist' &&
+      d.timeScale === 'decadal' && // TODO: remove
+      !!d.default &&
+      ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+  );
+  return defaultDataset
+    ? defaultDataset.url
+    : 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_SSP2_pcrglobwb_gfdl-esm2m_rcp4p5_pressoc_airruse_2001_2090.json'; // tslint:disable-line:max-line-length
+}
+
+export function getDefaultClimateModel() {
+  const defaultDataset = datasets.find(
+    d => d.population === 'hist' && !!d.default,
+  );
+  return defaultDataset ? defaultDataset.climateModel : 'watch';
+}
+
+export function getDefaultImpactModel() {
+  const defaultDataset = datasets.find(
+    d => d.population === 'hist' && !!d.default,
+  );
+  return defaultDataset ? defaultDataset.impactModel : 'watergap';
+}
+
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   const regionIDs = geoJSON.features.map(r => r.properties.featureId);
   // Note: we only have 20 unique colors

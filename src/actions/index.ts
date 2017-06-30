@@ -15,6 +15,8 @@ import {
   WorldRegion,
 } from '../types';
 import {
+  SET_FUTURE_MODEL,
+  SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_IMPACT_MODEL,
@@ -23,6 +25,8 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  SetFutureModelAction,
+  SetFutureTimeIndexAction,
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
   SetSelectedImpactModelAction,
@@ -119,6 +123,20 @@ export function setThresholdsForDataType(
     type: SET_THRESHOLDS_FOR_DATA_TYPE,
     dataType,
     thresholds,
+  };
+}
+
+export function setFutureTimeIndex(index: number): SetFutureTimeIndexAction {
+  return {
+    type: SET_FUTURE_TIME_INDEX,
+    index,
+  };
+}
+
+export function setFutureModel(id: string): SetFutureModelAction {
+  return {
+    type: SET_FUTURE_MODEL,
+    id,
   };
 }
 

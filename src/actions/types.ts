@@ -61,6 +61,18 @@ export interface SetThresholdsForDataTypeAction {
   thresholds: number[];
 }
 
+export const SET_FUTURE_TIME_INDEX = 'SET_FUTURE_TIME_INDEX';
+export interface SetFutureTimeIndexAction {
+  type: 'SET_FUTURE_TIME_INDEX';
+  index: number;
+}
+
+export const SET_FUTURE_MODEL = 'SET_FUTURE_MODEL';
+export interface SetFutureModelAction {
+  type: 'SET_FUTURE_MODEL';
+  id: string;
+}
+
 export const STORE_WATER_DATA = 'STORE_WATER_DATA';
 export interface StoreWaterDataAction {
   type: 'STORE_WATER_DATA';
@@ -101,6 +113,8 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | SetFutureModelAction
+  | SetFutureTimeIndexAction
   | StoreFutureDataAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
