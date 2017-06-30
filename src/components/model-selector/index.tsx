@@ -50,27 +50,6 @@ export default function ModelSelector({
       <p>
         <a href="#">Read more</a>. <a href="#">Explore alternatives</a>.
       </p>
-      {/*TODO: doesn't necessarily apply to all dataTypes */}
-      {/*TODO: currently only visual */}
-      <div className={classNames('row', 'between-xs', styles.model)}>
-        <Tooltip
-          text={
-            'Typically some water withdrawn returns to a water body, but ' +
-            "cannot necessarily be re-used. What counts as 'use' depends " +
-            'on how return flows are treated.'
-          }
-        >
-          Return flows:
-        </Tooltip>
-        <RadioSelector
-          selectedValue="consumption"
-          values={[
-            { value: 'consumption', label: 'Consumption' },
-            { value: 'withdrawal', label: 'Withdrawals' },
-          ]}
-          disabled={true}
-        />
-      </div>
     </div>
   );
 }
