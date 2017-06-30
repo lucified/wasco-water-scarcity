@@ -61,6 +61,18 @@ export interface SetThresholdsForDataTypeAction {
   thresholds: number[];
 }
 
+export const SET_FUTURE_TIME_INDEX = 'SET_FUTURE_TIME_INDEX';
+export interface SetFutureTimeIndexAction {
+  type: 'SET_FUTURE_TIME_INDEX';
+  index: number;
+}
+
+export const SET_FUTURE_MODEL = 'SET_FUTURE_MODEL';
+export interface SetFutureModelAction {
+  type: 'SET_FUTURE_MODEL';
+  id: string;
+}
+
 export const STORE_WATER_DATA = 'STORE_WATER_DATA';
 export interface StoreWaterDataAction {
   type: 'STORE_WATER_DATA';
@@ -86,6 +98,12 @@ export interface StoreWaterToWorldRegionMapAction {
   map: { [waterRegionId: number]: number };
 }
 
+export const STORE_FUTURE_DATA = 'STORE_FUTURE_DATA';
+export interface StoreFutureDataAction {
+  type: 'STORE_FUTURE_DATA';
+  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>;
+}
+
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
@@ -95,6 +113,9 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | SetFutureModelAction
+  | SetFutureTimeIndexAction
+  | StoreFutureDataAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction

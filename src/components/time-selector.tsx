@@ -44,22 +44,22 @@ function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
       return [
         {
           key: 'Heavy stress',
-          total: datum.populationHighBlueWaterStress,
+          total: datum.populationHighStress,
           color: colors[3],
         },
         {
           key: 'Moderate stress',
-          total: datum.populationModerateBlueWaterStress,
+          total: datum.populationModerateStress,
           color: colors[2],
         },
         {
           key: 'Low stress',
-          total: datum.populationLowBlueWaterStress,
+          total: datum.populationLowStress,
           color: colors[1],
         },
         {
           key: 'No stress',
-          total: datum.populationNoBlueWaterStress,
+          total: datum.populationNoStress,
           color: colors[0],
         },
       ];
@@ -67,22 +67,22 @@ function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
       return [
         {
           key: 'Heavy shortage',
-          total: datum.populationHighBlueWaterShortage,
+          total: datum.populationHighShortage,
           color: colors[3],
         },
         {
           key: 'Moderate shortage',
-          total: datum.populationModerateBlueWaterShortage,
+          total: datum.populationModerateShortage,
           color: colors[2],
         },
         {
           key: 'Low shortage',
-          total: datum.populationLowBlueWaterShortage,
+          total: datum.populationLowShortage,
           color: colors[1],
         },
         {
           key: 'No shortage',
-          total: datum.populationNoBlueWaterShortage,
+          total: datum.populationNoShortage,
           color: colors[0],
         },
       ];
@@ -90,22 +90,22 @@ function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
       return [
         {
           key: 'Stress and shortage',
-          total: datum.populationBlueWaterShortageAndStress,
+          total: datum.populationShortageAndStress,
           color: colors[3],
         },
         {
           key: 'Shortage only',
-          total: datum.populationOnlyBlueWaterShortage,
+          total: datum.populationOnlyShortage,
           color: colors[2],
         },
         {
           key: 'Stress only',
-          total: datum.populationOnlyBlueWaterStress,
+          total: datum.populationOnlyStress,
           color: colors[1],
         },
         {
           key: 'No scarcity',
-          total: datum.populationNoBlueWaterShortageAndStress,
+          total: datum.populationNoShortageAndStress,
           color: colors[0],
         },
       ];

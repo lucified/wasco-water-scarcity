@@ -21,11 +21,11 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
     data.map((d, i) => ({
       key: i,
-      total: d.blueWaterAvailability,
+      total: d.availability,
       values: [
         {
           key: 'Availability',
-          total: d.blueWaterAvailability,
+          total: d.availability,
           color: 'green',
         },
       ],

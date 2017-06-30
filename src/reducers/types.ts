@@ -11,6 +11,7 @@ import {
 export interface StateTree {
   data: {
     stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+    futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
     worldRegions?: WorldRegion[];
     waterRegions?: WaterRegionGeoJSON;
     waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -23,6 +24,8 @@ export interface StateTree {
   };
   selections: {
     timeIndex: number;
+    futureTimeIndex: number;
+    futureModelId: string;
     dataType: DataType;
     impactModel: string;
     climateModel: string;

@@ -19,28 +19,31 @@ interface DispatchProps {
 
 interface PassedProps {
   className?: string;
+  hideScarcity?: boolean;
 }
-
-const values = [
-  {
-    value: 'scarcity',
-    label: 'Scarcity',
-  },
-  {
-    value: 'stress',
-    label: 'Stress',
-  },
-  {
-    value: 'shortage',
-    label: 'Shortage',
-  },
-];
 
 type Props = StateProps & DispatchProps & PassedProps;
 
 class DataTypeSelector extends React.Component<Props> {
   public render() {
-    const { className, dataType, onChange } = this.props;
+    const { className, dataType, onChange, hideScarcity } = this.props;
+    const values = [
+      {
+        value: 'stress',
+        label: 'Stress',
+      },
+      {
+        value: 'shortage',
+        label: 'Shortage',
+      },
+    ];
+
+    if (!hideScarcity) {
+      values.push({
+        value: 'scarcity',
+        label: 'Scarcity',
+      });
+    }
 
     return (
       <RadioSelector

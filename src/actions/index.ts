@@ -1,7 +1,8 @@
 import { Dispatch } from 'redux';
 
 import {
-  fetchStressShortageData,
+  fetchAllFutureData,
+  fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
   generateWaterToWorldRegionsMap,
@@ -14,6 +15,8 @@ import {
   WorldRegion,
 } from '../types';
 import {
+  SET_FUTURE_MODEL,
+  SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_IMPACT_MODEL,
@@ -22,6 +25,8 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  SetFutureModelAction,
+  SetFutureTimeIndexAction,
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
   SetSelectedImpactModelAction,
@@ -30,10 +35,12 @@ import {
   SetSelectedWorldRegionAction,
   SetThresholdsForDataTypeAction,
   SetTimeIndexAction,
+  STORE_FUTURE_DATA,
   STORE_WATER_DATA,
   STORE_WATER_REGION_DATA,
   STORE_WATER_TO_WORLD_REGION_MAP,
   STORE_WORLD_REGION_DATA,
+  StoreFutureDataAction,
   StoreWaterDataAction,
   StoreWaterRegionDataAction,
   StoreWaterToWorldRegionMapAction,
@@ -119,6 +126,20 @@ export function setThresholdsForDataType(
   };
 }
 
+export function setFutureTimeIndex(index: number): SetFutureTimeIndexAction {
+  return {
+    type: SET_FUTURE_TIME_INDEX,
+    index,
+  };
+}
+
+export function setFutureModel(id: string): SetFutureModelAction {
+  return {
+    type: SET_FUTURE_MODEL,
+    id,
+  };
+}
+
 export function storeWaterData(
   data: Array<TimeAggregate<StressShortageDatum>>,
 ): StoreWaterDataAction {
@@ -155,19 +176,38 @@ export function storeWaterToWorldRegionMap(map: {
   };
 }
 
+export function storeFutureData(
+  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>,
+): StoreFutureDataAction {
+  return {
+    type: STORE_FUTURE_DATA,
+    data,
+  };
+}
+
 export function loadModelData(
   climateModel: string,
   impactModel: string,
   timeScale: string,
 ) {
   return (dispatch: Dispatch<any>) => {
-    return fetchStressShortageData(
+    return fetchHistoricalStressShortageData(
       climateModel,
       impactModel,
       timeScale,
     ).then(waterData => {
       if (waterData) {
         dispatch(storeWaterData(waterData));
+      }
+    });
+  };
+}
+
+export function loadFutureData() {
+  return (dispatch: Dispatch<any>) => {
+    return fetchAllFutureData().then(futureData => {
+      if (futureData) {
+        dispatch(storeFutureData(futureData));
       }
     });
   };
@@ -180,7 +220,7 @@ export function loadAppData(
 ) {
   return (dispatch: Dispatch<any>) => {
     return Promise.all([
-      fetchStressShortageData(climateModel, impactModel, timeScale),
+      fetchHistoricalStressShortageData(climateModel, impactModel, timeScale),
       fetchWaterRegionsData(),
       fetchWorldRegionsData(),
     ]).then(([waterData, waterRegionData, worldRegionsData]) => {

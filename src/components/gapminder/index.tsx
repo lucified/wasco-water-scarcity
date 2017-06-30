@@ -35,11 +35,11 @@ interface GeneratedDispatchProps {
 type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 function shortageSelector(data: { [dataType: string]: number[] }) {
-  return data.blueWaterShortage;
+  return data.shortage;
 }
 
 function stressSelector(data: { [dataType: string]: number[] }) {
-  return data.blueWaterStress;
+  return data.stress;
 }
 
 function populationSelector(data: { [dataType: string]: number[] }) {

@@ -1,36 +1,47 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
+import { Dispatch } from 'redux';
 
+import { setSelectedDataType } from '../../../actions';
 import { WaterRegionGeoJSON } from '../../../data/types';
+import { StateTree } from '../../../reducers';
+import {
+  getSelectedFutureStressShortageData,
+  getWaterRegionData,
+} from '../../../selectors';
 import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
-import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import DataSelector from '../../data-selector';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
-import SelectedRegionInformation from '../../selected-region-information';
-import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import FutureLineChart from './future-line-chart';
 
 import * as styles from './index.scss';
 
-interface PassedProps extends RouteComponentProps<void> {
+type PassedProps = RouteComponentProps<void>;
+
+interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
-  selectedWaterData?: TimeAggregate<StressShortageDatum>;
+}
+
+interface GeneratedStateProps {
+  selectedFutureWaterData?: TimeAggregate<StressShortageDatum>;
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type Props = PassedProps;
+type Props = PassedProps & GeneratedStateProps & GeneratedDispatchProps;
 
-class ScarcityBody extends React.Component<Props> {
+class FutureBody extends React.Component<Props> {
   public componentDidMount() {
-    this.props.setSelectedDataType('scarcity');
+    this.props.setSelectedDataType('stress');
   }
 
   public render() {
-    const { selectedWaterData, waterRegions } = this.props;
+    const { selectedFutureWaterData, waterRegions } = this.props;
 
     return (
       <div>
@@ -49,48 +60,59 @@ class ScarcityBody extends React.Component<Props> {
             </p>
           </div>
         </div>
-        <div className="row">
-          <div className="col-xs-12">
-            <h2>Actions</h2>
-            <p>
-              <em>Placeholder for actions</em>
-            </p>
-          </div>
-        </div>
-        {!selectedWaterData || !waterRegions
+        {!selectedFutureWaterData || !waterRegions
           ? <div className="row middle-xs">
               <div className="col-xs-12">
                 <Spinner />
               </div>
             </div>
           : <div>
-              <div className="row middle-xs">
+              <div className="row">
                 <div className="col-xs-12 col-md-6 col-lg-8">
-                  <TimeSelector />
                   <Map
                     width={800}
-                    selectedData={selectedWaterData}
+                    selectedData={selectedFutureWaterData}
                     waterRegions={waterRegions}
                   />
                 </div>
                 <div className="col-xs-12 col-md-6 col-lg-4">
-                  <DataSelector />
-                  <div>Futures</div>
+                  <DataSelector hideScarcity />
+                  <FutureLineChart />
                 </div>
               </div>
               <div className="row">
-                <WorldRegionSelector />
-              </div>
-              <div className="row">
-                <SelectedRegionInformation />
+                <div className="col-xs-12">
+                  <WorldRegionSelector />
+                </div>
               </div>
             </div>}
         <div className="row">
-          <CrossReferences fromPage="future" />
+          <div className="col-xs-12">
+            <CrossReferences fromPage="future" />
+          </div>
         </div>
       </div>
     );
   }
 }
 
-export default withPageData(ScarcityBody);
+function mapStateToProps(state: StateTree): GeneratedStateProps {
+  return {
+    selectedFutureWaterData: getSelectedFutureStressShortageData(state),
+    waterRegions: getWaterRegionData(state),
+  };
+}
+
+function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
+  return {
+    setSelectedDataType: (dataType: DataType) => {
+      dispatch(setSelectedDataType(dataType));
+    },
+  };
+}
+
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps
+>(mapStateToProps, mapDispatchToProps)(FutureBody);

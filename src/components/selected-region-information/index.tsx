@@ -111,6 +111,7 @@ class SelectedRegionInformation extends React.Component<Props> {
           ? <DataLineChart
               dataType="stress"
               dataColor="red"
+              id="stress"
               thresholds={stressThresholds}
               thresholdColors={['none', ...getDataTypeColors('stress')]}
               data={timeSeriesForSelectedWaterRegion}
@@ -151,6 +152,7 @@ class SelectedRegionInformation extends React.Component<Props> {
                 'none',
                 ...getDataTypeColors('shortage'),
               ].reverse()}
+              id="shortage"
               data={timeSeriesForSelectedWaterRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
@@ -250,7 +252,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       Datum,
       number
     >(timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion, d =>
-      Math.max(d.blueWaterAvailability, d.blueWaterConsumptionTotal),
+      Math.max(d.availability, d.consumptionTotal),
     )!;
 
     return (

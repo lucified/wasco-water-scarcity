@@ -9,11 +9,11 @@ const styles = require('./data-line-chart.scss');
 
 interface PassedProps {
   dataType: 'shortage' | 'stress';
-  dataLabel?: string;
   dataColor: string;
   thresholds: number[];
   thresholdColors: string[];
   yAxisLabel?: string;
+  id: string;
   data: StressShortageDatum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
@@ -23,9 +23,9 @@ type Props = PassedProps;
 
 export default function DataLineChart({
   data,
-  dataLabel,
   dataType,
   dataColor,
+  id,
   thresholds,
   thresholdColors,
   yAxisLabel,
@@ -34,7 +34,7 @@ export default function DataLineChart({
 }: Props) {
   const selector = waterPropertySelector(dataType);
   const chartData: Data = {
-    label: dataLabel,
+    id,
     color: dataColor,
     series: data.map(d => ({
       value: selector(d)!,
@@ -58,6 +58,7 @@ export default function DataLineChart({
       width={400}
       height={180}
       yAxisLabel={yAxisLabel}
+      selectedDataSeries={id}
       selectedTimeIndex={selectedTimeIndex}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}

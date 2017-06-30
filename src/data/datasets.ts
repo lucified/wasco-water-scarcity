@@ -606,6 +606,7 @@ const datasets: Dataset[] = [
     url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_annual_bluewater_wbm_hadgem2-es_hist_pressoc_airruse_1971_2004.json',
   },
   {
+    default: true,
     spatialUnit: 'FPU',
     timeScale: 'decadal',
     dataType: 'bluewater',
@@ -984,6 +985,7 @@ const datasets: Dataset[] = [
     url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_SSP2_lpjml_hadgem2-es_rcp8p5_pressoc_noco2_airruse_2001_2090.json',
   },
   {
+    default: true,
     spatialUnit: 'FPU',
     timeScale: 'decadal',
     dataType: 'bluewater',

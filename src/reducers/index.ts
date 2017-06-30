@@ -4,6 +4,8 @@ import { combineReducers } from 'redux';
 
 import {
   Action,
+  SET_FUTURE_MODEL,
+  SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_IMPACT_MODEL,
@@ -12,6 +14,7 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
+  STORE_FUTURE_DATA,
   STORE_WATER_DATA,
   STORE_WATER_REGION_DATA,
   STORE_WATER_TO_WORLD_REGION_MAP,
@@ -21,6 +24,9 @@ import {
 import {
   defaultDataTypeThresholds,
   getClimateModels,
+  getDefaultClimateModel,
+  getDefaultFutureModel,
+  getDefaultImpactModel,
   getImpactModels,
 } from '../data';
 import { WaterRegionGeoJSON } from '../data/types';
@@ -37,8 +43,10 @@ const defaultState: StateTree = {
   },
   selections: {
     timeIndex: 0,
-    impactModel: 'watergap',
-    climateModel: 'watch',
+    futureTimeIndex: 0,
+    futureModelId: getDefaultFutureModel(),
+    impactModel: getDefaultImpactModel(),
+    climateModel: getDefaultClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
     worldRegion: 0, // 0 means global
@@ -52,6 +60,7 @@ function dataReducer(
   action: Action,
 ): {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+  futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -76,6 +85,15 @@ function dataReducer(
       return {
         ...state,
         waterToWorldRegionsMap: action.map,
+      };
+    case STORE_FUTURE_DATA:
+      const futureDataObject = { ...state.futureData || {} };
+      action.data.forEach(d => {
+        futureDataObject[d.id] = d.data;
+      });
+      return {
+        ...state,
+        futureData: futureDataObject,
       };
   }
   return state;
@@ -214,6 +232,24 @@ function selectionsReducer(state = initialState.selections, action: Action) {
         return {
           ...state,
           timeScale: action.timeScale,
+        };
+      }
+
+      return state;
+    case SET_FUTURE_MODEL:
+      if (action.id !== state.futureModelId) {
+        return {
+          ...state,
+          futureModelId: action.id,
+        };
+      }
+
+      return state;
+    case SET_FUTURE_TIME_INDEX:
+      if (action.index !== state.futureTimeIndex) {
+        return {
+          ...state,
+          futureTimeIndex: action.index,
         };
       }
 

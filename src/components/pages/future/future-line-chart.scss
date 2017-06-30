@@ -1,0 +1,14 @@
+@import '../../definitions.scss';
+
+.chart {
+  overflow: visible !important;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  font-weight: 200;
+  color: $color-gray;
+}
