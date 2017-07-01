@@ -1,8 +1,5 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 
-import RadioSelector from '../generic/radio-selector';
-import Tooltip from '../generic/tooltip';
 import InlineAssumptionSelector from '../inline-assumption-selector';
 
 import 'react-select/dist/react-select.css';
