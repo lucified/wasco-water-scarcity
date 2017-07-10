@@ -45,15 +45,17 @@ type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 class App extends React.Component<Props> {
   public componentDidMount() {
     const {
-      loadAppData,
-      loadFutureData,
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
     } = this.props;
 
-    loadAppData(selectedClimateModel, selectedImpactModel, selectedTimeScale);
-    loadFutureData();
+    this.props.loadAppData(
+      selectedClimateModel,
+      selectedImpactModel,
+      selectedTimeScale,
+    );
+    this.props.loadFutureData();
   }
 
   public componentWillReceiveProps(nextProps: Props) {
@@ -61,7 +63,6 @@ class App extends React.Component<Props> {
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
-      loadModelData,
     } = this.props;
 
     if (
@@ -69,7 +70,7 @@ class App extends React.Component<Props> {
       selectedImpactModel !== nextProps.selectedImpactModel ||
       selectedTimeScale !== nextProps.selectedTimeScale
     ) {
-      loadModelData(
+      this.props.loadModelData(
         nextProps.selectedClimateModel,
         nextProps.selectedImpactModel,
         nextProps.selectedTimeScale,
