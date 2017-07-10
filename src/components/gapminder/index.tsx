@@ -3,7 +3,10 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex, toggleSelectedRegion } from '../../actions';
+import {
+  setTimeIndex as setTimeIndexAction,
+  toggleSelectedRegion as toggleSelectedRegionAction,
+} from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
@@ -122,10 +125,10 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     setTimeIndex: (value: number) => {
-      dispatch(setTimeIndex(value));
+      dispatch(setTimeIndexAction(value));
     },
     toggleSelectedRegion: (id: string) => {
-      dispatch(toggleSelectedRegion(Number(id)));
+      dispatch(toggleSelectedRegionAction(Number(id)));
     },
   };
 }

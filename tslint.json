@@ -19,7 +19,8 @@
     "object-literal-key-quotes": [false],
     "arrow-parens": false,
     "no-empty-interface": false,
-    "semicolon": [true, "always", "ignore-bound-class-methods"]
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "no-this-assignment": [true, {"allow-destructuring": true}]
   },
   "jsRules": {
     "arrow-parens": false,
