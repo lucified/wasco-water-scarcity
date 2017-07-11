@@ -47,12 +47,7 @@ class FutureBody extends React.Component<Props> {
       <div>
         <div className="row between-xs">
           <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-6',
-              'col-lg-6',
-              styles['body-text'],
-            )}
+            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
             <h1>The Future?</h1>
             <p>

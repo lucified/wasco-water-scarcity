@@ -20,7 +20,7 @@ export default function ModelSelector({
 }: Props) {
   return (
     <div className={className}>
-      <p>
+      <p className={styles['first-element']}>
         These estimates of blue water {estimateLabel} are produced using{' '}
         <span className={styles.assumption}>blue water availability</span>
         {includeConsumption &&
