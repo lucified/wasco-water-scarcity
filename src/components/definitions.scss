@@ -1,6 +1,6 @@
 // FONT
 
-$bodyFontSize: 16; // in pixels
+$bodyFontSize: 17px; // in pixels
 $fontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
 // BREAKPOINTS
@@ -85,8 +85,16 @@ $default-margin: 20px;
 .body-text {
   font-family: $fontFamily;
   font-size: $bodyFontSize;
-  line-height: 1.5;
+  line-height: 1.8;
   color: $color-darker-gray;
+}
+
+.secondary-content {
+  @extend .body-text;
+
+  color: $color-gray;
+  padding-left: $default-margin;
+  border-left: 1px solid $color-light-gray;
 }
 
 // MISCELLANEOUS

@@ -45,12 +45,12 @@ class FutureBody extends React.Component<Props> {
 
     return (
       <div>
-        <div className="row">
+        <div className="row between-xs">
           <div
             className={classNames(
               'col-xs-12',
               'col-md-6',
-              'col-lg-8',
+              'col-lg-6',
               styles['body-text'],
             )}
           >
