@@ -37,7 +37,7 @@ class ShortageBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1>Water Shortage</h1>
+        <h1 className={styles['section-header']}>Water Shortage</h1>
         <div className="row between-xs">
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}

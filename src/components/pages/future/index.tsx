@@ -49,7 +49,7 @@ class FutureBody extends React.Component<Props> {
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
-            <h1>The Future?</h1>
+            <h1 className={styles['section-header']}>The Future?</h1>
             <p>
               <em>What can we do about this in the future?</em>
             </p>
