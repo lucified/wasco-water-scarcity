@@ -39,17 +39,20 @@ class ScarcityBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1>Blue Water Scarcity: stress and shortage</h1>
-        <div className="row">
+        <h1 className={styles['section-header']}>
+          Blue Water Scarcity: stress and shortage
+        </h1>
+        <div className="row between-xs">
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
             <Description />
           </div>
           <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
+            className={classNames('col-xs-12', 'col-md-4', styles['body-text'])}
           >
             <ModelSelector
+              className={styles['secondary-content']}
               estimateLabel="stress and shortage"
               includeConsumption
             />

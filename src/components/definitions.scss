@@ -1,24 +1,25 @@
 // FONT
 
-$bodyFontSize: 16; // in pixels
+$bodyFontSize: 17px; // in pixels
 $fontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$bodyLineHeight: 1.8;
 
 // BREAKPOINTS
 
-$mobileBreakpoint            : 320px;
-$tabletBreakpoint            : 768px;
-$computerBreakpoint          : 992px;
-$largeMonitorBreakpoint      : 1200px;
-$widescreenMonitorBreakpoint : 1920px;
+$mobileBreakpoint: 320px;
+$tabletBreakpoint: 768px;
+$computerBreakpoint: 992px;
+$largeMonitorBreakpoint: 1200px;
+$widescreenMonitorBreakpoint: 1920px;
 
 // COLOR VALUES
 
 // colors from design
-$color-red: #DD0035;
-$color-blue: #23408F;
-$color-blue-darker: #000D5C;
-$color-cerise: #E6007E;
-$color-light-blue: #58ADDB;
+$color-red: #dd0035;
+$color-blue: #23408f;
+$color-blue-darker: #000d5c;
+$color-cerise: #e6007e;
+$color-light-blue: #58addb;
 
 $color-blue-chill: rgb(10, 135, 165);
 $color-blue-chill-darker: rgb(0, 84, 114);
@@ -29,12 +30,12 @@ $color-light-gray: #e5dddb;
 $color-gray: #999999;
 $color-dark-gray: #807775;
 $color-darker-gray: #292220;
-$color-darkest-gray: #0B1328;
+$color-darkest-gray: #0b1328;
 $color-lightest-gray-with-transparency: rgba($color-lightest-gray, 0.04);
 $color-lighter-red: #e19791;
 $color-dark-red: #930e03;
 
-$color-aalto-blue: #0075B1;
+$color-aalto-blue: #0075b1;
 
 // COMMON COLOR PRESETS
 
@@ -82,11 +83,23 @@ $default-margin: 20px;
 
 // REPEATING ELEMENTS
 
+.section-header {
+  margin-top: $default-margin * 2;
+}
+
 .body-text {
   font-family: $fontFamily;
   font-size: $bodyFontSize;
-  line-height: 1.5;
+  line-height: $bodyLineHeight;
   color: $color-darker-gray;
+}
+
+.secondary-content {
+  @extend .body-text;
+
+  font-size: 14px;
+  padding-left: $default-margin;
+  border-left: 1px solid $color-light-gray;
 }
 
 // MISCELLANEOUS
@@ -95,10 +108,10 @@ $golden: 61.803%;
 
 @mixin no-select() {
   -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }

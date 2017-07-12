@@ -138,6 +138,7 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
         className={classNames(styles.link, className)}
       >
         {this.props[variable]}
+        <span className={styles['select-arrow']} />
       </span>
     );
   }

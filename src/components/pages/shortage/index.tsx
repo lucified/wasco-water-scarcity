@@ -37,17 +37,18 @@ class ShortageBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1>Water Shortage</h1>
-        <div className="row">
+        <h1 className={styles['section-header']}>Water Shortage</h1>
+        <div className="row between-xs">
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
             <Description />
           </div>
-          <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
-          >
-            <ModelSelector estimateLabel="shortage" />
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <ModelSelector
+              className={styles['secondary-content']}
+              estimateLabel="shortage"
+            />
           </div>
         </div>
         {!selectedWaterData || !waterRegions

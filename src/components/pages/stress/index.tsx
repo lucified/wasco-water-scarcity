@@ -37,17 +37,19 @@ class StressBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1>Water Stress</h1>
-        <div className="row">
+        <h1 className={styles['section-header']}>Water Stress</h1>
+        <div className="row between-xs">
           <div
             className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
           >
             <Description />
           </div>
-          <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
-          >
-            <ModelSelector estimateLabel="stress" includeConsumption />
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <ModelSelector
+              className={styles['secondary-content']}
+              estimateLabel="stress"
+              includeConsumption
+            />
           </div>
         </div>
         {!selectedWaterData || !waterRegions
