@@ -43,7 +43,6 @@ export const getSelectedFutureDatasetData = createSelector(
   (allFutureData, selectedDataset) => {
     const { variableName, timeScale } = selectedDataset;
 
-    debugger;
     return (
       allFutureData[variableName] && allFutureData[variableName][timeScale]
     );
@@ -55,8 +54,6 @@ export const getSelectedFutureDataForModel = createSelector(
   getSelectedClimateModel,
   getSelectedImpactModel,
   (datasetData, climateModel, impactModel) => {
-    debugger;
-
     // TODO: also use population model and climateExperiment
     return (
       datasetData &&
