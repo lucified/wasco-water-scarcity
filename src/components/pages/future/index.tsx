@@ -11,7 +11,7 @@ import {
   getSelectedFutureStressShortageData,
   getWaterRegionData,
 } from '../../../selectors';
-import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
+import { DataType, TimeAggregate } from '../../../types';
 
 import CrossReferences from '../../cross-references';
 import DataSelector from '../../data-selector';
@@ -29,7 +29,7 @@ interface GeneratedDispatchProps {
 }
 
 interface GeneratedStateProps {
-  selectedFutureWaterData?: TimeAggregate<StressShortageDatum>;
+  selectedFutureWaterData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
 

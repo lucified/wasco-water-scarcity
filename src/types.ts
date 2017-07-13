@@ -79,10 +79,6 @@ export function getDataTypeColors(dataType: DataType) {
   return [];
 }
 
-export function waterPropertySelector(dataType: 'stress' | 'shortage') {
-  return (d: StressShortageDatum) => d[dataType];
-}
-
 export function scarcitySelector(
   scarcityThresholds: number[],
   stressThresholds: number[],

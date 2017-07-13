@@ -13,11 +13,7 @@ import {
   getSelectedWaterRegionId,
   getThresholdsForDataType,
 } from '../../../selectors';
-import {
-  getDataTypeColors,
-  StressShortageDatum,
-  waterPropertySelector,
-} from '../../../types';
+import { getDataTypeColors, StressShortageDatum } from '../../../types';
 
 import LineChart, { Data } from '../../generic/line-chart';
 import Spinner from '../../generic/spinner';
@@ -59,12 +55,11 @@ function FutureLineChart({
     return <Spinner />;
   }
 
-  const selector = waterPropertySelector(selectedDataType);
   const chartData: Data[] = data.map(series => ({
     id: series.id,
     color: 'blue',
     series: series.data.map(d => ({
-      value: selector(d)!,
+      value: d[selectedDataType],
       start: new Date(d.startYear, 0, 1),
       end: new Date(d.endYear, 11, 31),
     })),

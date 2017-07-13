@@ -1,3 +1,4 @@
+import mapValues = require('lodash/mapValues');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
@@ -8,16 +9,22 @@ import { WaterRegionGeoJSON } from '../../data/types';
 import { StateTree } from '../../reducers';
 import {
   getSelectedStressShortageData,
+  getThresholdsForDataType,
   getWaterRegionData,
 } from '../../selectors';
-import { DataType, StressShortageDatum, TimeAggregate } from '../../types';
+import {
+  DataType,
+  scarcitySelector,
+  StressShortageDatum,
+  TimeAggregate,
+} from '../../types';
 
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
 }
 
 interface GeneratedStateProps {
-  selectedWaterData?: TimeAggregate<StressShortageDatum>;
+  selectedWaterData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
 
@@ -25,24 +32,38 @@ type PassedProps = RouteComponentProps<void>;
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  return {
-    selectedWaterData: getSelectedStressShortageData(state),
-    waterRegions: getWaterRegionData(state),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
-    setSelectedDataType: (dataType: DataType) => {
-      dispatch(setSelectedDataType(dataType));
-    },
-  };
-}
-
-export default function withPageData(Component: React.ComponentClass<Props>) {
+export default function withPageData(
+  Component: React.ComponentClass<Props>,
+  dataType: DataType,
+) {
   return connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps>(
-    mapStateToProps,
-    mapDispatchToProps,
+    (state: StateTree): GeneratedStateProps => {
+      const selectedData = getSelectedStressShortageData(state);
+      const selector =
+        dataType === 'scarcity'
+          ? scarcitySelector(
+              getThresholdsForDataType(state, 'scarcity'),
+              getThresholdsForDataType(state, 'stress'),
+              getThresholdsForDataType(state, 'shortage'),
+            )
+          : (d: StressShortageDatum) => d[dataType];
+      const dataForComponent = selectedData && {
+        ...selectedData,
+        data: mapValues<StressShortageDatum, number>(selectedData.data, d =>
+          selector(d),
+        ),
+      };
+      return {
+        selectedWaterData: dataForComponent,
+        waterRegions: getWaterRegionData(state),
+      };
+    },
+    (dispatch: Dispatch<any>): GeneratedDispatchProps => {
+      return {
+        setSelectedDataType: (newDataType: DataType) => {
+          dispatch(setSelectedDataType(newDataType));
+        },
+      };
+    },
   )(Component);
 }
