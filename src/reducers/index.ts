@@ -4,7 +4,6 @@ import { combineReducers } from 'redux';
 
 import {
   Action,
-  SET_FUTURE_MODEL,
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
@@ -25,17 +24,21 @@ import {
   defaultDataTypeThresholds,
   getClimateModels,
   getDefaultClimateModel,
-  getDefaultFutureModel,
+  getDefaultFutureDataset,
   getDefaultImpactModel,
+  getFutureDatasets,
   getImpactModels,
 } from '../data';
-import { WaterRegionGeoJSON } from '../data/types';
+import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data/types';
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
 import { StateTree } from './types';
 
 const defaultState: StateTree = {
   routing: {} as any,
-  data: {},
+  data: {
+    futureDatasets: getFutureDatasets(),
+    futureData: {},
+  },
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
@@ -44,7 +47,7 @@ const defaultState: StateTree = {
   selections: {
     timeIndex: 0,
     futureTimeIndex: 0,
-    futureModelId: getDefaultFutureModel(),
+    futureDataset: getDefaultFutureDataset(),
     impactModel: getDefaultImpactModel(),
     climateModel: getDefaultClimateModel(),
     timeScale: 'decadal',
@@ -60,7 +63,10 @@ function dataReducer(
   action: Action,
 ): {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
-  futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
+  futureData: {
+    [variableName: string]: { annual?: FutureData; decadal?: FutureData };
+  };
+  futureDatasets: FutureDataset[];
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -87,13 +93,16 @@ function dataReducer(
         waterToWorldRegionsMap: action.map,
       };
     case STORE_FUTURE_DATA:
-      const futureDataObject = { ...state.futureData || {} };
-      action.data.forEach(d => {
-        futureDataObject[d.id] = d.data;
-      });
+      const existingVariableData = state.futureData[action.variableName] || {};
       return {
         ...state,
-        futureData: futureDataObject,
+        futureData: {
+          ...state.futureData,
+          [action.variableName]: {
+            ...existingVariableData,
+            [action.timeScale]: action.data,
+          },
+        },
       };
   }
   return state;
@@ -232,15 +241,6 @@ function selectionsReducer(state = initialState.selections, action: Action) {
         return {
           ...state,
           timeScale: action.timeScale,
-        };
-      }
-
-      return state;
-    case SET_FUTURE_MODEL:
-      if (action.id !== state.futureModelId) {
-        return {
-          ...state,
-          futureModelId: action.id,
         };
       }
 

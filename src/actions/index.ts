@@ -1,13 +1,13 @@
 import { Dispatch } from 'redux';
 
 import {
-  fetchAllFutureData,
+  fetchFutureData,
   fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
   generateWaterToWorldRegionsMap,
 } from '../data';
-import { WaterRegionGeoJSON } from '../data/types';
+import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data/types';
 import {
   DataType,
   StressShortageDatum,
@@ -15,7 +15,6 @@ import {
   WorldRegion,
 } from '../types';
 import {
-  SET_FUTURE_MODEL,
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
@@ -25,7 +24,6 @@ import {
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
   SET_TIME_INDEX,
-  SetFutureModelAction,
   SetFutureTimeIndexAction,
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
@@ -133,13 +131,6 @@ export function setFutureTimeIndex(index: number): SetFutureTimeIndexAction {
   };
 }
 
-export function setFutureModel(id: string): SetFutureModelAction {
-  return {
-    type: SET_FUTURE_MODEL,
-    id,
-  };
-}
-
 export function storeWaterData(
   data: Array<TimeAggregate<StressShortageDatum>>,
 ): StoreWaterDataAction {
@@ -177,10 +168,14 @@ export function storeWaterToWorldRegionMap(map: {
 }
 
 export function storeFutureData(
-  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>,
+  variableName: string,
+  timeScale: 'annual' | 'decadal',
+  data: FutureData,
 ): StoreFutureDataAction {
   return {
     type: STORE_FUTURE_DATA,
+    variableName,
+    timeScale,
     data,
   };
 }
@@ -203,11 +198,13 @@ export function loadModelData(
   };
 }
 
-export function loadFutureData() {
+export function loadFutureData(dataset: FutureDataset) {
   return (dispatch: Dispatch<any>) => {
-    return fetchAllFutureData().then(futureData => {
+    return fetchFutureData(dataset).then(futureData => {
       if (futureData) {
-        dispatch(storeFutureData(futureData));
+        dispatch(
+          storeFutureData(dataset.variableName, dataset.timeScale, futureData),
+        );
       }
     });
   };

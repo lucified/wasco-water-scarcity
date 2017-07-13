@@ -4,11 +4,21 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
-import { setSelectedDataType } from '../../../actions';
-import { WaterRegionGeoJSON } from '../../../data/types';
+import {
+  loadFutureData,
+  setSelectedClimateModel,
+  setSelectedDataType,
+  setSelectedImpactModel,
+} from '../../../actions';
+import { getClimateModels, getImpactModels } from '../../../data';
+import { FutureDataset, WaterRegionGeoJSON } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
-  getSelectedFutureStressShortageData,
+  getSelectedClimateModel,
+  getSelectedFutureDataForModel,
+  getSelectedFutureDataset,
+  getSelectedFutureTimeIndex,
+  getSelectedImpactModel,
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
@@ -26,10 +36,16 @@ type PassedProps = RouteComponentProps<void>;
 
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
+  loadFutureData: (dataset: FutureDataset) => void;
+  setSelectedImpactModel: (model: string) => void;
+  setSelectedClimateModel: (model: string) => void;
 }
 
 interface GeneratedStateProps {
-  selectedFutureWaterData?: TimeAggregate<number>;
+  selectedFutureDataset: FutureDataset;
+  selectedImpactModel: string;
+  selectedClimateModel: string;
+  mapData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
 
@@ -37,11 +53,39 @@ type Props = PassedProps & GeneratedStateProps & GeneratedDispatchProps;
 
 class FutureBody extends React.Component<Props> {
   public componentDidMount() {
+    const {
+      mapData,
+      selectedFutureDataset,
+      selectedClimateModel,
+      selectedImpactModel,
+    } = this.props;
+
     this.props.setSelectedDataType('stress');
+    if (!mapData) {
+      this.props.loadFutureData(selectedFutureDataset);
+    }
+
+    if (
+      selectedClimateModel === 'watch' ||
+      selectedImpactModel === 'watergap'
+    ) {
+      this.props.setSelectedClimateModel(
+        getClimateModels().filter(m => m !== 'watch')[0],
+      );
+      this.props.setSelectedImpactModel(
+        getImpactModels().filter(m => m !== 'watergap')[0],
+      );
+    }
+  }
+
+  public componentWillReceiveProps(nextProps: Props) {
+    if (nextProps.selectedFutureDataset !== this.props.selectedFutureDataset) {
+      nextProps.loadFutureData(nextProps.selectedFutureDataset);
+    }
   }
 
   public render() {
-    const { selectedFutureWaterData, waterRegions } = this.props;
+    const { mapData, waterRegions } = this.props;
 
     return (
       <div>
@@ -55,7 +99,7 @@ class FutureBody extends React.Component<Props> {
             </p>
           </div>
         </div>
-        {!selectedFutureWaterData || !waterRegions
+        {!waterRegions || !mapData
           ? <div className="row middle-xs">
               <div className="col-xs-12">
                 <Spinner />
@@ -66,7 +110,7 @@ class FutureBody extends React.Component<Props> {
                 <div className="col-xs-12 col-md-6 col-lg-8">
                   <Map
                     width={800}
-                    selectedData={selectedFutureWaterData}
+                    selectedData={mapData}
                     waterRegions={waterRegions}
                   />
                 </div>
@@ -92,9 +136,25 @@ class FutureBody extends React.Component<Props> {
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
+  const futureData = getSelectedFutureDataForModel(state);
+  let mapData: TimeAggregate<number> | undefined;
+
+  if (futureData) {
+    const timeIndex = getSelectedFutureTimeIndex(state);
+    const { y0: startYear, y1: endYear, regions } = futureData.data[timeIndex];
+    mapData = {
+      startYear,
+      endYear,
+      data: regions,
+    };
+  }
+
   return {
-    selectedFutureWaterData: getSelectedFutureStressShortageData(state),
+    mapData,
     waterRegions: getWaterRegionData(state),
+    selectedClimateModel: getSelectedClimateModel(state),
+    selectedFutureDataset: getSelectedFutureDataset(state),
+    selectedImpactModel: getSelectedImpactModel(state),
   };
 }
 
@@ -102,6 +162,15 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     setSelectedDataType: (dataType: DataType) => {
       dispatch(setSelectedDataType(dataType));
+    },
+    setSelectedClimateModel: (model: string) => {
+      dispatch(setSelectedClimateModel(model));
+    },
+    setSelectedImpactModel: (model: string) => {
+      dispatch(setSelectedImpactModel(model));
+    },
+    loadFutureData: (dataset: FutureDataset) => {
+      dispatch(loadFutureData(dataset));
     },
   };
 }

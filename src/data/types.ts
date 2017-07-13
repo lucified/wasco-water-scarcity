@@ -10,7 +10,7 @@ export interface WorldRegionGeoJSONFeature {
   };
 }
 
-export interface Dataset {
+export interface HistoricalDataset {
   default?: boolean;
   spatialUnit: string;
   timeScale: 'decadal' | 'annual';
@@ -26,11 +26,17 @@ export interface Dataset {
   url: string;
 }
 
-// Note: not yet used
-export type FutureData = Array<{
-  modelId: string;
-  featureId: string; // e.g. stress, shortage
+export interface FutureDataset {
   default?: boolean;
+  url: string;
+  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
+  timeScale: 'decadal' | 'annual';
+}
+
+export interface FutureDataForModel {
+  scenarioId: string;
+  default?: boolean;
+  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   spatialUnit: string;
   timeScale: 'decadal' | 'annual';
   dataType: string;
@@ -49,7 +55,9 @@ export type FutureData = Array<{
       [regionId: number]: number;
     };
   }>;
-}>;
+}
+
+export type FutureData = FutureDataForModel[];
 
 export interface WorldRegionGeoJSON {
   type: 'FeatureCollection';

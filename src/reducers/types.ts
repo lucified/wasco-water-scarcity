@@ -1,6 +1,6 @@
 import { RouterState } from 'react-router-redux';
 
-import { WaterRegionGeoJSON } from '../data/types';
+import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data/types';
 import {
   DataType,
   StressShortageDatum,
@@ -11,10 +11,13 @@ import {
 export interface StateTree {
   data: {
     stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
-    futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
+    futureData: {
+      [variableName: string]: { annual?: FutureData; decadal?: FutureData };
+    };
     worldRegions?: WorldRegion[];
     waterRegions?: WaterRegionGeoJSON;
     waterToWorldRegionsMap?: { [waterId: number]: number };
+    futureDatasets: FutureDataset[];
   };
   routing: RouterState;
   thresholds: {
@@ -25,7 +28,7 @@ export interface StateTree {
   selections: {
     timeIndex: number;
     futureTimeIndex: number;
-    futureModelId: string;
+    futureDataset: FutureDataset;
     dataType: DataType;
     impactModel: string;
     climateModel: string;

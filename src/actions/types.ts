@@ -1,4 +1,4 @@
-import { WaterRegionGeoJSON } from '../data/types';
+import { FutureData, WaterRegionGeoJSON } from '../data/types';
 import {
   DataType,
   StressShortageDatum,
@@ -67,12 +67,6 @@ export interface SetFutureTimeIndexAction {
   index: number;
 }
 
-export const SET_FUTURE_MODEL = 'SET_FUTURE_MODEL';
-export interface SetFutureModelAction {
-  type: 'SET_FUTURE_MODEL';
-  id: string;
-}
-
 export const STORE_WATER_DATA = 'STORE_WATER_DATA';
 export interface StoreWaterDataAction {
   type: 'STORE_WATER_DATA';
@@ -101,7 +95,9 @@ export interface StoreWaterToWorldRegionMapAction {
 export const STORE_FUTURE_DATA = 'STORE_FUTURE_DATA';
 export interface StoreFutureDataAction {
   type: 'STORE_FUTURE_DATA';
-  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>;
+  variableName: string;
+  timeScale: 'annual' | 'decadal';
+  data: FutureData;
 }
 
 export type Action =
@@ -113,7 +109,6 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
-  | SetFutureModelAction
   | SetFutureTimeIndexAction
   | StoreFutureDataAction
   | StoreWaterDataAction
