@@ -28,6 +28,7 @@ import CrossReferences from '../../cross-references';
 import DataSelector from '../../data-selector';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
+import ModelSelector from '../../model-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 
@@ -94,7 +95,7 @@ class FutureBody extends React.Component<Props> {
   }
 
   public render() {
-    const { mapData, waterRegions } = this.props;
+    const { mapData, waterRegions, selectedDataType } = this.props;
 
     return (
       <div>
@@ -106,6 +107,17 @@ class FutureBody extends React.Component<Props> {
             <p>
               <em>What can we do about this in the future?</em>
             </p>
+          </div>
+          <div
+            className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
+          >
+            <DataSelector hideScarcity />
+            <ModelSelector
+              className={styles['secondary-content']}
+              estimateLabel={selectedDataType}
+              includeConsumption={selectedDataType === 'stress'}
+              future
+            />
           </div>
         </div>
         {!waterRegions || !mapData
@@ -124,7 +136,6 @@ class FutureBody extends React.Component<Props> {
                   />
                 </div>
                 <div className="col-xs-12 col-md-6 col-lg-4">
-                  <DataSelector hideScarcity />
                   <FutureLineChart />
                 </div>
               </div>
