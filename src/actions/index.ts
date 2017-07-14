@@ -168,7 +168,7 @@ export function storeWaterToWorldRegionMap(map: {
   };
 }
 
-export function storeFutureData(
+function storeFutureData(
   variableName: string,
   timeScale: TimeScale,
   data: FutureData,

@@ -10,7 +10,10 @@ import {
   setSelectedDataType,
   setSelectedImpactModel,
 } from '../../../actions';
-import { getClimateModels, getImpactModels } from '../../../data';
+import {
+  getHistoricalClimateModels,
+  getHistoricalImpactModels,
+} from '../../../data';
 import {
   FutureData,
   FutureDataset,
@@ -83,10 +86,10 @@ class FutureBody extends React.Component<Props> {
       selectedImpactModel === 'watergap'
     ) {
       this.props.setSelectedClimateModel(
-        getClimateModels().filter(m => m !== 'watch')[0],
+        getHistoricalClimateModels().filter(m => m !== 'watch')[0],
       );
       this.props.setSelectedImpactModel(
-        getImpactModels().filter(m => m !== 'watergap')[0],
+        getHistoricalImpactModels().filter(m => m !== 'watergap')[0],
       );
     }
   }

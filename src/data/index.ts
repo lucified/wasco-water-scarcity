@@ -4,7 +4,12 @@ import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 import uniq = require('lodash/uniq');
 
-import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import {
+  StressShortageDatum,
+  TimeAggregate,
+  TimeScale,
+  WorldRegion,
+} from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
   FutureData,
@@ -70,15 +75,15 @@ export async function fetchFutureData(
   }
 }
 
-export function getClimateModels() {
+export function getHistoricalClimateModels() {
   return uniq(historicalDatasets.map(d => d.climateModel)).sort();
 }
 
-export function getImpactModels() {
+export function getHistoricalImpactModels() {
   return uniq(historicalDatasets.map(d => d.impactModel)).sort();
 }
 
-export function getTimeScales() {
+export function getTimeScales(): TimeScale[] {
   return uniq(historicalDatasets.map(d => d.timeScale)).sort();
 }
 
@@ -87,20 +92,16 @@ export function getFutureDatasets() {
 }
 
 export function getDefaultFutureDataset() {
-  return futureDatasets.find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
+  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
 }
 
-export function getDefaultClimateModel() {
-  const defaultDataset = historicalDatasets.find(
-    d => d.population === 'hist' && !!d.default,
-  );
+export function getDefaultHistoricalClimateModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
   return defaultDataset ? defaultDataset.climateModel : 'watch';
 }
 
-export function getDefaultImpactModel() {
-  const defaultDataset = historicalDatasets.find(
-    d => d.population === 'hist' && !!d.default,
-  );
+export function getDefaultHistoricalImpactModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
 }
 

@@ -9,7 +9,11 @@ import {
   setSelectedImpactModel,
   setSelectedTimeScale,
 } from '../../actions';
-import { getClimateModels, getImpactModels, getTimeScales } from '../../data';
+import {
+  getHistoricalClimateModels,
+  getHistoricalImpactModels,
+  getTimeScales,
+} from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedClimateModel,
@@ -51,11 +55,11 @@ interface EditingState {
   editing: boolean;
 }
 
-const impactModelOptions = getImpactModels().map(value => ({
+const impactModelOptions = getHistoricalImpactModels().map(value => ({
   value,
   label: value,
 }));
-const climateModelOptions = getClimateModels().map(value => ({
+const climateModelOptions = getHistoricalClimateModels().map(value => ({
   value,
   label: value,
 }));

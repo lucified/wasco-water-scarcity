@@ -22,12 +22,10 @@ import {
 } from '../actions';
 import {
   defaultDataTypeThresholds,
-  getClimateModels,
-  getDefaultClimateModel,
   getDefaultFutureDataset,
-  getDefaultImpactModel,
+  getDefaultHistoricalClimateModel,
+  getDefaultHistoricalImpactModel,
   getFutureDatasets,
-  getImpactModels,
 } from '../data';
 import { FutureData, WaterRegionGeoJSON } from '../data/types';
 import {
@@ -52,8 +50,8 @@ const defaultState: StateTree = {
     timeIndex: 0,
     futureTimeIndex: 0,
     futureDataset: getDefaultFutureDataset(),
-    impactModel: getDefaultImpactModel(),
-    climateModel: getDefaultClimateModel(),
+    impactModel: getDefaultHistoricalImpactModel(),
+    climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
     worldRegion: 0, // 0 means global
@@ -226,7 +224,7 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           // If watergap/watch was previously selected, we need to switch to a
           // valid climateModel.
           if (climateModel === 'watch') {
-            climateModel = getClimateModels().filter(m => m !== 'watch')[0];
+            climateModel = getDefaultHistoricalClimateModel();
           }
         }
 
@@ -250,7 +248,7 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           // If watergap/watch was previously selected, we need to switch to a
           // valid impactModel.
           if (impactModel === 'watergap') {
-            impactModel = getImpactModels().filter(m => m !== 'watergap')[0];
+            impactModel = getDefaultHistoricalImpactModel();
           }
         }
 
