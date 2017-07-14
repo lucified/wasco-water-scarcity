@@ -44,7 +44,11 @@ export const getSelectedFutureDatasetData = createSelector(
     const { variableName, timeScale } = selectedDataset;
 
     return (
-      allFutureData[variableName] && allFutureData[variableName][timeScale]
+      allFutureData[variableName] &&
+      allFutureData[variableName][timeScale] &&
+      allFutureData[variableName][timeScale]!.filter(
+        d => ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+      )
     );
   },
 );
