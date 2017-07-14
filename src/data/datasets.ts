@@ -1,6 +1,7 @@
+// tslint:disable:max-line-length
+
 import { FutureDataset, HistoricalDataset } from './types';
 
-// tslint:disable:max-line-length
 // prettier-ignore
 const historicalDatasets: HistoricalDataset[] = [
   {
@@ -86,34 +87,6 @@ const historicalDatasets: HistoricalDataset[] = [
     startYear: '1971',
     endYear: '2004',
     url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_annual_bluewater_pcrglobwb_hadgem2-es_hist_pressoc_airruse_1971_2004.json',
-  },
-  {
-    spatialUnit: 'FPU',
-    timeScale: 'annual',
-    dataType: 'bluewater',
-    population: 'hist',
-    impactModel: 'wbm',
-    climateModel: 'gfdl-esm2m',
-    climateExperiment: 'hist',
-    socialForcing: 'pressoc',
-    co2Forcing: 'NA',
-    startYear: '1971',
-    endYear: '2005',
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_annual_bluewater_wbm_gfdl-esm2m_hist_pressoc_airruse_1971_2005.json',
-  },
-  {
-    spatialUnit: 'FPU',
-    timeScale: 'annual',
-    dataType: 'bluewater',
-    population: 'hist',
-    impactModel: 'wbm',
-    climateModel: 'hadgem2-es',
-    climateExperiment: 'hist',
-    socialForcing: 'pressoc',
-    co2Forcing: 'NA',
-    startYear: '1971',
-    endYear: '2004',
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_annual_bluewater_wbm_hadgem2-es_hist_pressoc_airruse_1971_2004.json',
   },
   {
     default: true,
@@ -214,95 +187,58 @@ const historicalDatasets: HistoricalDataset[] = [
     endYear: '2000',
     url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_pcrglobwb_hadgem2-es_hist_pressoc_airruse_1971_2000.json',
   },
-  {
-    spatialUnit: 'FPU',
-    timeScale: 'decadal',
-    dataType: 'bluewater',
-    population: 'hist',
-    impactModel: 'wbm',
-    climateModel: 'gfdl-esm2m',
-    climateExperiment: 'hist',
-    socialForcing: 'pressoc',
-    co2Forcing: 'NA',
-    startYear: '1971',
-    endYear: '2000',
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_wbm_gfdl-esm2m_hist_pressoc_airruse_1971_2000.json',
-  },
-  {
-    spatialUnit: 'FPU',
-    timeScale: 'decadal',
-    dataType: 'bluewater',
-    population: 'hist',
-    impactModel: 'wbm',
-    climateModel: 'hadgem2-es',
-    climateExperiment: 'hist',
-    socialForcing: 'pressoc',
-    co2Forcing: 'NA',
-    startYear: '1971',
-    endYear: '2000',
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_wbm_hadgem2-es_hist_pressoc_airruse_1971_2000.json',
-  },
 ];
 
+// prettier-ignore
 const futureDatasets: FutureDataset[] = [
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_short.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_short.json',
     variableName: 'short',
     timeScale: 'decadal',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_stress.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_stress.json',
     variableName: 'stress',
     timeScale: 'decadal',
     default: true,
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_consIrr.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_consIrr.json',
     variableName: 'consIrr',
     timeScale: 'decadal',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_pop.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_pop.json',
     variableName: 'pop',
     timeScale: 'decadal',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_avail.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_decadal_bluewater_SSP_avail.json',
     variableName: 'avail',
     timeScale: 'decadal',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_short.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_short.json',
     variableName: 'short',
     timeScale: 'annual',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_stress.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_stress.json',
     variableName: 'stress',
     timeScale: 'annual',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_consIrr.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_consIrr.json',
     variableName: 'consIrr',
     timeScale: 'annual',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_pop.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_pop.json',
     variableName: 'pop',
     timeScale: 'annual',
   },
   {
-    url:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_avail.json',
+    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/20170713/ensemble_FPU_annual_bluewater_SSP_avail.json',
     variableName: 'avail',
     timeScale: 'annual',
   },
