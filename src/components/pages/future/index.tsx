@@ -15,6 +15,7 @@ import { FutureDataset, WaterRegionGeoJSON } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedClimateModel,
+  getSelectedDataType,
   getSelectedFutureDataForModel,
   getSelectedFutureDataset,
   getSelectedFutureTimeIndex,
@@ -42,6 +43,7 @@ interface GeneratedDispatchProps {
 }
 
 interface GeneratedStateProps {
+  selectedDataType: DataType;
   selectedFutureDataset: FutureDataset;
   selectedImpactModel: string;
   selectedClimateModel: string;
@@ -58,9 +60,13 @@ class FutureBody extends React.Component<Props> {
       selectedFutureDataset,
       selectedClimateModel,
       selectedImpactModel,
+      selectedDataType,
     } = this.props;
 
-    this.props.setSelectedDataType('stress');
+    if (selectedDataType === 'scarcity') {
+      this.props.setSelectedDataType('stress');
+    }
+
     if (!mapData) {
       this.props.loadFutureData(selectedFutureDataset);
     }
@@ -79,7 +85,10 @@ class FutureBody extends React.Component<Props> {
   }
 
   public componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.selectedFutureDataset !== this.props.selectedFutureDataset) {
+    if (
+      nextProps.selectedFutureDataset !== this.props.selectedFutureDataset &&
+      !nextProps.mapData
+    ) {
       nextProps.loadFutureData(nextProps.selectedFutureDataset);
     }
   }
@@ -152,6 +161,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     mapData,
     waterRegions: getWaterRegionData(state),
+    selectedDataType: getSelectedDataType(state),
     selectedClimateModel: getSelectedClimateModel(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
     selectedImpactModel: getSelectedImpactModel(state),
