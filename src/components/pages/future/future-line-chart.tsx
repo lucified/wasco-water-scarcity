@@ -34,7 +34,11 @@ interface GeneratedStateProps {
   thresholds: number[];
 }
 
-type Props = GeneratedDispatchProps & GeneratedStateProps;
+interface PassedProps {
+  onLineHover?: (scenarioId: string) => void;
+}
+
+type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 function FutureLineChart({
   data,
@@ -44,6 +48,7 @@ function FutureLineChart({
   selectedTimeIndex,
   selectedWaterRegionId,
   onTimeIndexChange,
+  onLineHover,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
     return <div className={styles.empty}>Select a unit</div>;
@@ -80,7 +85,8 @@ function FutureLineChart({
       height={180}
       selectedTimeIndex={selectedTimeIndex}
       selectedDataSeries={selectedFutureDataForModel.scenarioId}
-      onHover={onTimeIndexChange}
+      onChartHover={onTimeIndexChange}
+      onLineHover={onLineHover}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
       marginTop={15}
@@ -111,7 +117,8 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(FutureLineChart);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps
+>(mapStateToProps, mapDispatchToProps)(FutureLineChart);

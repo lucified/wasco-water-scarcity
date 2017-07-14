@@ -9,7 +9,6 @@ interface PassedProps {
   className?: string;
   estimateLabel: string;
   includeConsumption?: boolean;
-  future?: boolean;
 }
 
 type Props = PassedProps;
@@ -18,13 +17,11 @@ export default function ModelSelector({
   className,
   estimateLabel,
   includeConsumption,
-  future,
 }: Props) {
   return (
     <div className={className}>
       <div className={styles.content}>
-        These {future ? 'projections' : 'estimates'} of blue water{' '}
-        {estimateLabel} are produced using{' '}
+        These estimates of blue water {estimateLabel} are produced using{' '}
         <span className={styles.assumption}>blue water availability</span>
         {includeConsumption &&
           <span>
@@ -34,12 +31,10 @@ export default function ModelSelector({
         <InlineAssumptionSelector
           variable="impactModel"
           className={styles.assumption}
-          future={future}
         />, driven by climate data from{' '}
         <InlineAssumptionSelector
           variable="climateModel"
           className={styles.assumption}
-          future={future}
         />, calculated for{' '}
         <span className={styles.assumption}>food production units</span> at a{' '}
         <InlineAssumptionSelector

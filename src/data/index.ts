@@ -75,24 +75,17 @@ export async function fetchFutureData(
   }
 }
 
+export function getTimeScales(): TimeScale[] {
+  return ['annual', 'decadal'];
+}
+
+/* Historical */
 export function getHistoricalClimateModels() {
   return uniq(historicalDatasets.map(d => d.climateModel)).sort();
 }
 
 export function getHistoricalImpactModels() {
   return uniq(historicalDatasets.map(d => d.impactModel)).sort();
-}
-
-export function getTimeScales(): TimeScale[] {
-  return uniq(historicalDatasets.map(d => d.timeScale)).sort();
-}
-
-export function getFutureDatasets() {
-  return futureDatasets;
-}
-
-export function getDefaultFutureDataset() {
-  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
 }
 
 export function getDefaultHistoricalClimateModel() {
@@ -103,6 +96,15 @@ export function getDefaultHistoricalClimateModel() {
 export function getDefaultHistoricalImpactModel() {
   const defaultDataset = historicalDatasets.find(d => !!d.default);
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
+}
+
+/* Future */
+export function getFutureDatasets() {
+  return futureDatasets;
+}
+
+export function getDefaultFutureDataset() {
+  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {

@@ -8,6 +8,7 @@ import {
   loadFutureData,
   setSelectedClimateModel,
   setSelectedDataType,
+  setSelectedFutureScenario,
   setSelectedImpactModel,
 } from '../../../actions';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
+  getSelectedClimateExperiment,
   getSelectedClimateModel,
   getSelectedDataType,
   getSelectedFutureDataForModel,
@@ -28,15 +30,17 @@ import {
   getSelectedFutureDatasetData,
   getSelectedFutureTimeIndex,
   getSelectedImpactModel,
+  getSelectedPopulation,
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
 
 import CrossReferences from '../../cross-references';
-import DataSelector from '../../data-selector';
+import DataTypeSelector from '../../data-type-selector';
+import FutureModelDescription from '../../future-model-description';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
-import ModelSelector from '../../model-selector';
+import TimeScaleSelector from '../../time-scale-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 
@@ -49,6 +53,12 @@ interface GeneratedDispatchProps {
   loadFutureData: (dataset: FutureDataset) => void;
   setSelectedImpactModel: (model: string) => void;
   setSelectedClimateModel: (model: string) => void;
+  setSelectedFutureScenario: (
+    climateModel: string,
+    climateExperiment: string,
+    impactModel: string,
+    population: string,
+  ) => void;
 }
 
 interface GeneratedStateProps {
@@ -57,6 +67,8 @@ interface GeneratedStateProps {
   selectedFutureData?: FutureData;
   selectedImpactModel: string;
   selectedClimateModel: string;
+  selectedClimateExperiment: string;
+  selectedPopulation: string;
   mapData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
@@ -73,9 +85,18 @@ class FutureBody extends React.Component<Props> {
       selectedDataType,
     } = this.props;
 
+    // Default to stress if scarcity is selected
     if (selectedDataType === 'scarcity') {
       this.props.setSelectedDataType('stress');
     }
+
+    // TODO: replace this with something proper
+    this.props.setSelectedFutureScenario(
+      'gfdl-esm2m',
+      'rcp8p5',
+      'lpjml',
+      'SSP1',
+    );
 
     if (!mapData) {
       this.props.loadFutureData(selectedFutureDataset);
@@ -94,6 +115,29 @@ class FutureBody extends React.Component<Props> {
     }
   }
 
+  private handleLineHover = (scenarioId: string) => {
+    const hoveredData = this.props.selectedFutureData!.find(
+      d => d.scenarioId === scenarioId,
+    );
+
+    if (!hoveredData) {
+      console.error('Error selecting line with scenario ID:', scenarioId);
+    } else {
+      const {
+        climateModel,
+        climateExperiment,
+        impactModel,
+        population,
+      } = hoveredData;
+      this.props.setSelectedFutureScenario(
+        climateModel,
+        climateExperiment,
+        impactModel,
+        population,
+      );
+    }
+  };
+
   public componentWillReceiveProps(nextProps: Props) {
     if (
       nextProps.selectedFutureDataset !== this.props.selectedFutureDataset &&
@@ -109,6 +153,10 @@ class FutureBody extends React.Component<Props> {
       waterRegions,
       selectedDataType,
       selectedFutureData,
+      selectedClimateModel,
+      selectedImpactModel,
+      selectedClimateExperiment,
+      selectedPopulation,
     } = this.props;
 
     return (
@@ -144,14 +192,18 @@ class FutureBody extends React.Component<Props> {
           <div
             className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
           >
-            <DataSelector hideScarcity />
-            <ModelSelector
+            <DataTypeSelector hideScarcity />
+            <TimeScaleSelector />
+            <FutureModelDescription
               className={styles['secondary-content']}
               estimateLabel={selectedDataType}
               includeConsumption={selectedDataType === 'stress'}
-              future
+              climateModel={selectedClimateModel}
+              climateExperiment={selectedClimateExperiment}
+              population={selectedPopulation}
+              impactModel={selectedImpactModel}
             />
-            <FutureLineChart />
+            <FutureLineChart onLineHover={this.handleLineHover} />
           </div>
         </div>
         <div className="row">
@@ -184,6 +236,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedDataType: getSelectedDataType(state),
     selectedFutureData: getSelectedFutureDatasetData(state),
     selectedClimateModel: getSelectedClimateModel(state),
+    selectedClimateExperiment: getSelectedClimateExperiment(state),
+    selectedPopulation: getSelectedPopulation(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
     selectedImpactModel: getSelectedImpactModel(state),
   };
@@ -202,6 +256,21 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     },
     loadFutureData: (dataset: FutureDataset) => {
       dispatch(loadFutureData(dataset));
+    },
+    setSelectedFutureScenario: (
+      climateModel: string,
+      climateExperiment: string,
+      impactModel: string,
+      population: string,
+    ) => {
+      dispatch(
+        setSelectedFutureScenario(
+          climateModel,
+          climateExperiment,
+          impactModel,
+          population,
+        ),
+      );
     },
   };
 }

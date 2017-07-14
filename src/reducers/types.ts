@@ -32,6 +32,8 @@ export interface StateTree {
     dataType: DataType;
     impactModel: string;
     climateModel: string;
+    climateExperiment: string; // Only used in Future page
+    population: string; // Only used in Future page
     timeScale: TimeScale;
     worldRegion: number;
     region?: number;

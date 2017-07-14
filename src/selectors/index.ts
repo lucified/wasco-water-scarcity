@@ -57,12 +57,17 @@ export const getSelectedFutureDataForModel = createSelector(
   getSelectedFutureDatasetData,
   getSelectedClimateModel,
   getSelectedImpactModel,
-  (datasetData, climateModel, impactModel) => {
-    // TODO: also use population model and climateExperiment
+  getSelectedClimateExperiment,
+  getSelectedPopulation,
+  (datasetData, climateModel, impactModel, climateExperiment, population) => {
     return (
       datasetData &&
       datasetData.find(
-        d => d.climateModel === climateModel && d.impactModel === impactModel,
+        d =>
+          d.climateModel === climateModel &&
+          d.impactModel === impactModel &&
+          d.climateExperiment === climateExperiment &&
+          d.population === population,
       )
     );
   },
@@ -232,19 +237,27 @@ export const getSelectedWorldRegion = createSelector<
   (id, regions) => regions && regions.find(r => r.id === id),
 );
 
-export function getSelectedDataType(state: StateTree): DataType {
+export function getSelectedDataType(state: StateTree) {
   return state.selections.dataType;
 }
 
-export function getSelectedImpactModel(state: StateTree): string {
+export function getSelectedImpactModel(state: StateTree) {
   return state.selections.impactModel;
 }
 
-export function getSelectedClimateModel(state: StateTree): string {
+export function getSelectedClimateModel(state: StateTree) {
   return state.selections.climateModel;
 }
 
-export function getSelectedTimeScale(state: StateTree): string {
+export function getSelectedClimateExperiment(state: StateTree) {
+  return state.selections.climateExperiment;
+}
+
+export function getSelectedPopulation(state: StateTree) {
+  return state.selections.population;
+}
+
+export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
 }
 

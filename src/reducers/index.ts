@@ -7,6 +7,7 @@ import {
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_FUTURE_SCENARIO,
   SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
   SET_SELECTED_TIME_SCALE,
@@ -54,6 +55,8 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
+    population: 'SSP1',
+    climateExperiment: 'rcp8p5',
     worldRegion: 0, // 0 means global
   },
 };
@@ -280,6 +283,23 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           ...state,
           futureDataset,
           timeScale: action.timeScale,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_FUTURE_SCENARIO:
+      if (
+        action.climateModel !== state.climateModel ||
+        action.climateExperiment !== state.climateExperiment ||
+        action.impactModel !== state.impactModel ||
+        action.population !== state.population
+      ) {
+        return {
+          ...state,
+          climateModel: action.climateModel,
+          climateExperiment: action.climateExperiment,
+          impactModel: action.impactModel,
+          population: action.population,
         };
       }
 

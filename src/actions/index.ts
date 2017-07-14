@@ -19,6 +19,7 @@ import {
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_FUTURE_SCENARIO,
   SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
   SET_SELECTED_TIME_SCALE,
@@ -28,6 +29,7 @@ import {
   SetFutureTimeIndexAction,
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
+  SetSelectedFutureScenarioAction,
   SetSelectedImpactModelAction,
   SetSelectedRegionAction,
   SetSelectedTimeScaleAction,
@@ -102,6 +104,21 @@ export function setSelectedClimateModel(
   return {
     type: SET_SELECTED_CLIMATE_MODEL,
     climateModel,
+  };
+}
+
+export function setSelectedFutureScenario(
+  climateModel: string,
+  climateExperiment: string,
+  impactModel: string,
+  population: string,
+): SetSelectedFutureScenarioAction {
+  return {
+    type: SET_SELECTED_FUTURE_SCENARIO,
+    climateModel,
+    climateExperiment,
+    impactModel,
+    population,
   };
 }
 
