@@ -22,7 +22,7 @@ export default function ModelSelector({
 }: Props) {
   return (
     <div className={className}>
-      <div className={styles['content']}>
+      <div className={styles.content}>
         These {future ? 'projections' : 'estimates'} of blue water{' '}
         {estimateLabel} are produced using{' '}
         <span className={styles.assumption}>blue water availability</span>
