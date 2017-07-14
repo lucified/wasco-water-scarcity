@@ -4,20 +4,17 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setFutureTimeIndex } from '../../../actions';
+import { FutureData, FutureDataForModel } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
-  getAllFutureTimeSeriesForSelectedWaterRegion,
   getSelectedDataType,
-  getSelectedFutureModel,
+  getSelectedFutureDataForModel,
+  getSelectedFutureDatasetData,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
 } from '../../../selectors';
-import {
-  getDataTypeColors,
-  StressShortageDatum,
-  waterPropertySelector,
-} from '../../../types';
+import { getDataTypeColors } from '../../../types';
 
 import LineChart, { Data } from '../../generic/line-chart';
 import Spinner from '../../generic/spinner';
@@ -30,13 +27,10 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  selectedFutureModel: string;
   selectedDataType?: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
-  data?: Array<{
-    id: string;
-    data: StressShortageDatum[];
-  }>;
+  data?: FutureData;
+  selectedFutureDataForModel?: FutureDataForModel;
   thresholds: number[];
 }
 
@@ -46,7 +40,7 @@ function FutureLineChart({
   data,
   selectedDataType,
   thresholds,
-  selectedFutureModel,
+  selectedFutureDataForModel,
   selectedTimeIndex,
   selectedWaterRegionId,
   onTimeIndexChange,
@@ -55,18 +49,17 @@ function FutureLineChart({
     return <div className={styles.empty}>Select a unit</div>;
   }
 
-  if (!data) {
+  if (!data || !selectedFutureDataForModel) {
     return <Spinner />;
   }
 
-  const selector = waterPropertySelector(selectedDataType);
   const chartData: Data[] = data.map(series => ({
-    id: series.id,
+    id: series.scenarioId,
     color: 'blue',
     series: series.data.map(d => ({
-      value: selector(d)!,
-      start: new Date(d.startYear, 0, 1),
-      end: new Date(d.endYear, 11, 31),
+      value: d.regions[selectedWaterRegionId],
+      start: new Date(d.y0, 0, 1),
+      end: new Date(d.y1, 11, 31),
     })),
   }));
 
@@ -86,7 +79,7 @@ function FutureLineChart({
       width={400}
       height={180}
       selectedTimeIndex={selectedTimeIndex}
-      selectedDataSeries={selectedFutureModel}
+      selectedDataSeries={selectedFutureDataForModel.scenarioId}
       onHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
@@ -101,11 +94,11 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
-    selectedFutureModel: getSelectedFutureModel(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
-    data: getAllFutureTimeSeriesForSelectedWaterRegion(state),
+    data: getSelectedFutureDatasetData(state),
+    selectedFutureDataForModel: getSelectedFutureDataForModel(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
   };
 }

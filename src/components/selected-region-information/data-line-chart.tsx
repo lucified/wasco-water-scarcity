@@ -1,7 +1,7 @@
 import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 
-import { StressShortageDatum, waterPropertySelector } from '../../types';
+import { StressShortageDatum } from '../../types';
 
 import LineChart, { Data } from '../generic/line-chart';
 
@@ -32,12 +32,11 @@ export default function DataLineChart({
   selectedTimeIndex,
   onTimeIndexChange,
 }: Props) {
-  const selector = waterPropertySelector(dataType);
   const chartData: Data = {
     id,
     color: dataColor,
     series: data.map(d => ({
-      value: selector(d)!,
+      value: d[dataType],
       start: new Date(d.startYear, 0, 1),
       end: new Date(d.endYear, 11, 31),
     })),

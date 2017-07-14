@@ -1,8 +1,9 @@
-import { WaterRegionGeoJSON } from '../data/types';
+import { FutureData, WaterRegionGeoJSON } from '../data/types';
 import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  TimeScale,
   WorldRegion,
 } from '../types';
 
@@ -51,7 +52,7 @@ export interface SetSelectedClimateModelAction {
 export const SET_SELECTED_TIME_SCALE = 'SET_SELECTED_TIME_SCALE';
 export interface SetSelectedTimeScaleAction {
   type: 'SET_SELECTED_TIME_SCALE';
-  timeScale: string;
+  timeScale: TimeScale;
 }
 
 export const SET_THRESHOLDS_FOR_DATA_TYPE = 'SET_THRESHOLDS_FOR_DATA_TYPE';
@@ -65,12 +66,6 @@ export const SET_FUTURE_TIME_INDEX = 'SET_FUTURE_TIME_INDEX';
 export interface SetFutureTimeIndexAction {
   type: 'SET_FUTURE_TIME_INDEX';
   index: number;
-}
-
-export const SET_FUTURE_MODEL = 'SET_FUTURE_MODEL';
-export interface SetFutureModelAction {
-  type: 'SET_FUTURE_MODEL';
-  id: string;
 }
 
 export const STORE_WATER_DATA = 'STORE_WATER_DATA';
@@ -101,7 +96,9 @@ export interface StoreWaterToWorldRegionMapAction {
 export const STORE_FUTURE_DATA = 'STORE_FUTURE_DATA';
 export interface StoreFutureDataAction {
   type: 'STORE_FUTURE_DATA';
-  data: Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>;
+  variableName: string;
+  timeScale: TimeScale;
+  data: FutureData;
 }
 
 export type Action =
@@ -113,7 +110,6 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
-  | SetFutureModelAction
   | SetFutureTimeIndexAction
   | StoreFutureDataAction
   | StoreWaterDataAction

@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
+import { connect, Dispatch } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 
-import { loadAppData, loadFutureData, loadModelData } from '../actions';
+import { loadAppData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
+
 import Header from './header';
 import Future from './pages/future';
 import NotFound from './pages/not-found';
@@ -31,7 +32,6 @@ interface GeneratedDispatchProps {
     impactModel: string,
     timeScale: string,
   ) => void;
-  loadFutureData: () => void;
 }
 
 interface GeneratedStateProps {
@@ -55,7 +55,6 @@ class App extends React.Component<Props> {
       selectedImpactModel,
       selectedTimeScale,
     );
-    this.props.loadFutureData();
   }
 
   public componentWillReceiveProps(nextProps: Props) {
@@ -105,10 +104,25 @@ export default connect<
   GeneratedDispatchProps,
   PassedProps
 >(
-  (state: StateTree) => ({
+  (state: StateTree): GeneratedStateProps => ({
     selectedClimateModel: getSelectedClimateModel(state),
     selectedImpactModel: getSelectedImpactModel(state),
     selectedTimeScale: getSelectedTimeScale(state),
   }),
-  { loadAppData, loadModelData, loadFutureData },
+  (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
+    loadAppData: (
+      climateModel: string,
+      impactModel: string,
+      timeScale: string,
+    ) => {
+      dispatch(loadAppData(climateModel, impactModel, timeScale));
+    },
+    loadModelData: (
+      climateModel: string,
+      impactModel: string,
+      timeScale: string,
+    ) => {
+      dispatch(loadModelData(climateModel, impactModel, timeScale));
+    },
+  }),
 )(App);

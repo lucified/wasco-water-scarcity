@@ -16,6 +16,7 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../../selectors';
+import { TimeScale } from '../../types';
 
 import RadioSelector from '../generic/radio-selector';
 
@@ -31,11 +32,12 @@ interface StateProps {
 interface DispatchProps {
   onImpactModelChange: (value: string) => void;
   onClimateModelChange: (value: string) => void;
-  onTimeScaleChange: (value: string) => void;
+  onTimeScaleChange: (value: TimeScale) => void;
 }
 
 interface PassedProps {
   variable: 'impactModel' | 'climateModel' | 'timeScale';
+  future?: boolean;
   className?: string;
 }
 
@@ -84,7 +86,7 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
     this.setState({ editing: false });
   };
 
-  private handleTimeScaleChange = (value: string) => {
+  private handleTimeScaleChange = (value: TimeScale) => {
     this.props.onTimeScaleChange(value);
     this.setState({ editing: false });
   };
@@ -94,21 +96,29 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
       <Select
         className={styles.select}
         name="Impact model"
-        options={impactModelOptions}
+        options={impactModelOptions.filter(
+          d => !this.props.future || d.value !== 'watergap',
+        )}
         value={this.props.impactModel}
         onChange={this.handleImpactModelChange}
         searchable={false}
         clearable={false}
+        openOnFocus
+        autofocus
       />,
     climateModel: () =>
       <Select
         className={styles.select}
         name="Climate model"
-        options={climateModelOptions}
+        options={climateModelOptions.filter(
+          d => !this.props.future || d.value !== 'watch',
+        )}
         value={this.props.climateModel}
         onChange={this.handleClimateModelChange}
         searchable={false}
         clearable={false}
+        openOnFocus
+        autofocus
       />,
     timeScale: () =>
       <div className={styles['time-scale-selector']}>
@@ -157,7 +167,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   onClimateModelChange: (value: string) => {
     dispatch(setSelectedClimateModel(value));
   },
-  onTimeScaleChange: (value: string) => {
+  onTimeScaleChange: (value: TimeScale) => {
     dispatch(setSelectedTimeScale(value));
   },
 });

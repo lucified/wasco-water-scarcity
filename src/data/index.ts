@@ -5,8 +5,10 @@ import values = require('lodash/values');
 import uniq = require('lodash/uniq');
 
 import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
-import datasets from './datasets';
+import { futureDatasets, historicalDatasets } from './datasets';
 import {
+  FutureData,
+  FutureDataset,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
   WaterRegionGeoJSON,
@@ -32,12 +34,11 @@ export async function fetchHistoricalStressShortageData(
   impactModel: string,
   timeScale: string,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
-  const dataset = datasets.find(
+  const dataset = historicalDatasets.find(
     d =>
       d.impactModel === impactModel &&
       d.climateModel === climateModel &&
       d.timeScale === timeScale &&
-      d.population === 'hist' &&
       ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
   );
   if (!dataset) {
@@ -56,34 +57,13 @@ export async function fetchHistoricalStressShortageData(
   }
 }
 
-export async function fetchAllFutureData(): Promise<
-  | Array<{ id: string; data: Array<TimeAggregate<StressShortageDatum>> }>
-  | undefined
-> {
-  const futureDatasetURLs = datasets
-    .filter(
-      d =>
-        d.population !== 'hist' &&
-        d.timeScale === 'decadal' && // TODO: remove
-        ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
-    )
-    .map(d => d.url);
-  if (futureDatasetURLs.length === 0) {
-    console.error('Unable to find future datasets');
-    return undefined;
-  }
-
+export async function fetchFutureData(
+  dataset: FutureDataset,
+): Promise<FutureData | undefined> {
   try {
-    const results = await Promise.all(
-      futureDatasetURLs.map(url => fetch(url, { credentials: 'same-origin' })),
-    );
-    const parsedResults: RawRegionStressShortageDatum[][] = await Promise.all(
-      results.map(response => response.json()),
-    );
-    return parsedResults.map((data, i) => ({
-      id: futureDatasetURLs[i], // Use the URL as the ID
-      data: generateStressShortageData(data),
-    }));
+    const response = await fetch(dataset.url, { credentials: 'same-origin' });
+    const parsedResult: FutureData = await response.json();
+    return parsedResult;
   } catch (error) {
     console.error('Unable to fetch future data', error);
     return undefined;
@@ -91,39 +71,34 @@ export async function fetchAllFutureData(): Promise<
 }
 
 export function getClimateModels() {
-  return uniq(datasets.map(d => d.climateModel)).sort();
+  return uniq(historicalDatasets.map(d => d.climateModel)).sort();
 }
 
 export function getImpactModels() {
-  return uniq(datasets.map(d => d.impactModel)).sort();
+  return uniq(historicalDatasets.map(d => d.impactModel)).sort();
 }
 
 export function getTimeScales() {
-  return uniq(datasets.map(d => d.timeScale)).sort();
+  return uniq(historicalDatasets.map(d => d.timeScale)).sort();
 }
 
-export function getDefaultFutureModel() {
-  const defaultDataset = datasets.find(
-    d =>
-      d.population !== 'hist' &&
-      d.timeScale === 'decadal' && // TODO: remove
-      !!d.default &&
-      ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
-  );
-  return defaultDataset
-    ? defaultDataset.url
-    : 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v1-20170629/FPU_decadal_bluewater_SSP2_pcrglobwb_gfdl-esm2m_rcp4p5_pressoc_airruse_2001_2090.json'; // tslint:disable-line:max-line-length
+export function getFutureDatasets() {
+  return futureDatasets;
+}
+
+export function getDefaultFutureDataset() {
+  return futureDatasets.find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
 }
 
 export function getDefaultClimateModel() {
-  const defaultDataset = datasets.find(
+  const defaultDataset = historicalDatasets.find(
     d => d.population === 'hist' && !!d.default,
   );
   return defaultDataset ? defaultDataset.climateModel : 'watch';
 }
 
 export function getDefaultImpactModel() {
-  const defaultDataset = datasets.find(
+  const defaultDataset = historicalDatasets.find(
     d => d.population === 'hist' && !!d.default,
   );
   return defaultDataset ? defaultDataset.impactModel : 'watergap';

@@ -63,6 +63,7 @@ export interface StressShortageDatum extends Datum {
 }
 
 export type DataType = 'stress' | 'shortage' | 'scarcity';
+export type TimeScale = 'decadal' | 'annual';
 
 export function getDataTypeColors(dataType: DataType) {
   switch (dataType) {
@@ -77,10 +78,6 @@ export function getDataTypeColors(dataType: DataType) {
 
   console.warn('Unknown data type', dataType);
   return [];
-}
-
-export function waterPropertySelector(dataType: 'stress' | 'shortage') {
-  return (d: StressShortageDatum) => d[dataType];
 }
 
 export function scarcitySelector(

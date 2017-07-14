@@ -2,6 +2,7 @@ import keyBy = require('lodash/keyBy');
 import { createSelector } from 'reselect';
 
 import { Data as GapminderData } from '../components/generic/gapminder';
+import { FutureDataset } from '../data/types';
 import { StateTree } from '../reducers';
 import {
   AggregateStressShortageDatum,
@@ -11,16 +12,10 @@ import {
   WorldRegion,
 } from '../types';
 
-export function getStressShortageData(
+function getStressShortageData(
   state: StateTree,
 ): Array<TimeAggregate<StressShortageDatum>> | undefined {
   return state.data.stressShortageData;
-}
-
-export function getFutureData(
-  state: StateTree,
-): { [id: string]: Array<TimeAggregate<StressShortageDatum>> } | undefined {
-  return state.data.futureData;
 }
 
 export function getSelectedStressShortageData(
@@ -30,24 +25,46 @@ export function getSelectedStressShortageData(
   return data && data[getSelectedTimeIndex(state)];
 }
 
-export function getSelectedFutureModel(state: StateTree): string {
-  return state.selections.futureModelId;
-}
-
 export function getSelectedFutureTimeIndex(state: StateTree): number {
   return state.selections.futureTimeIndex;
 }
 
-export function getSelectedFutureStressShortageData(
-  state: StateTree,
-): TimeAggregate<StressShortageDatum> | undefined {
-  const selectedModel = getSelectedFutureModel(state);
-  const selectedTimeIndex = getSelectedFutureTimeIndex(state);
-  const data = getFutureData(state);
-  return data && data[selectedModel] && data[selectedModel][selectedTimeIndex];
+export function getSelectedFutureDataset(state: StateTree): FutureDataset {
+  return state.selections.futureDataset;
 }
 
-export const getAggregateData = createSelector(
+function getFutureData(state: StateTree) {
+  return state.data.futureData;
+}
+
+export const getSelectedFutureDatasetData = createSelector(
+  getFutureData,
+  getSelectedFutureDataset,
+  (allFutureData, selectedDataset) => {
+    const { variableName, timeScale } = selectedDataset;
+
+    return (
+      allFutureData[variableName] && allFutureData[variableName][timeScale]
+    );
+  },
+);
+
+export const getSelectedFutureDataForModel = createSelector(
+  getSelectedFutureDatasetData,
+  getSelectedClimateModel,
+  getSelectedImpactModel,
+  (datasetData, climateModel, impactModel) => {
+    // TODO: also use population model and climateExperiment
+    return (
+      datasetData &&
+      datasetData.find(
+        d => d.climateModel === climateModel && d.impactModel === impactModel,
+      )
+    );
+  },
+);
+
+const getAggregateData = createSelector(
   getStressShortageData,
   getThresholds,
   getWaterToWorldRegionMap,
@@ -236,21 +253,6 @@ export const getTimeSeriesForSelectedWaterRegion = createSelector(
     }
 
     return data.map(timeAggregate => timeAggregate.data[selectedRegion]);
-  },
-);
-
-export const getAllFutureTimeSeriesForSelectedWaterRegion = createSelector(
-  getSelectedWaterRegionId,
-  getFutureData,
-  (selectedRegion, data) => {
-    if (!data || selectedRegion === undefined) {
-      return undefined;
-    }
-
-    return Object.keys(data).map(id => ({
-      id,
-      data: data[id].map(timeAggregate => timeAggregate.data[selectedRegion]),
-    }));
   },
 );
 

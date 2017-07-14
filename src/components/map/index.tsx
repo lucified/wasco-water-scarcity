@@ -32,10 +32,7 @@ import {
 import {
   DataType,
   getDataTypeColors,
-  scarcitySelector,
-  StressShortageDatum,
   TimeAggregate,
-  waterPropertySelector,
   WorldRegion,
 } from '../../types';
 
@@ -48,7 +45,7 @@ const styles = require('./index.scss');
 
 interface PassedProps {
   width: number;
-  selectedData: TimeAggregate<StressShortageDatum>;
+  selectedData: TimeAggregate<number>;
   waterRegions: WaterRegionGeoJSON;
 }
 
@@ -370,19 +367,8 @@ class Map extends React.Component<Props> {
   }
 
   private getColorForWaterRegion(featureId: number): string {
-    const {
-      selectedDataType,
-      colorScale,
-      thresholds,
-      stressThresholds,
-      shortageThresholds,
-      selectedData: { data },
-    } = this.props;
-    const selector =
-      selectedDataType === 'scarcity'
-        ? scarcitySelector(thresholds, stressThresholds, shortageThresholds)
-        : waterPropertySelector(selectedDataType);
-    const value = selector(data[featureId]);
+    const { colorScale, selectedData: { data } } = this.props;
+    const value = data[featureId];
     return value != null ? colorScale(value) : '#807775';
   }
 

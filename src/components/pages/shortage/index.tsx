@@ -3,7 +3,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { WaterRegionGeoJSON } from '../../../data/types';
-import { DataType, StressShortageDatum, TimeAggregate } from '../../../types';
+import { DataType, TimeAggregate } from '../../../types';
 import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
@@ -21,7 +21,7 @@ import * as styles from './index.scss';
 
 interface PassedProps extends RouteComponentProps<void> {
   setSelectedDataType: (dataType: DataType) => void;
-  selectedWaterData?: TimeAggregate<StressShortageDatum>;
+  selectedWaterData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
 
@@ -99,4 +99,4 @@ class ShortageBody extends React.Component<Props> {
   }
 }
 
-export default withPageData(ShortageBody);
+export default withPageData(ShortageBody, 'shortage');

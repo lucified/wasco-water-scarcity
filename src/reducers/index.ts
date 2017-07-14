@@ -4,7 +4,6 @@ import { combineReducers } from 'redux';
 
 import {
   Action,
-  SET_FUTURE_MODEL,
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
@@ -25,17 +24,25 @@ import {
   defaultDataTypeThresholds,
   getClimateModels,
   getDefaultClimateModel,
-  getDefaultFutureModel,
+  getDefaultFutureDataset,
   getDefaultImpactModel,
+  getFutureDatasets,
   getImpactModels,
 } from '../data';
-import { WaterRegionGeoJSON } from '../data/types';
-import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import { FutureData, WaterRegionGeoJSON } from '../data/types';
+import {
+  StressShortageDatum,
+  TimeAggregate,
+  TimeScale,
+  WorldRegion,
+} from '../types';
 import { StateTree } from './types';
 
 const defaultState: StateTree = {
   routing: {} as any,
-  data: {},
+  data: {
+    futureData: {},
+  },
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
@@ -44,7 +51,7 @@ const defaultState: StateTree = {
   selections: {
     timeIndex: 0,
     futureTimeIndex: 0,
-    futureModelId: getDefaultFutureModel(),
+    futureDataset: getDefaultFutureDataset(),
     impactModel: getDefaultImpactModel(),
     climateModel: getDefaultClimateModel(),
     timeScale: 'decadal',
@@ -55,12 +62,34 @@ const defaultState: StateTree = {
 
 export const initialState = defaultState;
 
+function getFutureDataset(
+  dataType: 'stress' | 'shortage',
+  timeScale: TimeScale,
+) {
+  const dataset = getFutureDatasets()
+    .filter(d => d.timeScale === timeScale)
+    .find(
+      d =>
+        dataType === 'shortage'
+          ? d.variableName === 'short'
+          : d.variableName === 'stress',
+    );
+
+  if (!dataset) {
+    console.error('No future dataset found for dataType:', dataType);
+  }
+
+  return dataset;
+}
+
 function dataReducer(
   state = initialState.data,
   action: Action,
 ): {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
-  futureData?: { [id: string]: Array<TimeAggregate<StressShortageDatum>> };
+  futureData: {
+    [variableName: string]: { annual?: FutureData; decadal?: FutureData };
+  };
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -87,13 +116,16 @@ function dataReducer(
         waterToWorldRegionsMap: action.map,
       };
     case STORE_FUTURE_DATA:
-      const futureDataObject = { ...state.futureData || {} };
-      action.data.forEach(d => {
-        futureDataObject[d.id] = d.data;
-      });
+      const existingVariableData = state.futureData[action.variableName] || {};
       return {
         ...state,
-        futureData: futureDataObject,
+        futureData: {
+          ...state.futureData,
+          [action.variableName]: {
+            ...existingVariableData,
+            [action.timeScale]: action.data,
+          },
+        },
       };
   }
   return state;
@@ -167,8 +199,17 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       return state;
     case SET_SELECTED_DATA_TYPE:
       if (action.dataType !== state.dataType) {
+        let { futureDataset } = state;
+        if (action.dataType !== 'scarcity') {
+          const dataset = getFutureDataset(action.dataType, state.timeScale);
+          if (dataset) {
+            futureDataset = dataset;
+          }
+        }
+
         return {
           ...state,
+          futureDataset,
           dataType: action.dataType,
         };
       }
@@ -229,18 +270,18 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           return state;
         }
 
-        return {
-          ...state,
-          timeScale: action.timeScale,
-        };
-      }
+        let { futureDataset } = state;
+        if (state.dataType !== 'scarcity') {
+          const dataset = getFutureDataset(state.dataType, action.timeScale);
+          if (dataset) {
+            futureDataset = dataset;
+          }
+        }
 
-      return state;
-    case SET_FUTURE_MODEL:
-      if (action.id !== state.futureModelId) {
         return {
           ...state,
-          futureModelId: action.id,
+          futureDataset,
+          timeScale: action.timeScale,
         };
       }
 
