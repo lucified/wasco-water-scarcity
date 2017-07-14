@@ -1,4 +1,4 @@
-import { StressShortageDatum } from '../types';
+import { StressShortageDatum, TimeScale } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
   geometry: any;
@@ -13,7 +13,7 @@ export interface WorldRegionGeoJSONFeature {
 export interface HistoricalDataset {
   default?: boolean;
   spatialUnit: string;
-  timeScale: 'decadal' | 'annual';
+  timeScale: TimeScale;
   dataType: string;
   population: string;
   impactModel: string;
@@ -30,7 +30,7 @@ export interface FutureDataset {
   default?: boolean;
   url: string;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
-  timeScale: 'decadal' | 'annual';
+  timeScale: TimeScale;
 }
 
 export interface FutureDataForModel {
@@ -38,7 +38,7 @@ export interface FutureDataForModel {
   default?: boolean;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   spatialUnit: string;
-  timeScale: 'decadal' | 'annual';
+  timeScale: TimeScale;
   dataType: string;
   population: string;
   impactModel: string;

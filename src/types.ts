@@ -63,6 +63,7 @@ export interface StressShortageDatum extends Datum {
 }
 
 export type DataType = 'stress' | 'shortage' | 'scarcity';
+export type TimeScale = 'decadal' | 'annual';
 
 export function getDataTypeColors(dataType: DataType) {
   switch (dataType) {

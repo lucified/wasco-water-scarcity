@@ -3,6 +3,7 @@ import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  TimeScale,
   WorldRegion,
 } from '../types';
 
@@ -51,7 +52,7 @@ export interface SetSelectedClimateModelAction {
 export const SET_SELECTED_TIME_SCALE = 'SET_SELECTED_TIME_SCALE';
 export interface SetSelectedTimeScaleAction {
   type: 'SET_SELECTED_TIME_SCALE';
-  timeScale: string;
+  timeScale: TimeScale;
 }
 
 export const SET_THRESHOLDS_FOR_DATA_TYPE = 'SET_THRESHOLDS_FOR_DATA_TYPE';
@@ -96,7 +97,7 @@ export const STORE_FUTURE_DATA = 'STORE_FUTURE_DATA';
 export interface StoreFutureDataAction {
   type: 'STORE_FUTURE_DATA';
   variableName: string;
-  timeScale: 'annual' | 'decadal';
+  timeScale: TimeScale;
   data: FutureData;
 }
 

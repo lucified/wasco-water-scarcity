@@ -16,6 +16,7 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../../selectors';
+import { TimeScale } from '../../types';
 
 import RadioSelector from '../generic/radio-selector';
 
@@ -31,7 +32,7 @@ interface StateProps {
 interface DispatchProps {
   onImpactModelChange: (value: string) => void;
   onClimateModelChange: (value: string) => void;
-  onTimeScaleChange: (value: string) => void;
+  onTimeScaleChange: (value: TimeScale) => void;
 }
 
 interface PassedProps {
@@ -84,7 +85,7 @@ class InlineAssumptionSelector extends React.Component<Props, EditingState> {
     this.setState({ editing: false });
   };
 
-  private handleTimeScaleChange = (value: string) => {
+  private handleTimeScaleChange = (value: TimeScale) => {
     this.props.onTimeScaleChange(value);
     this.setState({ editing: false });
   };
@@ -157,7 +158,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   onClimateModelChange: (value: string) => {
     dispatch(setSelectedClimateModel(value));
   },
-  onTimeScaleChange: (value: string) => {
+  onTimeScaleChange: (value: TimeScale) => {
     dispatch(setSelectedTimeScale(value));
   },
 });

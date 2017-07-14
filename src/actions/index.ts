@@ -12,6 +12,7 @@ import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  TimeScale,
   WorldRegion,
 } from '../types';
 import {
@@ -105,7 +106,7 @@ export function setSelectedClimateModel(
 }
 
 export function setSelectedTimeScale(
-  timeScale: string,
+  timeScale: TimeScale,
 ): SetSelectedTimeScaleAction {
   return {
     type: SET_SELECTED_TIME_SCALE,
@@ -169,7 +170,7 @@ export function storeWaterToWorldRegionMap(map: {
 
 export function storeFutureData(
   variableName: string,
-  timeScale: 'annual' | 'decadal',
+  timeScale: TimeScale,
   data: FutureData,
 ): StoreFutureDataAction {
   return {

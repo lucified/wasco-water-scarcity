@@ -5,6 +5,7 @@ import {
   DataType,
   StressShortageDatum,
   TimeAggregate,
+  TimeScale,
   WorldRegion,
 } from '../types';
 
@@ -32,7 +33,7 @@ export interface StateTree {
     dataType: DataType;
     impactModel: string;
     climateModel: string;
-    timeScale: string;
+    timeScale: TimeScale;
     worldRegion: number;
     region?: number;
   };
