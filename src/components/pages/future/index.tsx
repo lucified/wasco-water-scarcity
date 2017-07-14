@@ -101,12 +101,27 @@ class FutureBody extends React.Component<Props> {
       <div>
         <div className="row between-xs">
           <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
+            className={classNames(
+              'col-xs-12',
+              'col-md-6',
+              'col-lg-8',
+              styles['body-text'],
+            )}
           >
             <h1 className={styles['section-header']}>The Future?</h1>
             <p>
               <em>What can we do about this in the future?</em>
             </p>
+            {!waterRegions || !mapData
+              ? <Spinner />
+              : <div>
+                  <Map
+                    width={800}
+                    selectedData={mapData}
+                    waterRegions={waterRegions}
+                  />
+                  <WorldRegionSelector />
+                </div>}
           </div>
           <div
             className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
@@ -118,33 +133,9 @@ class FutureBody extends React.Component<Props> {
               includeConsumption={selectedDataType === 'stress'}
               future
             />
+            <FutureLineChart />
           </div>
         </div>
-        {!waterRegions || !mapData
-          ? <div className="row middle-xs">
-              <div className="col-xs-12">
-                <Spinner />
-              </div>
-            </div>
-          : <div>
-              <div className="row">
-                <div className="col-xs-12 col-md-6 col-lg-8">
-                  <Map
-                    width={800}
-                    selectedData={mapData}
-                    waterRegions={waterRegions}
-                  />
-                </div>
-                <div className="col-xs-12 col-md-6 col-lg-4">
-                  <FutureLineChart />
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs-12">
-                  <WorldRegionSelector />
-                </div>
-              </div>
-            </div>}
         <div className="row">
           <div className="col-xs-12">
             <CrossReferences fromPage="future" />
