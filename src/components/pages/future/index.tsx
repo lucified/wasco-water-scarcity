@@ -11,13 +11,18 @@ import {
   setSelectedImpactModel,
 } from '../../../actions';
 import { getClimateModels, getImpactModels } from '../../../data';
-import { FutureDataset, WaterRegionGeoJSON } from '../../../data/types';
+import {
+  FutureData,
+  FutureDataset,
+  WaterRegionGeoJSON,
+} from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedClimateModel,
   getSelectedDataType,
   getSelectedFutureDataForModel,
   getSelectedFutureDataset,
+  getSelectedFutureDatasetData,
   getSelectedFutureTimeIndex,
   getSelectedImpactModel,
   getWaterRegionData,
@@ -46,6 +51,7 @@ interface GeneratedDispatchProps {
 interface GeneratedStateProps {
   selectedDataType: DataType;
   selectedFutureDataset: FutureDataset;
+  selectedFutureData?: FutureData;
   selectedImpactModel: string;
   selectedClimateModel: string;
   mapData?: TimeAggregate<number>;
@@ -95,7 +101,12 @@ class FutureBody extends React.Component<Props> {
   }
 
   public render() {
-    const { mapData, waterRegions, selectedDataType } = this.props;
+    const {
+      mapData,
+      waterRegions,
+      selectedDataType,
+      selectedFutureData,
+    } = this.props;
 
     return (
       <div>
@@ -112,16 +123,20 @@ class FutureBody extends React.Component<Props> {
             <p>
               <em>What can we do about this in the future?</em>
             </p>
-            {!waterRegions || !mapData
+            {!waterRegions || !selectedFutureData
               ? <Spinner />
-              : <div>
-                  <Map
-                    width={800}
-                    selectedData={mapData}
-                    waterRegions={waterRegions}
-                  />
-                  <WorldRegionSelector />
-                </div>}
+              : !mapData
+                ? <div className={styles.error}>
+                    No data found for selected model.
+                  </div>
+                : <div>
+                    <Map
+                      width={800}
+                      selectedData={mapData}
+                      waterRegions={waterRegions}
+                    />
+                    <WorldRegionSelector />
+                  </div>}
           </div>
           <div
             className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
@@ -164,6 +179,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     mapData,
     waterRegions: getWaterRegionData(state),
     selectedDataType: getSelectedDataType(state),
+    selectedFutureData: getSelectedFutureDatasetData(state),
     selectedClimateModel: getSelectedClimateModel(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
     selectedImpactModel: getSelectedImpactModel(state),
