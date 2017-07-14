@@ -18,7 +18,6 @@ export interface StateTree {
     worldRegions?: WorldRegion[];
     waterRegions?: WaterRegionGeoJSON;
     waterToWorldRegionsMap?: { [waterId: number]: number };
-    futureDatasets: FutureDataset[];
   };
   routing: RouterState;
   thresholds: {

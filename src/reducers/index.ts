@@ -29,14 +29,18 @@ import {
   getFutureDatasets,
   getImpactModels,
 } from '../data';
-import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data/types';
-import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import { FutureData, WaterRegionGeoJSON } from '../data/types';
+import {
+  StressShortageDatum,
+  TimeAggregate,
+  TimeScale,
+  WorldRegion,
+} from '../types';
 import { StateTree } from './types';
 
 const defaultState: StateTree = {
   routing: {} as any,
   data: {
-    futureDatasets: getFutureDatasets(),
     futureData: {},
   },
   thresholds: {
@@ -58,6 +62,26 @@ const defaultState: StateTree = {
 
 export const initialState = defaultState;
 
+function getFutureDataset(
+  dataType: 'stress' | 'shortage',
+  timeScale: TimeScale,
+) {
+  const dataset = getFutureDatasets()
+    .filter(d => d.timeScale === timeScale)
+    .find(
+      d =>
+        dataType === 'shortage'
+          ? d.variableName === 'short'
+          : d.variableName === 'stress',
+    );
+
+  if (!dataset) {
+    console.error('No future dataset found for dataType:', dataType);
+  }
+
+  return dataset;
+}
+
 function dataReducer(
   state = initialState.data,
   action: Action,
@@ -66,7 +90,6 @@ function dataReducer(
   futureData: {
     [variableName: string]: { annual?: FutureData; decadal?: FutureData };
   };
-  futureDatasets: FutureDataset[];
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };
@@ -176,8 +199,17 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       return state;
     case SET_SELECTED_DATA_TYPE:
       if (action.dataType !== state.dataType) {
+        let { futureDataset } = state;
+        if (action.dataType !== 'scarcity') {
+          const dataset = getFutureDataset(action.dataType, state.timeScale);
+          if (dataset) {
+            futureDataset = dataset;
+          }
+        }
+
         return {
           ...state,
+          futureDataset,
           dataType: action.dataType,
         };
       }
@@ -238,8 +270,17 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           return state;
         }
 
+        let { futureDataset } = state;
+        if (state.dataType !== 'scarcity') {
+          const dataset = getFutureDataset(state.dataType, action.timeScale);
+          if (dataset) {
+            futureDataset = dataset;
+          }
+        }
+
         return {
           ...state,
+          futureDataset,
           timeScale: action.timeScale,
         };
       }
