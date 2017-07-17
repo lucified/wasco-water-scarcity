@@ -39,13 +39,13 @@ import { DataType, TimeAggregate } from '../../../types';
 
 import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
-import FutureScenarioDescription from '../../future-scenario-description';
-import FutureScenarioFilter from '../../future-scenario-filter';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import TimeScaleSelector from '../../time-scale-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
+import FutureScenarioDescription from './future-scenario-description';
+import FutureScenarioFilter from './future-scenario-filter';
 
 import * as styles from './index.scss';
 
