@@ -13,10 +13,6 @@ import {
   setSelectedImpactModel,
 } from '../../../actions';
 import {
-  getHistoricalClimateModels,
-  getHistoricalImpactModels,
-} from '../../../data';
-import {
   FutureData,
   FutureDataset,
   WaterRegionGeoJSON,
@@ -93,10 +89,8 @@ type Props = PassedProps & GeneratedStateProps & GeneratedDispatchProps;
 class FutureBody extends React.Component<Props> {
   public componentDidMount() {
     const {
-      mapData,
       selectedFutureDataset,
-      selectedClimateModel,
-      selectedImpactModel,
+      selectedFutureData,
       selectedDataType,
     } = this.props;
 
@@ -105,29 +99,40 @@ class FutureBody extends React.Component<Props> {
       this.props.setSelectedDataType('stress');
     }
 
-    // TODO: replace this with something proper
-    this.props.setSelectedFutureScenario(
-      'gfdl-esm2m',
-      'rcp8p5',
-      'lpjml',
-      'SSP1',
-    );
-
-    if (!mapData) {
+    if (!selectedFutureData) {
       this.props.loadFutureData(selectedFutureDataset);
     }
 
-    if (
-      selectedClimateModel === 'watch' ||
-      selectedImpactModel === 'watergap'
-    ) {
-      // TODO: get future models instead
-      this.props.setSelectedClimateModel(
-        getHistoricalClimateModels().filter(m => m !== 'watch')[0],
-      );
-      this.props.setSelectedImpactModel(
-        getHistoricalImpactModels().filter(m => m !== 'watergap')[0],
-      );
+    this.verifyDataExistsForSelectedScenario();
+  }
+
+  private verifyDataExistsForSelectedScenario() {
+    const { mapData, selectedFutureData } = this.props;
+
+    if (selectedFutureData && !mapData) {
+      // This means we have fetched the data but have currently selected a
+      // scenario for which data does not exist. Switch to the default one.
+      let defaultScenario = selectedFutureData.find(d => !!d.default);
+      if (!defaultScenario) {
+        console.warn('Missing default scenario for dataset');
+        defaultScenario = selectedFutureData[0];
+      }
+      if (!defaultScenario) {
+        console.error('No scenarios for dataset!');
+      } else {
+        const {
+          climateModel,
+          climateExperiment,
+          impactModel,
+          population,
+        } = defaultScenario;
+        this.props.setSelectedFutureScenario(
+          climateModel,
+          climateExperiment,
+          impactModel,
+          population,
+        );
+      }
     }
   }
 
@@ -157,10 +162,12 @@ class FutureBody extends React.Component<Props> {
   public componentWillReceiveProps(nextProps: Props) {
     if (
       nextProps.selectedFutureDataset !== this.props.selectedFutureDataset &&
-      !nextProps.mapData
+      !nextProps.selectedFutureData
     ) {
       nextProps.loadFutureData(nextProps.selectedFutureDataset);
     }
+
+    this.verifyDataExistsForSelectedScenario();
   }
 
   private handleClimateModelFilterChange = (climateModels: string[]) => {
