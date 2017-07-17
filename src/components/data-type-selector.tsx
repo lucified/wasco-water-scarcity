@@ -14,7 +14,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onChange: (value: DataType) => void;
+  onChange: (option: { value: DataType; label: string }) => void;
 }
 
 interface PassedProps {
@@ -27,7 +27,7 @@ type Props = StateProps & DispatchProps & PassedProps;
 class DataTypeSelector extends React.Component<Props> {
   public render() {
     const { className, dataType, onChange, hideScarcity } = this.props;
-    const values = [
+    const values: Array<{ value: DataType; label: string }> = [
       {
         value: 'stress',
         label: 'Stress',
@@ -61,8 +61,8 @@ const mapStateToProps = (state: StateTree): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onChange: (value: DataType) => {
-    dispatch(setSelectedDataType(value));
+  onChange: (option: { value: DataType; label: string }) => {
+    dispatch(setSelectedDataType(option.value));
   },
 });
 

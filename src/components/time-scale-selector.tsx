@@ -14,7 +14,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onChange: (value: TimeScale) => void;
+  onChange: (option: { value: TimeScale; label: string }) => void;
 }
 
 interface PassedProps {
@@ -23,7 +23,7 @@ interface PassedProps {
 
 type Props = StateProps & DispatchProps & PassedProps;
 
-const values = [
+const values: Array<{ value: TimeScale; label: string }> = [
   {
     value: 'annual',
     label: 'Annual',
@@ -50,8 +50,8 @@ const mapStateToProps = (state: StateTree): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onChange: (value: TimeScale) => {
-    dispatch(setSelectedTimeScale(value));
+  onChange: (option: { value: TimeScale; label: string }) => {
+    dispatch(setSelectedTimeScale(option.value));
   },
 });
 
