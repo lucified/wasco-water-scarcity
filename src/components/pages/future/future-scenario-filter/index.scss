@@ -12,3 +12,15 @@
 .assumption {
   font-weight: bold;
 }
+
+.parameter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 14px;
+}
+
+.dropdown {
+  width: 260px;
+}

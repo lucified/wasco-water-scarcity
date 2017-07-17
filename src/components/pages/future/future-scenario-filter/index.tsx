@@ -60,38 +60,54 @@ export default function FutureScenarioFilter({
 }: Props) {
   return (
     <div className={classNames(styles.content, className)}>
-      <Select
-        options={toOptions(impactModels)}
-        name="Impact models"
-        multi
-        clearable={false}
-        value={selectedImpactModels}
-        onChange={createChangeHandler(onImpactModelChange)}
-      />
-      <Select
-        options={toOptions(climateModels)}
-        name="Climate models"
-        clearable={false}
-        multi
-        value={selectedClimateModels}
-        onChange={createChangeHandler(onClimateModelChange)}
-      />
-      <Select
-        options={toOptions(climateExperiments)}
-        name="Climate experiments"
-        clearable={false}
-        multi
-        value={selectedClimateExperiments}
-        onChange={createChangeHandler(onClimateExpirementChange)}
-      />
-      <Select
-        options={toOptions(populations)}
-        name="Populations"
-        clearable={false}
-        multi
-        value={selectedPopulations}
-        onChange={createChangeHandler(onPopulationChange)}
-      />
+      <div className={styles.parameter}>
+        Impact models:
+        <Select
+          className={styles.dropdown}
+          options={toOptions(impactModels)}
+          name="Impact models"
+          multi
+          clearable={false}
+          value={selectedImpactModels}
+          onChange={createChangeHandler(onImpactModelChange)}
+        />
+      </div>
+      <div className={styles.parameter}>
+        Climate models:
+        <Select
+          className={styles.dropdown}
+          options={toOptions(climateModels)}
+          name="Climate models"
+          clearable={false}
+          multi
+          value={selectedClimateModels}
+          onChange={createChangeHandler(onClimateModelChange)}
+        />
+      </div>
+      <div className={styles.parameter}>
+        Climate experiments:
+        <Select
+          className={styles.dropdown}
+          options={toOptions(climateExperiments)}
+          name="Climate experiments"
+          clearable={false}
+          multi
+          value={selectedClimateExperiments}
+          onChange={createChangeHandler(onClimateExpirementChange)}
+        />
+      </div>
+      <div className={styles.parameter}>
+        Population models:
+        <Select
+          className={styles.dropdown}
+          options={toOptions(populations)}
+          name="Populations"
+          clearable={false}
+          multi
+          value={selectedPopulations}
+          onChange={createChangeHandler(onPopulationChange)}
+        />
+      </div>
     </div>
   );
 }
