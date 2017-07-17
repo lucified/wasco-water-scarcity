@@ -258,11 +258,8 @@ class LineChart extends React.Component<Props> {
 
     // prettier-ignore
     const lineGroup = g
-      .selectAll<
-        SVGGElement,
-        { label: string; color: string; series: Datum[] }
-      >('g.line-group')
-      .data(Array.isArray(data) ? data : [data])
+      .selectAll<SVGGElement, Data>('g.line-group')
+      .data(Array.isArray(data) ? data : [data], d => d.id)
       .enter()
         .append('g')
         .attr('class', 'line-group');
@@ -407,11 +404,8 @@ class LineChart extends React.Component<Props> {
         .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)) as any);
 
     const lineGroup = g
-      .selectAll<
-        SVGGElement,
-        { label: string; color: string; series: Datum[] }
-      >('g.line-group')
-      .data(Array.isArray(data) ? data : [data]);
+      .selectAll<SVGGElement, Data>('g.line-group')
+      .data(Array.isArray(data) ? data : [data], d => d.id);
 
     // prettier-ignore
     lineGroup.enter()
