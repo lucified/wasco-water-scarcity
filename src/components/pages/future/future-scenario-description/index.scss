@@ -1,0 +1,14 @@
+@import '../../../definitions.scss';
+
+.model {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.content {
+  padding: $default-margin/2 0;
+}
+
+.assumption {
+  font-weight: bold;
+}

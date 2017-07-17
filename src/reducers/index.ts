@@ -7,6 +7,8 @@ import {
   SET_FUTURE_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
+  SET_SELECTED_FUTURE_FILTERS,
+  SET_SELECTED_FUTURE_SCENARIO,
   SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
   SET_SELECTED_TIME_SCALE,
@@ -22,21 +24,15 @@ import {
 } from '../actions';
 import {
   defaultDataTypeThresholds,
-  getClimateModels,
-  getDefaultClimateModel,
   getDefaultFutureDataset,
-  getDefaultImpactModel,
-  getFutureDatasets,
-  getImpactModels,
+  getDefaultHistoricalClimateModel,
+  getDefaultHistoricalImpactModel,
+  getFutureDataset,
 } from '../data';
-import { FutureData, WaterRegionGeoJSON } from '../data/types';
-import {
-  StressShortageDatum,
-  TimeAggregate,
-  TimeScale,
-  WorldRegion,
-} from '../types';
-import { StateTree } from './types';
+import { TimeScale } from '../types';
+import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
+
+const defaultFutureDataset = getDefaultFutureDataset();
 
 const defaultState: StateTree = {
   routing: {} as any,
@@ -51,49 +47,26 @@ const defaultState: StateTree = {
   selections: {
     timeIndex: 0,
     futureTimeIndex: 0,
-    futureDataset: getDefaultFutureDataset(),
-    impactModel: getDefaultImpactModel(),
-    climateModel: getDefaultClimateModel(),
+    futureDataset: defaultFutureDataset,
+    futureFilters: {
+      climateModels: defaultFutureDataset.climateModels,
+      climateExperiments: defaultFutureDataset.climateExperiments,
+      impactModels: defaultFutureDataset.impactModels,
+      populations: defaultFutureDataset.populations,
+    },
+    impactModel: getDefaultHistoricalImpactModel(),
+    climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
+    population: 'SSP1',
+    climateExperiment: 'rcp8p5',
     worldRegion: 0, // 0 means global
   },
 };
 
 export const initialState = defaultState;
 
-function getFutureDataset(
-  dataType: 'stress' | 'shortage',
-  timeScale: TimeScale,
-) {
-  const dataset = getFutureDatasets()
-    .filter(d => d.timeScale === timeScale)
-    .find(
-      d =>
-        dataType === 'shortage'
-          ? d.variableName === 'short'
-          : d.variableName === 'stress',
-    );
-
-  if (!dataset) {
-    console.error('No future dataset found for dataType:', dataType);
-  }
-
-  return dataset;
-}
-
-function dataReducer(
-  state = initialState.data,
-  action: Action,
-): {
-  stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
-  futureData: {
-    [variableName: string]: { annual?: FutureData; decadal?: FutureData };
-  };
-  worldRegions?: WorldRegion[];
-  waterRegions?: WaterRegionGeoJSON;
-  waterToWorldRegionsMap?: { [waterId: number]: number };
-} {
+function dataReducer(state = initialState.data, action: Action): DataTree {
   switch (action.type) {
     case STORE_WATER_DATA:
       return {
@@ -134,7 +107,7 @@ function dataReducer(
 function thresholdsReducer(
   state = initialState.thresholds,
   action: Action,
-): { stress: number[]; shortage: number[]; scarcity: number[] } {
+): ThresholdsTree {
   switch (action.type) {
     case SET_THRESHOLDS_FOR_DATA_TYPE:
       if (!isEqual(state[action.dataType], action.thresholds)) {
@@ -147,7 +120,51 @@ function thresholdsReducer(
   return state;
 }
 
-function selectionsReducer(state = initialState.selections, action: Action) {
+function getDatasetAndFilters(
+  dataType: 'stress' | 'shortage',
+  timeScale: TimeScale,
+  existingFilters: {
+    impactModels: string[];
+    climateModels: string[];
+    climateExperiments: string[];
+    populations: string[];
+  },
+) {
+  const dataset = getFutureDataset(dataType, timeScale);
+  let filters = existingFilters;
+  if (dataset) {
+    // If the existing filters contain a value that's not in the new dataset,
+    // reset the filters to the new dataset's values.
+    if (
+      existingFilters.climateExperiments.some(
+        f => !dataset.climateExperiments.find(d => d === f),
+      ) ||
+      existingFilters.climateModels.some(
+        f => !dataset.climateModels.find(d => d === f),
+      ) ||
+      existingFilters.impactModels.some(
+        f => !dataset.impactModels.find(d => d === f),
+      ) ||
+      existingFilters.populations.some(
+        f => !dataset.populations.find(d => d === f),
+      )
+    ) {
+      filters = {
+        climateExperiments: dataset.climateExperiments,
+        climateModels: dataset.climateModels,
+        impactModels: dataset.impactModels,
+        populations: dataset.populations,
+      };
+    }
+  }
+
+  return { dataset, filters };
+}
+
+function selectionsReducer(
+  state = initialState.selections,
+  action: Action,
+): SelectionsTree {
   switch (action.type) {
     case SET_TIME_INDEX:
       if (action.value !== state.timeIndex) {
@@ -199,16 +216,22 @@ function selectionsReducer(state = initialState.selections, action: Action) {
       return state;
     case SET_SELECTED_DATA_TYPE:
       if (action.dataType !== state.dataType) {
-        let { futureDataset } = state;
+        let { futureDataset, futureFilters } = state;
         if (action.dataType !== 'scarcity') {
-          const dataset = getFutureDataset(action.dataType, state.timeScale);
+          const { dataset, filters } = getDatasetAndFilters(
+            action.dataType,
+            state.timeScale,
+            futureFilters,
+          );
           if (dataset) {
             futureDataset = dataset;
+            futureFilters = filters;
           }
         }
 
         return {
           ...state,
+          futureFilters,
           futureDataset,
           dataType: action.dataType,
         };
@@ -226,7 +249,7 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           // If watergap/watch was previously selected, we need to switch to a
           // valid climateModel.
           if (climateModel === 'watch') {
-            climateModel = getClimateModels().filter(m => m !== 'watch')[0];
+            climateModel = getDefaultHistoricalClimateModel();
           }
         }
 
@@ -250,7 +273,7 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           // If watergap/watch was previously selected, we need to switch to a
           // valid impactModel.
           if (impactModel === 'watergap') {
-            impactModel = getImpactModels().filter(m => m !== 'watergap')[0];
+            impactModel = getDefaultHistoricalImpactModel();
           }
         }
 
@@ -270,18 +293,63 @@ function selectionsReducer(state = initialState.selections, action: Action) {
           return state;
         }
 
-        let { futureDataset } = state;
+        let { futureDataset, futureFilters } = state;
         if (state.dataType !== 'scarcity') {
-          const dataset = getFutureDataset(state.dataType, action.timeScale);
+          const { dataset, filters } = getDatasetAndFilters(
+            state.dataType,
+            action.timeScale,
+            futureFilters,
+          );
           if (dataset) {
             futureDataset = dataset;
+            futureFilters = filters;
           }
         }
 
         return {
           ...state,
+          futureFilters,
           futureDataset,
           timeScale: action.timeScale,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_FUTURE_SCENARIO:
+      if (
+        action.climateModel !== state.climateModel ||
+        action.climateExperiment !== state.climateExperiment ||
+        action.impactModel !== state.impactModel ||
+        action.population !== state.population
+      ) {
+        return {
+          ...state,
+          climateModel: action.climateModel,
+          climateExperiment: action.climateExperiment,
+          impactModel: action.impactModel,
+          population: action.population,
+        };
+      }
+
+      return state;
+    case SET_SELECTED_FUTURE_FILTERS:
+      if (
+        !isEqual(action.climateModels, state.futureFilters.climateModels) ||
+        !isEqual(
+          action.climateExperiments,
+          state.futureFilters.climateExperiments,
+        ) ||
+        !isEqual(action.impactModels, state.futureFilters.impactModels) ||
+        !isEqual(action.populations, state.futureFilters.populations)
+      ) {
+        return {
+          ...state,
+          futureFilters: {
+            climateModels: action.climateModels,
+            impactModels: action.impactModels,
+            climateExperiments: action.climateExperiments,
+            populations: action.populations,
+          },
         };
       }
 

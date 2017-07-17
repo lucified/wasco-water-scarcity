@@ -7,7 +7,7 @@ import { DataType, TimeAggregate } from '../../../types';
 import withPageData from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
-import DataSelector from '../../data-selector';
+import DataTypeSelector from '../../data-type-selector';
 import GapMinder from '../../gapminder';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
@@ -79,7 +79,7 @@ class ScarcityBody extends React.Component<Props> {
                       className={styles['threshold-selector']}
                       dataType="shortage"
                     />
-                    <DataSelector />
+                    <DataTypeSelector />
                   </div>
                 </div>
               </div>

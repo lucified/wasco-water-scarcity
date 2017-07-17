@@ -1,0 +1,26 @@
+@import '../../../definitions.scss';
+
+.model {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.content {
+  padding: $default-margin/2 0;
+}
+
+.assumption {
+  font-weight: bold;
+}
+
+.parameter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 14px;
+}
+
+.dropdown {
+  width: 260px;
+}

@@ -4,7 +4,12 @@ import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 import uniq = require('lodash/uniq');
 
-import { StressShortageDatum, TimeAggregate, WorldRegion } from '../types';
+import {
+  StressShortageDatum,
+  TimeAggregate,
+  TimeScale,
+  WorldRegion,
+} from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
   FutureData,
@@ -70,38 +75,36 @@ export async function fetchFutureData(
   }
 }
 
-export function getClimateModels() {
+export function getTimeScales(): TimeScale[] {
+  return ['annual', 'decadal'];
+}
+
+/* Historical */
+export function getHistoricalClimateModels() {
   return uniq(historicalDatasets.map(d => d.climateModel)).sort();
 }
 
-export function getImpactModels() {
+export function getHistoricalImpactModels() {
   return uniq(historicalDatasets.map(d => d.impactModel)).sort();
 }
 
-export function getTimeScales() {
-  return uniq(historicalDatasets.map(d => d.timeScale)).sort();
+export function getDefaultHistoricalClimateModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
+  return defaultDataset ? defaultDataset.climateModel : 'watch';
 }
 
+export function getDefaultHistoricalImpactModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
+  return defaultDataset ? defaultDataset.impactModel : 'watergap';
+}
+
+/* Future */
 export function getFutureDatasets() {
   return futureDatasets;
 }
 
 export function getDefaultFutureDataset() {
-  return futureDatasets.find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
-}
-
-export function getDefaultClimateModel() {
-  const defaultDataset = historicalDatasets.find(
-    d => d.population === 'hist' && !!d.default,
-  );
-  return defaultDataset ? defaultDataset.climateModel : 'watch';
-}
-
-export function getDefaultImpactModel() {
-  const defaultDataset = historicalDatasets.find(
-    d => d.population === 'hist' && !!d.default,
-  );
-  return defaultDataset ? defaultDataset.impactModel : 'watergap';
+  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
@@ -176,4 +179,24 @@ export async function fetchWaterRegionsData(): Promise<
     console.error('Unable to fetch water regions data', filename, error);
     return undefined;
   }
+}
+
+export function getFutureDataset(
+  dataType: 'stress' | 'shortage',
+  timeScale: TimeScale,
+) {
+  const dataset = getFutureDatasets()
+    .filter(d => d.timeScale === timeScale)
+    .find(
+      d =>
+        dataType === 'shortage'
+          ? d.variableName === 'short'
+          : d.variableName === 'stress',
+    );
+
+  if (!dataset) {
+    console.error('No future dataset found for dataType:', dataType);
+  }
+
+  return dataset;
 }

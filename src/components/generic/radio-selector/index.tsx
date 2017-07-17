@@ -3,20 +3,25 @@ import * as React from 'react';
 
 const styles = require('./index.scss');
 
+export interface Option {
+  value: string;
+  label: string;
+}
+
 interface PassedProps {
-  values: Array<{ value: string; label: string }>;
+  values: Option[];
   className?: string;
-  onChange?: (value: string) => void;
+  onChange?: (option: Option) => void;
   selectedValue: string;
   disabled?: boolean;
 }
 
 export default class RadioSelector extends React.Component<PassedProps> {
-  private generateClickCallback(value: string) {
+  private generateClickCallback(option: Option) {
     return (_e: React.MouseEvent<HTMLAnchorElement>) => {
       const { onChange } = this.props;
       if (onChange) {
-        onChange(value);
+        onChange(option);
       }
     };
   }
@@ -33,15 +38,15 @@ export default class RadioSelector extends React.Component<PassedProps> {
           className,
         )}
       >
-        {values.map(({ label, value }) =>
+        {values.map(option =>
           <a
-            key={`selector-${value}`}
-            onClick={this.generateClickCallback(value)}
+            key={`selector-${option.value}`}
+            onClick={this.generateClickCallback(option)}
             className={classNames(styles.button, {
-              [styles.selected]: selectedValue === value,
+              [styles.selected]: selectedValue === option.value,
             })}
           >
-            {label}
+            {option.label}
           </a>,
         )}
       </div>

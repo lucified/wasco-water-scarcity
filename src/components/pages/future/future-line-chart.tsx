@@ -1,14 +1,17 @@
+import { extent } from 'd3-array';
 import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import flattenDeep = require('lodash/flattenDeep');
 
 import { setFutureTimeIndex } from '../../../actions';
 import { FutureData, FutureDataForModel } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
+  getFilteredSelectedFutureDatasetData,
   getSelectedDataType,
-  getSelectedFutureDataForModel,
+  getSelectedFutureDataForScenario,
   getSelectedFutureDatasetData,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
@@ -17,9 +20,8 @@ import {
 import { getDataTypeColors } from '../../../types';
 
 import LineChart, { Data } from '../../generic/line-chart';
-import Spinner from '../../generic/spinner';
 
-const styles = require('./future-line-chart.scss');
+import * as styles from './future-line-chart.scss';
 
 interface GeneratedDispatchProps {
   onTimeIndexChange: (value: number) => void;
@@ -30,30 +32,43 @@ interface GeneratedStateProps {
   selectedDataType?: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
   data?: FutureData;
-  selectedFutureDataForModel?: FutureDataForModel;
+  filteredData?: FutureData;
+  selectedFutureDataForScenario?: FutureDataForModel;
   thresholds: number[];
 }
 
-type Props = GeneratedDispatchProps & GeneratedStateProps;
+interface PassedProps {
+  onLineHover?: (scenarioId: string) => void;
+}
+
+type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 function FutureLineChart({
   data,
+  filteredData,
   selectedDataType,
   thresholds,
-  selectedFutureDataForModel,
+  selectedFutureDataForScenario,
   selectedTimeIndex,
   selectedWaterRegionId,
   onTimeIndexChange,
+  onLineHover,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
-    return <div className={styles.empty}>Select a unit</div>;
+    return <div className={styles.empty}>Select a unit on the map</div>;
   }
 
-  if (!data || !selectedFutureDataForModel) {
-    return <Spinner />;
+  if (!data || !filteredData || !selectedFutureDataForScenario) {
+    return null;
   }
 
-  const chartData: Data[] = data.map(series => ({
+  const dataValueExtent = extent(
+    flattenDeep<number>(
+      data.map(d => d.data.map(c => c.regions[selectedWaterRegionId])),
+    ),
+  );
+
+  const chartData: Data[] = filteredData.map(series => ({
     id: series.scenarioId,
     color: 'blue',
     series: series.data.map(d => ({
@@ -78,9 +93,12 @@ function FutureLineChart({
       data={chartData}
       width={400}
       height={180}
+      minY={dataValueExtent[0]}
+      maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}
-      selectedDataSeries={selectedFutureDataForModel.scenarioId}
-      onHover={onTimeIndexChange}
+      selectedDataSeries={selectedFutureDataForScenario.scenarioId}
+      onChartHover={onTimeIndexChange}
+      onLineHover={onLineHover}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
       marginTop={15}
@@ -98,7 +116,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
     data: getSelectedFutureDatasetData(state),
-    selectedFutureDataForModel: getSelectedFutureDataForModel(state),
+    filteredData: getFilteredSelectedFutureDatasetData(state),
+    selectedFutureDataForScenario: getSelectedFutureDataForScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
   };
 }
@@ -111,7 +130,8 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(FutureLineChart);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps
+>(mapStateToProps, mapDispatchToProps)(FutureLineChart);

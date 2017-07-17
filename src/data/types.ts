@@ -31,6 +31,10 @@ export interface FutureDataset {
   url: string;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   timeScale: TimeScale;
+  impactModels: string[];
+  climateModels: string[];
+  populations: string[];
+  climateExperiments: string[];
 }
 
 export interface FutureDataForModel {

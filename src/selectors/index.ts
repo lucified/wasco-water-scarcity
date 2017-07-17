@@ -2,7 +2,6 @@ import keyBy = require('lodash/keyBy');
 import { createSelector } from 'reselect';
 
 import { Data as GapminderData } from '../components/generic/gapminder';
-import { FutureDataset } from '../data/types';
 import { StateTree } from '../reducers';
 import {
   AggregateStressShortageDatum,
@@ -25,16 +24,20 @@ export function getSelectedStressShortageData(
   return data && data[getSelectedTimeIndex(state)];
 }
 
-export function getSelectedFutureTimeIndex(state: StateTree): number {
+export function getSelectedFutureTimeIndex(state: StateTree) {
   return state.selections.futureTimeIndex;
 }
 
-export function getSelectedFutureDataset(state: StateTree): FutureDataset {
+export function getSelectedFutureDataset(state: StateTree) {
   return state.selections.futureDataset;
 }
 
 function getFutureData(state: StateTree) {
   return state.data.futureData;
+}
+
+export function getSelectedFutureFilters(state: StateTree) {
+  return state.selections.futureFilters;
 }
 
 export const getSelectedFutureDatasetData = createSelector(
@@ -44,21 +47,47 @@ export const getSelectedFutureDatasetData = createSelector(
     const { variableName, timeScale } = selectedDataset;
 
     return (
-      allFutureData[variableName] && allFutureData[variableName][timeScale]
+      allFutureData[variableName] &&
+      allFutureData[variableName][timeScale] &&
+      allFutureData[variableName][timeScale]!.filter(
+        d => ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
+      )
     );
   },
 );
 
-export const getSelectedFutureDataForModel = createSelector(
+export const getFilteredSelectedFutureDatasetData = createSelector(
+  getSelectedFutureDatasetData,
+  getSelectedFutureFilters,
+  (datasetData, filters) => {
+    return (
+      datasetData &&
+      datasetData.filter(
+        d =>
+          !!filters.climateExperiments.find(f => f === d.climateExperiment) &&
+          !!filters.climateModels.find(f => f === d.climateModel) &&
+          !!filters.impactModels.find(f => f === d.impactModel) &&
+          !!filters.populations.find(f => f === d.population),
+      )
+    );
+  },
+);
+
+export const getSelectedFutureDataForScenario = createSelector(
   getSelectedFutureDatasetData,
   getSelectedClimateModel,
   getSelectedImpactModel,
-  (datasetData, climateModel, impactModel) => {
-    // TODO: also use population model and climateExperiment
+  getSelectedClimateExperiment,
+  getSelectedPopulation,
+  (datasetData, climateModel, impactModel, climateExperiment, population) => {
     return (
       datasetData &&
       datasetData.find(
-        d => d.climateModel === climateModel && d.impactModel === impactModel,
+        d =>
+          d.climateModel === climateModel &&
+          d.impactModel === impactModel &&
+          d.climateExperiment === climateExperiment &&
+          d.population === population,
       )
     );
   },
@@ -228,19 +257,27 @@ export const getSelectedWorldRegion = createSelector<
   (id, regions) => regions && regions.find(r => r.id === id),
 );
 
-export function getSelectedDataType(state: StateTree): DataType {
+export function getSelectedDataType(state: StateTree) {
   return state.selections.dataType;
 }
 
-export function getSelectedImpactModel(state: StateTree): string {
+export function getSelectedImpactModel(state: StateTree) {
   return state.selections.impactModel;
 }
 
-export function getSelectedClimateModel(state: StateTree): string {
+export function getSelectedClimateModel(state: StateTree) {
   return state.selections.climateModel;
 }
 
-export function getSelectedTimeScale(state: StateTree): string {
+export function getSelectedClimateExperiment(state: StateTree) {
+  return state.selections.climateExperiment;
+}
+
+export function getSelectedPopulation(state: StateTree) {
+  return state.selections.population;
+}
+
+export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
 }
 

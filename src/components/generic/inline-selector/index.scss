@@ -1,22 +1,9 @@
-@import '../definitions.scss';
+@import '../../definitions.scss';
 
-.title {
-  margin-top: 0;
-}
-
-.time-scale-selector {
+.radio {
   margin-bottom: $default-margin / 2;
   display: inline-block;
   width: 250px;
-}
-
-.model {
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.label {
-  margin-right: 0.5rem;
 }
 
 .link {

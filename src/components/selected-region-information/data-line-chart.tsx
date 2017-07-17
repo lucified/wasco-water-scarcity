@@ -59,7 +59,7 @@ export default function DataLineChart({
       yAxisLabel={yAxisLabel}
       selectedDataSeries={id}
       selectedTimeIndex={selectedTimeIndex}
-      onHover={onTimeIndexChange}
+      onChartHover={onTimeIndexChange}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
       marginTop={15}
