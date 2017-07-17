@@ -20,9 +20,8 @@ import {
 import { getDataTypeColors } from '../../../types';
 
 import LineChart, { Data } from '../../generic/line-chart';
-import Spinner from '../../generic/spinner';
 
-const styles = require('./future-line-chart.scss');
+import * as styles from './future-line-chart.scss';
 
 interface GeneratedDispatchProps {
   onTimeIndexChange: (value: number) => void;
@@ -56,11 +55,11 @@ function FutureLineChart({
   onLineHover,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
-    return <div className={styles.empty}>Select a unit</div>;
+    return <div className={styles.empty}>Select a unit on the map</div>;
   }
 
   if (!data || !filteredData || !selectedFutureDataForScenario) {
-    return <Spinner />;
+    return null;
   }
 
   const dataValueExtent = extent(
