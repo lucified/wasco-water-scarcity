@@ -1,7 +1,9 @@
+import { extent } from 'd3-array';
 import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import flattenDeep = require('lodash/flattenDeep');
 
 import { setFutureTimeIndex } from '../../../actions';
 import { FutureData, FutureDataForModel } from '../../../data/types';
@@ -10,6 +12,7 @@ import {
   getFilteredSelectedFutureDatasetData,
   getSelectedDataType,
   getSelectedFutureDataForScenario,
+  getSelectedFutureDatasetData,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
@@ -30,6 +33,7 @@ interface GeneratedStateProps {
   selectedDataType?: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
   data?: FutureData;
+  filteredData?: FutureData;
   selectedFutureDataForScenario?: FutureDataForModel;
   thresholds: number[];
 }
@@ -42,6 +46,7 @@ type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 function FutureLineChart({
   data,
+  filteredData,
   selectedDataType,
   thresholds,
   selectedFutureDataForScenario,
@@ -54,11 +59,17 @@ function FutureLineChart({
     return <div className={styles.empty}>Select a unit</div>;
   }
 
-  if (!data || !selectedFutureDataForScenario) {
+  if (!data || !filteredData || !selectedFutureDataForScenario) {
     return <Spinner />;
   }
 
-  const chartData: Data[] = data.map(series => ({
+  const dataValueExtent = extent(
+    flattenDeep<number>(
+      data.map(d => d.data.map(c => c.regions[selectedWaterRegionId])),
+    ),
+  );
+
+  const chartData: Data[] = filteredData.map(series => ({
     id: series.scenarioId,
     color: 'blue',
     series: series.data.map(d => ({
@@ -83,6 +94,8 @@ function FutureLineChart({
       data={chartData}
       width={400}
       height={180}
+      minY={dataValueExtent[0]}
+      maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}
       selectedDataSeries={selectedFutureDataForScenario.scenarioId}
       onChartHover={onTimeIndexChange}
@@ -103,7 +116,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
-    data: getFilteredSelectedFutureDatasetData(state),
+    data: getSelectedFutureDatasetData(state),
+    filteredData: getFilteredSelectedFutureDatasetData(state),
     selectedFutureDataForScenario: getSelectedFutureDataForScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
   };
