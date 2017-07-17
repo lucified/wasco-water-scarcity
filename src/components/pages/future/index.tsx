@@ -173,10 +173,9 @@ class FutureBody extends React.Component<Props> {
   private handleClimateModelFilterChange = (climateModels: string[]) => {
     const {
       selectedFutureFilters: { populations, climateExperiments, impactModels },
-      setSelectedFutureFilters,
     } = this.props;
 
-    setSelectedFutureFilters(
+    this.props.setSelectedFutureFilters(
       climateModels,
       climateExperiments,
       impactModels,
@@ -189,10 +188,9 @@ class FutureBody extends React.Component<Props> {
   ) => {
     const {
       selectedFutureFilters: { climateModels, populations, impactModels },
-      setSelectedFutureFilters,
     } = this.props;
 
-    setSelectedFutureFilters(
+    this.props.setSelectedFutureFilters(
       climateModels,
       climateExperiments,
       impactModels,
@@ -203,10 +201,9 @@ class FutureBody extends React.Component<Props> {
   private handleImpactModelFilterChange = (impactModels: string[]) => {
     const {
       selectedFutureFilters: { climateModels, climateExperiments, populations },
-      setSelectedFutureFilters,
     } = this.props;
 
-    setSelectedFutureFilters(
+    this.props.setSelectedFutureFilters(
       climateModels,
       climateExperiments,
       impactModels,
@@ -221,10 +218,9 @@ class FutureBody extends React.Component<Props> {
         climateExperiments,
         impactModels,
       },
-      setSelectedFutureFilters,
     } = this.props;
 
-    setSelectedFutureFilters(
+    this.props.setSelectedFutureFilters(
       climateModels,
       climateExperiments,
       impactModels,
