@@ -8,7 +8,6 @@ import {
   loadFutureData,
   setSelectedClimateModel,
   setSelectedDataType,
-  setSelectedFutureFilters,
   setSelectedFutureScenario,
   setSelectedImpactModel,
 } from '../../../actions';
@@ -25,7 +24,6 @@ import {
   getSelectedFutureDataForScenario,
   getSelectedFutureDataset,
   getSelectedFutureDatasetData,
-  getSelectedFutureFilters,
   getSelectedFutureTimeIndex,
   getSelectedImpactModel,
   getSelectedPopulation,
@@ -58,24 +56,12 @@ interface GeneratedDispatchProps {
     impactModel: string,
     population: string,
   ) => void;
-  setSelectedFutureFilters: (
-    climateModels: string[],
-    climateExperiments: string[],
-    impactModels: string[],
-    populations: string[],
-  ) => void;
 }
 
 interface GeneratedStateProps {
   selectedDataType: DataType;
   selectedFutureDataset: FutureDataset;
   selectedFutureData?: FutureData;
-  selectedFutureFilters: {
-    climateModels: string[];
-    climateExperiments: string[];
-    impactModels: string[];
-    populations: string[];
-  };
   selectedImpactModel: string;
   selectedClimateModel: string;
   selectedClimateExperiment: string;
@@ -170,76 +156,16 @@ class FutureBody extends React.Component<Props> {
     this.verifyDataExistsForSelectedScenario();
   }
 
-  private handleClimateModelFilterChange = (climateModels: string[]) => {
-    const {
-      selectedFutureFilters: { populations, climateExperiments, impactModels },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
-  private handleClimateExperimentFilterChange = (
-    climateExperiments: string[],
-  ) => {
-    const {
-      selectedFutureFilters: { climateModels, populations, impactModels },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
-  private handleImpactModelFilterChange = (impactModels: string[]) => {
-    const {
-      selectedFutureFilters: { climateModels, climateExperiments, populations },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
-  private handlePopulationFilterChange = (populations: string[]) => {
-    const {
-      selectedFutureFilters: {
-        climateModels,
-        climateExperiments,
-        impactModels,
-      },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
   public render() {
     const {
       mapData,
       waterRegions,
       selectedDataType,
       selectedFutureData,
-      selectedFutureDataset,
       selectedClimateModel,
       selectedImpactModel,
       selectedClimateExperiment,
       selectedPopulation,
-      selectedFutureFilters,
     } = this.props;
 
     return (
@@ -277,24 +203,7 @@ class FutureBody extends React.Component<Props> {
           >
             <DataTypeSelector hideScarcity />
             <TimeScaleSelector />
-            <FutureScenarioFilter
-              climateModels={selectedFutureDataset.climateModels}
-              selectedClimateModels={selectedFutureFilters.climateModels}
-              onClimateModelChange={this.handleClimateModelFilterChange}
-              climateExperiments={selectedFutureDataset.climateExperiments}
-              selectedClimateExperiments={
-                selectedFutureFilters.climateExperiments
-              }
-              onClimateExpirementChange={
-                this.handleClimateExperimentFilterChange
-              }
-              impactModels={selectedFutureDataset.impactModels}
-              selectedImpactModels={selectedFutureFilters.impactModels}
-              onImpactModelChange={this.handleImpactModelFilterChange}
-              populations={selectedFutureDataset.populations}
-              selectedPopulations={selectedFutureFilters.populations}
-              onPopulationChange={this.handlePopulationFilterChange}
-            />
+            <FutureScenarioFilter />
             <FutureScenarioDescription
               className={styles['secondary-content']}
               estimateLabel={selectedDataType}
@@ -340,7 +249,6 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedClimateExperiment: getSelectedClimateExperiment(state),
     selectedPopulation: getSelectedPopulation(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
-    selectedFutureFilters: getSelectedFutureFilters(state),
     selectedImpactModel: getSelectedImpactModel(state),
   };
 }
@@ -371,21 +279,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
           climateExperiment,
           impactModel,
           population,
-        ),
-      );
-    },
-    setSelectedFutureFilters: (
-      climateModels: string[],
-      climateExperiments: string[],
-      impactModels: string[],
-      populations: string[],
-    ) => {
-      dispatch(
-        setSelectedFutureFilters(
-          climateModels,
-          climateExperiments,
-          impactModels,
-          populations,
         ),
       );
     },
