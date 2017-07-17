@@ -43,78 +43,49 @@ function toOptions(values: string[]): Select.Option[] {
   return values.map(value => ({ value, label: value }));
 }
 
-function createChangeHandler(callback: (models: string[]) => void) {
-  return (options: Select.Option[] | Select.Option | null) => {
-    if (Array.isArray(options)) {
-      callback(
-        options
-          .filter(option => option.value)
-          .map(option => String(option.value!)),
-      );
-    } else if (options) {
-      callback([String(options.value)]);
-    } else {
-      callback([]);
-    }
-  };
-}
-
 class FutureScenarioFilter extends React.Component<Props> {
-  private handleClimateModelFilterChange = (climateModels: string[]) => {
-    const {
-      selectedFutureFilters: { populations, climateExperiments, impactModels },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
-  private handleClimateExperimentFilterChange = (
-    climateExperiments: string[],
+  private createChangeHandler = (
+    field:
+      | 'climateModels'
+      | 'climateExperiments'
+      | 'impactModels'
+      | 'populations',
   ) => {
-    const {
-      selectedFutureFilters: { climateModels, populations, impactModels },
-    } = this.props;
+    // tslint:disable:prefer-conditional-expression
+    return (options: Select.Option[] | Select.Option | null) => {
+      let results: string[];
+      if (Array.isArray(options)) {
+        results = options
+          .filter(option => option.value)
+          .map(option => String(option.value!));
+      } else if (options) {
+        results = [String(options.value)];
+      } else {
+        results = [];
+      }
 
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
+      this.handleChange({
+        [field]: results,
+      });
+    };
   };
 
-  private handleImpactModelFilterChange = (impactModels: string[]) => {
-    const {
-      selectedFutureFilters: { climateModels, climateExperiments, populations },
-    } = this.props;
+  private handleChange = (newFilters: {
+    climateModels?: string[];
+    climateExperiments?: string[];
+    impactModels?: string[];
+    populations?: string[];
+  }) => {
+    const filters = {
+      ...this.props.selectedFutureFilters,
+      ...newFilters,
+    };
 
     this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
-    );
-  };
-
-  private handlePopulationFilterChange = (populations: string[]) => {
-    const {
-      selectedFutureFilters: {
-        climateModels,
-        climateExperiments,
-        impactModels,
-      },
-    } = this.props;
-
-    this.props.setSelectedFutureFilters(
-      climateModels,
-      climateExperiments,
-      impactModels,
-      populations,
+      filters.climateModels,
+      filters.climateExperiments,
+      filters.impactModels,
+      filters.populations,
     );
   };
 
@@ -135,7 +106,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             multi
             clearable={false}
             value={selectedFutureFilters.impactModels}
-            onChange={createChangeHandler(this.handleImpactModelFilterChange)}
+            onChange={this.createChangeHandler('impactModels')}
           />
         </div>
         <div className={styles.parameter}>
@@ -147,7 +118,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             clearable={false}
             multi
             value={selectedFutureFilters.climateModels}
-            onChange={createChangeHandler(this.handleClimateModelFilterChange)}
+            onChange={this.createChangeHandler('climateModels')}
           />
         </div>
         <div className={styles.parameter}>
@@ -159,9 +130,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             clearable={false}
             multi
             value={selectedFutureFilters.climateExperiments}
-            onChange={createChangeHandler(
-              this.handleClimateExperimentFilterChange,
-            )}
+            onChange={this.createChangeHandler('climateExperiments')}
           />
         </div>
         <div className={styles.parameter}>
@@ -173,7 +142,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             clearable={false}
             multi
             value={selectedFutureFilters.populations}
-            onChange={createChangeHandler(this.handlePopulationFilterChange)}
+            onChange={this.createChangeHandler('populations')}
           />
         </div>
       </div>
