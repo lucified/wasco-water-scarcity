@@ -7,9 +7,9 @@ import { setFutureTimeIndex } from '../../../actions';
 import { FutureData, FutureDataForModel } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
+  getFilteredSelectedFutureDatasetData,
   getSelectedDataType,
-  getSelectedFutureDataForModel,
-  getSelectedFutureDatasetData,
+  getSelectedFutureDataForScenario,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
@@ -30,7 +30,7 @@ interface GeneratedStateProps {
   selectedDataType?: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
   data?: FutureData;
-  selectedFutureDataForModel?: FutureDataForModel;
+  selectedFutureDataForScenario?: FutureDataForModel;
   thresholds: number[];
 }
 
@@ -44,7 +44,7 @@ function FutureLineChart({
   data,
   selectedDataType,
   thresholds,
-  selectedFutureDataForModel,
+  selectedFutureDataForScenario,
   selectedTimeIndex,
   selectedWaterRegionId,
   onTimeIndexChange,
@@ -54,7 +54,7 @@ function FutureLineChart({
     return <div className={styles.empty}>Select a unit</div>;
   }
 
-  if (!data || !selectedFutureDataForModel) {
+  if (!data || !selectedFutureDataForScenario) {
     return <Spinner />;
   }
 
@@ -84,7 +84,7 @@ function FutureLineChart({
       width={400}
       height={180}
       selectedTimeIndex={selectedTimeIndex}
-      selectedDataSeries={selectedFutureDataForModel.scenarioId}
+      selectedDataSeries={selectedFutureDataForScenario.scenarioId}
       onChartHover={onTimeIndexChange}
       onLineHover={onLineHover}
       backgroundColorScale={backgroundColorScale}
@@ -103,8 +103,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
-    data: getSelectedFutureDatasetData(state),
-    selectedFutureDataForModel: getSelectedFutureDataForModel(state),
+    data: getFilteredSelectedFutureDatasetData(state),
+    selectedFutureDataForScenario: getSelectedFutureDataForScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
   };
 }

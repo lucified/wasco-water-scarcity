@@ -58,6 +58,15 @@ export interface SetSelectedFutureScenarioAction {
   population: string;
 }
 
+export const SET_SELECTED_FUTURE_FILTERS = 'SET_SELECTED_FUTURE_FILTERS';
+export interface SetSelectedFutureFiltersAction {
+  type: 'SET_SELECTED_FUTURE_FILTERS';
+  climateModels: string[];
+  climateExperiments: string[];
+  impactModels: string[];
+  populations: string[];
+}
+
 export const SET_SELECTED_TIME_SCALE = 'SET_SELECTED_TIME_SCALE';
 export interface SetSelectedTimeScaleAction {
   type: 'SET_SELECTED_TIME_SCALE';
@@ -114,6 +123,7 @@ export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
   | SetSelectedFutureScenarioAction
+  | SetSelectedFutureFiltersAction
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction

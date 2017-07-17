@@ -180,3 +180,23 @@ export async function fetchWaterRegionsData(): Promise<
     return undefined;
   }
 }
+
+export function getFutureDataset(
+  dataType: 'stress' | 'shortage',
+  timeScale: TimeScale,
+) {
+  const dataset = getFutureDatasets()
+    .filter(d => d.timeScale === timeScale)
+    .find(
+      d =>
+        dataType === 'shortage'
+          ? d.variableName === 'short'
+          : d.variableName === 'stress',
+    );
+
+  if (!dataset) {
+    console.error('No future dataset found for dataType:', dataType);
+  }
+
+  return dataset;
+}

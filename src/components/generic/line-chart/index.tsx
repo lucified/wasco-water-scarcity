@@ -261,11 +261,11 @@ class LineChart extends React.Component<Props> {
       .selectAll<
         SVGGElement,
         { label: string; color: string; series: Datum[] }
-      >('g#line-group')
+      >('g.line-group')
       .data(Array.isArray(data) ? data : [data])
       .enter()
         .append('g')
-        .attr('id', 'line-group');
+        .attr('class', 'line-group');
 
     lineGroup
       .append('path')
@@ -273,7 +273,7 @@ class LineChart extends React.Component<Props> {
       .attr('d', d => this.lineGenerator!(d.series))
       .style(
         'opacity',
-        d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.05 : 1),
+        d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1),
       )
       .style('stroke', d => d.color)
       .on('mouseenter', d => {
@@ -318,7 +318,7 @@ class LineChart extends React.Component<Props> {
 
     if (onChartHover) {
       const lineGroup = select(this.svgRef!).select<SVGGElement>(
-        'g#line-group',
+        'g.line-group',
       );
       const hoveredTime = this.xScale!.invert(
         mouse(lineGroup.node() as any)[0],
@@ -338,6 +338,7 @@ class LineChart extends React.Component<Props> {
       backgroundColorScale,
       selectedDataSeries,
       data,
+      onLineHover,
     } = this.props as PropsWithDefaults;
 
     const seriesData = Array.isArray(data)
@@ -409,15 +410,35 @@ class LineChart extends React.Component<Props> {
       .selectAll<
         SVGGElement,
         { label: string; color: string; series: Datum[] }
-      >('g#line-group')
+      >('g.line-group')
       .data(Array.isArray(data) ? data : [data]);
+
+    // prettier-ignore
+    lineGroup.enter()
+      .append('g')
+        .attr('class', 'line-group')
+        .append('path')
+          .attr('class', styles.line)
+          .attr('d', d => this.lineGenerator!(d.series))
+          .style(
+            'opacity',
+            d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1),
+          )
+          .style('stroke', d => d.color)
+          .on('mouseenter', d => {
+            if (onLineHover) {
+              onLineHover(d.id);
+            }
+          });
 
     // prettier-ignore
     lineGroup
       .select('path')
       .transition(t)
-        .style('opacity', d => selectedDataSeries && d.id !== selectedDataSeries ? 0.05 : 1)
+        .style('opacity', d => selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1)
         .attr('d', d => this.lineGenerator!(d.series));
+
+    lineGroup.exit().remove();
 
     // TODO: The following will break if selectedTimeIndex doesn't exist when the component is mounted
     if (selectedDataPoint) {
