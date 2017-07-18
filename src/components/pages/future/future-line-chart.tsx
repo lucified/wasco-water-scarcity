@@ -95,8 +95,8 @@ function FutureLineChart({
     <LineChart
       className={styles.chart}
       data={chartData}
-      width={width || 400}
-      height={height || 180}
+      width={width || 600}
+      height={height || 240}
       minY={dataValueExtent[0]}
       maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}
