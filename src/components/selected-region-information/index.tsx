@@ -27,6 +27,7 @@ import {
 import AvailabilityChart from './availability-chart';
 import ConsumptionChart from './consumption-chart';
 import DataLineChart from './data-line-chart';
+import PopulationChart from './population-chart';
 
 const styles = require('./index.scss');
 
@@ -72,6 +73,16 @@ class SelectedRegionInformation extends React.Component<Props> {
 
   private getChartTitle(type: string) {
     const { selectedWaterRegionId, selectedWorldRegion } = this.props;
+
+    if (type === 'population') {
+      if (selectedWaterRegionId != null) {
+        return 'Region population';
+      } else if (selectedWorldRegion) {
+        return `Population for ${selectedWorldRegion.name}`;
+      }
+
+      return 'Global population';
+    }
 
     if (
       selectedWaterRegionId != null ||
@@ -224,6 +235,31 @@ class SelectedRegionInformation extends React.Component<Props> {
     );
   }
 
+  private getPopulationChart() {
+    const {
+      timeSeriesForSelectedWaterRegion,
+      timeSeriesForSelectedWorldRegion,
+      selectedTimeIndex,
+    } = this.props as PropsWithDefaults;
+
+    return (
+      <div className="col-xs-12 col-md-4">
+        <h4 className={styles.heading}>
+          {this.getChartTitle('population')}
+        </h4>
+        <p className={styles.description}>Population</p>
+        <PopulationChart
+          data={
+            timeSeriesForSelectedWaterRegion ||
+            timeSeriesForSelectedWorldRegion!
+          }
+          selectedTimeIndex={selectedTimeIndex}
+          onTimeIndexChange={this.handleTimeIndexChange}
+        />
+      </div>
+    );
+  }
+
   private getTitle() {
     const { selectedWaterRegionId, selectedWorldRegion } = this.props;
 
@@ -242,6 +278,7 @@ class SelectedRegionInformation extends React.Component<Props> {
     const {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
+      dataType,
     } = this.props as PropsWithDefaults;
 
     if (!timeSeriesForSelectedWorldRegion) {
@@ -264,7 +301,9 @@ class SelectedRegionInformation extends React.Component<Props> {
           {this.getStressChart()}
           {this.getShortageChart()}
           {this.getAvailabilityChart(maxConsumptionOrAvailability)}
-          {this.getConsumptionChart(maxConsumptionOrAvailability)}
+          {dataType === 'shortage'
+            ? this.getPopulationChart()
+            : this.getConsumptionChart(maxConsumptionOrAvailability)}
         </div>
       </div>
     );
