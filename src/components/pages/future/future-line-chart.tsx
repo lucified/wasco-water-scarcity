@@ -39,6 +39,8 @@ interface GeneratedStateProps {
 
 interface PassedProps {
   onLineHover?: (scenarioId: string) => void;
+  width?: number;
+  height?: number;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
@@ -53,6 +55,8 @@ function FutureLineChart({
   selectedWaterRegionId,
   onTimeIndexChange,
   onLineHover,
+  width,
+  height,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
     return <div className={styles.empty}>Select a unit on the map</div>;
@@ -91,8 +95,8 @@ function FutureLineChart({
     <LineChart
       className={styles.chart}
       data={chartData}
-      width={400}
-      height={180}
+      width={width || 400}
+      height={height || 180}
       minY={dataValueExtent[0]}
       maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}

@@ -173,40 +173,33 @@ class FutureBody extends React.Component<Props> {
 
     return (
       <div>
-        <div className="row between-xs">
+        <div className="row middle-xs">
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <h1>The Future?</h1>
+          </div>
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <DataTypeSelector hideScarcity />
+          </div>
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <TimeScaleSelector />
+          </div>
+        </div>
+        <div className="row bottom-xs between-xs">
           <div
             className={classNames(
               'col-xs-12',
-              'col-md-6',
-              'col-lg-8',
-              styles['body-text'],
+              'col-md-8',
+              styles['line-chart'],
             )}
           >
-            <h1 className={styles['section-header']}>The Future?</h1>
-            <p>
-              <em>What can we do about this in the future?</em>
-            </p>
-            {!waterRegions || !allScenariosInSelectedDataset
-              ? <Spinner />
-              : !mapData
-                ? <div className={styles.error}>
-                    No data found for selected model.
-                  </div>
-                : <div>
-                    <Map
-                      width={800}
-                      selectedData={mapData}
-                      waterRegions={waterRegions}
-                    />
-                    <WorldRegionSelector />
-                  </div>}
+            <FutureScenarioFilter className={styles.filters} />
+            <FutureLineChart
+              onLineHover={this.handleLineHover}
+              width={790}
+              height={240}
+            />
           </div>
-          <div
-            className={classNames('col-xs-12', 'col-md-4', styles.selectors)}
-          >
-            <DataTypeSelector hideScarcity />
-            <TimeScaleSelector />
-            <FutureScenarioFilter />
+          <div className={classNames('col-xs-12', 'col-md-4')}>
             <FutureScenarioDescription
               className={styles['secondary-content']}
               estimateLabel={selectedDataType}
@@ -216,7 +209,24 @@ class FutureBody extends React.Component<Props> {
               population={selectedPopulation}
               impactModel={selectedImpactModel}
             />
-            <FutureLineChart onLineHover={this.handleLineHover} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-12">
+            {!waterRegions || !allScenariosInSelectedDataset
+              ? <Spinner />
+              : !mapData
+                ? <div className={styles.error}>
+                    No data found for selected model.
+                  </div>
+                : <div>
+                    <Map
+                      width={1000}
+                      selectedData={mapData}
+                      waterRegions={waterRegions}
+                    />
+                    <WorldRegionSelector />
+                  </div>}
           </div>
         </div>
         <div className="row">

@@ -3,16 +3,16 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import * as Select from 'react-select';
 
-import { setSelectedFutureFilters } from '../../../../actions';
-import { FutureDataset } from '../../../../data/types';
-import { StateTree } from '../../../../reducers';
+import { setSelectedFutureFilters } from '../../../actions';
+import { FutureDataset } from '../../../data/types';
+import { StateTree } from '../../../reducers';
 import {
   getSelectedFutureDataset,
   getSelectedFutureFilters,
-} from '../../../../selectors';
+} from '../../../selectors';
 
 import 'react-select/dist/react-select.css';
-import * as styles from './index.scss';
+import * as styles from './future-scenario-filter.scss';
 
 interface PassedProps {
   className?: string;
@@ -96,54 +96,58 @@ class FutureScenarioFilter extends React.Component<Props> {
       className,
     } = this.props;
     return (
-      <div className={classNames(styles.content, className)}>
-        <div className={styles.parameter}>
-          Impact models:
-          <Select
-            className={styles.dropdown}
-            options={toOptions(selectedFutureDataset.impactModels)}
-            name="Impact models"
-            multi
-            clearable={false}
-            value={selectedFutureFilters.impactModels}
-            onChange={this.createChangeHandler('impactModels')}
-          />
+      <div className={classNames('row', className)}>
+        <div className="col-xs-12 col-md-6">
+          <div className={styles.parameter}>
+            Climate experiments:
+            <Select
+              className={styles.dropdown}
+              options={toOptions(selectedFutureDataset.climateExperiments)}
+              name="Climate experiments"
+              clearable={false}
+              multi
+              value={selectedFutureFilters.climateExperiments}
+              onChange={this.createChangeHandler('climateExperiments')}
+            />
+          </div>
+          <div className={styles.parameter}>
+            Population models:
+            <Select
+              className={styles.dropdown}
+              options={toOptions(selectedFutureDataset.populations)}
+              name="Populations"
+              clearable={false}
+              multi
+              value={selectedFutureFilters.populations}
+              onChange={this.createChangeHandler('populations')}
+            />
+          </div>
         </div>
-        <div className={styles.parameter}>
-          Climate models:
-          <Select
-            className={styles.dropdown}
-            options={toOptions(selectedFutureDataset.climateModels)}
-            name="Climate models"
-            clearable={false}
-            multi
-            value={selectedFutureFilters.climateModels}
-            onChange={this.createChangeHandler('climateModels')}
-          />
-        </div>
-        <div className={styles.parameter}>
-          Climate experiments:
-          <Select
-            className={styles.dropdown}
-            options={toOptions(selectedFutureDataset.climateExperiments)}
-            name="Climate experiments"
-            clearable={false}
-            multi
-            value={selectedFutureFilters.climateExperiments}
-            onChange={this.createChangeHandler('climateExperiments')}
-          />
-        </div>
-        <div className={styles.parameter}>
-          Population models:
-          <Select
-            className={styles.dropdown}
-            options={toOptions(selectedFutureDataset.populations)}
-            name="Populations"
-            clearable={false}
-            multi
-            value={selectedFutureFilters.populations}
-            onChange={this.createChangeHandler('populations')}
-          />
+        <div className="col-xs-12 col-md-6">
+          <div className={styles.parameter}>
+            Impact models:
+            <Select
+              className={styles.dropdown}
+              options={toOptions(selectedFutureDataset.impactModels)}
+              name="Impact models"
+              multi
+              clearable={false}
+              value={selectedFutureFilters.impactModels}
+              onChange={this.createChangeHandler('impactModels')}
+            />
+          </div>
+          <div className={styles.parameter}>
+            Climate models:
+            <Select
+              className={styles.dropdown}
+              options={toOptions(selectedFutureDataset.climateModels)}
+              name="Climate models"
+              clearable={false}
+              multi
+              value={selectedFutureFilters.climateModels}
+              onChange={this.createChangeHandler('climateModels')}
+            />
+          </div>
         </div>
       </div>
     );
