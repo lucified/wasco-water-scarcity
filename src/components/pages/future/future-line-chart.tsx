@@ -82,9 +82,10 @@ function FutureLineChart({
     })),
   }));
 
-  const thresholdColors = selectedDataType === 'shortage'
-    ? ['none', ...getDataTypeColors('shortage')].reverse()
-    : ['none', ...getDataTypeColors('stress')];
+  const thresholdColors =
+    selectedDataType === 'shortage'
+      ? ['none', ...getDataTypeColors('shortage')].reverse()
+      : ['none', ...getDataTypeColors('stress')];
 
   const backgroundColorScale = scaleThreshold<number, string>()
     .domain(thresholds)
@@ -116,9 +117,8 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
-    selectedDataType: selectedDataType === 'scarcity'
-      ? undefined
-      : selectedDataType,
+    selectedDataType:
+      selectedDataType === 'scarcity' ? undefined : selectedDataType,
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
     selectedFutureDataForScenario: getSelectedFutureScenario(state),
