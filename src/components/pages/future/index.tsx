@@ -197,17 +197,6 @@ class FutureBody extends React.Component<Props> {
           <div className={classNames('col-xs-12', 'col-md-8')}>
             <FutureScenarioFilter className={styles.filters} />
           </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
-            <FutureScenarioDescription
-              className={styles['secondary-content']}
-              estimateLabel={selectedDataType}
-              includeConsumption={selectedDataType === 'stress'}
-              climateModel={selectedClimateModel}
-              climateExperiment={selectedClimateExperiment}
-              population={selectedPopulation}
-              impactModel={selectedImpactModel}
-            />
-          </div>
         </div>
         <div className="row bottom-xs between-xs">
           <div
@@ -221,6 +210,17 @@ class FutureBody extends React.Component<Props> {
               onLineHover={this.handleLineHover}
               width={790}
               height={240}
+            />
+          </div>
+          <div className={classNames('col-xs-12', 'col-md-4')}>
+            <FutureScenarioDescription
+              className={styles['secondary-content']}
+              estimateLabel={selectedDataType}
+              includeConsumption={selectedDataType === 'stress'}
+              climateModel={selectedClimateModel}
+              climateExperiment={selectedClimateExperiment}
+              population={selectedPopulation}
+              impactModel={selectedImpactModel}
             />
           </div>
         </div>

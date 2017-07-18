@@ -98,8 +98,9 @@ class FutureScenarioFilter extends React.Component<Props> {
     return (
       <div className={classNames('row', className)}>
         <div className="col-xs-12 col-md-6">
+          <h2>Actions</h2>
           <div className={styles.parameter}>
-            Climate experiments:
+            Climate scenario:
             <Select
               className={styles.dropdown}
               options={toOptions(selectedFutureDataset.climateExperiments)}
@@ -124,6 +125,7 @@ class FutureScenarioFilter extends React.Component<Props> {
           </div>
         </div>
         <div className="col-xs-12 col-md-6">
+          <h2>Uncertainties</h2>
           <div className={styles.parameter}>
             Impact models:
             <Select
