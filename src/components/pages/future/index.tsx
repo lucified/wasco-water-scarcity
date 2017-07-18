@@ -174,30 +174,21 @@ class FutureBody extends React.Component<Props> {
     return (
       <div>
         <div className="row middle-xs">
-          <div className={classNames('col-xs-12', 'col-md-4')}>
+          <div className={classNames('col-xs-24', 'col-md-8')}>
             <h1>The Future?</h1>
           </div>
           <div className={classNames('col-xs-12', 'col-md-4')}>
-            <DataTypeSelector hideScarcity />
-          </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
-            <TimeScaleSelector />
+            <div className="row">
+              <DataTypeSelector hideScarcity />
+            </div>
+            <div className="row">
+              <TimeScaleSelector />
+            </div>
           </div>
         </div>
         <div className="row bottom-xs between-xs">
-          <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-8',
-              styles['line-chart'],
-            )}
-          >
+          <div className={classNames('col-xs-12', 'col-md-8')}>
             <FutureScenarioFilter className={styles.filters} />
-            <FutureLineChart
-              onLineHover={this.handleLineHover}
-              width={790}
-              height={240}
-            />
           </div>
           <div className={classNames('col-xs-12', 'col-md-4')}>
             <FutureScenarioDescription
@@ -211,7 +202,23 @@ class FutureBody extends React.Component<Props> {
             />
           </div>
         </div>
+        <div className="row bottom-xs between-xs">
+          <div
+            className={classNames(
+              'col-xs-12',
+              'col-md-8',
+              styles['line-chart'],
+            )}
+          >
+            <FutureLineChart
+              onLineHover={this.handleLineHover}
+              width={790}
+              height={240}
+            />
+          </div>
+        </div>
         <div className="row">
+          <h2>Selected scenario</h2>
           <div className="col-xs-12">
             {!waterRegions || !allScenariosInSelectedDataset
               ? <Spinner />
