@@ -1,11 +1,7 @@
 @import '../../definitions.scss';
 
-.assumption {
-  font-weight: bold;
-}
-
-.selectors {
-  padding-top: $default-margin;
+.title-row {
+  margin-bottom: $default-margin/2;
 }
 
 .filters {
