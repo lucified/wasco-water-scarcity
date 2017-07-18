@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 
-import { loadAppData, loadModelData } from '../actions';
+import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
   getSelectedClimateModel,
@@ -22,11 +22,7 @@ import * as styles from './app.scss';
 type PassedProps = RouteComponentProps<void>;
 
 interface GeneratedDispatchProps {
-  loadAppData: (
-    climateModel: string,
-    impactModel: string,
-    timeScale: string,
-  ) => void;
+  loadMapData: () => void;
   loadModelData: (
     climateModel: string,
     impactModel: string,
@@ -50,7 +46,8 @@ class App extends React.Component<Props> {
       selectedTimeScale,
     } = this.props;
 
-    this.props.loadAppData(
+    this.props.loadMapData();
+    this.props.loadModelData(
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
@@ -110,12 +107,8 @@ export default connect<
     selectedTimeScale: getSelectedTimeScale(state),
   }),
   (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
-    loadAppData: (
-      climateModel: string,
-      impactModel: string,
-      timeScale: string,
-    ) => {
-      dispatch(loadAppData(climateModel, impactModel, timeScale));
+    loadMapData: () => {
+      dispatch(loadMapData());
     },
     loadModelData: (
       climateModel: string,

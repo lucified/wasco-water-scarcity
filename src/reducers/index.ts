@@ -8,9 +8,9 @@ import {
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_FUTURE_FILTERS,
-  SET_SELECTED_FUTURE_SCENARIO,
   SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
+  SET_SELECTED_SCENARIO,
   SET_SELECTED_TIME_SCALE,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
@@ -315,7 +315,7 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_FUTURE_SCENARIO:
+    case SET_SELECTED_SCENARIO:
       if (
         action.climateModel !== state.climateModel ||
         action.climateExperiment !== state.climateExperiment ||

@@ -40,12 +40,10 @@ export function getSelectedFutureFilters(state: StateTree) {
   return state.selections.futureFilters;
 }
 
-export const getSelectedFutureDatasetData = createSelector(
+export const getAllScenariosInSelectedFutureDataset = createSelector(
   getFutureData,
   getSelectedFutureDataset,
-  (allFutureData, selectedDataset) => {
-    const { variableName, timeScale } = selectedDataset;
-
+  (allFutureData, { variableName, timeScale }) => {
     return (
       allFutureData[variableName] &&
       allFutureData[variableName][timeScale] &&
@@ -56,8 +54,8 @@ export const getSelectedFutureDatasetData = createSelector(
   },
 );
 
-export const getFilteredSelectedFutureDatasetData = createSelector(
-  getSelectedFutureDatasetData,
+export const getFilteredScenariosInSelectedFutureDataset = createSelector(
+  getAllScenariosInSelectedFutureDataset,
   getSelectedFutureFilters,
   (datasetData, filters) => {
     return (
@@ -73,8 +71,8 @@ export const getFilteredSelectedFutureDatasetData = createSelector(
   },
 );
 
-export const getSelectedFutureDataForScenario = createSelector(
-  getSelectedFutureDatasetData,
+export const getSelectedFutureScenario = createSelector(
+  getAllScenariosInSelectedFutureDataset,
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedClimateExperiment,

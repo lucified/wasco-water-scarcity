@@ -20,9 +20,9 @@ import {
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_FUTURE_FILTERS,
-  SET_SELECTED_FUTURE_SCENARIO,
   SET_SELECTED_IMPACT_MODEL,
   SET_SELECTED_REGION,
+  SET_SELECTED_SCENARIO,
   SET_SELECTED_TIME_SCALE,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
@@ -31,9 +31,9 @@ import {
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
   SetSelectedFutureFiltersAction,
-  SetSelectedFutureScenarioAction,
   SetSelectedImpactModelAction,
   SetSelectedRegionAction,
+  SetSelectedScenarioAction,
   SetSelectedTimeScaleAction,
   SetSelectedWorldRegionAction,
   SetThresholdsForDataTypeAction,
@@ -109,14 +109,14 @@ export function setSelectedClimateModel(
   };
 }
 
-export function setSelectedFutureScenario(
+export function setSelectedScenario(
   climateModel: string,
   climateExperiment: string,
   impactModel: string,
   population: string,
-): SetSelectedFutureScenarioAction {
+): SetSelectedScenarioAction {
   return {
-    type: SET_SELECTED_FUTURE_SCENARIO,
+    type: SET_SELECTED_SCENARIO,
     climateModel,
     climateExperiment,
     impactModel,
@@ -245,21 +245,12 @@ export function loadFutureData(dataset: FutureDataset) {
   };
 }
 
-export function loadAppData(
-  climateModel: string,
-  impactModel: string,
-  timeScale: string,
-) {
+export function loadMapData() {
   return (dispatch: Dispatch<any>) => {
     return Promise.all([
-      fetchHistoricalStressShortageData(climateModel, impactModel, timeScale),
       fetchWaterRegionsData(),
       fetchWorldRegionsData(),
-    ]).then(([waterData, waterRegionData, worldRegionsData]) => {
-      if (waterData) {
-        dispatch(storeWaterData(waterData));
-      }
-
+    ]).then(([waterRegionData, worldRegionsData]) => {
       if (waterRegionData) {
         dispatch(storeWaterRegionData(waterRegionData));
         dispatch(

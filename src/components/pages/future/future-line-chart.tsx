@@ -9,10 +9,10 @@ import { setFutureTimeIndex } from '../../../actions';
 import { FutureData, FutureDataForModel } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
-  getFilteredSelectedFutureDatasetData,
+  getAllScenariosInSelectedFutureDataset,
+  getFilteredScenariosInSelectedFutureDataset,
   getSelectedDataType,
-  getSelectedFutureDataForScenario,
-  getSelectedFutureDatasetData,
+  getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
@@ -115,9 +115,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedDataType:
       selectedDataType === 'scarcity' ? undefined : selectedDataType,
-    data: getSelectedFutureDatasetData(state),
-    filteredData: getFilteredSelectedFutureDatasetData(state),
-    selectedFutureDataForScenario: getSelectedFutureDataForScenario(state),
+    data: getAllScenariosInSelectedFutureDataset(state),
+    filteredData: getFilteredScenariosInSelectedFutureDataset(state),
+    selectedFutureDataForScenario: getSelectedFutureScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
   };
 }

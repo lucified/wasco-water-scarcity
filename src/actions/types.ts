@@ -49,9 +49,9 @@ export interface SetSelectedClimateModelAction {
   climateModel: string;
 }
 
-export const SET_SELECTED_FUTURE_SCENARIO = 'SET_SELECTED_FUTURE_SCENARIO';
-export interface SetSelectedFutureScenarioAction {
-  type: 'SET_SELECTED_FUTURE_SCENARIO';
+export const SET_SELECTED_SCENARIO = 'SET_SELECTED_SCENARIO';
+export interface SetSelectedScenarioAction {
+  type: 'SET_SELECTED_SCENARIO';
   climateModel: string;
   climateExperiment: string;
   impactModel: string;
@@ -122,7 +122,7 @@ export interface StoreFutureDataAction {
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
-  | SetSelectedFutureScenarioAction
+  | SetSelectedScenarioAction
   | SetSelectedFutureFiltersAction
   | SetSelectedDataTypeAction
   | SetSelectedWorldRegionAction
