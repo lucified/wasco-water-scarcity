@@ -1,5 +1,9 @@
 @import '../../definitions.scss';
 
+.data-selectors {
+  padding-top: 1.5 * $default-margin;
+}
+
 .error {
   margin-top: 40px;
   text-align: center;

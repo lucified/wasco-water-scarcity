@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
@@ -172,12 +173,19 @@ class FutureBody extends React.Component<Props> {
 
     return (
       <div>
-        <div className="row bottom-xs between-xs">
+        <div className="row between-xs">
           <div className="col-xs-12 col-md-8">
             <h1>The Future?</h1>
             <FutureScenarioFilter />
           </div>
-          <div className="col-xs-12 col-md-offset-1 col-md-3">
+          <div
+            className={classNames(
+              'col-xs-12',
+              'col-md-offset-1',
+              'col-md-3',
+              styles['data-selectors'],
+            )}
+          >
             <DataTypeSelector hideScarcity />
             <TimeScaleSelector />
           </div>
