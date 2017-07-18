@@ -1,12 +1,8 @@
-@import '../../../definitions.scss';
+@import '../../definitions.scss';
 
 .model {
   align-items: center;
   margin-bottom: 0.5rem;
-}
-
-.content {
-  padding: $default-margin/2 0;
 }
 
 .assumption {
@@ -19,6 +15,7 @@
   align-items: center;
 
   font-size: 14px;
+  line-height: 1.1;
 }
 
 .dropdown {

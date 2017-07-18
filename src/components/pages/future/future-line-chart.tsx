@@ -39,6 +39,8 @@ interface GeneratedStateProps {
 
 interface PassedProps {
   onLineHover?: (scenarioId: string) => void;
+  width?: number;
+  height?: number;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
@@ -53,6 +55,8 @@ function FutureLineChart({
   selectedWaterRegionId,
   onTimeIndexChange,
   onLineHover,
+  width,
+  height,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
     return <div className={styles.empty}>Select a unit on the map</div>;
@@ -78,10 +82,9 @@ function FutureLineChart({
     })),
   }));
 
-  const thresholdColors =
-    selectedDataType === 'shortage'
-      ? ['none', ...getDataTypeColors('shortage')].reverse()
-      : ['none', ...getDataTypeColors('stress')];
+  const thresholdColors = selectedDataType === 'shortage'
+    ? ['none', ...getDataTypeColors('shortage')].reverse()
+    : ['none', ...getDataTypeColors('stress')];
 
   const backgroundColorScale = scaleThreshold<number, string>()
     .domain(thresholds)
@@ -91,8 +94,8 @@ function FutureLineChart({
     <LineChart
       className={styles.chart}
       data={chartData}
-      width={400}
-      height={180}
+      width={width || 600}
+      height={height || 240}
       minY={dataValueExtent[0]}
       maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}
@@ -113,8 +116,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
-    selectedDataType:
-      selectedDataType === 'scarcity' ? undefined : selectedDataType,
+    selectedDataType: selectedDataType === 'scarcity'
+      ? undefined
+      : selectedDataType,
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
     selectedFutureDataForScenario: getSelectedFutureScenario(state),

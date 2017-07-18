@@ -1,11 +1,11 @@
 @import '../../definitions.scss';
 
-.assumption {
-  font-weight: bold;
+.data-selectors {
+  padding-top: 1.5 * $default-margin;
 }
 
-.selectors {
-  padding-top: $default-margin;
+.spinner {
+  margin-top: 40px;
 }
 
 .error {
