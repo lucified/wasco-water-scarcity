@@ -112,7 +112,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             />
           </div>
           <div className={styles.parameter}>
-            Population models:
+            Population scenarios:
             <Select
               className={styles.dropdown}
               options={toOptions(selectedFutureDataset.populations)}

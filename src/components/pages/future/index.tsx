@@ -1,4 +1,3 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
@@ -173,46 +172,25 @@ class FutureBody extends React.Component<Props> {
 
     return (
       <div>
-        <div
-          className={classNames(
-            'row',
-            'middle-xs',
-            'between-xs',
-            styles['title-row'],
-          )}
-        >
-          <div className={classNames('col-xs-24', 'col-md-8')}>
+        <div className="row bottom-xs between-xs">
+          <div className="col-xs-12 col-md-8">
             <h1>The Future?</h1>
+            <FutureScenarioFilter />
           </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
-            <div className="row">
-              <DataTypeSelector hideScarcity />
-            </div>
-            <div className="row">
-              <TimeScaleSelector />
-            </div>
+          <div className="col-xs-12 col-md-offset-1 col-md-3">
+            <DataTypeSelector hideScarcity />
+            <TimeScaleSelector />
           </div>
         </div>
         <div className="row bottom-xs between-xs">
-          <div className={classNames('col-xs-12', 'col-md-8')}>
-            <FutureScenarioFilter className={styles.filters} />
-          </div>
-        </div>
-        <div className="row bottom-xs between-xs">
-          <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-8',
-              styles['line-chart'],
-            )}
-          >
+          <div className="col-xs-12 col-md-8">
             <FutureLineChart
               onLineHover={this.handleLineHover}
               width={790}
               height={240}
             />
           </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
+          <div className="col-xs-12 col-md-4">
             <FutureScenarioDescription
               className={styles['secondary-content']}
               estimateLabel={selectedDataType}
@@ -225,8 +203,8 @@ class FutureBody extends React.Component<Props> {
           </div>
         </div>
         <div className="row">
-          <h2>Selected scenario</h2>
           <div className="col-xs-12">
+            <h2>Selected scenario</h2>
             {!waterRegions || !allScenariosInSelectedDataset
               ? <Spinner />
               : !mapData
