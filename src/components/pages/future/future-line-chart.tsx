@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import flattenDeep = require('lodash/flattenDeep');
 
-import { setFutureTimeIndex } from '../../../actions';
+import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import { FutureData, FutureDataForModel } from '../../../data/types';
 import { StateTree } from '../../../reducers';
 import {
@@ -16,6 +16,7 @@ import {
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
+  isFutureScenarioLocked,
 } from '../../../selectors';
 import { getDataTypeColors } from '../../../types';
 
@@ -25,6 +26,7 @@ import * as styles from './future-line-chart.scss';
 
 interface GeneratedDispatchProps {
   onTimeIndexChange: (value: number) => void;
+  onToggleLock: () => void;
 }
 
 interface GeneratedStateProps {
@@ -35,6 +37,7 @@ interface GeneratedStateProps {
   filteredData?: FutureData;
   selectedFutureDataForScenario?: FutureDataForModel;
   thresholds: number[];
+  futureScenarioLocked: boolean;
 }
 
 interface PassedProps {
@@ -55,6 +58,8 @@ function FutureLineChart({
   selectedWaterRegionId,
   onTimeIndexChange,
   onLineHover,
+  onToggleLock,
+  futureScenarioLocked,
   width,
   height,
 }: Props) {
@@ -101,8 +106,10 @@ function FutureLineChart({
       maxY={dataValueExtent[1]}
       selectedTimeIndex={selectedTimeIndex}
       selectedDataSeries={selectedFutureDataForScenario.scenarioId}
+      selectedDataSeriesLocked={futureScenarioLocked}
       onChartHover={onTimeIndexChange}
       onLineHover={onLineHover}
+      onClick={onToggleLock}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
       marginTop={15}
@@ -123,6 +130,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
     selectedFutureDataForScenario: getSelectedFutureScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
+    futureScenarioLocked: isFutureScenarioLocked(state),
   };
 }
 
@@ -130,6 +138,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     onTimeIndexChange: (value: number) => {
       dispatch(setFutureTimeIndex(value));
+    },
+    onToggleLock: () => {
+      dispatch(toggleFutureScenarioLock());
     },
   };
 }

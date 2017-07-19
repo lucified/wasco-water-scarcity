@@ -40,6 +40,14 @@ export function getSelectedFutureFilters(state: StateTree) {
   return state.selections.futureFilters;
 }
 
+export function isHistoricalTimeIndexLocked(state: StateTree) {
+  return state.selections.lockHistoricalTimeIndex;
+}
+
+export function isFutureScenarioLocked(state: StateTree) {
+  return state.selections.lockFutureScenario;
+}
+
 export const getAllScenariosInSelectedFutureDataset = createSelector(
   getFutureData,
   getSelectedFutureDataset,

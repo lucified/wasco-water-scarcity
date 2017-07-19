@@ -23,6 +23,7 @@ export interface Props {
   yTickFormat?: (value: number) => string;
   onMouseEnter?: (item: BarChartDatum) => void;
   onMouseOut?: (item: BarChartDatum) => void;
+  onClick?: () => void;
   maxYValue?: number;
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
@@ -342,6 +343,7 @@ export default class BarChart extends React.Component<Props, {}> {
       height,
       width,
       transitionDuration,
+      onClick,
     } = this.props as PropsWithDefaults;
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
@@ -350,6 +352,7 @@ export default class BarChart extends React.Component<Props, {}> {
         className={classNames(styles.chart, className)}
         height={height}
         width={width}
+        onClick={onClick}
       >
         <g transform={`translate(${marginLeft}, ${marginTop})`}>
           <rect

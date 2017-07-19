@@ -42,8 +42,10 @@ interface PassedProps {
   yAxisLabel?: string;
   selectedTimeIndex?: number;
   selectedDataSeries?: string;
+  selectedDataSeriesLocked?: boolean;
   onChartHover?: (hoveredIndex: number) => void; // Hovering on top of the chart
-  onLineHover?: (hovredLineId: string) => void; // Clicked on line
+  onLineHover?: (hoveredLineId: string) => void; // Hovered on line
+  onClick?: () => void;
   backgroundColorScale?: ScaleThreshold<number, string>;
 }
 
@@ -160,6 +162,7 @@ class LineChart extends React.Component<Props> {
       width,
       height,
       selectedDataSeries,
+      selectedDataSeriesLocked,
       backgroundColorScale,
       data,
       onLineHover,
@@ -272,7 +275,13 @@ class LineChart extends React.Component<Props> {
         'opacity',
         d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1),
       )
-      .style('stroke', d => d.color)
+      .style(
+        'stroke',
+        d =>
+          selectedDataSeriesLocked && d.id === selectedDataSeries
+            ? 'red'
+            : d.color,
+      )
       .on('mouseenter', d => {
         if (onLineHover) {
           onLineHover(d.id);
@@ -334,6 +343,7 @@ class LineChart extends React.Component<Props> {
       height,
       backgroundColorScale,
       selectedDataSeries,
+      selectedDataSeriesLocked,
       data,
       onLineHover,
     } = this.props as PropsWithDefaults;
@@ -413,12 +423,6 @@ class LineChart extends React.Component<Props> {
         .attr('class', 'line-group')
         .append('path')
           .attr('class', styles.line)
-          .attr('d', d => this.lineGenerator!(d.series))
-          .style(
-            'opacity',
-            d => (selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1),
-          )
-          .style('stroke', d => d.color)
           .on('mouseenter', d => {
             if (onLineHover) {
               onLineHover(d.id);
@@ -429,7 +433,16 @@ class LineChart extends React.Component<Props> {
     lineGroup
       .select('path')
       .transition(t)
-        .style('opacity', d => selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1)
+        .style(
+          'opacity',
+          d => selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1,
+        )
+        .style(
+          'stroke',
+          d => selectedDataSeriesLocked && d.id === selectedDataSeries
+            ? 'red'
+            : d.color,
+        )
         .attr('d', d => this.lineGenerator!(d.series));
 
     lineGroup.exit().remove();
@@ -470,6 +483,7 @@ class LineChart extends React.Component<Props> {
       marginBottom,
       yAxisLabel,
       className,
+      onClick,
     } = this.props as PropsWithDefaults;
 
     return (
@@ -478,6 +492,7 @@ class LineChart extends React.Component<Props> {
         height={height}
         className={className}
         ref={this.storeSvgRef}
+        onClick={onClick}
       >
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
           <g
