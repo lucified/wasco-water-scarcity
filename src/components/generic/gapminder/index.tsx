@@ -555,7 +555,7 @@ class Gapminder extends React.Component<Props> {
       <svg
         width={width}
         height={height}
-        className={classNames(styles.svg, className)}
+        className={className}
         ref={this.storeSvgRef}
       >
         <defs>
