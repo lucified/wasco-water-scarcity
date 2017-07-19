@@ -1,6 +1,7 @@
 import { max } from 'd3-array';
 import { format } from 'd3-format';
 import { schemeBlues } from 'd3-scale-chromatic';
+import range = require('lodash/range');
 import * as React from 'react';
 
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
@@ -107,14 +108,27 @@ class ConsumptionChart extends React.Component<Props, State> {
     onTimeIndexChange(item.key);
   };
 
-  private xTickFormatter = (index: string) => {
+  private xTickFormatter = (i: string) => {
     const { data } = this.props;
     const formatter = format('02d');
-    const i = Number(index);
-    return `${formatter(data[i].startYear % 100)}-${formatter(
-      data[i].endYear % 100,
-    )}`;
+    const index = Number(i);
+    const d = data[index];
+    if (d.startYear === d.endYear) {
+      return `'${formatter(d.startYear % 100)}`;
+    }
+
+    return `'${formatter(d.startYear % 100)}-'${formatter(d.endYear % 100)}`;
   };
+
+  private getXTickValues() {
+    const { data } = this.props;
+
+    if (data.length <= 10) {
+      return undefined;
+    }
+
+    return range(0, data.length, Math.floor(data.length / 10)).map(String);
+  }
 
   public render() {
     const { data, maxY, selectedTimeIndex, timeIndexLocked } = this.props;
@@ -133,6 +147,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginLeft={40}
           yTickFormat={yTickFormatter}
           xTickFormat={this.xTickFormatter}
+          xTickValues={this.getXTickValues()}
           selectedIndex={selectedTimeIndex}
           onClick={this.handleClick}
           indexLocked={timeIndexLocked}

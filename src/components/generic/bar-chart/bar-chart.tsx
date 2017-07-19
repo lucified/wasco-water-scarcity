@@ -26,7 +26,7 @@ export interface Props {
   onClick?: (item: BarChartDatum) => void;
   maxYValue?: number;
   className?: string;
-  xTickValues?: (xscale: ScaleBand<string>) => string[];
+  xTickValues?: string[];
   selectedIndex?: number;
   indexLocked?: boolean;
   hideSelectedLabel?: boolean;
@@ -136,7 +136,7 @@ export default class BarChart extends React.Component<Props, {}> {
         .tickSize(5)
         .tickFormat(this.props.xTickFormat!);
       if (xTickValues) {
-        this._xAxis.tickValues(xTickValues(xscale));
+        this._xAxis.tickValues(xTickValues);
       }
     }
     return this._xAxis!;
