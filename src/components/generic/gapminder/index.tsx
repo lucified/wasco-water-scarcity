@@ -257,8 +257,8 @@ class Gapminder extends React.Component<Props> {
 
     g.call(this.drawBackgroundColors);
 
-    g.select('g#x-axis').call(axisBottom(this.xScale!));
-    g.select('g#y-axis').call(axisLeft(this.yScale!));
+    g.select('g#x-axis').call(axisBottom(this.xScale!).ticks(3, '.1r'));
+    g.select('g#y-axis').call(axisLeft(this.yScale!).ticks(3, '.1r'));
 
     const label = g
       .select('text#year-label')
@@ -555,7 +555,7 @@ class Gapminder extends React.Component<Props> {
       <svg
         width={width}
         height={height}
-        className={className}
+        className={classNames(styles.svg, className)}
         ref={this.storeSvgRef}
       >
         <defs>
