@@ -44,16 +44,22 @@ These files will be available under
 `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/`.
 
 
-## Building deployment distributions
+## Deploying
 
-All the following build commands should be executed in the project root folder.
+The end result of this project is a bunch of static HTML, CSS, JS and JSON
+files. The files need to be hosted on the root path of the server and the
+server needs to be configured to direct all requests to `/index.html` in order
+to support react-router routing.
 
-Build a *production* distribution into `dist` with:
+The following commands build a distribution bundle into `dist`. Upload these
+files to your hosting server to deploy.
+
+A *production* distribution:
 ```shell
 NODE_ENV=production yarn run build
 ```
 
-Build a *staging* distribution into `dist` with:
+A *staging* distribution:
 ```shell
 NODE_ENV=staging yarn run build
 ```
