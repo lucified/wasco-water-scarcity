@@ -28,6 +28,8 @@ import {
   getDefaultHistoricalClimateModel,
   getDefaultHistoricalImpactModel,
   getFutureDataset,
+  getHistoricalClimateModels,
+  getHistoricalImpactModels,
 } from '../data';
 import { TimeScale } from '../types';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
@@ -249,7 +251,9 @@ function selectionsReducer(
           // If watergap/watch was previously selected, we need to switch to a
           // valid climateModel.
           if (climateModel === 'watch') {
-            climateModel = getDefaultHistoricalClimateModel();
+            climateModel = getHistoricalClimateModels().filter(
+              m => m !== 'watch',
+            )[0];
           }
         }
 
@@ -273,7 +277,9 @@ function selectionsReducer(
           // If watergap/watch was previously selected, we need to switch to a
           // valid impactModel.
           if (impactModel === 'watergap') {
-            impactModel = getDefaultHistoricalImpactModel();
+            impactModel = getHistoricalImpactModels().filter(
+              m => m !== 'watergap',
+            )[0];
           }
         }
 
