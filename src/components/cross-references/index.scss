@@ -14,6 +14,9 @@
   padding: $default-margin;
   border: 1px solid $color-lightest-gray;
   color: $color-darker-gray;
+  font-family: $headingFontFamily;
+  font-weight: 600;
+  text-decoration: none;
 
   &:visited {
     color: $color-dark-gray;

@@ -1,7 +1,10 @@
 // FONT
 
-$bodyFontSize: 17px; // in pixels
-$fontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$bodyFontSize: 18px; // in pixels
+$bodyFontFamily: 'Source Serif Pro', 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$headingFontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$labelFontFamily: $headingFontFamily;
+
 $bodyLineHeight: 1.8;
 
 // BREAKPOINTS
@@ -29,7 +32,7 @@ $color-lighter-gray: #f0e9e9;
 $color-light-gray: #e5dddb;
 $color-gray: #999999;
 $color-dark-gray: #807775;
-$color-darker-gray: #292220;
+$color-darker-gray: #4a4a4a;
 $color-darkest-gray: #0b1328;
 $color-lightest-gray-with-transparency: rgba($color-lightest-gray, 0.04);
 $color-lighter-red: #e19791;
@@ -88,10 +91,14 @@ $default-margin: 20px;
 }
 
 .body-text {
-  font-family: $fontFamily;
+  font-family: $bodyFontFamily;
   font-size: $bodyFontSize;
   line-height: $bodyLineHeight;
   color: $color-darker-gray;
+
+  b {
+    color: $color-darkest-gray;
+  }
 }
 
 .secondary-content {

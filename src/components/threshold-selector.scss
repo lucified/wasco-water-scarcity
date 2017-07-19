@@ -2,6 +2,7 @@
 
 .header {
   margin-bottom: 4px;
+  font-family: $labelFontFamily;
 }
 
 .slider {
@@ -62,6 +63,7 @@
 .labels {
   position: relative;
   font-size: 14px;
+  font-family: $labelFontFamily;
   color: $color-darker-gray;
   margin: 0 10px; // The slider controls don't go all the way to the sides
 }
@@ -85,6 +87,7 @@
   color: $color-dark-gray;
   font-size: 14px;
   font-weight: lighter;
+  font-family: $labelFontFamily;
 
   &:hover {
     color: $color-darker-gray;
