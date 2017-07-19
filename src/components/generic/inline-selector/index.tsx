@@ -41,13 +41,17 @@ export default class InlineSelector extends React.Component<
     this.setState({ editing: true });
   };
 
+  private handleChange = (option: Option) => {
+    this.props.onChange(option);
+    this.setState({ editing: false });
+  };
+
   public render() {
     const {
       selectedValue,
       className,
       selector,
       options,
-      onChange,
       disabled,
       name,
     } = this.props;
@@ -60,7 +64,7 @@ export default class InlineSelector extends React.Component<
             <RadioSelector
               selectedValue={selectedValue}
               values={options}
-              onChange={onChange}
+              onChange={this.handleChange}
               disabled={disabled}
             />
           </div>
@@ -73,7 +77,7 @@ export default class InlineSelector extends React.Component<
           name={name}
           options={options}
           value={selectedValue}
-          onChange={onChange}
+          onChange={this.handleChange}
           searchable={false}
           clearable={false}
           openOnFocus
