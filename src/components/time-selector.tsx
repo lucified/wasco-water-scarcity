@@ -8,7 +8,7 @@ import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
   getSelectedDataType,
-  getSelectedTimeIndex,
+  getSelectedHistoricalTimeIndex,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
 } from '../selectors';
@@ -179,7 +179,7 @@ class TimeSelector extends React.PureComponent<Props> {
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   const data = getTimeSeriesForSelectedGlobalRegion(state);
-  const selectedIndex = getSelectedTimeIndex(state);
+  const selectedIndex = getSelectedHistoricalTimeIndex(state);
   const currentSelectedData = data && data[selectedIndex];
   const label = currentSelectedData
     ? currentSelectedData.startYear !== currentSelectedData.endYear

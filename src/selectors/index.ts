@@ -21,7 +21,7 @@ export function getSelectedStressShortageData(
   state: StateTree,
 ): TimeAggregate<StressShortageDatum> | undefined {
   const data = getStressShortageData(state);
-  return data && data[getSelectedTimeIndex(state)];
+  return data && data[getSelectedHistoricalTimeIndex(state)];
 }
 
 export function getSelectedFutureTimeIndex(state: StateTree) {
@@ -231,8 +231,8 @@ const getAggregateData = createSelector(
   },
 );
 
-export function getSelectedTimeIndex(state: StateTree): number {
-  return state.selections.timeIndex;
+export function getSelectedHistoricalTimeIndex(state: StateTree): number {
+  return state.selections.historicalTimeIndex;
 }
 
 export function getSelectedWaterRegionId(state: StateTree): number | undefined {

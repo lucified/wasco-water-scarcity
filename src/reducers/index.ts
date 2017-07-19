@@ -45,7 +45,7 @@ const defaultState: StateTree = {
     scarcity: [...defaultDataTypeThresholds.scarcity],
   },
   selections: {
-    timeIndex: 0,
+    historicalTimeIndex: 0,
     futureTimeIndex: 0,
     futureDataset: defaultFutureDataset,
     futureFilters: {
@@ -167,10 +167,10 @@ function selectionsReducer(
 ): SelectionsTree {
   switch (action.type) {
     case SET_TIME_INDEX:
-      if (action.value !== state.timeIndex) {
+      if (action.value !== state.historicalTimeIndex) {
         return {
           ...state,
-          timeIndex: action.value,
+          historicalTimeIndex: action.value,
         };
       }
 
@@ -180,7 +180,7 @@ function selectionsReducer(
       // time period
       return {
         ...state,
-        timeIndex: action.data.length - 1,
+        historicalTimeIndex: action.data.length - 1,
       };
     case TOGGLE_SELECTED_REGION:
       if (state.region === action.id) {

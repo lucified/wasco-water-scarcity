@@ -10,7 +10,7 @@ import {
 } from '../types';
 
 export interface SelectionsTree {
-  timeIndex: number;
+  historicalTimeIndex: number;
   futureTimeIndex: number;
   futureDataset: FutureDataset;
   futureFilters: {

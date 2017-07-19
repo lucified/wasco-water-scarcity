@@ -8,7 +8,7 @@ import { Dispatch } from 'redux';
 import { setTimeIndex } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedTimeIndex,
+  getSelectedHistoricalTimeIndex,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
@@ -312,7 +312,7 @@ class SelectedRegionInformation extends React.Component<Props> {
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
-    selectedTimeIndex: getSelectedTimeIndex(state),
+    selectedTimeIndex: getSelectedHistoricalTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
     timeSeriesForSelectedWaterRegion: getTimeSeriesForSelectedWaterRegion(
