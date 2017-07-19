@@ -14,7 +14,7 @@ interface PassedProps {
   selectedTimeIndex: number;
   timeIndexLocked?: boolean;
   onTimeIndexChange: (value: number) => void;
-  onClick?: () => void;
+  onToggleLock?: () => void;
   maxY?: number;
 }
 
@@ -61,10 +61,6 @@ class ConsumptionChart extends React.Component<Props, State> {
     super(props);
 
     this.state = {};
-
-    this.handleLegendHover = this.handleLegendHover.bind(this);
-    this.handleBarHover = this.handleBarHover.bind(this);
-    this.xTickFormatter = this.xTickFormatter.bind(this);
   }
 
   private generateBarChartData = memoize(
@@ -86,7 +82,7 @@ class ConsumptionChart extends React.Component<Props, State> {
       })),
   );
 
-  private handleLegendHover(title?: string) {
+  private handleLegendHover = (title?: string) => {
     if (!title) {
       this.setState({ hoveredType: undefined });
     } else {
@@ -97,29 +93,31 @@ class ConsumptionChart extends React.Component<Props, State> {
         console.warn('Unknown type!', title);
       }
     }
-  }
+  };
 
-  private handleBarHover(item: BarChartDatum) {
+  private handleBarHover = (item: BarChartDatum) => {
     this.props.onTimeIndexChange(item.key);
-  }
+  };
 
-  private xTickFormatter(index: string) {
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, onTimeIndexChange } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    onTimeIndexChange(item.key);
+  };
+
+  private xTickFormatter = (index: string) => {
     const { data } = this.props;
     const formatter = format('02d');
     const i = Number(index);
     return `${formatter(data[i].startYear % 100)}-${formatter(
       data[i].endYear % 100,
     )}`;
-  }
+  };
 
   public render() {
-    const {
-      data,
-      maxY,
-      selectedTimeIndex,
-      timeIndexLocked,
-      onClick,
-    } = this.props;
+    const { data, maxY, selectedTimeIndex, timeIndexLocked } = this.props;
     const { hoveredType } = this.state;
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
@@ -136,7 +134,7 @@ class ConsumptionChart extends React.Component<Props, State> {
           yTickFormat={yTickFormatter}
           xTickFormat={this.xTickFormatter}
           selectedIndex={selectedTimeIndex}
-          onClick={onClick}
+          onClick={this.handleClick}
           indexLocked={timeIndexLocked}
           onMouseEnter={this.handleBarHover}
           transitionDuration={100}

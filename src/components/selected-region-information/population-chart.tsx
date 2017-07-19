@@ -10,7 +10,7 @@ interface PassedProps {
   data: Datum[];
   selectedTimeIndex: number;
   timeIndexLocked?: boolean;
-  onClick?: () => void;
+  onToggleLock?: () => void;
   onTimeIndexChange: (value: number) => void;
   maxY?: number;
 }
@@ -34,6 +34,14 @@ export default class PopulationChart extends React.PureComponent<Props> {
     })),
   );
 
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, onTimeIndexChange } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    onTimeIndexChange(item.key);
+  };
+
   public render() {
     const {
       data,
@@ -41,7 +49,6 @@ export default class PopulationChart extends React.PureComponent<Props> {
       onTimeIndexChange,
       maxY,
       timeIndexLocked,
-      onClick,
     } = this.props;
     const barChartData: BarChartDatum[] = this.generateBarChartData(data);
 
@@ -70,7 +77,7 @@ export default class PopulationChart extends React.PureComponent<Props> {
         xTickFormat={xTickFormatter}
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}
-        onClick={onClick}
+        onClick={this.handleClick}
         onMouseEnter={handleHover}
         transitionDuration={100}
       />

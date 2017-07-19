@@ -212,7 +212,7 @@ class SelectedRegionInformation extends React.Component<Props> {
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
           maxY={maxConsumptionOrAvailability}
-          onClick={toggleTimeIndexLock}
+          onToggleLock={toggleTimeIndexLock}
           timeIndexLocked={timeIndexLocked}
         />
       </div>
@@ -247,7 +247,7 @@ class SelectedRegionInformation extends React.Component<Props> {
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
           maxY={maxConsumptionOrAvailability}
-          onClick={toggleTimeIndexLock}
+          onToggleLock={toggleTimeIndexLock}
           timeIndexLocked={timeIndexLocked}
         />
       </div>
@@ -276,7 +276,7 @@ class SelectedRegionInformation extends React.Component<Props> {
           }
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
-          onClick={toggleTimeIndexLock}
+          onToggleLock={toggleTimeIndexLock}
           timeIndexLocked={timeIndexLocked}
         />
       </div>

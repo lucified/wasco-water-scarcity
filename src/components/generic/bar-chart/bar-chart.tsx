@@ -23,7 +23,7 @@ export interface Props {
   yTickFormat?: (value: number) => string;
   onMouseEnter?: (item: BarChartDatum) => void;
   onMouseOut?: (item: BarChartDatum) => void;
-  onClick?: () => void;
+  onClick?: (item: BarChartDatum) => void;
   maxYValue?: number;
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
@@ -57,20 +57,13 @@ interface HoverRectProps {
 }
 
 class HoverRect extends React.PureComponent<HoverRectProps> {
-  constructor(props: HoverRectProps) {
-    super(props);
-
-    this.handleMouseOut = this.handleMouseOut.bind(this);
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
-  }
-
-  private handleMouseOut() {
+  private handleMouseOut = () => {
     this.props.onMouseOut(this.props.data);
-  }
+  };
 
-  private handleMouseEnter() {
+  private handleMouseEnter = () => {
     this.props.onMouseEnter(this.props.data);
-  }
+  };
 
   public render() {
     const { x, y, width, height } = this.props;
@@ -109,13 +102,6 @@ export default class BarChart extends React.Component<Props, {}> {
   private _xAxis?: Axis<string> | null;
   private _enrichedData?: BarChartDatum[] | null;
   private _mouseOutTimer?: any;
-
-  constructor(props: Props) {
-    super(props);
-
-    this.handleMouseOut = this.handleMouseOut.bind(this);
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
-  }
 
   public componentWillReceiveProps(nextProps: Props) {
     if (nextProps.data !== this.props.data) {
@@ -323,21 +309,31 @@ export default class BarChart extends React.Component<Props, {}> {
     );
   }
 
-  private handleMouseEnter(item: BarChartDatum) {
+  private handleMouseEnter = (item: BarChartDatum) => {
     const { onMouseEnter } = this.props;
     if (onMouseEnter) {
       onMouseEnter(item);
     }
-  }
+  };
 
-  private handleMouseOut(item: BarChartDatum) {
+  private handleMouseOut = (item: BarChartDatum) => {
     const { onMouseOut } = this.props;
     if (onMouseOut) {
       this._mouseOutTimer = setTimeout(() => {
         onMouseOut(item);
       }, 100);
     }
-  }
+  };
+
+  private handleMouseClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    const { marginLeft, data, onClick } = this.props as PropsWithDefaults;
+    if (onClick) {
+      const xScale = this.getXScale();
+      const barWidth = xScale.step();
+      const index = Math.floor((e.nativeEvent.offsetX - marginLeft) / barWidth);
+      onClick(data[index]);
+    }
+  };
 
   public render() {
     const {
@@ -347,7 +343,6 @@ export default class BarChart extends React.Component<Props, {}> {
       height,
       width,
       transitionDuration,
-      onClick,
     } = this.props as PropsWithDefaults;
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
@@ -356,7 +351,7 @@ export default class BarChart extends React.Component<Props, {}> {
         className={classNames(styles.chart, className)}
         height={height}
         width={width}
-        onClick={onClick}
+        onClick={this.handleMouseClick}
       >
         <g transform={`translate(${marginLeft}, ${marginTop})`}>
           <rect

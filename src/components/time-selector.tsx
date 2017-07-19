@@ -135,6 +135,14 @@ class TimeSelector extends React.PureComponent<Props> {
       })),
   );
 
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, setSelectedTime } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    setSelectedTime(item.key);
+  };
+
   public render() {
     const {
       data,
@@ -143,7 +151,6 @@ class TimeSelector extends React.PureComponent<Props> {
       selectedWorldRegion,
       setSelectedTime,
       timeIndexLocked,
-      onToggleLock,
     } = this.props;
     if (!data) {
       return null;
@@ -175,7 +182,7 @@ class TimeSelector extends React.PureComponent<Props> {
           selectedIndex={selectedIndex}
           indexLocked={timeIndexLocked}
           onMouseEnter={handleHover}
-          onClick={onToggleLock}
+          onClick={this.handleClick}
           hideSelectedLabel
           transitionDuration={100}
         />

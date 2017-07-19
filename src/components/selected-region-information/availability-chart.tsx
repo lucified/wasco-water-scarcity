@@ -11,7 +11,7 @@ interface PassedProps {
   selectedTimeIndex: number;
   timeIndexLocked?: boolean;
   onTimeIndexChange: (value: number) => void;
-  onClick?: () => void;
+  onToggleLock?: () => void;
   maxY?: number;
 }
 
@@ -34,6 +34,14 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
     })),
   );
 
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, onTimeIndexChange } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    onTimeIndexChange(item.key);
+  };
+
   public render() {
     const {
       data,
@@ -41,7 +49,6 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
       onTimeIndexChange,
       maxY,
       timeIndexLocked,
-      onClick,
     } = this.props;
     const barChartData: BarChartDatum[] = this.generateBarChartData(data);
 
@@ -71,7 +78,7 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}
         onMouseEnter={handleHover}
-        onClick={onClick}
+        onClick={this.handleClick}
         transitionDuration={100}
       />
     );
