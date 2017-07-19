@@ -41,6 +41,7 @@ interface PassedProps {
   minY?: number;
   yAxisLabel?: string;
   selectedTimeIndex?: number;
+  selectedTimeIndexLocked?: boolean;
   selectedDataSeries?: string;
   selectedDataSeriesLocked?: boolean;
   onChartHover?: (hoveredIndex: number) => void; // Hovering on top of the chart
@@ -161,6 +162,7 @@ class LineChart extends React.Component<Props> {
       marginTop,
       width,
       height,
+      selectedTimeIndexLocked,
       selectedDataSeries,
       selectedDataSeriesLocked,
       backgroundColorScale,
@@ -232,6 +234,7 @@ class LineChart extends React.Component<Props> {
           'width',
           xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start),
         )
+        .attr('stroke-width', selectedTimeIndexLocked ? 2 : 0)
         .attr('class', styles['selected-area']);
     }
 
@@ -344,6 +347,7 @@ class LineChart extends React.Component<Props> {
       backgroundColorScale,
       selectedDataSeries,
       selectedDataSeriesLocked,
+      selectedTimeIndexLocked,
       data,
       onLineHover,
     } = this.props as PropsWithDefaults;
@@ -454,7 +458,11 @@ class LineChart extends React.Component<Props> {
         .select('rect#selected-group')
         .transition(t)
           .attr('x', xScale(selectedDataPoint.start))
-          .attr('width', xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start));
+          .attr(
+            'width',
+            xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start),
+          )
+          .attr('stroke-width', selectedTimeIndexLocked ? 2 : 0);
 
       // prettier-ignore
       g

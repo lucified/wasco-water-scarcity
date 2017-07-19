@@ -3,7 +3,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../actions';
+import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
 import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
@@ -11,6 +11,7 @@ import {
   getSelectedHistoricalTimeIndex,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
+  isHistoricalTimeIndexLocked,
 } from '../selectors';
 import {
   AggregateStressShortageDatum,
@@ -27,10 +28,12 @@ interface GeneratedStateProps {
   data?: AggregateStressShortageDatum[];
   dataType: DataType;
   selectedWorldRegion?: WorldRegion;
+  timeIndexLocked: boolean;
 }
 
 interface GeneratedDispatchProps {
   setSelectedTime: (value: number) => void;
+  onToggleLock: () => void;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
@@ -139,6 +142,8 @@ class TimeSelector extends React.PureComponent<Props> {
       selectedIndex,
       selectedWorldRegion,
       setSelectedTime,
+      timeIndexLocked,
+      onToggleLock,
     } = this.props;
     if (!data) {
       return null;
@@ -168,7 +173,9 @@ class TimeSelector extends React.PureComponent<Props> {
           yTickFormat={yTickFormatter}
           xTickFormat={xTickFormatter}
           selectedIndex={selectedIndex}
+          indexLocked={timeIndexLocked}
           onMouseEnter={handleHover}
+          onClick={onToggleLock}
           hideSelectedLabel
           transitionDuration={100}
         />
@@ -193,6 +200,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     data,
     dataType: getSelectedDataType(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
+    timeIndexLocked: isHistoricalTimeIndexLocked(state),
   };
 }
 
@@ -201,12 +209,13 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     setSelectedTime: (value: number) => {
       dispatch(setTimeIndex(value));
     },
+    onToggleLock: () => {
+      dispatch(toggleHistoricalTimeIndexLock());
+    },
   };
 }
 
 export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
   mapStateToProps,
   mapDispatchToProps,
-)(TimeSelector as any);
-// For some reason the typings don't allow for a function that can return null
-// even though it's allowed.
+)(TimeSelector);

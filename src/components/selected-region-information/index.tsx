@@ -5,7 +5,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setTimeIndex } from '../../actions';
+import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../../actions';
 import { StateTree } from '../../reducers';
 import {
   getSelectedHistoricalTimeIndex,
@@ -14,6 +14,7 @@ import {
   getThresholdsForDataType,
   getTimeSeriesForSelectedGlobalRegion,
   getTimeSeriesForSelectedWaterRegion,
+  isHistoricalTimeIndexLocked,
 } from '../../selectors';
 import {
   AggregateStressShortageDatum,
@@ -41,12 +42,14 @@ interface GeneratedStateProps {
   selectedWorldRegion?: WorldRegion;
   timeSeriesForSelectedWaterRegion?: StressShortageDatum[];
   timeSeriesForSelectedWorldRegion?: AggregateStressShortageDatum[];
+  timeIndexLocked: boolean;
   stressThresholds: number[];
   shortageThresholds: number[];
 }
 
 interface GeneratedDispatchProps {
   setTimeIndex: (value: number) => void;
+  toggleTimeIndexLock: () => void;
 }
 
 interface DefaultProps {
@@ -104,6 +107,8 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       stressThresholds,
       selectedTimeIndex,
+      toggleTimeIndexLock,
+      timeIndexLocked,
     } = this.props as PropsWithDefaults;
 
     if (['stress', 'scarcity'].indexOf(dataType) < 0) {
@@ -128,6 +133,8 @@ class SelectedRegionInformation extends React.Component<Props> {
               data={timeSeriesForSelectedWaterRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
+              onClick={toggleTimeIndexLock}
+              timeIndexLocked={timeIndexLocked}
             />
           : <div className={styles.empty}>Select a unit</div>}
       </div>
@@ -140,6 +147,8 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       shortageThresholds,
       selectedTimeIndex,
+      toggleTimeIndexLock,
+      timeIndexLocked,
     } = this.props as PropsWithDefaults;
 
     if (['shortage', 'scarcity'].indexOf(dataType) < 0) {
@@ -167,6 +176,8 @@ class SelectedRegionInformation extends React.Component<Props> {
               data={timeSeriesForSelectedWaterRegion}
               selectedTimeIndex={selectedTimeIndex}
               onTimeIndexChange={this.handleTimeIndexChange}
+              onClick={toggleTimeIndexLock}
+              timeIndexLocked={timeIndexLocked}
             />
           : <div className={styles.empty}>Select a unit</div>}
       </div>
@@ -179,6 +190,8 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       selectedTimeIndex,
+      toggleTimeIndexLock,
+      timeIndexLocked,
     } = this.props as PropsWithDefaults;
 
     if (['stress', 'shortage'].indexOf(dataType) < 0) {
@@ -199,6 +212,8 @@ class SelectedRegionInformation extends React.Component<Props> {
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
           maxY={maxConsumptionOrAvailability}
+          onClick={toggleTimeIndexLock}
+          timeIndexLocked={timeIndexLocked}
         />
       </div>
     );
@@ -210,6 +225,8 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       selectedTimeIndex,
+      toggleTimeIndexLock,
+      timeIndexLocked,
     } = this.props as PropsWithDefaults;
 
     if (['stress', 'shortage'].indexOf(dataType) < 0) {
@@ -230,6 +247,8 @@ class SelectedRegionInformation extends React.Component<Props> {
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
           maxY={maxConsumptionOrAvailability}
+          onClick={toggleTimeIndexLock}
+          timeIndexLocked={timeIndexLocked}
         />
       </div>
     );
@@ -240,6 +259,8 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       selectedTimeIndex,
+      toggleTimeIndexLock,
+      timeIndexLocked,
     } = this.props as PropsWithDefaults;
 
     return (
@@ -255,6 +276,8 @@ class SelectedRegionInformation extends React.Component<Props> {
           }
           selectedTimeIndex={selectedTimeIndex}
           onTimeIndexChange={this.handleTimeIndexChange}
+          onClick={toggleTimeIndexLock}
+          timeIndexLocked={timeIndexLocked}
         />
       </div>
     );
@@ -321,6 +344,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     timeSeriesForSelectedWorldRegion: getTimeSeriesForSelectedGlobalRegion(
       state,
     ),
+    timeIndexLocked: isHistoricalTimeIndexLocked(state),
     stressThresholds: getThresholdsForDataType(state, 'stress'),
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   };
@@ -330,6 +354,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   return {
     setTimeIndex: (value: number) => {
       dispatch(setTimeIndex(value));
+    },
+    toggleTimeIndexLock: () => {
+      dispatch(toggleHistoricalTimeIndexLock());
     },
   };
 }

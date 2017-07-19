@@ -28,6 +28,7 @@ export interface Props {
   className?: string;
   xTickValues?: (xscale: ScaleBand<string>) => string[];
   selectedIndex?: number;
+  indexLocked?: boolean;
   hideSelectedLabel?: boolean;
   transitionDuration?: number;
 }
@@ -255,7 +256,7 @@ export default class BarChart extends React.Component<Props, {}> {
   }
 
   private getSelectionBackground() {
-    const { data, selectedIndex } = this.props;
+    const { data, selectedIndex, indexLocked } = this.props;
     if (selectedIndex == null) {
       return null;
     }
@@ -265,7 +266,10 @@ export default class BarChart extends React.Component<Props, {}> {
 
     return (
       <rect
-        className={styles['selection-background']}
+        className={classNames(
+          styles['selection-background'],
+          indexLocked && styles.locked,
+        )}
         x={
           xScale(String(selectedData.key))! -
           xScale.paddingInner() * xScale.step() / 2

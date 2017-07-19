@@ -12,7 +12,9 @@ import { Datum } from '../../types';
 interface PassedProps {
   data: Datum[];
   selectedTimeIndex: number;
+  timeIndexLocked?: boolean;
   onTimeIndexChange: (value: number) => void;
+  onClick?: () => void;
   maxY?: number;
 }
 
@@ -111,7 +113,13 @@ class ConsumptionChart extends React.Component<Props, State> {
   }
 
   public render() {
-    const { data, maxY, selectedTimeIndex } = this.props;
+    const {
+      data,
+      maxY,
+      selectedTimeIndex,
+      timeIndexLocked,
+      onClick,
+    } = this.props;
     const { hoveredType } = this.state;
     const chartMaxValue = hoveredType ? max(data, d => d[hoveredType]) : maxY;
 
@@ -128,6 +136,8 @@ class ConsumptionChart extends React.Component<Props, State> {
           yTickFormat={yTickFormatter}
           xTickFormat={this.xTickFormatter}
           selectedIndex={selectedTimeIndex}
+          onClick={onClick}
+          indexLocked={timeIndexLocked}
           onMouseEnter={this.handleBarHover}
           transitionDuration={100}
         />

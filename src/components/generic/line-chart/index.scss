@@ -16,17 +16,14 @@
 }
 
 .selected-area {
-  fill: black;
-  fill-opacity: 0.1;
-  stroke-width: 0;
+  fill: #eee;
+  stroke: darkgray; // Only shown if time is "locked"
 }
 
 .selected-label {
   font-size: 12px;
   color: black;
-  text-shadow:
-    -1px 1px 0 white,
-    1px 1px 0 white;
+  text-shadow: -1px 1px 0 white, 1px 1px 0 white;
 }
 
 .line-label {

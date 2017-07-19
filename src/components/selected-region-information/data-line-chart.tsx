@@ -17,6 +17,8 @@ interface PassedProps {
   data: StressShortageDatum[];
   selectedTimeIndex: number;
   onTimeIndexChange: (value: number) => void;
+  timeIndexLocked?: boolean;
+  onClick?: () => void;
 }
 
 type Props = PassedProps;
@@ -31,6 +33,8 @@ export default function DataLineChart({
   yAxisLabel,
   selectedTimeIndex,
   onTimeIndexChange,
+  onClick,
+  timeIndexLocked,
 }: Props) {
   const chartData: Data = {
     id,
@@ -60,6 +64,8 @@ export default function DataLineChart({
       selectedDataSeries={id}
       selectedTimeIndex={selectedTimeIndex}
       onChartHover={onTimeIndexChange}
+      onClick={onClick}
+      selectedTimeIndexLocked={timeIndexLocked}
       backgroundColorScale={backgroundColorScale}
       marginRight={0}
       marginTop={15}
