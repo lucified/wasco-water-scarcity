@@ -15,6 +15,10 @@ import 'react-select/dist/react-select.css';
 import * as styles from './future-scenario-filter.scss';
 
 interface PassedProps {
+  climateModel: string;
+  climateExperiment: string;
+  impactModel: string;
+  population: string;
   className?: string;
 }
 
@@ -39,8 +43,12 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-function toOptions(values: string[]): Select.Option[] {
-  return values.map(value => ({ value, label: value }));
+function toOptions(values: string[], selectedValue: string): Select.Option[] {
+  return values.map(value => ({
+    value,
+    label: value,
+    clearableValue: value !== selectedValue,
+  }));
 }
 
 class FutureScenarioFilter extends React.Component<Props> {
@@ -93,6 +101,10 @@ class FutureScenarioFilter extends React.Component<Props> {
     const {
       selectedFutureFilters,
       selectedFutureDataset,
+      impactModel,
+      climateExperiment,
+      climateModel,
+      population,
       className,
     } = this.props;
     return (
@@ -103,7 +115,10 @@ class FutureScenarioFilter extends React.Component<Props> {
             Climate scenario:
             <Select
               className={styles.dropdown}
-              options={toOptions(selectedFutureDataset.climateExperiments)}
+              options={toOptions(
+                selectedFutureDataset.climateExperiments,
+                climateExperiment,
+              )}
               name="Climate experiments"
               clearable={false}
               multi
@@ -115,7 +130,7 @@ class FutureScenarioFilter extends React.Component<Props> {
             Population scenarios:
             <Select
               className={styles.dropdown}
-              options={toOptions(selectedFutureDataset.populations)}
+              options={toOptions(selectedFutureDataset.populations, population)}
               name="Populations"
               clearable={false}
               multi
@@ -130,7 +145,10 @@ class FutureScenarioFilter extends React.Component<Props> {
             Impact models:
             <Select
               className={styles.dropdown}
-              options={toOptions(selectedFutureDataset.impactModels)}
+              options={toOptions(
+                selectedFutureDataset.impactModels,
+                impactModel,
+              )}
               name="Impact models"
               multi
               clearable={false}
@@ -142,7 +160,10 @@ class FutureScenarioFilter extends React.Component<Props> {
             Climate models:
             <Select
               className={styles.dropdown}
-              options={toOptions(selectedFutureDataset.climateModels)}
+              options={toOptions(
+                selectedFutureDataset.climateModels,
+                climateModel,
+              )}
               name="Climate models"
               clearable={false}
               multi

@@ -20,4 +20,14 @@
 
 .dropdown {
   width: 260px;
+
+  :global {
+    .Select-value-label {
+      font-weight: bold;
+    }
+
+    .Select-value-icon + .Select-value-label {
+      font-weight: normal;
+    }
+  }
 }

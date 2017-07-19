@@ -176,7 +176,12 @@ class FutureBody extends React.Component<Props> {
         <div className="row between-xs">
           <div className="col-xs-12 col-md-8">
             <h1>The Future?</h1>
-            <FutureScenarioFilter />
+            <FutureScenarioFilter
+              impactModel={selectedImpactModel}
+              climateModel={selectedClimateModel}
+              climateExperiment={selectedClimateExperiment}
+              population={selectedPopulation}
+            />
           </div>
           <div
             className={classNames(
