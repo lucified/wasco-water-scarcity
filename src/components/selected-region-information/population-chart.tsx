@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import memoize from '../../memoize';
 import { Datum } from '../../types';
+import { formatPopulation } from '../../utils';
 
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
@@ -16,8 +17,6 @@ interface PassedProps {
 }
 
 type Props = PassedProps;
-
-const yTickFormatter = (d: number) => format('.2s')(d).replace('G', 'B');
 
 export default class PopulationChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
@@ -73,7 +72,7 @@ export default class PopulationChart extends React.PureComponent<Props> {
         marginRight={0}
         marginTop={15}
         marginLeft={40}
-        yTickFormat={yTickFormatter}
+        yTickFormat={formatPopulation}
         xTickFormat={xTickFormatter}
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}

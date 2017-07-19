@@ -19,6 +19,7 @@ import {
   getDataTypeColors,
   WorldRegion,
 } from '../types';
+import { formatPopulation } from '../utils';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 
@@ -123,8 +124,6 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
   return `Population living in water ${dataType} in ${worldRegion.name}`;
 }
 
-const yTickFormatter = (d: number) => format('.2s')(d).replace('G', 'B');
-
 class TimeSelector extends React.PureComponent<Props> {
   private generateBarChartData = memoize(
     (data: AggregateStressShortageDatum[], dataType: DataType) =>
@@ -184,7 +183,7 @@ class TimeSelector extends React.PureComponent<Props> {
           marginRight={0}
           marginTop={5}
           marginLeft={40}
-          yTickFormat={yTickFormatter}
+          yTickFormat={formatPopulation}
           xTickFormat={xTickFormatter}
           selectedIndex={selectedIndex}
           indexLocked={timeIndexLocked}
