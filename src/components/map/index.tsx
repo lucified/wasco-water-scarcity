@@ -117,6 +117,7 @@ class Map extends React.Component<Props> {
     this.generateScales();
     this.drawMap();
     this.drawLegend();
+    this.zoomToGlobalArea(false);
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -300,7 +301,7 @@ class Map extends React.Component<Props> {
     g.call(this.addLegendLabels);
   }
 
-  private zoomToGlobalArea() {
+  private zoomToGlobalArea(useTransition = true) {
     const { selectedWorldRegion } = this.props;
     const svg = select<SVGElement, undefined>(this.svgRef!);
 
@@ -338,7 +339,7 @@ class Map extends React.Component<Props> {
 
     const ourZoom = zoom().on('zoom', zoomed);
 
-    const t = transition('zoom').duration(750);
+    const t = transition('zoom').duration(useTransition ? 750 : 0);
     svg
       .transition(t)
       .call(
