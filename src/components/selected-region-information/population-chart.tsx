@@ -17,7 +17,7 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-const yTickFormatter = format('.2s');
+const yTickFormatter = (d: number) => format('.2s')(d).replace('G', 'B');
 
 export default class PopulationChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
