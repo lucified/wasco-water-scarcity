@@ -9,6 +9,7 @@
 .link {
   cursor: pointer;
   border-bottom: 1px dashed $color-darker-gray;
+  white-space: nowrap;
 }
 
 .select {

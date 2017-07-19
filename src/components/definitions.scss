@@ -1,8 +1,11 @@
 // FONT
 
-$bodyFontSize: 17px; // in pixels
-$fontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-$bodyLineHeight: 1.8;
+$bodyFontSize: 18px; // in pixels
+$bodyFontFamily: 'Source Serif Pro', 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$headingFontFamily: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+$labelFontFamily: $headingFontFamily;
+
+$bodyLineHeight: 1.64;
 
 // BREAKPOINTS
 
@@ -29,8 +32,8 @@ $color-lighter-gray: #f0e9e9;
 $color-light-gray: #e5dddb;
 $color-gray: #999999;
 $color-dark-gray: #807775;
-$color-darker-gray: #292220;
-$color-darkest-gray: #0b1328;
+$color-darker-gray: #373433;
+$color-darkest-gray: #131212;
 $color-lightest-gray-with-transparency: rgba($color-lightest-gray, 0.04);
 $color-lighter-red: #e19791;
 $color-dark-red: #930e03;
@@ -88,17 +91,22 @@ $default-margin: 20px;
 }
 
 .body-text {
-  font-family: $fontFamily;
+  font-family: $bodyFontFamily;
   font-size: $bodyFontSize;
   line-height: $bodyLineHeight;
   color: $color-darker-gray;
+
+  b {
+    color: $color-darkest-gray;
+  }
 }
 
 .secondary-content {
   @extend .body-text;
 
-  font-size: 14px;
+  font-size: 15px;
   padding-left: $default-margin;
+  padding-top: 5px;
   border-left: 1px solid $color-light-gray;
 }
 

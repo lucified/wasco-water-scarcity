@@ -4,13 +4,18 @@
   @import '~normalize.css/normalize';
   @import '~flexboxgrid/dist/flexboxgrid.min';
   @import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&amp;subset=latin-ext,cyrillic,latin");
+  @import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,700');
 
   *, *:before, *:after {
     box-sizing: border-box;
   }
 
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $headingFontFamily !important;
+    color: $color-darkest-gray;
+  }
+
   body {
-    font-family: $fontFamily !important;
     height: 100%;
     margin: 0;
     overflow-y: scroll; // Always show scrollbar
