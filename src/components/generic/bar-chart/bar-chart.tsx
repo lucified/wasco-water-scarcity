@@ -133,7 +133,7 @@ export default class BarChart extends React.Component<Props, {}> {
     if (!this._xAxis) {
       const xscale = this.getXScale();
       this._xAxis = axisBottom<string>(xscale)
-        .tickSize(5)
+        .tickSize(3)
         .tickFormat(this.props.xTickFormat!);
       if (xTickValues) {
         this._xAxis.tickValues(xTickValues);

@@ -22,22 +22,13 @@ svg.chart {
 
   /* render tick marks */
   line {
-    fill: none;
-    stroke: $color-darker-gray;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
+    display: none;
   }
 
   /* do not render axis */
   path {
     fill: none;
     stroke: lighten(#000, 80);
-  }
-}
-
-.tick {
-  text {
-    font-size: 0.7rem;
   }
 }
 
