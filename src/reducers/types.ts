@@ -11,6 +11,7 @@ import {
 
 export interface SelectionsTree {
   historicalTimeIndex: number;
+  lockHistoricalTimeIndex: boolean;
   futureTimeIndex: number;
   futureDataset: FutureDataset;
   futureFilters: {
@@ -24,6 +25,7 @@ export interface SelectionsTree {
   climateModel: string;
   climateExperiment: string; // Only used in Future page
   population: string; // Only used in Future page
+  lockFutureScenario: boolean;
   timeScale: TimeScale;
   worldRegion: number;
   region?: number;

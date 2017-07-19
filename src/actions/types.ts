@@ -7,9 +7,9 @@ import {
   WorldRegion,
 } from '../types';
 
-export const SET_TIME_INDEX = 'SET_TIME_INDEX';
+export const SET_HISTORICAL_TIME_INDEX = 'SET_HISTORICAL_TIME_INDEX';
 export interface SetTimeIndexAction {
-  type: 'SET_TIME_INDEX';
+  type: 'SET_HISTORICAL_TIME_INDEX';
   value: number;
 }
 
@@ -119,6 +119,17 @@ export interface StoreFutureDataAction {
   data: FutureData;
 }
 
+export const TOGGLE_HISTORICAL_TIME_INDEX_LOCK =
+  'TOGGLE_HISTORICAL_TIME_INDEX_LOCK';
+export interface ToggleHistoricalTimeIndexLockAction {
+  type: 'TOGGLE_HISTORICAL_TIME_INDEX_LOCK';
+}
+
+export const TOGGLE_FUTURE_SCENARIO_LOCK = 'TOGGLE_FUTURE_SCENARIO_LOCK';
+export interface ToggleFutureScenarioLockAction {
+  type: 'TOGGLE_FUTURE_SCENARIO_LOCK';
+}
+
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
@@ -136,4 +147,6 @@ export type Action =
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction
   | StoreWaterToWorldRegionMapAction
+  | ToggleHistoricalTimeIndexLockAction
+  | ToggleFutureScenarioLockAction
   | ToggleSelectedRegionAction;

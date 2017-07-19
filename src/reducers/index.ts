@@ -5,6 +5,7 @@ import { combineReducers } from 'redux';
 import {
   Action,
   SET_FUTURE_TIME_INDEX,
+  SET_HISTORICAL_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_FUTURE_FILTERS,
@@ -14,12 +15,13 @@ import {
   SET_SELECTED_TIME_SCALE,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
-  SET_TIME_INDEX,
   STORE_FUTURE_DATA,
   STORE_WATER_DATA,
   STORE_WATER_REGION_DATA,
   STORE_WATER_TO_WORLD_REGION_MAP,
   STORE_WORLD_REGION_DATA,
+  TOGGLE_FUTURE_SCENARIO_LOCK,
+  TOGGLE_HISTORICAL_TIME_INDEX_LOCK,
   TOGGLE_SELECTED_REGION,
 } from '../actions';
 import {
@@ -48,6 +50,7 @@ const defaultState: StateTree = {
   },
   selections: {
     historicalTimeIndex: 0,
+    lockHistoricalTimeIndex: false,
     futureTimeIndex: 0,
     futureDataset: defaultFutureDataset,
     futureFilters: {
@@ -62,6 +65,7 @@ const defaultState: StateTree = {
     dataType: 'stress',
     population: 'SSP1',
     climateExperiment: 'rcp8p5',
+    lockFutureScenario: false,
     worldRegion: 0, // 0 means global
   },
 };
@@ -168,8 +172,11 @@ function selectionsReducer(
   action: Action,
 ): SelectionsTree {
   switch (action.type) {
-    case SET_TIME_INDEX:
-      if (action.value !== state.historicalTimeIndex) {
+    case SET_HISTORICAL_TIME_INDEX:
+      if (
+        !state.lockHistoricalTimeIndex &&
+        action.value !== state.historicalTimeIndex
+      ) {
         return {
           ...state,
           historicalTimeIndex: action.value,
@@ -323,10 +330,11 @@ function selectionsReducer(
       return state;
     case SET_SELECTED_SCENARIO:
       if (
-        action.climateModel !== state.climateModel ||
-        action.climateExperiment !== state.climateExperiment ||
-        action.impactModel !== state.impactModel ||
-        action.population !== state.population
+        !state.lockFutureScenario &&
+        (action.climateModel !== state.climateModel ||
+          action.climateExperiment !== state.climateExperiment ||
+          action.impactModel !== state.impactModel ||
+          action.population !== state.population)
       ) {
         return {
           ...state,
@@ -369,6 +377,16 @@ function selectionsReducer(
       }
 
       return state;
+    case TOGGLE_HISTORICAL_TIME_INDEX_LOCK:
+      return {
+        ...state,
+        lockHistoricalTimeIndex: !state.lockHistoricalTimeIndex,
+      };
+    case TOGGLE_FUTURE_SCENARIO_LOCK:
+      return {
+        ...state,
+        lockFutureScenario: !state.lockFutureScenario,
+      };
   }
 
   return state;

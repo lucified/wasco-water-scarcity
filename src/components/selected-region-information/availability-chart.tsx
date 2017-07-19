@@ -9,7 +9,9 @@ import BarChart, { BarChartDatum } from '../generic/bar-chart';
 interface PassedProps {
   data: Datum[];
   selectedTimeIndex: number;
+  timeIndexLocked?: boolean;
   onTimeIndexChange: (value: number) => void;
+  onToggleLock?: () => void;
   maxY?: number;
 }
 
@@ -32,8 +34,22 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
     })),
   );
 
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, onTimeIndexChange } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    onTimeIndexChange(item.key);
+  };
+
   public render() {
-    const { data, selectedTimeIndex, onTimeIndexChange, maxY } = this.props;
+    const {
+      data,
+      selectedTimeIndex,
+      onTimeIndexChange,
+      maxY,
+      timeIndexLocked,
+    } = this.props;
     const barChartData: BarChartDatum[] = this.generateBarChartData(data);
 
     function handleHover(item: BarChartDatum) {
@@ -60,7 +76,9 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
         yTickFormat={yTickFormatter}
         xTickFormat={xTickFormatter}
         selectedIndex={selectedTimeIndex}
+        indexLocked={timeIndexLocked}
         onMouseEnter={handleHover}
+        onClick={this.handleClick}
         transitionDuration={100}
       />
     );

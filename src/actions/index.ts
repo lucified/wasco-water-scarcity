@@ -17,6 +17,7 @@ import {
 } from '../types';
 import {
   SET_FUTURE_TIME_INDEX,
+  SET_HISTORICAL_TIME_INDEX,
   SET_SELECTED_CLIMATE_MODEL,
   SET_SELECTED_DATA_TYPE,
   SET_SELECTED_FUTURE_FILTERS,
@@ -26,7 +27,6 @@ import {
   SET_SELECTED_TIME_SCALE,
   SET_SELECTED_WORLD_REGION,
   SET_THRESHOLDS_FOR_DATA_TYPE,
-  SET_TIME_INDEX,
   SetFutureTimeIndexAction,
   SetSelectedClimateModelAction,
   SetSelectedDataTypeAction,
@@ -48,13 +48,17 @@ import {
   StoreWaterRegionDataAction,
   StoreWaterToWorldRegionMapAction,
   StoreWorldRegionDataAction,
+  TOGGLE_FUTURE_SCENARIO_LOCK,
+  TOGGLE_HISTORICAL_TIME_INDEX_LOCK,
   TOGGLE_SELECTED_REGION,
+  ToggleFutureScenarioLockAction,
+  ToggleHistoricalTimeIndexLockAction,
   ToggleSelectedRegionAction,
 } from './types';
 
 export function setTimeIndex(value: number): SetTimeIndexAction {
   return {
-    type: SET_TIME_INDEX,
+    type: SET_HISTORICAL_TIME_INDEX,
     value,
   };
 }
@@ -199,6 +203,18 @@ export function storeWaterToWorldRegionMap(map: {
   return {
     type: STORE_WATER_TO_WORLD_REGION_MAP,
     map,
+  };
+}
+
+export function toggleHistoricalTimeIndexLock(): ToggleHistoricalTimeIndexLockAction {
+  return {
+    type: TOGGLE_HISTORICAL_TIME_INDEX_LOCK,
+  };
+}
+
+export function toggleFutureScenarioLock(): ToggleFutureScenarioLockAction {
+  return {
+    type: TOGGLE_FUTURE_SCENARIO_LOCK,
   };
 }
 

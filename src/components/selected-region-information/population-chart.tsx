@@ -9,6 +9,8 @@ import BarChart, { BarChartDatum } from '../generic/bar-chart';
 interface PassedProps {
   data: Datum[];
   selectedTimeIndex: number;
+  timeIndexLocked?: boolean;
+  onToggleLock?: () => void;
   onTimeIndexChange: (value: number) => void;
   maxY?: number;
 }
@@ -32,8 +34,22 @@ export default class PopulationChart extends React.PureComponent<Props> {
     })),
   );
 
+  private handleClick = (item: BarChartDatum) => {
+    const { onToggleLock, onTimeIndexChange } = this.props;
+    if (onToggleLock) {
+      onToggleLock();
+    }
+    onTimeIndexChange(item.key);
+  };
+
   public render() {
-    const { data, selectedTimeIndex, onTimeIndexChange, maxY } = this.props;
+    const {
+      data,
+      selectedTimeIndex,
+      onTimeIndexChange,
+      maxY,
+      timeIndexLocked,
+    } = this.props;
     const barChartData: BarChartDatum[] = this.generateBarChartData(data);
 
     function handleHover(item: BarChartDatum) {
@@ -60,6 +76,8 @@ export default class PopulationChart extends React.PureComponent<Props> {
         yTickFormat={yTickFormatter}
         xTickFormat={xTickFormatter}
         selectedIndex={selectedTimeIndex}
+        indexLocked={timeIndexLocked}
+        onClick={this.handleClick}
         onMouseEnter={handleHover}
         transitionDuration={100}
       />
