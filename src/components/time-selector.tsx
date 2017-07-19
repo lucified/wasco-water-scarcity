@@ -123,7 +123,7 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
   return `Population living in water ${dataType} in ${worldRegion.name}`;
 }
 
-const yTickFormatter = format('.2s');
+const yTickFormatter = (d: number) => format('.2s')(d).replace('G', 'B');
 
 class TimeSelector extends React.PureComponent<Props> {
   private generateBarChartData = memoize(
@@ -162,7 +162,14 @@ class TimeSelector extends React.PureComponent<Props> {
 
     function xTickFormatter(i: string) {
       const index = Number(i);
-      return `${data![index].startYear}-${data![index].endYear}`;
+      const d = data![index];
+      if (d.startYear === d.endYear) {
+        return data!.length > 20
+          ? `'${format('02d')(d.startYear % 100)}`
+          : String(d.startYear);
+      }
+
+      return `${d.startYear}-${d.endYear}`;
     }
 
     return (
