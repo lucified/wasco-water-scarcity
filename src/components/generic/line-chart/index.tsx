@@ -238,22 +238,6 @@ class LineChart extends React.Component<Props> {
         .attr('class', styles['selected-area']);
     }
 
-    if (selectedDataPoint) {
-      g
-        .append('text')
-        .attr('id', 'selected-label')
-        .attr('class', styles['selected-label'])
-        .attr('x', 9)
-        .attr('dy', '.35em')
-        .attr(
-          'transform',
-          `translate(${xScale(
-            toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
-          )},${yScale(selectedDataPoint.value)})`,
-        )
-        .text(this.numberFormatter(selectedDataPoint.value));
-    }
-
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
     g
       .append('rect')
@@ -290,6 +274,22 @@ class LineChart extends React.Component<Props> {
           onLineHover(d.id);
         }
       });
+
+    if (selectedDataPoint) {
+      g
+        .append('text')
+        .attr('id', 'selected-label')
+        .attr('class', styles['selected-label'])
+        .attr('x', 9)
+        .attr('dy', '.35em')
+        .attr(
+          'transform',
+          `translate(${xScale(
+            toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
+          )},${yScale(selectedDataPoint.value)})`,
+        )
+        .text(this.numberFormatter(selectedDataPoint.value));
+    }
   }
 
   private findClosestIndex(date: Date) {
