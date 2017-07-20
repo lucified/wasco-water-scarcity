@@ -30,7 +30,7 @@ interface GeneratedStateProps {
 
 type PassedProps = RouteComponentProps<void>;
 
-type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
+export type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 export default function withPageData(
   Component: React.ComponentClass<Props>,

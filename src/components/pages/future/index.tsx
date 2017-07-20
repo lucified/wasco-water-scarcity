@@ -171,6 +171,13 @@ class FutureBody extends React.Component<Props> {
       selectedPopulation,
     } = this.props;
 
+    const yearString =
+      mapData &&
+      (mapData.startYear !== mapData.endYear
+        ? `${mapData.startYear}-${mapData.endYear}`
+        : mapData.startYear);
+    const yearLabel = mapData && ` for ${yearString}`;
+
     return (
       <div>
         <div className="row between-xs">
@@ -220,7 +227,9 @@ class FutureBody extends React.Component<Props> {
               </div>
               <div className="row">
                 <div className="col-xs-12">
-                  <h2>Selected scenario</h2>
+                  <h2>
+                    Selected scenario{yearLabel}
+                  </h2>
                   {!mapData
                     ? <div className={styles.error}>
                         No data found for selected model.
