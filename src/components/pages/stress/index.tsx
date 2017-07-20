@@ -1,10 +1,7 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
-import { WaterRegionGeoJSON } from '../../../data/types';
-import { DataType, TimeAggregate } from '../../../types';
-import withPageData from '../with-page-data';
+import withPageData, { Props } from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
@@ -14,18 +11,11 @@ import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import YearLabel from '../../year-label';
 import Description from './description';
 import MoreInformation from './more-information';
 
 import * as styles from './index.scss';
-
-interface PassedProps extends RouteComponentProps<void> {
-  setSelectedDataType: (dataType: DataType) => void;
-  selectedWaterData?: TimeAggregate<number>;
-  waterRegions?: WaterRegionGeoJSON;
-}
-
-type Props = PassedProps;
 
 class StressBody extends React.Component<Props> {
   public componentDidMount() {
@@ -68,7 +58,12 @@ class StressBody extends React.Component<Props> {
                 </div>
               </div>
               <div className="row">
-                <div className="col-xs-12">
+                <div className={classNames(styles.map, 'col-xs-12')}>
+                  <YearLabel
+                    className={styles['year-label']}
+                    startYear={selectedWaterData.startYear}
+                    endYear={selectedWaterData.endYear}
+                  />
                   <Map
                     width={1200}
                     selectedData={selectedWaterData}

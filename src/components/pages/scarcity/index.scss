@@ -8,3 +8,14 @@
 .threshold-selector {
   margin-bottom: $default-margin;
 }
+
+.map {
+  position: relative;
+}
+
+.year-label {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 18px;
+}

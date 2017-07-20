@@ -1,10 +1,7 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 
-import { WaterRegionGeoJSON } from '../../../data/types';
-import { DataType, TimeAggregate } from '../../../types';
-import withPageData from '../with-page-data';
+import withPageData, { Props } from '../with-page-data';
 
 import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
@@ -16,18 +13,11 @@ import SelectedRegionInformation from '../../selected-region-information';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
+import YearLabel from '../../year-label';
 import Description from './description';
 import MoreInformation from './more-information';
 
 import * as styles from './index.scss';
-
-interface PassedProps extends RouteComponentProps<void> {
-  setSelectedDataType: (dataType: DataType) => void;
-  selectedWaterData?: TimeAggregate<number>;
-  waterRegions?: WaterRegionGeoJSON;
-}
-
-type Props = PassedProps;
 
 class ScarcityBody extends React.Component<Props> {
   public componentDidMount() {
@@ -84,7 +74,19 @@ class ScarcityBody extends React.Component<Props> {
                 </div>
               </div>
               <div className="row middle-xs">
-                <div className="col-xs-12 col-md-6 col-lg-8">
+                <div
+                  className={classNames(
+                    'col-xs-12',
+                    'col-md-6',
+                    'col-lg-8',
+                    styles.map,
+                  )}
+                >
+                  <YearLabel
+                    className={styles['year-label']}
+                    startYear={selectedWaterData.startYear}
+                    endYear={selectedWaterData.endYear}
+                  />
                   <Map
                     width={800}
                     selectedData={selectedWaterData}
