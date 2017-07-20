@@ -12,6 +12,7 @@ interface Props {
   items: LegendItem[];
   reverse?: boolean;
   onHover?: (title?: string) => void;
+  className?: string;
 }
 
 interface State {
@@ -92,8 +93,10 @@ export default class Legend extends React.Component<Props, State> {
   }
 
   public render() {
+    const { className } = this.props;
+
     return (
-      <div className={styles.legend}>
+      <div className={classNames(styles.legend, className)}>
         {this.getLegendItems()}
       </div>
     );
