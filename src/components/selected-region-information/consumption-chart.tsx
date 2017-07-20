@@ -11,6 +11,8 @@ import memoize from '../../memoize';
 import { Datum } from '../../types';
 import { formatYearRange } from '../../utils';
 
+import * as styles from './consumption-chart.scss';
+
 interface PassedProps {
   data: Datum[];
   selectedTimeIndex: number;
@@ -149,7 +151,10 @@ class ConsumptionChart extends React.Component<Props, State> {
           onMouseEnter={this.handleBarHover}
           transitionDuration={100}
         />
-        <Legend items={legendItems} onHover={this.handleLegendHover} />
+        <div className={styles.legend}>
+          <span className={styles.instructions}>Hover to filter:</span>
+          <Legend items={legendItems} onHover={this.handleLegendHover} />
+        </div>
       </div>
     );
   }
