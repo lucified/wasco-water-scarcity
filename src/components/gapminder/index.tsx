@@ -99,6 +99,8 @@ function GapminderWrapper({
         maxX={10000}
         minY={0.01}
         maxY={4}
+        xAxisLabel="Shortage"
+        yAxisLabel="Stress"
         marginLeft={38}
         marginRight={0}
         ySelector={stressSelector}

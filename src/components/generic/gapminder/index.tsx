@@ -66,6 +66,8 @@ interface PassedProps {
   marginTop?: number;
   marginBottom?: number;
   className?: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
   onHover?: (hoveredIndex: number) => void;
   onClick?: (id: string) => void;
   xBackgroundColorScale?: ScaleThreshold<number, string>;
@@ -548,6 +550,8 @@ class Gapminder extends React.Component<Props> {
       marginTop,
       marginBottom,
       marginRight,
+      xAxisLabel,
+      yAxisLabel,
       className,
     } = this.props as PropsWithDefaults;
 
@@ -576,8 +580,31 @@ class Gapminder extends React.Component<Props> {
             id="x-axis"
             className={classNames(styles.axis, styles.x)}
             transform={`translate(0,${height - marginTop - marginBottom})`}
-          />
-          <g id="y-axis" className={classNames(styles.axis, styles.y)} />
+          >
+            {xAxisLabel &&
+              <text
+                id="x-axis-label"
+                className={styles['axis-label']}
+                textAnchor="end"
+                x={width - marginRight - marginLeft}
+                y={30}
+              >
+                {xAxisLabel}
+              </text>}
+          </g>
+          <g id="y-axis" className={classNames(styles.axis, styles.y)}>
+            {yAxisLabel &&
+              <text
+                id="x-axis-label"
+                className={styles['axis-label']}
+                textAnchor="end"
+                x={0}
+                y={-20}
+                transform="rotate(-90)"
+              >
+                {yAxisLabel}
+              </text>}
+          </g>
           <g clipPath="url(#chart-contents)">
             <g id="background-colors">
               <g id="x-colors" />
