@@ -1,3 +1,7 @@
+.svg {
+  overflow: visible !important;
+}
+
 .axis path, .axis line {
   fill: none;
   stroke: #000;
@@ -6,6 +10,12 @@
   &.x path {
     display: none;
   }
+}
+
+.axis-label {
+  fill: #807775;
+  font-size: 13px;
+  font-weight: lighter;
 }
 
 .background-colors {
@@ -30,7 +40,7 @@
 }
 
 .year-label {
-  font: 500 50px "Helvetica Neue";
+  font: 600 50px "Open Sans";
   fill: #ddd;
 
   &.active {

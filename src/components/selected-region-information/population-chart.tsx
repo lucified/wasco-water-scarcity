@@ -1,8 +1,9 @@
-import { format } from 'd3-format';
+import range = require('lodash/range');
 import * as React from 'react';
 
 import memoize from '../../memoize';
 import { Datum } from '../../types';
+import { formatPopulation, formatYearRange } from '../../utils';
 
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
@@ -16,8 +17,6 @@ interface PassedProps {
 }
 
 type Props = PassedProps;
-
-const yTickFormatter = format('.2s');
 
 export default class PopulationChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
@@ -42,6 +41,16 @@ export default class PopulationChart extends React.PureComponent<Props> {
     onTimeIndexChange(item.key);
   };
 
+  private getXTickValues() {
+    const { data } = this.props;
+
+    if (data.length <= 10) {
+      return undefined;
+    }
+
+    return range(0, data.length, Math.floor(data.length / 10)).map(String);
+  }
+
   public render() {
     const {
       data,
@@ -56,12 +65,9 @@ export default class PopulationChart extends React.PureComponent<Props> {
       onTimeIndexChange(item.key);
     }
 
-    function xTickFormatter(index: string) {
-      const formatter = format('02d');
-      const i = Number(index);
-      return `${formatter(data[i].startYear % 100)}-${formatter(
-        data[i].endYear % 100,
-      )}`;
+    function xTickFormatter(i: string) {
+      const d = data[Number(i)];
+      return formatYearRange(d);
     }
 
     return (
@@ -73,8 +79,9 @@ export default class PopulationChart extends React.PureComponent<Props> {
         marginRight={0}
         marginTop={15}
         marginLeft={40}
-        yTickFormat={yTickFormatter}
+        yTickFormat={formatPopulation}
         xTickFormat={xTickFormatter}
+        xTickValues={this.getXTickValues()}
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}
         onClick={this.handleClick}

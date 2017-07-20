@@ -1,4 +1,3 @@
-import { format } from 'd3-format';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -19,6 +18,7 @@ import {
   getDataTypeColors,
   WorldRegion,
 } from '../types';
+import { formatPopulation, formatYearRange } from '../utils';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 
@@ -123,8 +123,6 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
   return `Population living in water ${dataType} in ${worldRegion.name}`;
 }
 
-const yTickFormatter = format('.2s');
-
 class TimeSelector extends React.PureComponent<Props> {
   private generateBarChartData = memoize(
     (data: AggregateStressShortageDatum[], dataType: DataType) =>
@@ -161,8 +159,8 @@ class TimeSelector extends React.PureComponent<Props> {
     }
 
     function xTickFormatter(i: string) {
-      const index = Number(i);
-      return `${data![index].startYear}-${data![index].endYear}`;
+      const d = data![Number(i)];
+      return formatYearRange(d, data!.length <= 20);
     }
 
     return (
@@ -177,7 +175,7 @@ class TimeSelector extends React.PureComponent<Props> {
           marginRight={0}
           marginTop={5}
           marginLeft={40}
-          yTickFormat={yTickFormatter}
+          yTickFormat={formatPopulation}
           xTickFormat={xTickFormatter}
           selectedIndex={selectedIndex}
           indexLocked={timeIndexLocked}
