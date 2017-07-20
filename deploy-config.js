@@ -5,16 +5,10 @@
 const lucifyDeployConfig = require('lucify-deploy-config').default; // eslint-disable-line
 
 const opts = {
-  baseUrl: (_env) => {
-    // TODO
-    return 'https://protected.lucify.com';
-  },
-  publicPath: (_env) => {
-    return '/';
-  },
+  bucket: 'lucify-wasco',
+  baseUrl: 'https://wasco.lucify.com',
+  publicPath: '/',
 };
 
-const env = process.env.CIRCLE_BRANCH === 'master' ? process.env.LUCIFY_ENV || 'staging'
-  : process.env.LUCIFY_ENV || process.env.NODE_ENV || 'development';
-
+const env = 'production';
 module.exports = lucifyDeployConfig(env, opts);

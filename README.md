@@ -43,8 +43,7 @@ yarn run upload-data
 These files will be available under
 `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/`.
 
-
-## Deploying
+## Building a distribution
 
 The end result of this project is a bunch of static HTML, CSS, JS and JSON
 files. The files need to be hosted on the root path of the server and the
@@ -74,4 +73,14 @@ This will start a light-weight local server at [http://localhost:8000](http://lo
 To use the `ws` command, you need to install `local-web-server`
 ```shell
 yarn add global local-web-server
+```
+
+## Deploying to production
+
+The production environment is currently managed by Lucify.
+Production deployments require Lucify's production credentials.
+
+Run a production deployment locally with:
+```
+yarn run deploy
 ```
