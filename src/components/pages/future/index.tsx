@@ -11,11 +11,7 @@ import {
   setSelectedImpactModel,
   setSelectedScenario,
 } from '../../../actions';
-import {
-  FutureData,
-  FutureDataset,
-  WaterRegionGeoJSON,
-} from '../../../data/types';
+import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,

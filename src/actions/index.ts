@@ -7,7 +7,7 @@ import {
   fetchWorldRegionsData,
   generateWaterToWorldRegionsMap,
 } from '../data';
-import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data/types';
+import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data';
 import {
   DataType,
   StressShortageDatum,

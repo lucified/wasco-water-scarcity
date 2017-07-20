@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../../actions';
+import { getDataTypeColors } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedHistoricalTimeIndex,
@@ -20,7 +21,6 @@ import {
   AggregateStressShortageDatum,
   DataType,
   Datum,
-  getDataTypeColors,
   StressShortageDatum,
   WorldRegion,
 } from '../../types';

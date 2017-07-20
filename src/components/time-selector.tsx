@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
+import { getDataTypeColors } from '../data';
 import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
@@ -12,12 +13,7 @@ import {
   getTimeSeriesForSelectedGlobalRegion,
   isHistoricalTimeIndexLocked,
 } from '../selectors';
-import {
-  AggregateStressShortageDatum,
-  DataType,
-  getDataTypeColors,
-  WorldRegion,
-} from '../types';
+import { AggregateStressShortageDatum, DataType, WorldRegion } from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';

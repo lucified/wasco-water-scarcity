@@ -5,19 +5,14 @@ import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
 import { setSelectedDataType } from '../../actions/index';
-import { WaterRegionGeoJSON } from '../../data/types';
+import { scarcitySelector, WaterRegionGeoJSON } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
 } from '../../selectors';
-import {
-  DataType,
-  scarcitySelector,
-  StressShortageDatum,
-  TimeAggregate,
-} from '../../types';
+import { DataType, StressShortageDatum, TimeAggregate } from '../../types';
 
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;

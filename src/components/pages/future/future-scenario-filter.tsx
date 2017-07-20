@@ -4,7 +4,7 @@ import { connect, Dispatch } from 'react-redux';
 import * as Select from 'react-select';
 
 import { setSelectedFutureFilters } from '../../../actions';
-import { FutureDataset } from '../../../data/types';
+import { FutureDataset } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedFutureDataset,

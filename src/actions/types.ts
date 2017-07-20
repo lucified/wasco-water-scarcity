@@ -1,4 +1,4 @@
-import { FutureData, WaterRegionGeoJSON } from '../data/types';
+import { FutureData, WaterRegionGeoJSON } from '../data';
 import {
   DataType,
   StressShortageDatum,

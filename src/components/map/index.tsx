@@ -19,9 +19,10 @@ import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import { defaultDataTypeThresholdMaxValues } from '../../data';
 import {
+  getDataTypeColors,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
-} from '../../data/types';
+} from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getSelectedDataType,
@@ -29,12 +30,7 @@ import {
   getSelectedWorldRegion,
   getThresholdsForDataType,
 } from '../../selectors';
-import {
-  DataType,
-  getDataTypeColors,
-  TimeAggregate,
-  WorldRegion,
-} from '../../types';
+import { DataType, TimeAggregate, WorldRegion } from '../../types';
 
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');

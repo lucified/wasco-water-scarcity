@@ -7,6 +7,7 @@ import {
   setTimeIndex as setTimeIndexAction,
   toggleSelectedRegion as toggleSelectedRegionAction,
 } from '../../actions';
+import { getDataTypeColors } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
@@ -16,7 +17,6 @@ import {
   getThresholdsForDataType,
   getWaterToWorldRegionMap,
 } from '../../selectors';
-import { getDataTypeColors } from '../../types';
 
 import Gapminder, { Data } from '../generic/gapminder';
 

@@ -1,4 +1,4 @@
-import { WorldRegionGeoJSONFeature } from './data/types';
+import { WorldRegionGeoJSONFeature } from './data';
 
 export interface TimeAggregate<T> {
   startYear: number;
@@ -64,42 +64,3 @@ export interface StressShortageDatum extends Datum {
 
 export type DataType = 'stress' | 'shortage' | 'scarcity';
 export type TimeScale = 'decadal' | 'annual';
-
-export function getDataTypeColors(dataType: DataType) {
-  switch (dataType) {
-    case 'stress':
-      // From d3-scale-chromatic's schemePurple
-      return ['#cbc9e2', '#9e9ac8', '#6a51a3'];
-    case 'shortage':
-      return ['#f5f07f', '#e6dc4c', '#d7c919'];
-    case 'scarcity':
-      return ['#6a51a3', '#d7c919', 'rgb(203, 24, 29)'];
-  }
-
-  console.warn('Unknown data type', dataType);
-  return [];
-}
-
-export function scarcitySelector(
-  scarcityThresholds: number[],
-  stressThresholds: number[],
-  shortageThresholds: number[],
-) {
-  return (d: StressShortageDatum) => {
-    const hasStress = d.stress >= stressThresholds[0];
-    const hasShortage = d.shortage <= shortageThresholds[2];
-    if (hasStress && hasShortage) {
-      return scarcityThresholds[2] + 0.1;
-    }
-
-    if (hasShortage) {
-      return scarcityThresholds[1] + 0.1;
-    }
-
-    if (hasStress) {
-      return scarcityThresholds[0] + 0.1;
-    }
-
-    return scarcityThresholds[0] - 0.1;
-  };
-}

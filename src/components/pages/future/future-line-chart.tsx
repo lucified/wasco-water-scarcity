@@ -6,7 +6,11 @@ import { Dispatch } from 'redux';
 import flattenDeep = require('lodash/flattenDeep');
 
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
-import { FutureData, FutureDataForModel } from '../../../data/types';
+import {
+  FutureData,
+  FutureDataForModel,
+  getDataTypeColors,
+} from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
@@ -18,7 +22,6 @@ import {
   getThresholdsForDataType,
   isFutureScenarioLocked,
 } from '../../../selectors';
-import { getDataTypeColors } from '../../../types';
 
 import LineChart, { Data } from '../../generic/line-chart';
 
