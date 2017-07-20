@@ -9,6 +9,7 @@ import Legend, { LegendItem } from '../generic/legend';
 
 import memoize from '../../memoize';
 import { Datum } from '../../types';
+import { formatYearRange } from '../../utils';
 
 interface PassedProps {
   data: Datum[];
@@ -110,14 +111,8 @@ class ConsumptionChart extends React.Component<Props, State> {
 
   private xTickFormatter = (i: string) => {
     const { data } = this.props;
-    const formatter = format('02d');
-    const index = Number(i);
-    const d = data[index];
-    if (d.startYear === d.endYear) {
-      return `'${formatter(d.startYear % 100)}`;
-    }
-
-    return `'${formatter(d.startYear % 100)}-'${formatter(d.endYear % 100)}`;
+    const d = data[Number(i)];
+    return formatYearRange(d);
   };
 
   private getXTickValues() {

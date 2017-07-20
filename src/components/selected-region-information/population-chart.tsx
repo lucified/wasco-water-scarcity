@@ -1,10 +1,9 @@
-import { format } from 'd3-format';
 import range = require('lodash/range');
 import * as React from 'react';
 
 import memoize from '../../memoize';
 import { Datum } from '../../types';
-import { formatPopulation } from '../../utils';
+import { formatPopulation, formatYearRange } from '../../utils';
 
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
@@ -67,14 +66,8 @@ export default class PopulationChart extends React.PureComponent<Props> {
     }
 
     function xTickFormatter(i: string) {
-      const formatter = format('02d');
-      const index = Number(i);
-      const d = data![index];
-      if (d.startYear === d.endYear) {
-        return `'${formatter(d.startYear % 100)}`;
-      }
-
-      return `'${formatter(d.startYear % 100)}-'${formatter(d.endYear % 100)}`;
+      const d = data[Number(i)];
+      return formatYearRange(d);
     }
 
     return (

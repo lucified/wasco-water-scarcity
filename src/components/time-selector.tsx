@@ -1,4 +1,3 @@
-import { format } from 'd3-format';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -19,7 +18,7 @@ import {
   getDataTypeColors,
   WorldRegion,
 } from '../types';
-import { formatPopulation } from '../utils';
+import { formatPopulation, formatYearRange } from '../utils';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart/index';
 
@@ -160,15 +159,8 @@ class TimeSelector extends React.PureComponent<Props> {
     }
 
     function xTickFormatter(i: string) {
-      const index = Number(i);
-      const d = data![index];
-      if (d.startYear === d.endYear) {
-        return data!.length > 20
-          ? `'${format('02d')(d.startYear % 100)}`
-          : String(d.startYear);
-      }
-
-      return `${d.startYear}-${d.endYear}`;
+      const d = data![Number(i)];
+      return formatYearRange(d, data!.length <= 20);
     }
 
     return (
