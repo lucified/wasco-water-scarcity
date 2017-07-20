@@ -555,7 +555,7 @@ class Gapminder extends React.Component<Props> {
       <svg
         width={width}
         height={height}
-        className={className}
+        className={classNames(styles.svg, className)}
         ref={this.storeSvgRef}
       >
         <defs>
@@ -584,8 +584,8 @@ class Gapminder extends React.Component<Props> {
               <g id="y-colors" />
             </g>
             <g id="dots" />
+            <path id="selected-data" className={styles['selected-line']} />
           </g>
-          <path id="selected-data" className={styles['selected-line']} />
           <rect className={styles.overlay} />
         </g>
       </svg>
