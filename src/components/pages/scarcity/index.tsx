@@ -123,4 +123,4 @@ class ScarcityBody extends React.Component<Props> {
   }
 }
 
-export default withPageData(ScarcityBody, 'scarcity');
+export default withPageData(ScarcityBody);

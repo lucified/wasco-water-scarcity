@@ -8,6 +8,7 @@ import { setSelectedDataType } from '../../actions/index';
 import { scarcitySelector, WaterRegionGeoJSON } from '../../data';
 import { StateTree } from '../../reducers';
 import {
+  getSelectedDataType,
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
@@ -29,10 +30,12 @@ export type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 export default function withPageData(
   Component: React.ComponentClass<Props>,
-  dataType: DataType,
+  // Force the dataType for certain pages, otherwise use the data type from the Redux state.
+  componentDataType?: DataType,
 ) {
   return connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps>(
     (state: StateTree): GeneratedStateProps => {
+      const dataType = componentDataType || getSelectedDataType(state);
       const selectedData = getSelectedStressShortageData(state);
       const selector =
         dataType === 'scarcity'
