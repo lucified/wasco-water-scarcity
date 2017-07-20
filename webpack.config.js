@@ -1,4 +1,5 @@
 const autoprefixer = require('autoprefixer');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const postCssFlexbugsFixer = require('postcss-flexbugs-fixes');
@@ -39,23 +40,27 @@ const rules = [
   },
   {
     test: /\.svg$/,
-    use: [{
-      loader: require.resolve('url-loader'),
-      options: {
-        limit: 10000,
-        mimetype: 'image/svg+xml',
-        name,
+    use: [
+      {
+        loader: require.resolve('url-loader'),
+        options: {
+          limit: 10000,
+          mimetype: 'image/svg+xml',
+          name,
+        },
       },
-    }],
+    ],
   },
   {
     test: /\.(jpeg|jpg|gif|png|eot|woff2|woff|ttf)$/,
-    use: [{
-      loader: require.resolve('file-loader'),
-      options: {
-        name,
+    use: [
+      {
+        loader: require.resolve('file-loader'),
+        options: {
+          name,
+        },
       },
-    }],
+    ],
   },
   {
     test: /\.scss$/,
@@ -142,12 +147,15 @@ const config = {
     path: path.resolve(deployConfig.base.dest),
     publicPath: deployConfig.base.publicPath,
   },
-  entry: [
-    require.resolve('babel-polyfill'),
-    './src/index.tsx',
-  ],
+  entry: [require.resolve('babel-polyfill'), './src/index.tsx'],
   plugins: [
     new HtmlWebpackPlugin(htmlWebpackPluginConfig),
+    new CopyWebpackPlugin([
+      {
+        from: 'public/*',
+        flatten: true,
+      },
+    ]),
     new webpack.DefinePlugin({
       'process.env.ENV': JSON.stringify(deployConfig.env),
     }),
