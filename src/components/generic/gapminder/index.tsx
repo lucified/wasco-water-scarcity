@@ -149,6 +149,7 @@ class Gapminder extends React.Component<Props> {
     this.circleOrder = this.circleOrder.bind(this);
     this.drawCircle = this.drawCircle.bind(this);
     this.drawSelectedPath = this.drawSelectedPath.bind(this);
+    this.drawSelectedDataPoint = this.drawSelectedDataPoint.bind(this);
     this.handleCircleClick = this.handleCircleClick.bind(this);
     this.setYearLabel = this.setYearLabel.bind(this);
     this.drawBackgroundColors = this.drawBackgroundColors.bind(this);
@@ -289,11 +290,19 @@ class Gapminder extends React.Component<Props> {
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),
-      );
-      g
-        .select<SVGPathElement>('path#selected-data')
+      ) as Array<[number, number]>;
+      const selectedGroup = g.select<SVGGElement>('g#selected-data');
+      selectedGroup
+        .select<SVGPathElement>('path')
         .datum(pathData)
         .call(this.drawSelectedPath);
+      selectedGroup
+        .selectAll<SVGCircleElement, [number, number]>('circle')
+        .data(pathData)
+        .enter()
+        .append<SVGCircleElement>('circle')
+        .attr('class', styles['selected-series-dot'])
+        .call(this.drawSelectedDataPoint);
     }
 
     // Add an overlay for the year label.
@@ -481,6 +490,18 @@ class Gapminder extends React.Component<Props> {
     path.attr('d', lineGenerator);
   }
 
+  private drawSelectedDataPoint(
+    circle:
+      | Selection<SVGCircleElement, [number, number], any, any>
+      | Transition<SVGCircleElement, [number, number], any, any>,
+  ) {
+    const { xScale, yScale } = this;
+    circle
+      .attr('cx', d => xScale!(d[0]))
+      .attr('cy', d => yScale!(d[1]))
+      .attr('r', 2.5);
+  }
+
   // Defines a sort order so that the smallest dots are drawn on top.
   // Selected data is always on top.
   private circleOrder(a: ChartDatum, b: ChartDatum) {
@@ -525,16 +546,29 @@ class Gapminder extends React.Component<Props> {
       const pathData = zip(
         xSelector(selectedDataSeries),
         ySelector(selectedDataSeries),
-      );
-      g
-        .select<SVGPathElement>('path#selected-data')
+      ) as Array<[number, number]>;
+
+      const selectedGroup = g.select<SVGGElement>('g#selected-data');
+      selectedGroup
+        .select<SVGPathElement>('path')
         .datum(pathData)
         .call(this.drawSelectedPath);
+      const circles = selectedGroup
+        .selectAll<SVGCircleElement, [number, number]>('circle')
+        .data(pathData);
+      circles
+        .enter()
+        .append<SVGCircleElement>('circle')
+        .attr('class', styles['selected-series-dot'])
+        .merge(circles)
+        .call(this.drawSelectedDataPoint);
+      circles.exit().remove();
     } else {
-      g
-        .select<SVGPathElement>('path#selected-data')
-        .datum(null)
-        .attr('d', null);
+      const selectedGroup = g.select<SVGGElement>('g#selected-data');
+      selectedGroup.select<SVGPathElement>('path').datum(null).attr('d', null);
+      selectedGroup
+        .selectAll<SVGCircleElement, [number, number]>('circle')
+        .remove();
     }
   }
 
@@ -611,7 +645,9 @@ class Gapminder extends React.Component<Props> {
               <g id="y-colors" />
             </g>
             <g id="dots" />
-            <path id="selected-data" className={styles['selected-line']} />
+            <g id="selected-data">
+              <path className={styles['selected-line']} />
+            </g>
           </g>
           <rect className={styles.overlay} />
         </g>
