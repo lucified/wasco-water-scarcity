@@ -30,7 +30,7 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
         {
           key: 'Availability',
           total: d.availability,
-          color: 'green',
+          color: '#60c13c',
         },
       ],
     })),

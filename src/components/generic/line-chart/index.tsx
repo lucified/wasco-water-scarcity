@@ -266,7 +266,7 @@ class LineChart extends React.Component<Props> {
         'stroke',
         d =>
           selectedDataSeriesLocked && d.id === selectedDataSeries
-            ? 'red'
+            ? '#e6007e'
             : d.color,
       )
       .on('mouseenter', d => {
@@ -444,7 +444,7 @@ class LineChart extends React.Component<Props> {
         .style(
           'stroke',
           d => selectedDataSeriesLocked && d.id === selectedDataSeries
-            ? 'red'
+            ? '#e6007e'
             : d.color,
         )
         .attr('d', d => this.lineGenerator!(d.series));

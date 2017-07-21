@@ -27,7 +27,7 @@ export default class PopulationChart extends React.PureComponent<Props> {
         {
           key: 'Population',
           total: d.population,
-          color: 'darkgray',
+          color: '#D3E4E6',
         },
       ],
     })),

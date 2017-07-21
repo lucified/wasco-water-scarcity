@@ -12,11 +12,11 @@
 }
 
 .background-colors {
-  opacity: 0.3;
+  opacity: 0.5;
 }
 
 .selected-area {
-  fill: #eee;
+  fill: rgba(#eee, 0.5);
   stroke: darkgray; // Only shown if time is "locked"
 }
 

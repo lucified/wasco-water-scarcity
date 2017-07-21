@@ -126,7 +126,7 @@ class SelectedRegionInformation extends React.Component<Props> {
         {timeSeriesForSelectedWaterRegion
           ? <DataLineChart
               dataType="stress"
-              dataColor="red"
+              dataColor="darkcyan"
               id="stress"
               thresholds={stressThresholds}
               thresholdColors={['none', ...getDataTypeColors('stress')]}
@@ -166,7 +166,7 @@ class SelectedRegionInformation extends React.Component<Props> {
         {timeSeriesForSelectedWaterRegion
           ? <DataLineChart
               dataType="shortage"
-              dataColor="purple"
+              dataColor="darkcyan"
               thresholds={shortageThresholds}
               thresholdColors={[
                 'none',
