@@ -23,7 +23,6 @@ const styles = require('./index.scss');
 
 export interface CircleData {
   id: string;
-  color: string;
   data: {
     [dataType: string]: number[];
   };
@@ -38,7 +37,6 @@ export interface Data {
 
 interface ChartDatum {
   id: string;
-  color: string;
   x: number[];
   y: number[];
   size: number[];
@@ -96,11 +94,10 @@ function generateChartData(
   sizeSelector: DataSeriesSelector,
 ): ChartDatum[] {
   return Object.keys(allData.circles).map(id => {
-    const { data, color } = allData.circles[id];
+    const { data } = allData.circles[id];
 
     return {
       id,
-      color,
       x: xSelector(data),
       y: ySelector(data),
       size: sizeSelector(data),
@@ -475,8 +472,7 @@ class Gapminder extends React.Component<Props> {
     circle
       .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
       .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
-      .attr('r', d => sizeScale!(d.size[selectedTimeIndex]))
-      .attr('fill', d => d.color);
+      .attr('r', d => sizeScale!(d.size[selectedTimeIndex]));
   }
 
   private drawSelectedPath(

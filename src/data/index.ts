@@ -1,4 +1,3 @@
-import { scaleOrdinal, schemeCategory20 } from 'd3-scale';
 import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
@@ -109,16 +108,9 @@ export function getDefaultFutureDataset() {
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
-  const regionIDs = geoJSON.features.map(r => r.properties.featureId);
-  // Note: we only have 20 unique colors
-  const colorScale = scaleOrdinal<number, string>()
-    .domain(regionIDs)
-    .range(schemeCategory20);
-
   return geoJSON.features.map(region => ({
     id: region.properties.featureId,
     name: region.properties.featureName,
-    color: colorScale(region.properties.featureId),
     feature: region,
   }));
 }

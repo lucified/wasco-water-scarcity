@@ -312,13 +312,11 @@ class Map extends React.Component<Props> {
     if (selectedWorldRegion) {
       const path = geoPath().projection(projection);
       bounds = path.bounds(selectedWorldRegion.feature as any);
-      svg.select('g#selected-region').select('path').remove();
       svg
         .select('g#selected-region')
         .append('path')
         .datum(selectedWorldRegion.feature)
-        .attr('d', path as any)
-        .attr('stroke', selectedWorldRegion.color);
+        .attr('d', path as any);
     } else {
       bounds = [[0, 0], [this.width, this.height]];
     }

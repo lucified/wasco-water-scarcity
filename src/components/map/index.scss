@@ -28,7 +28,8 @@
 }
 
 .selected-region path {
-  stroke-width: 1px;
+  stroke: $color-dark-gray;
+  stroke-width: 0.5px;
   opacity: 0.8;
   fill: none;
 }
