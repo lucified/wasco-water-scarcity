@@ -138,6 +138,4 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
   mapStateToProps,
   mapDispatchToProps,
-)(GapminderWrapper as any);
-// For some reason the typings don't allow for a function that can return null
-// even though it's allowed.
+)(GapminderWrapper);
