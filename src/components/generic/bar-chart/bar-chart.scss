@@ -34,6 +34,7 @@ svg.chart {
 
 .selection-background {
   fill: #eee;
+  opacity: 0.8;
 
   &.locked {
     stroke: darkgray;

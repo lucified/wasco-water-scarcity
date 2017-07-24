@@ -82,7 +82,7 @@ function FutureLineChart({
 
   const chartData: Data[] = filteredData.map(series => ({
     id: series.scenarioId,
-    color: 'blue',
+    color: 'darkcyan',
     series: series.data.map(d => ({
       value: d.regions[selectedWaterRegionId],
       start: new Date(d.y0, 0, 1),
