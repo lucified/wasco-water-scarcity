@@ -17,6 +17,22 @@
   margin-left: 0.5rem;
 }
 
+.disclaimer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 14px;
+  text-align: right;
+  color: $color-darker-gray;
+  font-weight: lighter;
+
+  .label {
+    font-size: 18px;
+    font-weight: normal;
+    margin-bottom: 2px;
+  }
+}
+
 .heading {
   font-size: 48px;
   font-weight: 300;
