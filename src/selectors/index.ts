@@ -357,12 +357,7 @@ export const getDataByRegion = createSelector(
     }
 
     const regionObjects = waterRegions.features.map(feature => {
-      const {
-        featureId: regionId,
-        worldRegionID: worldRegionId,
-      } = feature.properties;
-      const worldRegion = worldRegions.find(r => r.id === worldRegionId);
-      const color = worldRegion ? worldRegion.color : 'lightblue';
+      const { featureId: regionId } = feature.properties;
       const stress: number[] = [];
       const shortage: number[] = [];
       const population: number[] = [];
@@ -377,7 +372,6 @@ export const getDataByRegion = createSelector(
 
       return {
         id: String(regionId),
-        color,
         data: {
           stress,
           shortage,

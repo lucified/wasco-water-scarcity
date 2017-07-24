@@ -11,7 +11,6 @@ export interface TimeAggregate<T> {
 export interface WorldRegion {
   id: number;
   name: string;
-  color: string;
   feature: WorldRegionGeoJSONFeature;
 }
 

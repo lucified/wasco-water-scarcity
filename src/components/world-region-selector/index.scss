@@ -10,6 +10,12 @@
   font-family: $labelFontFamily;
   padding: 0.3rem 0.3rem;
   cursor: pointer;
+  color: $color-darkest-gray;
+
+  &.selected {
+    background-color: $color-darkest-gray;
+    color: white;
+  }
 }
 
 .region-name {
