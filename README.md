@@ -50,17 +50,11 @@ files. The files need to be hosted on the root path of the server and the
 server needs to be configured to direct all requests to `/index.html` in order
 to support react-router routing.
 
-The following commands build a distribution bundle into `dist`. Upload these
-files to your hosting server to deploy.
+The following command builds a production distribution bundle into `dist`.
+Upload these files to your hosting server to deploy.
 
-A *production* distribution:
 ```shell
-NODE_ENV=production yarn run build
-```
-
-A *staging* distribution:
-```shell
-NODE_ENV=staging yarn run build
+yarn run build
 ```
 
 You can test a distribution by:
