@@ -12,10 +12,11 @@
   // TODO: The below is ugly – the scale colors are duplicated here.
   // Fix it somehow.
   :global {
-    .bar-stress, .bar-shortage {
+    .bar-stress,
+    .bar-shortage {
       position: relative;
       top: 2px;
-      background: #D2E3E5;
+      background: #d2e3e5;
       height: 16px;
       border-radius: 8px;
       margin: 0 6px;

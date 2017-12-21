@@ -31,7 +31,6 @@ import {
   getDefaultHistoricalImpactModel,
   getFutureDataset,
   getHistoricalClimateModels,
-  getHistoricalImpactModels,
 } from '../data';
 import { TimeScale } from '../types';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
@@ -249,24 +248,18 @@ function selectionsReducer(
       return state;
     case SET_SELECTED_IMPACT_MODEL:
       if (action.impactModel !== state.impactModel) {
-        let { climateModel, timeScale } = state;
+        let { climateModel } = state;
 
-        if (action.impactModel === 'watergap') {
-          climateModel = 'watch';
-          timeScale = 'decadal';
-        } else {
-          // If watergap/watch was previously selected, we need to switch to a
-          // valid climateModel.
-          if (climateModel === 'watch') {
-            climateModel = getHistoricalClimateModels().filter(
-              m => m !== 'watch',
-            )[0];
-          }
+        // If watch was previously selected, we need to switch to a
+        // valid climateModel.
+        if (climateModel === 'watch') {
+          climateModel = getHistoricalClimateModels().filter(
+            m => m !== 'watch',
+          )[0];
         }
 
         return {
           ...state,
-          timeScale,
           climateModel,
           impactModel: action.impactModel,
         };
@@ -280,14 +273,6 @@ function selectionsReducer(
         if (action.climateModel === 'watch') {
           impactModel = 'watergap';
           timeScale = 'decadal';
-        } else {
-          // If watergap/watch was previously selected, we need to switch to a
-          // valid impactModel.
-          if (impactModel === 'watergap') {
-            impactModel = getHistoricalImpactModels().filter(
-              m => m !== 'watergap',
-            )[0];
-          }
         }
 
         return {
@@ -301,8 +286,8 @@ function selectionsReducer(
       return state;
     case SET_SELECTED_TIME_SCALE:
       if (action.timeScale !== state.timeScale) {
-        if (action.timeScale === 'annual' && state.impactModel === 'watergap') {
-          // Watergap model only has decadal data
+        if (action.timeScale === 'annual' && state.climateModel === 'watch') {
+          // WATCH dataset only has decadal data
           return state;
         }
 

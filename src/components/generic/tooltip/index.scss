@@ -7,7 +7,8 @@
 }
 
 /* Hide the tooltip content by default */
-[data-tooltip]:before, [data-tooltip]:after {
+[data-tooltip]:before,
+[data-tooltip]:after {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -51,7 +52,8 @@
 }
 
 /* Show tooltip content on hover */
-[data-tooltip]:hover:before, [data-tooltip]:hover:after {
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
   visibility: visible;
   opacity: 1;
 }

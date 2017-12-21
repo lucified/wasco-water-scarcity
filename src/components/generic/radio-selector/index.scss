@@ -28,7 +28,8 @@
     white-space: nowrap;
     background-color: white;
 
-    &:before, &:after {
+    &:before,
+    &:after {
       content: '';
       position: absolute;
     }
