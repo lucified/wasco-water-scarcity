@@ -110,7 +110,7 @@
     "upload-data": "atomic-s3 --path=data-external --bucket=lucify-large-files --region=eu-west-1"
   },
   "engines": {
-    "node": "^7.0.0"
+    "node": "^8.0.0"
   },
   "browserslist": [
     "> 1%",
