@@ -37,9 +37,7 @@
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
     "html-webpack-plugin": "^2.29.0",
-    "husky": "^0.14.3",
     "json-loader": "^0.5.7",
-    "lint-staged": "^4.0.2",
     "lucify-deploy-config": "^0.1.8",
     "lucify-notifier": "^0.1.17",
     "node-sass": "^4.5.3",
@@ -102,11 +100,8 @@
     "deploy-chatops": "[ -z \"$AWS_TEMPORARY\" ] || yarn run deploy-and-notify",
     "upload": "atomic-s3 --verbose",
     "compile": "tsc",
-    "lint": "tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js'",
-    "prettify": "prettier --parser typescript --single-quote --trailing-comma all --write \"src/**/*.ts?(x)\"",
-    "lint-staged-stash": "git stash save --keep-index 'lint-staged' && touch .didstash || rm .didstash || true",
-    "lint-staged-stash-pop": "test -f .didstash && rm .didstash && git stash pop || true",
-    "precommit": "lint-staged",
+    "lint": "tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js' && prettier --single-quote --trailing-comma all --list-different \"src/**/*.ts?(x)\" \"src/**/*.scss\"",
+    "prettify": "prettier --single-quote --trailing-comma all --write \"src/**/*.ts?(x)\" \"src/**/*.scss\"",
     "upload-data": "atomic-s3 --path=data-external --bucket=lucify-large-files --region=eu-west-1"
   },
   "engines": {
@@ -115,19 +110,5 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ],
-  "lint-staged": {
-    "*.js?(x)": [
-      "lint-staged-stash",
-      "prettier --single-quote --trailing-comma all --write",
-      "git add",
-      "lint-staged-stash-pop"
-    ],
-    "*.ts?(x)": [
-      "lint-staged-stash",
-      "prettier --parser typescript --single-quote --trailing-comma all --write",
-      "git add",
-      "lint-staged-stash-pop"
-    ]
-  }
+  ]
 }
