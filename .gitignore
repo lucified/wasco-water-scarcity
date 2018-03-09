@@ -9,3 +9,4 @@ npm-debug.log*
 .didstash
 data-external
 .awspublish*
+yarn-error.log
