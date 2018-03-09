@@ -1,7 +1,7 @@
 import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
-import values = require('lodash/values');
 import uniq = require('lodash/uniq');
+import values = require('lodash/values');
 import {
   DataType,
   StressShortageDatum,
@@ -19,6 +19,7 @@ import {
   WorldRegionGeoJSON,
 } from './types';
 
+// tslint:disable:no-implicit-dependencies
 // FIXME: We needed to change the file extension for this in order to override
 // Webpack's built-in JSON imports because it currently seems that we can't
 // override JSON importing with inline loader declarations (e.g.

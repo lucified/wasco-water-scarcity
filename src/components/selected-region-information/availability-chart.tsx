@@ -1,6 +1,6 @@
 import { format } from 'd3-format';
-import * as React from 'react';
 import range = require('lodash/range');
+import * as React from 'react';
 
 import memoize from '../../memoize';
 import { Datum } from '../../types';
