@@ -13,17 +13,17 @@
 }
 
 .water-region {
-  stroke-width: .5px;
+  stroke-width: 0.5px;
   stroke: #ccc;
-  transition: opacity .2s ease-in;
+  transition: opacity 0.2s ease-in;
 
   &.selected {
     stroke: black;
-    transition: opacity .2s ease-out;
+    transition: opacity 0.2s ease-out;
   }
   &.unselected {
     opacity: 0.5;
-    transition: opacity .2s ease-out;
+    transition: opacity 0.2s ease-out;
   }
 }
 

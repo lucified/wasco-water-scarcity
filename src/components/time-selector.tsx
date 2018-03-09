@@ -161,9 +161,7 @@ class TimeSelector extends React.PureComponent<Props> {
 
     return (
       <div>
-        <h3>
-          {getTitle(dataType, selectedWorldRegion)}
-        </h3>
+        <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
         <BarChart
           data={this.generateBarChartData(data, dataType)}
           height={120}

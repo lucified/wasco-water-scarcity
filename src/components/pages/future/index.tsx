@@ -198,54 +198,56 @@ class FutureBody extends React.Component<Props> {
             <TimeScaleSelector />
           </div>
         </div>
-        {!waterRegions || !allScenariosInSelectedDataset
-          ? <Spinner className={styles.spinner} />
-          : <div>
-              <div className="row bottom-xs between-xs">
-                <div className="col-xs-12 col-md-8">
-                  <FutureLineChart
-                    onLineHover={this.handleLineHover}
-                    width={790}
-                    height={240}
-                  />
-                </div>
-                <div className="col-xs-12 col-md-4">
-                  <FutureScenarioDescription
-                    className={styles['secondary-content']}
-                    estimateLabel={selectedDataType}
-                    includeConsumption={selectedDataType === 'stress'}
-                    climateModel={selectedClimateModel}
-                    climateExperiment={selectedClimateExperiment}
-                    population={selectedPopulation}
-                    impactModel={selectedImpactModel}
-                  />
-                </div>
+        {!waterRegions || !allScenariosInSelectedDataset ? (
+          <Spinner className={styles.spinner} />
+        ) : (
+          <div>
+            <div className="row bottom-xs between-xs">
+              <div className="col-xs-12 col-md-8">
+                <FutureLineChart
+                  onLineHover={this.handleLineHover}
+                  width={790}
+                  height={240}
+                />
               </div>
-              <div className="row">
-                <div className="col-xs-12">
-                  <h2>
-                    Selected scenario{yearLabel}
-                  </h2>
-                  {!mapData
-                    ? <div className={styles.error}>
-                        No data found for selected model.
-                      </div>
-                    : <div>
-                        <Map
-                          width={1000}
-                          selectedData={mapData}
-                          waterRegions={waterRegions}
-                        />
-                        <WorldRegionSelector />
-                      </div>}
-                </div>
+              <div className="col-xs-12 col-md-4">
+                <FutureScenarioDescription
+                  className={styles['secondary-content']}
+                  estimateLabel={selectedDataType}
+                  includeConsumption={selectedDataType === 'stress'}
+                  climateModel={selectedClimateModel}
+                  climateExperiment={selectedClimateExperiment}
+                  population={selectedPopulation}
+                  impactModel={selectedImpactModel}
+                />
               </div>
-              <div className="row">
-                <div className="col-xs-12">
-                  <CrossReferences fromPage="future" />
-                </div>
+            </div>
+            <div className="row">
+              <div className="col-xs-12">
+                <h2>Selected scenario{yearLabel}</h2>
+                {!mapData ? (
+                  <div className={styles.error}>
+                    No data found for selected model.
+                  </div>
+                ) : (
+                  <div>
+                    <Map
+                      width={1000}
+                      selectedData={mapData}
+                      waterRegions={waterRegions}
+                    />
+                    <WorldRegionSelector />
+                  </div>
+                )}
               </div>
-            </div>}
+            </div>
+            <div className="row">
+              <div className="col-xs-12">
+                <CrossReferences fromPage="future" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

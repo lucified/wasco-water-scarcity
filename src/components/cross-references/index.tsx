@@ -34,13 +34,13 @@ export default class Header extends React.Component<Props> {
       <div className={classNames('col-xs-12', styles.root)}>
         <h3>Where to from here?</h3>
         <div className="row">
-          {references[fromPage].map(link =>
+          {references[fromPage].map(link => (
             <div className="col-xs" key={`link-to-${link.url}`}>
               <NavLink key={link.url} className={styles.link} to={link.url}>
                 {link.title}
               </NavLink>
-            </div>,
-          )}
+            </div>
+          ))}
         </div>
       </div>
     );

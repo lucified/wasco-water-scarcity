@@ -96,27 +96,24 @@ class App extends React.Component<Props> {
   }
 }
 
-export default hot(module)(connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(
-  (state: StateTree): GeneratedStateProps => ({
-    selectedClimateModel: getSelectedClimateModel(state),
-    selectedImpactModel: getSelectedImpactModel(state),
-    selectedTimeScale: getSelectedTimeScale(state),
-  }),
-  (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
-    loadMapData: () => {
-      dispatch(loadMapData());
-    },
-    loadModelData: (
-      climateModel: string,
-      impactModel: string,
-      timeScale: string,
-    ) => {
-      dispatch(loadModelData(climateModel, impactModel, timeScale));
-    },
-  }),
-)(App));
+export default hot(module)(
+  connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
+    (state: StateTree): GeneratedStateProps => ({
+      selectedClimateModel: getSelectedClimateModel(state),
+      selectedImpactModel: getSelectedImpactModel(state),
+      selectedTimeScale: getSelectedTimeScale(state),
+    }),
+    (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
+      loadMapData: () => {
+        dispatch(loadMapData());
+      },
+      loadModelData: (
+        climateModel: string,
+        impactModel: string,
+        timeScale: string,
+      ) => {
+        dispatch(loadModelData(climateModel, impactModel, timeScale));
+      },
+    }),
+  )(App),
+);

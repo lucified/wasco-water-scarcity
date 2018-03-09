@@ -12,9 +12,5 @@ interface Props {
 export default function YearLabel({ startYear, endYear, className }: Props) {
   const label =
     startYear === endYear ? startYear : [startYear, endYear].join('-');
-  return (
-    <div className={classNames(styles.label, className)}>
-      {label}
-    </div>
-  );
+  return <div className={classNames(styles.label, className)}>{label}</div>;
 }

@@ -50,9 +50,7 @@ export default function withPageData(
           : (d: StressShortageDatum) => d[dataType];
       const dataForComponent = selectedData && {
         ...selectedData,
-        data: mapValues(selectedData.data, d =>
-          selector(d),
-        ),
+        data: mapValues(selectedData.data, d => selector(d)),
       };
       return {
         selectedWaterData: dataForComponent,

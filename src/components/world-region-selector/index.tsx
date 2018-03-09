@@ -37,7 +37,7 @@ class WorldRegionSelector extends React.Component<Props> {
         {[
           { id: 0, name: 'Global', color: 'black' },
           ...(worldRegions || []),
-        ].map(({ id, name }) =>
+        ].map(({ id, name }) => (
           <a
             key={`world-region-selector-${id}`}
             onClick={this.generateClickCallback(id)}
@@ -45,11 +45,9 @@ class WorldRegionSelector extends React.Component<Props> {
               [styles.selected]: selectedWorldRegionId === id,
             })}
           >
-            <span className={styles['region-name']}>
-              {name}
-            </span>
-          </a>,
-        )}
+            <span className={styles['region-name']}>{name}</span>
+          </a>
+        ))}
       </div>
     );
   }

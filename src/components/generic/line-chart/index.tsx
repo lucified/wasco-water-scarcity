@@ -119,11 +119,10 @@ class LineChart extends React.Component<Props> {
     const chartHeight = height - marginTop - marginBottom;
 
     this.xScale = scaleTime<number, number>()
-      .domain(
-        extent(
-          flatMap(seriesData.map(d => [d.start, d.end])),
-        ) as [Date, Date],
-      )
+      .domain(extent(flatMap(seriesData.map(d => [d.start, d.end]))) as [
+        Date,
+        Date
+      ])
       .range([0, chartWidth]);
     this.yScale = scaleLinear()
       .domain([minY || dataValueExtent[0], maxY || dataValueExtent[1]])
@@ -509,7 +508,7 @@ class LineChart extends React.Component<Props> {
             transform={`translate(0,${height - marginTop - marginBottom})`}
           />
           <g id="y-axis">
-            {yAxisLabel &&
+            {yAxisLabel && (
               <text
                 transform="rotate(-90)"
                 y="6"
@@ -517,7 +516,8 @@ class LineChart extends React.Component<Props> {
                 className={styles['y-axis-label']}
               >
                 {yAxisLabel}
-              </text>}
+              </text>
+            )}
           </g>
         </g>
       </svg>

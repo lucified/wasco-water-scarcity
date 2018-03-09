@@ -27,10 +27,12 @@ export default function FutureModelDescription({
     <div className={className}>
       This scenario of blue water {estimateLabel} is produced using{' '}
       <span className={styles.assumption}>blue water availability</span>
-      {includeConsumption &&
+      {includeConsumption && (
         <span>
-          {' '}and <span className={styles.assumption}>consumption</span>
-        </span>}{' '}
+          {' '}
+          and <span className={styles.assumption}>consumption</span>
+        </span>
+      )}{' '}
       estimates from the water model{' '}
       <span className={styles.assumption}>{impactModel}</span>, driven by
       climate data from{' '}

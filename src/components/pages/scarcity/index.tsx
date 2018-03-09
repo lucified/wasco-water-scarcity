@@ -48,73 +48,75 @@ class ScarcityBody extends React.Component<Props> {
             />
           </div>
         </div>
-        {!selectedWaterData || !waterRegions
-          ? <div className="row middle-xs">
-              <div className="col-xs-12">
-                <Spinner />
+        {!selectedWaterData || !waterRegions ? (
+          <div className="row middle-xs">
+            <div className="col-xs-12">
+              <Spinner />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="row middle-xs">
+              <div className="col-xs-12 col-md-8">
+                <TimeSelector />
+              </div>
+              <div className="col-xs-12 col-md-4">
+                <div className={styles.selectors}>
+                  <ThresholdSelector
+                    className={styles['threshold-selector']}
+                    dataType="stress"
+                  />
+                  <ThresholdSelector
+                    className={styles['threshold-selector']}
+                    dataType="shortage"
+                  />
+                  <DataTypeSelector />
+                </div>
               </div>
             </div>
-          : <div>
-              <div className="row middle-xs">
-                <div className="col-xs-12 col-md-8">
-                  <TimeSelector />
-                </div>
-                <div className="col-xs-12 col-md-4">
-                  <div className={styles.selectors}>
-                    <ThresholdSelector
-                      className={styles['threshold-selector']}
-                      dataType="stress"
-                    />
-                    <ThresholdSelector
-                      className={styles['threshold-selector']}
-                      dataType="shortage"
-                    />
-                    <DataTypeSelector />
-                  </div>
-                </div>
+            <div className="row middle-xs">
+              <div
+                className={classNames(
+                  'col-xs-12',
+                  'col-md-6',
+                  'col-lg-8',
+                  styles.map,
+                )}
+              >
+                <YearLabel
+                  className={styles['year-label']}
+                  startYear={selectedWaterData.startYear}
+                  endYear={selectedWaterData.endYear}
+                />
+                <Map
+                  width={800}
+                  selectedData={selectedWaterData}
+                  waterRegions={waterRegions}
+                />
               </div>
-              <div className="row middle-xs">
-                <div
-                  className={classNames(
-                    'col-xs-12',
-                    'col-md-6',
-                    'col-lg-8',
-                    styles.map,
-                  )}
-                >
-                  <YearLabel
-                    className={styles['year-label']}
-                    startYear={selectedWaterData.startYear}
-                    endYear={selectedWaterData.endYear}
-                  />
-                  <Map
-                    width={800}
-                    selectedData={selectedWaterData}
-                    waterRegions={waterRegions}
-                  />
-                </div>
-                <div className="col-xs-12 col-md-6 col-lg-4">
-                  <GapMinder />
-                </div>
+              <div className="col-xs-12 col-md-6 col-lg-4">
+                <GapMinder />
               </div>
-              <div className="row">
-                <WorldRegionSelector />
+            </div>
+            <div className="row">
+              <WorldRegionSelector />
+            </div>
+            <div className="row">
+              <SelectedRegionInformation />
+            </div>
+            <div className="row">
+              <div
+                className={classNames(
+                  'col-xs-12',
+                  'col-md-6',
+                  styles['body-text'],
+                )}
+              >
+                <MoreInformation />
               </div>
-              <div className="row">
-                <SelectedRegionInformation />
-              </div>
-              <div className="row">
-                <div
-                  className={classNames(
-                    'col-xs-12',
-                    'col-md-6',
-                    styles['body-text'],
-                  )}
-                >
-                  <MoreInformation />
-                </div>
-              </div>
-            </div>}
+            </div>
+          </div>
+        )}
         <div className="row">
           <CrossReferences fromPage="scarcity" />
         </div>

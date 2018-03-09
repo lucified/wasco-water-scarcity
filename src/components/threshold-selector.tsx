@@ -51,9 +51,7 @@ function getHeaderText(dataType: 'stress' | 'shortage') {
       : 'Consumption relative to availability';
   return (
     <span>
-      <strong>
-        {dataType.charAt(0).toUpperCase() + dataType.slice(1)}:
-      </strong>{' '}
+      <strong>{dataType.charAt(0).toUpperCase() + dataType.slice(1)}:</strong>{' '}
       {text}
     </span>
   );
@@ -73,9 +71,7 @@ function ThresholdSelector({
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
     <div className={className}>
-      <div className={styles.header}>
-        {getHeaderText(dataType)}
-      </div>
+      <div className={styles.header}>{getHeaderText(dataType)}</div>
       <ReactSlider
         min={min}
         max={slidingMax}
@@ -92,15 +88,15 @@ function ThresholdSelector({
         onChange={setThresholds}
       />
       <div className={styles.labels}>
-        {thresholds.map((d, i) =>
+        {thresholds.map((d, i) => (
           <span
             className={styles.label}
             style={{ left: `${(d - min) / (slidingMax - min) * 100}%` }}
             key={`${dataType}-threshold-label-${i}`}
           >
             {formatter(d)}
-          </span>,
-        )}
+          </span>
+        ))}
       </div>
       <div className={styles.reset}>
         <span

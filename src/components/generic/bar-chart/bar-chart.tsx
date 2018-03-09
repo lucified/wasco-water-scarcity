@@ -219,7 +219,7 @@ export default class BarChart extends React.Component<Props, {}> {
     return data.map(barData => {
       const bars = barData.values
         .filter(d => d.total > 0)
-        .map(barSegmentData =>
+        .map(barSegmentData => (
           <Bar
             key={`${barData.key}-${barSegmentData.key}`}
             width={barWidth}
@@ -228,8 +228,8 @@ export default class BarChart extends React.Component<Props, {}> {
             scale={yScale}
             fill={barSegmentData.color!}
             transitionDuration={transitionDuration}
-          />,
-        );
+          />
+        ));
       return (
         <g
           key={barData.key}
@@ -295,7 +295,7 @@ export default class BarChart extends React.Component<Props, {}> {
     const { data } = this.props;
     const xScale = this.getXScale();
 
-    return data.map(d =>
+    return data.map(d => (
       <HoverRect
         key={`hover-${d.key}`}
         x={xScale(String(d.key))!}
@@ -305,8 +305,8 @@ export default class BarChart extends React.Component<Props, {}> {
         onMouseOut={this.handleMouseOut}
         onMouseEnter={this.handleMouseEnter}
         data={d}
-      />,
-    );
+      />
+    ));
   }
 
   private handleMouseEnter = (item: BarChartDatum) => {

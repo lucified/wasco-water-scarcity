@@ -40,7 +40,8 @@ export default class InlineSelector extends React.Component<
     this.setState({ editing: true });
   };
 
-  private handleChange = (option: any) => { // TODO: fix typing
+  private handleChange = (option: any) => {
+    // TODO: fix typing
     this.props.onChange(option);
     this.setState({ editing: false });
   };

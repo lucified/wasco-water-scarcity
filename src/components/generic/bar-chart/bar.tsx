@@ -79,7 +79,9 @@ export default class Bar extends React.Component<Props, any> {
       );
     }
 
-    select(this.barRef).transition(t as any).attr('height', height);
+    select(this.barRef)
+      .transition(t as any)
+      .attr('height', height);
   }
 
   private storeBarRef(ref: SVGRectElement) {

@@ -14,14 +14,10 @@ export default function ShortageMoreInformation() {
       <Link to="/sustainability">sustainability</Link>, availability typically
       only considers renewable freshwater, not{' '}
       <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
-      <Link to="/interbasin-water-transfers">
-        Interbasin water transfers
-      </Link>{' '}
+      <Link to="/interbasin-water-transfers">Interbasin water transfers</Link>{' '}
       are usually also analysed separately.{' '}
       <Link to="/green-water">"Green water"</Link> (rainfall and soil moisture)
-      and <Link to="/virtual-water-dependency/shortage">
-        "virtual water"
-      </Link>{' '}
+      and <Link to="/virtual-water-dependency/shortage">"virtual water"</Link>{' '}
       (importing water-using products) can also increase the effective
       availability of water. These other sources of water could potentially
       decrease water shortage, but bring with them other side-effects.

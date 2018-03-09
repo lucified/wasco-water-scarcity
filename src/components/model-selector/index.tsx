@@ -71,10 +71,12 @@ function ModelSelector({
       <div className={styles.content}>
         These estimates of blue water {estimateLabel} are produced using{' '}
         <span className={styles.assumption}>blue water availability</span>
-        {includeConsumption &&
+        {includeConsumption && (
           <span>
-            {' '}and <span className={styles.assumption}>consumption</span>
-          </span>}{' '}
+            {' '}
+            and <span className={styles.assumption}>consumption</span>
+          </span>
+        )}{' '}
         estimates from the water model{' '}
         <InlineSelector
           options={impactModelOptions}

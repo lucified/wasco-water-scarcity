@@ -119,24 +119,24 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>
-          {title}
-        </h4>
+        <h4 className={styles.heading}>{title}</h4>
         <p className={styles.description}>Consumption / Availability</p>
-        {timeSeriesForSelectedWaterRegion
-          ? <DataLineChart
-              dataType="stress"
-              dataColor="darkcyan"
-              id="stress"
-              thresholds={stressThresholds}
-              thresholdColors={['none', ...getDataTypeColors('stress')]}
-              data={timeSeriesForSelectedWaterRegion}
-              selectedTimeIndex={selectedTimeIndex}
-              onTimeIndexChange={this.handleTimeIndexChange}
-              onClick={toggleTimeIndexLock}
-              timeIndexLocked={timeIndexLocked}
-            />
-          : <div className={styles.empty}>Select a unit</div>}
+        {timeSeriesForSelectedWaterRegion ? (
+          <DataLineChart
+            dataType="stress"
+            dataColor="darkcyan"
+            id="stress"
+            thresholds={stressThresholds}
+            thresholdColors={['none', ...getDataTypeColors('stress')]}
+            data={timeSeriesForSelectedWaterRegion}
+            selectedTimeIndex={selectedTimeIndex}
+            onTimeIndexChange={this.handleTimeIndexChange}
+            onClick={toggleTimeIndexLock}
+            timeIndexLocked={timeIndexLocked}
+          />
+        ) : (
+          <div className={styles.empty}>Select a unit</div>
+        )}
       </div>
     );
   }
@@ -159,27 +159,27 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>
-          {title}
-        </h4>
+        <h4 className={styles.heading}>{title}</h4>
         <p className={styles.description}>Availability per person (m³)</p>
-        {timeSeriesForSelectedWaterRegion
-          ? <DataLineChart
-              dataType="shortage"
-              dataColor="darkcyan"
-              thresholds={shortageThresholds}
-              thresholdColors={[
-                'none',
-                ...getDataTypeColors('shortage'),
-              ].reverse()}
-              id="shortage"
-              data={timeSeriesForSelectedWaterRegion}
-              selectedTimeIndex={selectedTimeIndex}
-              onTimeIndexChange={this.handleTimeIndexChange}
-              onClick={toggleTimeIndexLock}
-              timeIndexLocked={timeIndexLocked}
-            />
-          : <div className={styles.empty}>Select a unit</div>}
+        {timeSeriesForSelectedWaterRegion ? (
+          <DataLineChart
+            dataType="shortage"
+            dataColor="darkcyan"
+            thresholds={shortageThresholds}
+            thresholdColors={[
+              'none',
+              ...getDataTypeColors('shortage'),
+            ].reverse()}
+            id="shortage"
+            data={timeSeriesForSelectedWaterRegion}
+            selectedTimeIndex={selectedTimeIndex}
+            onTimeIndexChange={this.handleTimeIndexChange}
+            onClick={toggleTimeIndexLock}
+            timeIndexLocked={timeIndexLocked}
+          />
+        ) : (
+          <div className={styles.empty}>Select a unit</div>
+        )}
       </div>
     );
   }
@@ -200,9 +200,7 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>
-          {this.getChartTitle('availability')}
-        </h4>
+        <h4 className={styles.heading}>{this.getChartTitle('availability')}</h4>
         <p className={styles.description}>Total availability (m³)</p>
         <AvailabilityChart
           data={
@@ -235,9 +233,7 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>
-          {this.getChartTitle('consumption')}
-        </h4>
+        <h4 className={styles.heading}>{this.getChartTitle('consumption')}</h4>
         <p className={styles.description}>Consumption (m³)</p>
         <ConsumptionChart
           data={
@@ -265,9 +261,7 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>
-          {this.getChartTitle('population')}
-        </h4>
+        <h4 className={styles.heading}>{this.getChartTitle('population')}</h4>
         <p className={styles.description}>Population</p>
         <PopulationChart
           data={
@@ -308,18 +302,14 @@ class SelectedRegionInformation extends React.Component<Props> {
       return null;
     }
 
-    const maxConsumptionOrAvailability = max<
-      Datum,
-      number
-    >(timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion, d =>
-      Math.max(d.availability, d.consumptionTotal),
+    const maxConsumptionOrAvailability = max<Datum, number>(
+      timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion,
+      d => Math.max(d.availability, d.consumptionTotal),
     )!;
 
     return (
       <div className="col-xs-12 col-md-12 col-lg-12">
-        <h3 className={styles['section-heading']}>
-          {this.getTitle()}
-        </h3>
+        <h3 className={styles['section-heading']}>{this.getTitle()}</h3>
         <div className="row">
           {this.getStressChart()}
           {this.getShortageChart()}

@@ -38,7 +38,7 @@ export default class RadioSelector extends React.Component<PassedProps> {
           className,
         )}
       >
-        {values.map(option =>
+        {values.map(option => (
           <a
             key={`selector-${option.value}`}
             onClick={this.generateClickCallback(option)}
@@ -47,8 +47,8 @@ export default class RadioSelector extends React.Component<PassedProps> {
             })}
           >
             {option.label}
-          </a>,
-        )}
+          </a>
+        ))}
       </div>
     );
   }

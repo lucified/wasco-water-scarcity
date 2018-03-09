@@ -127,11 +127,17 @@ export async function fetchWorldRegionsData(): Promise<
   WorldRegion[] | undefined
 > {
   try {
-    const result = await fetch(worldRegionsFilename, { credentials: 'include' });
+    const result = await fetch(worldRegionsFilename, {
+      credentials: 'include',
+    });
     const parsedData: WorldRegionGeoJSON = await result.json();
     return generateWorldRegionsData(parsedData);
   } catch (error) {
-    console.error('Unable to fetch world regions data', worldRegionsFilename, error);
+    console.error(
+      'Unable to fetch world regions data',
+      worldRegionsFilename,
+      error,
+    );
     return undefined;
   }
 }

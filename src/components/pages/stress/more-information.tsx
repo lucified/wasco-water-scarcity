@@ -21,9 +21,7 @@ export default function StressMoreInformation() {
         <Link to="/sustainability">sustainability</Link>, availability typically
         only considers renewable freshwater, not{' '}
         <Link to="/fossil-groundwater">fossil groundwater</Link>.{' '}
-        <Link to="/interbasin-water-transfers">
-          Interbasin water transfers
-        </Link>{' '}
+        <Link to="/interbasin-water-transfers">Interbasin water transfers</Link>{' '}
         are usually also analysed separately. This explains why water use can be
         higher than availability.
       </p>
