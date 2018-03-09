@@ -2,7 +2,6 @@ import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
 import values = require('lodash/values');
 import uniq = require('lodash/uniq');
-
 import {
   DataType,
   StressShortageDatum,
@@ -19,6 +18,15 @@ import {
   WaterRegionGeoJSON,
   WorldRegionGeoJSON,
 } from './types';
+
+// FIXME: We needed to change the file extension for this in order to override
+// Webpack's built-in JSON imports because it currently seems that we can't
+// override JSON importing with inline loader declarations (e.g.
+// require('file-loader!file.json')). Once the following issue has been
+// resolved, change the filenames back to .json:
+// https://github.com/webpack/webpack/issues/6586
+const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
+const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
@@ -118,13 +126,12 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
 export async function fetchWorldRegionsData(): Promise<
   WorldRegion[] | undefined
 > {
-  const filename = require('!!file-loader!../../data/worldRegion.json');
   try {
-    const result = await fetch(filename, { credentials: 'include' });
+    const result = await fetch(worldRegionsFilename, { credentials: 'include' });
     const parsedData: WorldRegionGeoJSON = await result.json();
     return generateWorldRegionsData(parsedData);
   } catch (error) {
-    console.error('Unable to fetch world regions data', filename, error);
+    console.error('Unable to fetch world regions data', worldRegionsFilename, error);
     return undefined;
   }
 }
@@ -164,12 +171,11 @@ export function generateWaterToWorldRegionsMap(
 export async function fetchWaterRegionsData(): Promise<
   WaterRegionGeoJSON | undefined
 > {
-  const filename = require('!!file-loader!../../data/FPU.json');
   try {
-    const result = await fetch(filename, { credentials: 'include' });
+    const result = await fetch(fpuFilename, { credentials: 'include' });
     return (await result.json()) as WaterRegionGeoJSON;
   } catch (error) {
-    console.error('Unable to fetch water regions data', filename, error);
+    console.error('Unable to fetch water regions data', fpuFilename, error);
     return undefined;
   }
 }

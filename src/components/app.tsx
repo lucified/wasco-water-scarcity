@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { hot } from 'react-hot-loader';
 import { connect, Dispatch } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 
@@ -96,7 +97,7 @@ class App extends React.Component<Props> {
   }
 }
 
-export default connect<
+export default hot(module)(connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
   PassedProps
@@ -118,4 +119,4 @@ export default connect<
       dispatch(loadModelData(climateModel, impactModel, timeScale));
     },
   }),
-)(App);
+)(App));

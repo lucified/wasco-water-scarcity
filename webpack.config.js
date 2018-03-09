@@ -4,55 +4,43 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const postCssFlexbugsFixer = require('postcss-flexbugs-fixes');
 const webpack = require('webpack');
-
 const deployConfig = require('./deploy-config');
 
 const name = '[name]-[hash:8].[ext]';
 
-/*
- * Get the webpack loaders object for the webpack configuration
- */
+const browsers = ['> 0.5%', 'last 4 versions', 'Firefox ESR', 'not ie <= 10'];
+
 const rules = [
   {
     test: /\.tsx?$/,
-    exclude: /\.spec\.tsx?$/,
-    use: {
-      loader: require.resolve('awesome-typescript-loader'),
-      options: {
-        useBabel: true,
-        useCache: true,
-        babelOptions: {
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: require.resolve('babel-loader'),
+        options: {
+          // cacheDirectory: true,
           presets: [
-            // Make babel not transform modules since webpack 2 supports ES6 modules
-            // This should allow webpack to perform tree-shaking.
-            // TODO: Tree-shaking doesn't seem to work. Change tsconfig to
-            // output ES6 modules once this is fixed:
-            // https://github.com/webpack/webpack/issues/2867
-            ['es2015', { modules: false }],
+            [
+              'env',
+              {
+                targets: {
+                  browsers,
+                },
+              },
+            ],
+            'react',
           ],
           // Needed in order to transform generators. Babelification can be removed
           // once TypeScript supports generators, probably in TS 2.3.
           // When that is done, also change the output of TS to 'es5' in tsconfig.json
-          plugins: ['transform-regenerator'],
+          plugins: ['react-hot-loader/babel', 'transform-regenerator'],
         },
       },
-    },
-  },
-  {
-    test: /\.svg$/,
-    use: [
-      {
-        loader: require.resolve('url-loader'),
-        options: {
-          limit: 10000,
-          mimetype: 'image/svg+xml',
-          name,
-        },
-      },
+      { loader: require.resolve('ts-loader') },
     ],
   },
   {
-    test: /\.(jpeg|jpg|gif|png|eot|woff2|woff|ttf)$/,
+    test: /\.(svg|jpeg|jpg|gif|png)$/,
     use: [
       {
         loader: require.resolve('file-loader'),
@@ -81,12 +69,7 @@ const rules = [
           plugins: () => [
             postCssFlexbugsFixer,
             autoprefixer({
-              browsers: [
-                '>1%',
-                'last 4 versions',
-                'Firefox ESR',
-                'not ie < 9', // React doesn't support IE8 anyway
-              ],
+              browsers,
               flexbox: 'no-2009',
             }),
           ],
@@ -113,12 +96,7 @@ const rules = [
           plugins: () => [
             postCssFlexbugsFixer,
             autoprefixer({
-              browsers: [
-                '>1%',
-                'last 4 versions',
-                'Firefox ESR',
-                'not ie < 9', // React doesn't support IE8 anyway
-              ],
+              browsers,
               flexbox: 'no-2009',
             }),
           ],
@@ -126,13 +104,18 @@ const rules = [
       },
     ],
   },
+  {
+    test: /\.(woff|woff2|eot|ttf)$/,
+    use: [
+      {
+        loader: require.resolve('file-loader'),
+        options: {
+          name: 'fonts/[name].[ext]',
+        },
+      },
+    ],
+  },
 ];
-
-const htmlWebpackPluginConfig = {
-  template: require.resolve(`${__dirname}/src/index-template.tsx`),
-  inject: false,
-  filename: 'index.html',
-};
 
 const config = {
   resolve: {
@@ -149,7 +132,23 @@ const config = {
   },
   entry: [require.resolve('babel-polyfill'), './src/index.tsx'],
   plugins: [
-    new HtmlWebpackPlugin(htmlWebpackPluginConfig),
+    new HtmlWebpackPlugin({
+      template: require.resolve(`${__dirname}/src/index-template.tsx`),
+      inject: false,
+      filename: 'index.html',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
     new CopyWebpackPlugin([
       {
         from: 'public/*',
@@ -178,34 +177,12 @@ const config = {
 
 if (['production', 'staging'].indexOf(deployConfig.env) > -1) {
   config.bail = true;
+  config.mode = 'production';
   config.plugins = config.plugins.concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
       },
-    }),
-    // LopaderOptionsPlugin with minimize:true will be removed in Webpack 3.
-    // Will need to add minimize: true to loaders at that point.
-    // See https://webpack.js.org/guides/migrating/#uglifyjsplugin-minimize-loaders
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false,
-    }),
-    // Minify the code.
-    // TODO: Switch to BabiliPlugin in order to get tree-shaking at some point.
-    // It understands ES6 imports while (as of now) UglifyJs doesn't.
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        // This feature has been reported as buggy a few times, such as:
-        // https://github.com/mishoo/UglifyJS2/issues/1964
-        // We'll wait with enabling it by default until it is more solid.
-        reduce_vars: false,
-      },
-      output: {
-        comments: false,
-      },
-      sourceMap: true,
     }),
   ]);
 }
