@@ -1,5 +1,3 @@
-import { RouterState } from 'react-router-redux';
-
 import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data';
 import {
   DataType,
@@ -49,7 +47,6 @@ export interface DataTree {
 
 export interface StateTree {
   data: DataTree;
-  routing: RouterState;
   thresholds: ThresholdsTree;
   selections: SelectionsTree;
 }

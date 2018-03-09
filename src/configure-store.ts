@@ -1,5 +1,3 @@
-import { History } from 'history';
-import { routerMiddleware } from 'react-router-redux';
 import { applyMiddleware, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
@@ -7,8 +5,7 @@ import rootReducer, { StateTree } from './reducers';
 
 declare var window: { __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any };
 
-function configureStore(initialState: StateTree, history: History) {
-  const routerMiddlewareObject = routerMiddleware(history);
+function configureStore(initialState: StateTree) {
   const composeEnhancers =
     (process.env.NODE_ENV !== 'production' &&
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
@@ -16,7 +13,7 @@ function configureStore(initialState: StateTree, history: History) {
   const store = createStore(
     rootReducer,
     initialState,
-    composeEnhancers(applyMiddleware(routerMiddlewareObject, thunkMiddleware)),
+    composeEnhancers(applyMiddleware(thunkMiddleware)),
   );
 
   return store;

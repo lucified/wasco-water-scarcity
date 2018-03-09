@@ -1,5 +1,4 @@
 import isEqual = require('lodash/isEqual');
-import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 
 import {
@@ -38,7 +37,6 @@ import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 const defaultFutureDataset = getDefaultFutureDataset();
 
 const defaultState: StateTree = {
-  routing: {} as any,
   data: {
     futureData: {},
   },
@@ -378,7 +376,6 @@ function selectionsReducer(
 }
 
 export default combineReducers<StateTree>({
-  routing: routerReducer as any,
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
   data: dataReducer,
