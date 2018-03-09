@@ -5,7 +5,7 @@
     "no-var-requires": false,
     "interface-name": [false],
     "jsx-alignment": true,
-    "jsx-no-lambda": true,
+    "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "jsx-no-string-ref": true,
     "jsx-self-close": true,
@@ -20,12 +20,13 @@
     "arrow-parens": false,
     "no-empty-interface": false,
     "semicolon": [true, "always", "ignore-bound-class-methods"],
-    "no-this-assignment": [true, {"allow-destructuring": true}]
+    "no-this-assignment": [true, {"allow-destructuring": true}],
+    "no-submodule-imports": false
   },
   "jsRules": {
     "arrow-parens": false,
     "jsx-alignment": true,
-    "jsx-no-lambda": true,
+    "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "jsx-no-string-ref": true,
     "jsx-self-close": true,
@@ -34,7 +35,8 @@
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
     "quotemark": [true, "single", "avoid-escape", "jsx-double"],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"]
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+    "no-submodule-imports": false
   },
   "rulesDirectory": []
 }

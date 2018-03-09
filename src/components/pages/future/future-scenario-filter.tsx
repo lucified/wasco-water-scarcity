@@ -1,7 +1,7 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import * as Select from 'react-select';
+import Select, { Option } from 'react-select';
 
 import { setSelectedFutureFilters } from '../../../actions';
 import { FutureDataset } from '../../../data';
@@ -11,7 +11,6 @@ import {
   getSelectedFutureFilters,
 } from '../../../selectors';
 
-import 'react-select/dist/react-select.css';
 import * as styles from './future-scenario-filter.scss';
 
 interface PassedProps {
@@ -43,7 +42,7 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-function toOptions(values: string[], selectedValue: string): Select.Option[] {
+function toOptions(values: string[], selectedValue: string): Option[] {
   return values.map(value => ({
     value,
     label: value,
@@ -60,7 +59,7 @@ class FutureScenarioFilter extends React.Component<Props> {
       | 'populations',
   ) => {
     // tslint:disable:prefer-conditional-expression
-    return (options: Select.Option[] | Select.Option | null) => {
+    return (options: Option[] | Option | null) => {
       let results: string[];
       if (Array.isArray(options)) {
         results = options
@@ -207,5 +206,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps
+  PassedProps,
+  StateTree
 >(mapStateToProps, mapDispatchToProps)(FutureScenarioFilter);

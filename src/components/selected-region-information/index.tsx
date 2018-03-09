@@ -364,5 +364,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps
+  PassedProps,
+  StateTree
 >(mapStateToProps, mapDispatchToProps)(SelectedRegionInformation);

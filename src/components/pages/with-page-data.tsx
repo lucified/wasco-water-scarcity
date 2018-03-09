@@ -2,9 +2,7 @@ import mapValues = require('lodash/mapValues');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
-import { Dispatch } from 'redux';
-
-import { setSelectedDataType } from '../../actions/index';
+import { setSelectedDataType } from '../../actions';
 import { scarcitySelector, WaterRegionGeoJSON } from '../../data';
 import { StateTree } from '../../reducers';
 import {
@@ -24,17 +22,22 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type PassedProps = RouteComponentProps<void>;
+type PassedProps = RouteComponentProps<{}>;
 
 export type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 export default function withPageData(
-  Component: React.ComponentClass<Props>,
+  Component: React.ComponentType<Props>,
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
   componentDataType?: DataType,
 ) {
-  return connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps>(
-    (state: StateTree): GeneratedStateProps => {
+  return connect<
+    GeneratedStateProps,
+    GeneratedDispatchProps,
+    PassedProps,
+    StateTree
+  >(
+    state => {
       const dataType = componentDataType || getSelectedDataType(state);
       const selectedData = getSelectedStressShortageData(state);
       const selector =
@@ -47,7 +50,7 @@ export default function withPageData(
           : (d: StressShortageDatum) => d[dataType];
       const dataForComponent = selectedData && {
         ...selectedData,
-        data: mapValues<StressShortageDatum, number>(selectedData.data, d =>
+        data: mapValues(selectedData.data, d =>
           selector(d),
         ),
       };
@@ -56,7 +59,7 @@ export default function withPageData(
         waterRegions: getWaterRegionData(state),
       };
     },
-    (dispatch: Dispatch<any>): GeneratedDispatchProps => {
+    dispatch => {
       return {
         setSelectedDataType: (newDataType: DataType) => {
           dispatch(setSelectedDataType(newDataType));

@@ -7,18 +7,16 @@ import {
   scaleThreshold,
   ScaleThreshold,
 } from 'd3-scale';
-import { select, Selection } from 'd3-selection';
-import { event } from 'd3-selection';
+import { event, select, Selection } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { feature } from 'topojson';
-
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
-import { defaultDataTypeThresholdMaxValues } from '../../data';
 import {
+  defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
@@ -70,7 +68,9 @@ function getColorScale(dataType: DataType, thresholds: number[]) {
       ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
       : [emptyColor, ...getDataTypeColors(dataType)];
 
-  return scaleThreshold<number, string>().domain(thresholds).range(colors);
+  return scaleThreshold<number, string>()
+    .domain(thresholds)
+    .range(colors);
 }
 
 function getLabel(dataType: DataType) {
@@ -187,15 +187,18 @@ class Map extends React.Component<Props> {
     const svg = select<SVGElement, undefined>(this.svgRef!)
       .attr('width', this.width)
       .attr('height', this.height);
-    svg.select('#sphere').datum({ type: 'Sphere' }).attr('d', path);
+    svg
+      .select<SVGPathElement>('#sphere')
+      .datum({ type: 'Sphere' })
+      .attr('d', path as any); // TODO: fix typing
 
     svg.select(`use.${styles['globe-fill']}`).on('click', clearSelectedRegion);
 
     // Countries land mass
     svg
-      .select(`path.${styles.land}`)
+      .select<SVGPathElement>(`path.${styles.land}`)
       .datum(feature(worldData, worldData.objects.land))
-      .attr('d', path);
+      .attr('d', path as any);
 
     // Water regions
     // prettier-ignore
@@ -204,7 +207,7 @@ class Map extends React.Component<Props> {
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => String(d.properties.featureId))
       .enter()
-      .append('path')
+      .append<SVGPathElement>('path')
         .attr('class', styles['water-region'])
         .classed(
           styles.selected,
@@ -216,7 +219,7 @@ class Map extends React.Component<Props> {
             selectedWaterRegionId !== undefined &&
             selectedWaterRegionId !== d.properties.featureId,
         )
-        .attr('d', path as any)
+        .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId))
         .on('click', this.handleRegionClick);
@@ -229,10 +232,10 @@ class Map extends React.Component<Props> {
 
     // prettier-ignore
     g
-      .selectAll('rect')
+      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
       .data(this.legendExtentPairs!)
       .enter()
-        .append('rect')
+        .append<SVGRectElement>('rect')
         .attr('height', 8)
         .call(this.drawLegendRectangle);
 
@@ -240,7 +243,7 @@ class Map extends React.Component<Props> {
   }
 
   private drawLegendRectangle(
-    rect: Selection<SVGCircleElement, [number, number], any, any>,
+    rect: Selection<SVGRectElement, [number, number], any, any>,
   ) {
     const { legendXScale, colorScale } = this;
     rect
@@ -267,7 +270,10 @@ class Map extends React.Component<Props> {
         )
         .select('.domain')
         .remove();
-      g.selectAll('.tick').select('line').remove();
+      g
+        .selectAll('.tick')
+        .select('line')
+        .remove();
     } else {
       g
         .call(
@@ -275,7 +281,9 @@ class Map extends React.Component<Props> {
             .tickSize(13)
             .tickValues(this.colorScale!.domain())
             .tickFormat(
-              selectedDataType === 'stress' ? format('.2f') : format('d'),
+              selectedDataType === 'stress'
+                ? format('.2f')
+                : (format('d') as any), // TODO: fix typing
             ),
         )
         .select('.domain')
@@ -290,7 +298,7 @@ class Map extends React.Component<Props> {
 
     // prettier-ignore
     g
-      .selectAll('rect')
+      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
       .data(this.legendExtentPairs!)
       .call(this.drawLegendRectangle);
 
@@ -308,15 +316,18 @@ class Map extends React.Component<Props> {
       .translate([this.width / 2.2, this.height / 1.7]);
 
     let bounds;
-    svg.select('g#selected-region').select('path').remove();
+    svg
+      .select<SVGGElement>('g#selected-region')
+      .select<SVGPathElement>('path')
+      .remove();
     if (selectedWorldRegion) {
       const path = geoPath().projection(projection);
-      bounds = path.bounds(selectedWorldRegion.feature as any);
+      bounds = path.bounds(selectedWorldRegion.feature);
       svg
-        .select('g#selected-region')
-        .append('path')
+        .select<SVGGElement>('g#selected-region')
+        .append<SVGPathElement>('path')
         .datum(selectedWorldRegion.feature)
-        .attr('d', path as any);
+        .attr('d', path);
     } else {
       bounds = [[0, 0], [this.width, this.height]];
     }
@@ -335,7 +346,7 @@ class Map extends React.Component<Props> {
 
     const t = transition('zoom').duration(useTransition ? 750 : 0);
     svg
-      .transition(t)
+      .transition(t as any)
       .call(
         ourZoom.transform as any,
         zoomIdentity.translate(translate[0], translate[1]).scale(scale),
@@ -383,7 +394,7 @@ class Map extends React.Component<Props> {
           selectedWaterRegionId !== undefined &&
           selectedWaterRegionId !== d.properties.featureId,
       )
-      .transition(t)
+      .transition(t as any)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
   }
 
@@ -451,5 +462,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps
+  PassedProps,
+  StateTree
 >(mapStateToProps, mapDispatchToProps)(Map);

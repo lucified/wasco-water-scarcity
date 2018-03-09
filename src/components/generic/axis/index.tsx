@@ -16,7 +16,8 @@ export default class AxisComponent extends React.Component<Props> {
     this.storeAxisRef = this.storeAxisRef.bind(this);
   }
 
-  private axisRef: SVGGElement;
+  // prettier-ignore
+  private axisRef!: SVGGElement;
 
   private storeAxisRef(ref: SVGGElement) {
     this.axisRef = ref;
@@ -40,7 +41,7 @@ export default class AxisComponent extends React.Component<Props> {
       const t = transition('axis-transition').duration(
         transitionDuration || 250,
       );
-      select(this.axisRef).transition(t).call(axis as any);
+      select(this.axisRef).transition(t as any).call(axis);
     }
   }
 

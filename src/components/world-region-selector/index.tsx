@@ -66,7 +66,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   },
 });
 
-export default connect<StateProps, DispatchProps, {}>(
+export default connect<StateProps, DispatchProps, {}, StateTree>(
   mapStateToProps,
   mapDispatchToProps,
 )(WorldRegionSelector);

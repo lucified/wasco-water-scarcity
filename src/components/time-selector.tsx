@@ -16,7 +16,7 @@ import {
 import { AggregateStressShortageDatum, DataType, WorldRegion } from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
 
-import BarChart, { BarChartDatum } from './generic/bar-chart/index';
+import BarChart, { BarChartDatum } from './generic/bar-chart';
 
 interface GeneratedStateProps {
   selectedIndex: number;
@@ -216,7 +216,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(TimeSelector);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(mapStateToProps, mapDispatchToProps)(TimeSelector);

@@ -25,8 +25,10 @@ export default class Bar extends React.Component<Props, any> {
     transitionDuration: 250,
   };
 
-  private barRef: SVGElement;
-  private groupRef: SVGElement;
+  // prettier-ignore
+  private barRef!: SVGElement;
+  // prettier-ignore
+  private groupRef!: SVGElement;
 
   constructor(props: Props) {
     super(props);
@@ -68,7 +70,7 @@ export default class Bar extends React.Component<Props, any> {
     if (!initialDraw) {
       // prettier-ignore
       select(this.groupRef)
-        .transition(t)
+        .transition(t as any)
           .attr('transform', `scale(1, -1) translate(0, -${bottomY})`);
     } else {
       select(this.groupRef).attr(
@@ -77,7 +79,7 @@ export default class Bar extends React.Component<Props, any> {
       );
     }
 
-    select(this.barRef).transition(t).attr('height', height);
+    select(this.barRef).transition(t as any).attr('height', height);
   }
 
   private storeBarRef(ref: SVGRectElement) {

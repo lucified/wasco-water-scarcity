@@ -121,7 +121,7 @@ class LineChart extends React.Component<Props> {
     this.xScale = scaleTime<number, number>()
       .domain(
         extent(
-          flatMap<Date[], Date>(seriesData.map(d => [d.start, d.end])),
+          flatMap(seriesData.map(d => [d.start, d.end])),
         ) as [Date, Date],
       )
       .range([0, chartWidth]);
@@ -217,10 +217,10 @@ class LineChart extends React.Component<Props> {
     }
 
     g
-      .select('g#x-axis')
+      .select<SVGGElement>('g#x-axis')
       .call(axisBottom(xScale).ticks(Math.round(chartWidth / 50)));
     g
-      .select('g#y-axis')
+      .select<SVGGElement>('g#y-axis')
       .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)));
 
     if (selectedDataPoint) {
@@ -385,7 +385,7 @@ class LineChart extends React.Component<Props> {
         upperBound: colorAreaLowerBounds[i + 1] || dataValueExtent[1],
       }));
       const colorRects = backgroundColorsGroup
-        .selectAll('rect')
+        .selectAll<SVGRectElement, any>('rect')
         .data(colorAreas);
       // prettier-ignore
       colorRects
@@ -399,7 +399,7 @@ class LineChart extends React.Component<Props> {
           .attr('fill', d => backgroundColorScale(d.lowerBound));
       // prettier-ignore
       colorRects
-        .transition(t)
+        .transition(t as any)
           .attr('y', d => yScale(d.upperBound))
           .attr('height', d => yScale(d.lowerBound) - yScale(d.upperBound))
           .attr('fill', d => backgroundColorScale(d.lowerBound));
@@ -409,12 +409,12 @@ class LineChart extends React.Component<Props> {
     // prettier-ignore
     g
       .select('g#x-axis')
-      .transition(t)
+      .transition(t as any)
         .call(axisBottom(xScale).ticks(Math.round(chartWidth / 50)) as any);
     // prettier-ignore
     g
       .select('g#y-axis')
-      .transition(t)
+      .transition(t as any)
         .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)) as any);
 
     const lineGroup = g
@@ -436,7 +436,7 @@ class LineChart extends React.Component<Props> {
     // prettier-ignore
     lineGroup
       .select('path')
-      .transition(t)
+      .transition(t as any)
         .style(
           'opacity',
           d => selectedDataSeries && d.id !== selectedDataSeries ? 0.1 : 1,
@@ -456,7 +456,7 @@ class LineChart extends React.Component<Props> {
       // prettier-ignore
       g
         .select('rect#selected-group')
-        .transition(t)
+        .transition(t as any)
           .attr('x', xScale(selectedDataPoint.start))
           .attr(
             'width',
@@ -467,7 +467,7 @@ class LineChart extends React.Component<Props> {
       // prettier-ignore
       g
         .select('text#selected-label')
-        .transition(t)
+        .transition(t as any)
           .attr(
             'transform',
             `translate(${xScale(

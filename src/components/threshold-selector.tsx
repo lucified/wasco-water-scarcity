@@ -24,7 +24,7 @@ interface GeneratedStateProps {
 }
 
 interface GeneratedDispatchProps {
-  setThresholds: (values: number[]) => void;
+  setThresholds: (values: number | number[]) => void;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
@@ -105,7 +105,6 @@ function ThresholdSelector({
       <div className={styles.reset}>
         <span
           className={styles['reset-link']}
-          /* tslint:disable-next-line:jsx-no-lambda */
           onClick={() => {
             setThresholds(defaultDataTypeThresholds[dataType]);
           }}
@@ -131,9 +130,10 @@ function mapDispatchToProps(
   ownProps: PassedProps,
 ): GeneratedDispatchProps {
   return {
-    setThresholds: (values: number[]) => {
+    setThresholds: (values: number[] | number) => {
       // ReactSlider modifies the contents of the values array
-      dispatch(setThresholdsForDataType(ownProps.dataType, values.slice()));
+      const thresholds = Array.isArray(values) ? values.slice() : [values];
+      dispatch(setThresholdsForDataType(ownProps.dataType, thresholds));
     },
   };
 }
@@ -141,5 +141,6 @@ function mapDispatchToProps(
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps
+  PassedProps,
+  StateTree
 >(mapStateToProps, mapDispatchToProps)(ThresholdSelector);

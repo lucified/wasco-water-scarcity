@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-
 import {
   setSelectedClimateModel,
   setSelectedImpactModel,
@@ -19,10 +18,8 @@ import {
   getSelectedTimeScale,
 } from '../../selectors';
 import { TimeScale } from '../../types';
-
 import InlineSelector, { Option } from '../generic/inline-selector';
 
-import 'react-select/dist/react-select.css';
 import * as styles from './index.scss';
 
 interface StateProps {
@@ -131,7 +128,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   },
 });
 
-export default connect<StateProps, DispatchProps, PassedProps>(
+export default connect<StateProps, DispatchProps, PassedProps, StateTree>(
   mapStateToProps,
   mapDispatchToProps,
 )(ModelSelector);
