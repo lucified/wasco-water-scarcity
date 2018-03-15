@@ -253,7 +253,6 @@ export function getSelectedWorldRegionId(state: StateTree): number {
   return state.selections.worldRegion;
 }
 
-// prettier-ignore
 export const getSelectedWorldRegion = createSelector<
   StateTree,
   number,

@@ -16,7 +16,6 @@ export default class AxisComponent extends React.Component<Props> {
     this.storeAxisRef = this.storeAxisRef.bind(this);
   }
 
-  // prettier-ignore
   private axisRef!: SVGGElement;
 
   private storeAxisRef(ref: SVGGElement) {

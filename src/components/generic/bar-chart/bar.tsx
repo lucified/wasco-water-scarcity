@@ -25,9 +25,7 @@ export default class Bar extends React.Component<Props, any> {
     transitionDuration: 250,
   };
 
-  // prettier-ignore
   private barRef!: SVGElement;
-  // prettier-ignore
   private groupRef!: SVGElement;
 
   constructor(props: Props) {
@@ -68,10 +66,9 @@ export default class Bar extends React.Component<Props, any> {
     // We scale by (1, -1) to invert the coordinates: positive becomes up and negative down.
     // This allows us to grow the bar from bottom to top instead of top to bottom.
     if (!initialDraw) {
-      // prettier-ignore
       select(this.groupRef)
         .transition(t as any)
-          .attr('transform', `scale(1, -1) translate(0, -${bottomY})`);
+        .attr('transform', `scale(1, -1) translate(0, -${bottomY})`);
     } else {
       select(this.groupRef).attr(
         'transform',
