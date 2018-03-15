@@ -175,6 +175,8 @@ const config = {
   },
 };
 
+console.log('Building with deployConfig.env:', deployConfig.env);
+
 if (['production', 'staging'].indexOf(deployConfig.env) > -1) {
   config.bail = true;
   config.mode = 'production';

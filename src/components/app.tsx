@@ -40,7 +40,7 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-class App extends React.Component<Props> {
+class AppPlain extends React.Component<Props> {
   public componentDidMount() {
     const {
       selectedClimateModel,
@@ -96,7 +96,7 @@ class App extends React.Component<Props> {
   }
 }
 
-export default hot(module)(
+export const App = hot(module)(
   connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
     (state: StateTree): GeneratedStateProps => ({
       selectedClimateModel: getSelectedClimateModel(state),
@@ -115,5 +115,5 @@ export default hot(module)(
         dispatch(loadModelData(climateModel, impactModel, timeScale));
       },
     }),
-  )(App),
+  )(AppPlain),
 );
