@@ -68,9 +68,7 @@ export default class Legend extends React.Component<Props, State> {
         })}
       >
         <div className={styles.box} style={style} />
-        <div className={styles.title}>
-          {text}
-        </div>
+        <div className={styles.title}>{text}</div>
         <div
           className={styles.overlay}
           onMouseEnter={this.onHoverEnter}

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { hot } from 'react-hot-loader';
 import { connect, Dispatch } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 
@@ -17,9 +18,10 @@ import Scarcity from './pages/scarcity';
 import Shortage from './pages/shortage';
 import Stress from './pages/stress';
 
+import 'react-select/dist/react-select.css';
 import * as styles from './app.scss';
 
-type PassedProps = RouteComponentProps<void>;
+type PassedProps = RouteComponentProps<{}>;
 
 interface GeneratedDispatchProps {
   loadMapData: () => void;
@@ -38,7 +40,7 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-class App extends React.Component<Props> {
+class AppPlain extends React.Component<Props> {
   public componentDidMount() {
     const {
       selectedClimateModel,
@@ -75,8 +77,6 @@ class App extends React.Component<Props> {
   }
 
   public render() {
-    // tslint:disable:jsx-no-lambda
-
     return (
       <div className={styles.root}>
         <Header />
@@ -96,26 +96,24 @@ class App extends React.Component<Props> {
   }
 }
 
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps
->(
-  (state: StateTree): GeneratedStateProps => ({
-    selectedClimateModel: getSelectedClimateModel(state),
-    selectedImpactModel: getSelectedImpactModel(state),
-    selectedTimeScale: getSelectedTimeScale(state),
-  }),
-  (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
-    loadMapData: () => {
-      dispatch(loadMapData());
-    },
-    loadModelData: (
-      climateModel: string,
-      impactModel: string,
-      timeScale: string,
-    ) => {
-      dispatch(loadModelData(climateModel, impactModel, timeScale));
-    },
-  }),
-)(App);
+export const App = hot(module)(
+  connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
+    (state: StateTree): GeneratedStateProps => ({
+      selectedClimateModel: getSelectedClimateModel(state),
+      selectedImpactModel: getSelectedImpactModel(state),
+      selectedTimeScale: getSelectedTimeScale(state),
+    }),
+    (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
+      loadMapData: () => {
+        dispatch(loadMapData());
+      },
+      loadModelData: (
+        climateModel: string,
+        impactModel: string,
+        timeScale: string,
+      ) => {
+        dispatch(loadModelData(climateModel, impactModel, timeScale));
+      },
+    }),
+  )(AppPlain),
+);

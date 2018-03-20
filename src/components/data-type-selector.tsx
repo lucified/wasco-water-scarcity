@@ -14,7 +14,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onChange: (option: { value: DataType; label: string }) => void;
+  onChange: (option: { value: string; label: string }) => void;
 }
 
 interface PassedProps {
@@ -61,12 +61,12 @@ const mapStateToProps = (state: StateTree): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onChange: (option: { value: DataType; label: string }) => {
-    dispatch(setSelectedDataType(option.value));
+  onChange: (option: { value: string; label: string }) => {
+    dispatch(setSelectedDataType(option.value as DataType)); // TODO: validate
   },
 });
 
-export default connect<StateProps, DispatchProps, PassedProps>(
+export default connect<StateProps, DispatchProps, PassedProps, StateTree>(
   mapStateToProps,
   mapDispatchToProps,
 )(DataTypeSelector);

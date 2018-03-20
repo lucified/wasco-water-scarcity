@@ -1,10 +1,9 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-import * as Select from 'react-select';
+import Select from 'react-select';
 
 import RadioSelector from '../radio-selector';
 
-import 'react-select/dist/react-select.css';
 import * as styles from './index.scss';
 
 export interface Option {
@@ -41,7 +40,8 @@ export default class InlineSelector extends React.Component<
     this.setState({ editing: true });
   };
 
-  private handleChange = (option: Option) => {
+  private handleChange = (option: any) => {
+    // TODO: fix typing
     this.props.onChange(option);
     this.setState({ editing: false });
   };

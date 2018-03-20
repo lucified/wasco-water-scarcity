@@ -135,7 +135,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(GapminderWrapper);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(mapStateToProps, mapDispatchToProps)(GapminderWrapper);

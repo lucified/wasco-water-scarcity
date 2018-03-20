@@ -14,7 +14,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onChange: (option: { value: TimeScale; label: string }) => void;
+  onChange: (option: { value: string; label: string }) => void;
 }
 
 interface PassedProps {
@@ -50,12 +50,12 @@ const mapStateToProps = (state: StateTree): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onChange: (option: { value: TimeScale; label: string }) => {
-    dispatch(setSelectedTimeScale(option.value));
+  onChange: (option: { value: string; label: string }) => {
+    dispatch(setSelectedTimeScale(option.value as TimeScale)); // TODO: validate
   },
 });
 
-export default connect<StateProps, DispatchProps, PassedProps>(
+export default connect<StateProps, DispatchProps, PassedProps, StateTree>(
   mapStateToProps,
   mapDispatchToProps,
 )(TimeScaleSelector);

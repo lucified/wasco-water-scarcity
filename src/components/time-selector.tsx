@@ -16,7 +16,7 @@ import {
 import { AggregateStressShortageDatum, DataType, WorldRegion } from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
 
-import BarChart, { BarChartDatum } from './generic/bar-chart/index';
+import BarChart, { BarChartDatum } from './generic/bar-chart';
 
 interface GeneratedStateProps {
   selectedIndex: number;
@@ -161,9 +161,7 @@ class TimeSelector extends React.PureComponent<Props> {
 
     return (
       <div>
-        <h3>
-          {getTitle(dataType, selectedWorldRegion)}
-        </h3>
+        <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
         <BarChart
           data={this.generateBarChartData(data, dataType)}
           height={120}
@@ -216,7 +214,9 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<GeneratedStateProps, GeneratedDispatchProps, {}>(
-  mapStateToProps,
-  mapDispatchToProps,
-)(TimeSelector);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(mapStateToProps, mapDispatchToProps)(TimeSelector);

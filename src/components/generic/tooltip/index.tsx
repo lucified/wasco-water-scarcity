@@ -8,9 +8,5 @@ interface Props {
 }
 
 export default function Tooltip({ text, children }: Props) {
-  return (
-    <span data-tooltip={text}>
-      {children}
-    </span>
-  );
+  return <span data-tooltip={text}>{children}</span>;
 }

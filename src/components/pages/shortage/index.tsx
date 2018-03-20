@@ -41,51 +41,53 @@ class ShortageBody extends React.Component<Props> {
             />
           </div>
         </div>
-        {!selectedWaterData || !waterRegions
-          ? <div className="row middle-xs">
-              <div className="col-xs-12">
-                <Spinner />
+        {!selectedWaterData || !waterRegions ? (
+          <div className="row middle-xs">
+            <div className="col-xs-12">
+              <Spinner />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="row middle-xs">
+              <div className="col-xs-12 col-md-8">
+                <TimeSelector />
+              </div>
+              <div className="col-xs-12 col-md-4">
+                <ThresholdSelector dataType="shortage" />
               </div>
             </div>
-          : <div>
-              <div className="row middle-xs">
-                <div className="col-xs-12 col-md-8">
-                  <TimeSelector />
-                </div>
-                <div className="col-xs-12 col-md-4">
-                  <ThresholdSelector dataType="shortage" />
-                </div>
+            <div className="row middle-xs">
+              <div className={classNames(styles.map, 'col-xs-12')}>
+                <YearLabel
+                  className={styles['year-label']}
+                  startYear={selectedWaterData.startYear}
+                  endYear={selectedWaterData.endYear}
+                />
+                <Map
+                  width={1200}
+                  selectedData={selectedWaterData}
+                  waterRegions={waterRegions}
+                />
+                <WorldRegionSelector />
               </div>
-              <div className="row middle-xs">
-                <div className={classNames(styles.map, 'col-xs-12')}>
-                  <YearLabel
-                    className={styles['year-label']}
-                    startYear={selectedWaterData.startYear}
-                    endYear={selectedWaterData.endYear}
-                  />
-                  <Map
-                    width={1200}
-                    selectedData={selectedWaterData}
-                    waterRegions={waterRegions}
-                  />
-                  <WorldRegionSelector />
-                </div>
+            </div>
+            <div className="row">
+              <SelectedRegionInformation dataType="shortage" />
+            </div>
+            <div className="row">
+              <div
+                className={classNames(
+                  'col-xs-12',
+                  'col-md-6',
+                  styles['body-text'],
+                )}
+              >
+                <MoreInformation />
               </div>
-              <div className="row">
-                <SelectedRegionInformation dataType="shortage" />
-              </div>
-              <div className="row">
-                <div
-                  className={classNames(
-                    'col-xs-12',
-                    'col-md-6',
-                    styles['body-text'],
-                  )}
-                >
-                  <MoreInformation />
-                </div>
-              </div>
-            </div>}
+            </div>
+          </div>
+        )}
         <div className="row">
           <CrossReferences fromPage="shortage" />
         </div>

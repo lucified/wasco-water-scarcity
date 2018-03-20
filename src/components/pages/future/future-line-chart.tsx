@@ -1,9 +1,9 @@
 import { extent } from 'd3-array';
 import { scaleThreshold } from 'd3-scale';
+import flattenDeep = require('lodash/flattenDeep');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import flattenDeep = require('lodash/flattenDeep');
 
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import {
@@ -151,5 +151,6 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps
+  PassedProps,
+  StateTree
 >(mapStateToProps, mapDispatchToProps)(FutureLineChart);

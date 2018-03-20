@@ -12,11 +12,11 @@ import {
   scaleTime,
 } from 'd3-scale';
 import { mouse, select, Selection } from 'd3-selection';
+import { curveLinear, line } from 'd3-shape';
 import { transition, Transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import zip = require('lodash/zip');
-import { curveLinear, line } from 'd3-shape';
 import * as React from 'react';
 
 const styles = require('./index.scss');
@@ -211,26 +211,30 @@ class Gapminder extends React.Component<Props> {
     const yExtent =
       minY && maxY
         ? [minY, maxY]
-        : extent(
-            flatMap<number[], number>(
-              regionDataArray.map(d => ySelector(d.data)),
-            ),
-          ) as [number, number];
+        : (extent(flatMap(regionDataArray.map(d => ySelector(d.data)))) as [
+            number,
+            number
+          ]);
     const xExtent =
       minX && maxX
         ? [minX, maxX]
-        : extent(
-            flatMap<number[], number>(
-              regionDataArray.map(d => xSelector(d.data)),
-            ),
-          ) as [number, number];
+        : (extent(flatMap(regionDataArray.map(d => xSelector(d.data)))) as [
+            number,
+            number
+          ]);
     const sizeExtent = extent(
-      flatMap<number[], number>(regionDataArray.map(d => sizeSelector(d.data))),
+      flatMap(regionDataArray.map(d => sizeSelector(d.data))),
     ) as [number, number];
 
-    this.xScale = scaleLog().domain(xExtent).range([chartWidth, 0]);
-    this.yScale = scaleLog().domain(yExtent).range([chartHeight, 0]);
-    this.sizeScale = scaleSqrt().domain(sizeExtent).range([0, 40]);
+    this.xScale = scaleLog()
+      .domain(xExtent)
+      .range([chartWidth, 0]);
+    this.yScale = scaleLog()
+      .domain(yExtent)
+      .range([chartHeight, 0]);
+    this.sizeScale = scaleSqrt()
+      .domain(sizeExtent)
+      .range([0, 40]);
   }
 
   private drawChart() {
@@ -257,11 +261,15 @@ class Gapminder extends React.Component<Props> {
 
     g.call(this.drawBackgroundColors);
 
-    g.select('g#x-axis').call(axisBottom(this.xScale!).ticks(3, '.1r'));
-    g.select('g#y-axis').call(axisLeft(this.yScale!).ticks(3, '.1r'));
+    g
+      .select<SVGGElement>('g#x-axis')
+      .call(axisBottom(this.xScale!).ticks(3, '.1r'));
+    g
+      .select<SVGGElement>('g#y-axis')
+      .call(axisLeft(this.yScale!).ticks(3, '.1r'));
 
     const label = g
-      .select('text#year-label')
+      .select<SVGTextElement>('text#year-label')
       .attr('y', chartHeight)
       .attr('x', chartWidth)
       .call(this.setYearLabel);
@@ -320,7 +328,7 @@ class Gapminder extends React.Component<Props> {
     const { data } = this.props as PropsWithDefaults;
     const regionDataArray = values(data.circles);
     const dataExtent = extent(
-      flatMap<number[], number>(regionDataArray.map(d => selector(d.data))),
+      flatMap(regionDataArray.map(d => selector(d.data))),
     ) as [number, number];
     const thresholds = colorScale.domain();
     const colorAreaLowerBounds = [
@@ -365,7 +373,7 @@ class Gapminder extends React.Component<Props> {
       // prettier-ignore
       rectSelection
         .enter()
-          .append('rect')
+          .append<SVGRectElement>('rect')
             .attr('class', styles['background-colors'])
             .attr('y', 0)
             .attr('height', chartHeight)
@@ -393,7 +401,7 @@ class Gapminder extends React.Component<Props> {
       // prettier-ignore
       rectSelection
         .enter()
-          .append('rect')
+          .append<SVGRectElement>('rect')
             .attr('class', styles['background-colors'])
             .attr('x', 0)
             .attr('width', chartWidth)
@@ -430,10 +438,7 @@ class Gapminder extends React.Component<Props> {
     );
     const label = g.select<SVGTextElement>('text#year-label');
     const box = label.node()!.getBBox();
-    const timeExtent = extent(flatMap<Date[], Date>(data.timeRanges)) as [
-      Date,
-      Date
-    ];
+    const timeExtent = extent(flatMap(data.timeRanges)) as [Date, Date];
     const yearScale = scaleTime()
       .domain(timeExtent)
       .range([box.x + 10, box.x + box.width - 10])
@@ -532,10 +537,10 @@ class Gapminder extends React.Component<Props> {
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
       .classed(styles['fade-out'], shouldFadeOut as any)
-      .transition(t)
-        .call(this.drawCircle as any);
+      .transition(t as any)
+        .call(this.drawCircle);
 
-    g.select('text#year-label').call(this.setYearLabel);
+    g.select<SVGTextElement>('text#year-label').call(this.setYearLabel);
 
     if (selectedData) {
       const selectedDataSeries = data.circles[selectedData].data;
@@ -561,7 +566,10 @@ class Gapminder extends React.Component<Props> {
       circles.exit().remove();
     } else {
       const selectedGroup = g.select<SVGGElement>('g#selected-data');
-      selectedGroup.select<SVGPathElement>('path').datum(null).attr('d', null);
+      selectedGroup
+        .select<SVGPathElement>('path')
+        .datum(null)
+        .attr('d', null);
       selectedGroup
         .selectAll<SVGCircleElement, [number, number]>('circle')
         .remove();
@@ -611,7 +619,7 @@ class Gapminder extends React.Component<Props> {
             className={classNames(styles.axis, styles.x)}
             transform={`translate(0,${height - marginTop - marginBottom})`}
           >
-            {xAxisLabel &&
+            {xAxisLabel && (
               <text
                 id="x-axis-label"
                 className={styles['axis-label']}
@@ -620,10 +628,11 @@ class Gapminder extends React.Component<Props> {
                 y={30}
               >
                 {xAxisLabel}
-              </text>}
+              </text>
+            )}
           </g>
           <g id="y-axis" className={classNames(styles.axis, styles.y)}>
-            {yAxisLabel &&
+            {yAxisLabel && (
               <text
                 id="x-axis-label"
                 className={styles['axis-label']}
@@ -633,7 +642,8 @@ class Gapminder extends React.Component<Props> {
                 transform="rotate(-90)"
               >
                 {yAxisLabel}
-              </text>}
+              </text>
+            )}
           </g>
           <g clipPath="url(#chart-contents)">
             <g id="background-colors">

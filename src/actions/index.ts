@@ -5,9 +5,11 @@ import {
   fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
+  FutureData,
+  FutureDataset,
   generateWaterToWorldRegionsMap,
+  WaterRegionGeoJSON,
 } from '../data';
-import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data';
 import {
   DataType,
   StressShortageDatum,
@@ -263,23 +265,22 @@ export function loadFutureData(dataset: FutureDataset) {
 
 export function loadMapData() {
   return (dispatch: Dispatch<any>) => {
-    return Promise.all([
-      fetchWaterRegionsData(),
-      fetchWorldRegionsData(),
-    ]).then(([waterRegionData, worldRegionsData]) => {
-      if (waterRegionData) {
-        dispatch(storeWaterRegionData(waterRegionData));
-        dispatch(
-          storeWaterToWorldRegionMap(
-            generateWaterToWorldRegionsMap(waterRegionData),
-          ),
-        );
-      }
+    return Promise.all([fetchWaterRegionsData(), fetchWorldRegionsData()]).then(
+      ([waterRegionData, worldRegionsData]) => {
+        if (waterRegionData) {
+          dispatch(storeWaterRegionData(waterRegionData));
+          dispatch(
+            storeWaterToWorldRegionMap(
+              generateWaterToWorldRegionsMap(waterRegionData),
+            ),
+          );
+        }
 
-      if (worldRegionsData) {
-        dispatch(storeWorldRegionData(worldRegionsData));
-      }
-    });
+        if (worldRegionsData) {
+          dispatch(storeWorldRegionData(worldRegionsData));
+        }
+      },
+    );
   };
 }
 
