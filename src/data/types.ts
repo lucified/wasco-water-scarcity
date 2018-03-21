@@ -59,6 +59,13 @@ export interface FutureDataForModel {
   }>;
 }
 
+export interface SelectedScen {
+  population?: string;
+  impactModel?: string;
+  climateModel?: string;
+  climateExperiment?: string;
+}
+
 export type FutureData = FutureDataForModel[];
 
 export interface WorldRegionGeoJSON {

@@ -30,6 +30,7 @@ import {
   getDefaultHistoricalImpactModel,
   getFutureDataset,
   getHistoricalClimateModels,
+  SelectedScen,
 } from '../data';
 import { TimeScale } from '../types';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
@@ -60,8 +61,13 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
-    population: 'SSP1',
-    climateExperiment: 'rcp8p5',
+    selectedScen: {
+      //use default specified in dataset - note this causes flicker
+      impactModel: undefined,
+      climateModel: undefined,
+      population: undefined,
+      climateExperiment: undefined,
+    },
     lockFutureScenario: false,
     worldRegion: 0, // 0 means global
   },
@@ -312,20 +318,23 @@ function selectionsReducer(
 
       return state;
     case SET_SELECTED_SCENARIO:
-      if (
-        !state.lockFutureScenario &&
-        (action.climateModel !== state.climateModel ||
-          action.climateExperiment !== state.climateExperiment ||
-          action.impactModel !== state.impactModel ||
-          action.population !== state.population)
-      ) {
-        return {
-          ...state,
-          climateModel: action.climateModel,
-          climateExperiment: action.climateExperiment,
-          impactModel: action.impactModel,
-          population: action.population,
-        };
+      if (!state.lockFutureScenario) {
+        var newScen: SelectedScen = {};
+        //Only variables in the existing state are permitted, but partial updating is possible
+        Object.assign(newScen, state.selectedScen);
+        var need_update: boolean = false;
+        var k: keyof SelectedScen;
+        for (k in state.selectedScen) {
+          if (action.selectedScen[k] !== state.selectedScen[k]) {
+            need_update = true;
+            Object.assign(newScen, { [k]: action.selectedScen[k] });
+          }
+        }
+        if (need_update)
+          return {
+            ...state,
+            selectedScen: newScen,
+          };
       }
 
       return state;

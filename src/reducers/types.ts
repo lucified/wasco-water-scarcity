@@ -1,4 +1,9 @@
-import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../data';
+import {
+  FutureData,
+  FutureDataset,
+  SelectedScen,
+  WaterRegionGeoJSON,
+} from '../data';
 import {
   DataType,
   StressShortageDatum,
@@ -19,10 +24,9 @@ export interface SelectionsTree {
     populations: string[];
   };
   dataType: DataType;
-  impactModel: string;
-  climateModel: string;
-  climateExperiment: string; // Only used in Future page
-  population: string; // Only used in Future page
+  impactModel: string; // Only used in Historical pages
+  climateModel: string; // Only used in Historical pages
+  selectedScen: SelectedScen; // Only used in Future page
   lockFutureScenario: boolean;
   timeScale: TimeScale;
   worldRegion: number;

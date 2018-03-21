@@ -4,23 +4,24 @@ import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import {
   loadFutureData,
-  setSelectedClimateModel,
   setSelectedDataType,
-  setSelectedImpactModel,
   setSelectedScenario,
 } from '../../../actions';
-import { FutureData, FutureDataset, WaterRegionGeoJSON } from '../../../data';
+import {
+  FutureDataForModel,
+  FutureData,
+  FutureDataset,
+  SelectedScen,
+  WaterRegionGeoJSON,
+} from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
-  getSelectedClimateExperiment,
-  getSelectedClimateModel,
+  getSelectedScen,
   getSelectedDataType,
   getSelectedFutureDataset,
   getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
-  getSelectedImpactModel,
-  getSelectedPopulation,
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
@@ -65,24 +66,15 @@ const Error = styled.div`
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
   loadFutureData: (dataset: FutureDataset) => void;
-  setSelectedImpactModel: (model: string) => void;
-  setSelectedClimateModel: (model: string) => void;
-  setSelectedScenario: (
-    climateModel: string,
-    climateExperiment: string,
-    impactModel: string,
-    population: string,
-  ) => void;
+  setSelectedScenario: (scen: SelectedScen) => void;
 }
 
 interface GeneratedStateProps {
   selectedDataType: DataType;
   selectedFutureDataset: FutureDataset;
   allScenariosInSelectedDataset?: FutureData;
-  selectedImpactModel: string;
-  selectedClimateModel: string;
-  selectedClimateExperiment: string;
-  selectedPopulation: string;
+  futureData?: FutureDataForModel;
+  selectedScen: SelectedScen;
   mapData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
@@ -122,9 +114,9 @@ class FutureBody extends React.Component<Props> {
   }
 
   private verifyDataExistsForSelectedScenario() {
-    const { mapData, allScenariosInSelectedDataset } = this.props;
+    const { futureData, allScenariosInSelectedDataset } = this.props;
 
-    if (allScenariosInSelectedDataset && !mapData) {
+    if (allScenariosInSelectedDataset && !futureData) {
       // This means we have fetched the data but have currently selected a
       // scenario for which data does not exist. Switch to the default one.
       let defaultScenario = allScenariosInSelectedDataset.find(
@@ -137,18 +129,7 @@ class FutureBody extends React.Component<Props> {
       if (!defaultScenario) {
         console.error('No scenarios for dataset!');
       } else {
-        const {
-          climateModel,
-          climateExperiment,
-          impactModel,
-          population,
-        } = defaultScenario;
-        this.props.setSelectedScenario(
-          climateModel,
-          climateExperiment,
-          impactModel,
-          population,
-        );
+        this.props.setSelectedScenario(defaultScenario);
       }
     }
   }
@@ -161,18 +142,7 @@ class FutureBody extends React.Component<Props> {
     if (!hoveredData) {
       console.error('Error selecting line with scenario ID:', scenarioId);
     } else {
-      const {
-        climateModel,
-        climateExperiment,
-        impactModel,
-        population,
-      } = hoveredData;
-      this.props.setSelectedScenario(
-        climateModel,
-        climateExperiment,
-        impactModel,
-        population,
-      );
+      this.props.setSelectedScenario(hoveredData);
     }
   };
 
@@ -182,10 +152,7 @@ class FutureBody extends React.Component<Props> {
       waterRegions,
       selectedDataType,
       allScenariosInSelectedDataset,
-      selectedClimateModel,
-      selectedImpactModel,
-      selectedClimateExperiment,
-      selectedPopulation,
+      selectedScen,
     } = this.props;
 
     const yearString =
@@ -200,12 +167,7 @@ class FutureBody extends React.Component<Props> {
         <div className="row between-xs">
           <div className="col-xs-12 col-md-8">
             <h1>The Future?</h1>
-            <FutureScenarioFilter
-              impactModel={selectedImpactModel}
-              climateModel={selectedClimateModel}
-              climateExperiment={selectedClimateExperiment}
-              population={selectedPopulation}
-            />
+            <FutureScenarioFilter selectedScen={selectedScen} />
           </div>
           <DataSelectors className="col-xs-12 col-md-offset-1 col-md-3">
             <DataTypeSelector hideScarcity />
@@ -228,12 +190,9 @@ class FutureBody extends React.Component<Props> {
                 <StyledFutureScenarioDescription
                   estimateLabel={selectedDataType}
                   includeConsumption={selectedDataType === 'stress'}
-                  climateModel={selectedClimateModel}
-                  climateExperiment={selectedClimateExperiment}
-                  population={selectedPopulation}
-                  impactModel={selectedImpactModel}
+                  selectedScen={selectedScen}
                 />
-              </div>
+              </div>{' '}
             </div>
             <div className="row">
               <div className="col-xs-12">
@@ -274,17 +233,15 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   }
 
   return {
+    futureData,
     mapData,
     waterRegions: getWaterRegionData(state),
     selectedDataType: getSelectedDataType(state),
     allScenariosInSelectedDataset: getAllScenariosInSelectedFutureDataset(
       state,
     ),
-    selectedClimateModel: getSelectedClimateModel(state),
-    selectedClimateExperiment: getSelectedClimateExperiment(state),
-    selectedPopulation: getSelectedPopulation(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
-    selectedImpactModel: getSelectedImpactModel(state),
+    selectedScen: getSelectedScen(state),
   };
 }
 
@@ -293,29 +250,11 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     setSelectedDataType: (dataType: DataType) => {
       dispatch(setSelectedDataType(dataType));
     },
-    setSelectedClimateModel: (model: string) => {
-      dispatch(setSelectedClimateModel(model));
-    },
-    setSelectedImpactModel: (model: string) => {
-      dispatch(setSelectedImpactModel(model));
-    },
     loadFutureData: (dataset: FutureDataset) => {
       dispatch(loadFutureData(dataset));
     },
-    setSelectedScenario: (
-      climateModel: string,
-      climateExperiment: string,
-      impactModel: string,
-      population: string,
-    ) => {
-      dispatch(
-        setSelectedScenario(
-          climateModel,
-          climateExperiment,
-          impactModel,
-          population,
-        ),
-      );
+    setSelectedScenario: (scen: SelectedScen) => {
+      dispatch(setSelectedScenario(scen));
     },
   };
 }

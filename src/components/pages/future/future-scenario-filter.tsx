@@ -3,7 +3,7 @@ import { connect, Dispatch } from 'react-redux';
 import Select, { Option } from 'react-select';
 import styled from 'styled-components';
 import { setSelectedFutureFilters } from '../../../actions';
-import { FutureDataset } from '../../../data';
+import { FutureDataset, SelectedScen } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedFutureDataset,
@@ -34,10 +34,7 @@ const Dropdown = styled(Select)`
 `;
 
 interface PassedProps {
-  climateModel: string;
-  climateExperiment: string;
-  impactModel: string;
-  population: string;
+  selectedScen: SelectedScen;
   className?: string;
 }
 
@@ -120,12 +117,26 @@ class FutureScenarioFilter extends React.Component<Props> {
     const {
       selectedFutureFilters,
       selectedFutureDataset,
+      selectedScen,
+      className,
+    } = this.props;
+    const {
       impactModel,
       climateExperiment,
       climateModel,
       population,
-      className,
-    } = this.props;
+    } = selectedScen;
+    if (
+      impactModel === undefined ||
+      climateExperiment === undefined ||
+      climateModel === undefined ||
+      population === undefined
+    )
+      return (
+        <div>
+          Error: Scenario has an unexpected format and cannot be displayed
+        </div>
+      );
     return (
       <div className={`row ${className}`}>
         <div className="col-xs-12 col-md-6">

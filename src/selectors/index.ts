@@ -11,6 +11,8 @@ import {
   WorldRegion,
 } from '../types';
 
+import { SelectedScen } from '../data';
+
 function getStressShortageData(
   state: StateTree,
 ): Array<TimeAggregate<StressShortageDatum>> | undefined {
@@ -78,19 +80,16 @@ export const getFilteredScenariosInSelectedFutureDataset = createSelector(
 
 export const getSelectedFutureScenario = createSelector(
   getAllScenariosInSelectedFutureDataset,
-  getSelectedClimateModel,
-  getSelectedImpactModel,
-  getSelectedClimateExperiment,
-  getSelectedPopulation,
-  (datasetData, climateModel, impactModel, climateExperiment, population) => {
+  getSelectedScen,
+  (datasetData, selectedScen) => {
     return (
       datasetData &&
-      datasetData.find(
-        d =>
-          d.climateModel === climateModel &&
-          d.impactModel === impactModel &&
-          d.climateExperiment === climateExperiment &&
-          d.population === population,
+      datasetData.find(d =>
+        Object.keys(selectedScen).every(
+          k =>
+            d[k as keyof SelectedScen] ===
+            selectedScen[k as keyof SelectedScen],
+        ),
       )
     );
   },
@@ -273,12 +272,8 @@ export function getSelectedClimateModel(state: StateTree) {
   return state.selections.climateModel;
 }
 
-export function getSelectedClimateExperiment(state: StateTree) {
-  return state.selections.climateExperiment;
-}
-
-export function getSelectedPopulation(state: StateTree) {
-  return state.selections.population;
+export function getSelectedScen(state: StateTree) {
+  return state.selections.selectedScen;
 }
 
 export function getSelectedTimeScale(state: StateTree) {

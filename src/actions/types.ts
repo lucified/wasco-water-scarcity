@@ -1,4 +1,4 @@
-import { FutureData, WaterRegionGeoJSON } from '../data';
+import { FutureData, SelectedScen, WaterRegionGeoJSON } from '../data';
 import {
   DataType,
   StressShortageDatum,
@@ -52,10 +52,7 @@ export interface SetSelectedClimateModelAction {
 export const SET_SELECTED_SCENARIO = 'SET_SELECTED_SCENARIO';
 export interface SetSelectedScenarioAction {
   type: 'SET_SELECTED_SCENARIO';
-  climateModel: string;
-  climateExperiment: string;
-  impactModel: string;
-  population: string;
+  selectedScen: SelectedScen;
 }
 
 export const SET_SELECTED_FUTURE_FILTERS = 'SET_SELECTED_FUTURE_FILTERS';
