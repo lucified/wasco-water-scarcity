@@ -87,16 +87,14 @@ function FutureLineChart({
   }
 
   const dataValueExtent = extent(
-    flattenDeep<number>(
-      data.map(d => d.data.map(c => c.regions[selectedWaterRegionId])),
-    ),
+    flattenDeep<number>(data.map(d => d.data.map(c => c.value))),
   );
 
   const chartData: Data[] = filteredData.map(series => ({
     id: series.scenarioId,
     color: 'darkcyan',
     series: series.data.map(d => ({
-      value: d.regions[selectedWaterRegionId],
+      value: d.value,
       start: new Date(d.y0, 0, 1),
       end: new Date(d.y1, 11, 31),
     })),

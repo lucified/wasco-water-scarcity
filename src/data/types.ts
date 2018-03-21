@@ -55,9 +55,7 @@ export interface FutureDataForModel {
   data: Array<{
     y0: number; // start year
     y1: number; // end year
-    regions: {
-      [regionId: number]: number;
-    };
+    value: number;
   }>;
 }
 
