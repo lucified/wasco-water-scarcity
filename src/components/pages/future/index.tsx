@@ -22,6 +22,8 @@ import {
   getSelectedFutureDataset,
   getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
+  getSelectedWaterRegionId,
+  getSelectedWorldRegionId,
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
@@ -65,11 +67,13 @@ const Error = styled.div`
 
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
-  loadFutureData: (dataset: FutureDataset) => void;
+  loadFutureData: (dataset: FutureDataset, featureId: string) => void;
   setSelectedScenario: (scen: SelectedScen) => void;
 }
 
 interface GeneratedStateProps {
+  selectedWaterRegionId?: number;
+  selectedWorldRegionId?: number;
   selectedDataType: DataType;
   selectedFutureDataset: FutureDataset;
   allScenariosInSelectedDataset?: FutureData;
@@ -87,6 +91,7 @@ class FutureBody extends React.Component<Props> {
       selectedFutureDataset,
       allScenariosInSelectedDataset,
       selectedDataType,
+      selectedWorldRegionId,
     } = this.props;
 
     // Default to stress if scarcity is selected
@@ -95,21 +100,35 @@ class FutureBody extends React.Component<Props> {
     }
 
     if (!allScenariosInSelectedDataset) {
-      this.props.loadFutureData(selectedFutureDataset);
+      this.props.loadFutureData(
+        selectedFutureDataset,
+        'world-' + String(selectedWorldRegionId),
+      );
     }
 
     this.verifyDataExistsForSelectedScenario();
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const { allScenariosInSelectedDataset, selectedFutureDataset } = this.props;
+    //TODO: seems a bit buggy depending on when redux store is changed?
     if (
-      prevProps.selectedFutureDataset !== this.props.selectedFutureDataset &&
-      !allScenariosInSelectedDataset
+      prevProps.selectedFutureDataset !== this.props.selectedFutureDataset ||
+      prevProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
+      prevProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
     ) {
-      this.props.loadFutureData(selectedFutureDataset);
+      //Note: don't store, so no check if already loaded
+      if (this.props.selectedWaterRegionId) {
+        this.props.loadFutureData(
+          this.props.selectedFutureDataset,
+          String(this.props.selectedWaterRegionId),
+        );
+      } else {
+        this.props.loadFutureData(
+          this.props.selectedFutureDataset,
+          'world-' + String(this.props.selectedWorldRegionId),
+        );
+      }
     }
-
     this.verifyDataExistsForSelectedScenario();
   }
 
@@ -222,26 +241,44 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   const futureData = getSelectedFutureScenario(state);
   let mapData: TimeAggregate<number> | undefined;
 
+  const selectedScen = getSelectedScen(state);
+  const selectedFutureDataset = getSelectedFutureDataset(state);
+  const selectedDataType = getSelectedDataType(state);
+
   if (futureData) {
+    mapData = undefined;
+    const mapData_url = Object.keys(selectedScen).reduce(
+      (prev: string, key: string) =>
+        prev.replace(
+          '{{' + key + '}}',
+          String(selectedScen[key as keyof SelectedScen]),
+        ),
+      selectedFutureDataset.urlTemplateScenario,
+    );
     const timeIndex = getSelectedFutureTimeIndex(state);
-    const { y0: startYear, y1: endYear, regions } = futureData.data[timeIndex];
-    mapData = {
-      startYear,
-      endYear,
-      data: regions,
-    };
+    console.log(`Fetch mapData at ${timeIndex} from: ${mapData_url}`);
+    //TODO
+    //let futureScenarioData : Array<TimeAggregate<{stress:number,kcal:number}>>
+    // const { y0: startYear, y1: endYear, regions } = futureScenarioData[timeIndex];
+    // mapData = {
+    //   startYear,
+    //   endYear,
+    //   data: Object.keys(regions).forEach(k => {[k]:regions[k][selectedDataType]}),
+    // };
   }
 
   return {
     futureData,
     mapData,
     waterRegions: getWaterRegionData(state),
-    selectedDataType: getSelectedDataType(state),
+    selectedWaterRegionId: getSelectedWaterRegionId(state),
+    selectedWorldRegionId: getSelectedWorldRegionId(state),
+    selectedDataType: selectedDataType,
     allScenariosInSelectedDataset: getAllScenariosInSelectedFutureDataset(
       state,
     ),
-    selectedFutureDataset: getSelectedFutureDataset(state),
-    selectedScen: getSelectedScen(state),
+    selectedFutureDataset: selectedFutureDataset,
+    selectedScen: selectedScen,
   };
 }
 
@@ -250,8 +287,8 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     setSelectedDataType: (dataType: DataType) => {
       dispatch(setSelectedDataType(dataType));
     },
-    loadFutureData: (dataset: FutureDataset) => {
-      dispatch(loadFutureData(dataset));
+    loadFutureData: (dataset: FutureDataset, featureId: string) => {
+      dispatch(loadFutureData(dataset, featureId));
     },
     setSelectedScenario: (scen: SelectedScen) => {
       dispatch(setSelectedScenario(scen));

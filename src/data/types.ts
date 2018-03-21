@@ -28,7 +28,10 @@ export interface HistoricalDataset {
 
 export interface FutureDataset {
   default?: boolean;
-  url: string;
+  //{{featureId}} interpolated by loadFutureData
+  urlTemplateEnsemble: string;
+  //TODO: SelectedScen variables interpolated by future/index.ts to obtain mapData
+  urlTemplateScenario: string;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   timeScale: TimeScale;
   impactModels: string[];

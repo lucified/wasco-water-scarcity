@@ -246,11 +246,13 @@ export function loadModelData(
   };
 }
 
-export function loadFutureData(dataset: FutureDataset) {
+export function loadFutureData(dataset: FutureDataset, featureId: string) {
   return (dispatch: Dispatch<any>) => {
-    return fetchFutureData(dataset).then(futureData => {
+    const url = dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
+    return fetchFutureData(url).then(futureData => {
       if (futureData) {
         dispatch(
+          //TODO: will be overwritten by new featureId, but we don't want to store them anyway
           storeFutureData(dataset.variableName, dataset.timeScale, futureData),
         );
       }

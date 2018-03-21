@@ -12,7 +12,6 @@ import {
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
   FutureData,
-  FutureDataset,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
   WaterRegionGeoJSON,
@@ -72,10 +71,10 @@ export async function fetchHistoricalStressShortageData(
 }
 
 export async function fetchFutureData(
-  dataset: FutureDataset,
+  url: string,
 ): Promise<FutureData | undefined> {
   try {
-    const response = await fetch(dataset.url, { credentials: 'same-origin' });
+    const response = await fetch(url, { credentials: 'same-origin' });
     const parsedResult: FutureData = await response.json();
     return parsedResult;
   } catch (error) {

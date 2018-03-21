@@ -189,98 +189,29 @@ const historicalDatasets: HistoricalDataset[] = [
   },
 ];
 
-// prettier-ignore
 const futureDatasets: FutureDataset[] = [
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_annual_bluewater_SSP_avail.json',
-    variableName: 'avail',
-    timeScale: 'annual',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_annual_bluewater_SSP_consIrr.json',
-    variableName: 'consIrr',
-    timeScale: 'annual',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_annual_bluewater_SSP_pop.json',
-    variableName: 'pop',
-    timeScale: 'annual',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_annual_bluewater_SSP_short.json',
-    variableName: 'short',
-    timeScale: 'annual',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_annual_bluewater_SSP_stress.json',
-    variableName: 'stress',
-    timeScale: 'annual',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_decadal_bluewater_SSP_avail.json',
-    variableName: 'avail',
-    timeScale: 'decadal',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_decadal_bluewater_SSP_consIrr.json',
-    variableName: 'consIrr',
-    timeScale: 'decadal',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_decadal_bluewater_SSP_pop.json',
-    variableName: 'pop',
-    timeScale: 'decadal',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
-  {
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_decadal_bluewater_SSP_short.json',
-    variableName: 'short',
-    timeScale: 'decadal',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-  },
+  //Note: there will be datasets for other variables
   {
     default: true,
-    url: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v2-20171214/ensemble_FPU_decadal_bluewater_SSP_stress.json',
+    urlTemplateEnsemble:
+      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/{{featureId}}/all.json',
+    urlTemplateScenario:
+      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/scenario_fpu_decadal/' +
+      'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc_2011_2090/' +
+      '{{yieldGap}}_{{dietChange}}_{{foodLossRed}}_{{population}}_{{trade}}_{{agriExp}}_{{reuse}}_{{alloc}}.json',
     variableName: 'stress',
     timeScale: 'decadal',
     impactModels: ['h08', 'pcrglobwb', 'watergap'],
     climateModels: ['gfdl-esm2m', 'hadgem2-es'],
     climateExperiments: ['rcp4p5', 'rcp8p5'],
+    yieldGaps: ['current', 'medium', 'high'],
+    dietChanges: ['current', 'medium', 'high'],
+    foodLossReds: ['current', 'medium', 'high'],
     populations: ['SSP1', 'SSP2', 'SSP3'],
+    trades: ['none', 'current volume'],
+    agriExps: ['current', 'increase'],
+    reuses: ['maxfood', 'minwater', 'meetfood'],
+    allocs: ['runoff', 'discharge'],
   },
 ];
 
