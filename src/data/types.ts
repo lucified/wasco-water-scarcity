@@ -35,19 +35,41 @@ export interface FutureDataset {
   climateModels: string[];
   populations: string[];
   climateExperiments: string[];
+  yieldGaps: string[];
+  dietChanges: string[];
+  foodLossReds: string[];
+  trades: string[];
+  agriExps: string[];
+  reuses: string[];
+  allocs: string[];
 }
 
-export interface FutureDataForModel {
+/*
+ Scenario variables are optional to allow mixing scenario types
+   and allow partial updates of a scenario.
+ Check that all are present in the reducers selections tree
+*/
+export interface SelectedScen {
+  population?: string;
+  impactModel?: string;
+  climateModel?: string;
+  climateExperiment?: string;
+  yieldGap?: string;
+  dietChange?: string;
+  foodLossRed?: string;
+  trade?: string;
+  agriExp?: string;
+  reuse?: string;
+  alloc?: string;
+}
+
+export interface FutureDataForModel extends SelectedScen {
   scenarioId: string;
   default?: boolean;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   spatialUnit: string;
   timeScale: TimeScale;
   dataType: string;
-  population: string;
-  impactModel: string;
-  climateModel: string;
-  climateExperiment: string;
   socialForcing: string;
   co2Forcing: string;
   startYear: string;
@@ -57,13 +79,6 @@ export interface FutureDataForModel {
     y1: number; // end year
     value: number;
   }>;
-}
-
-export interface SelectedScen {
-  population?: string;
-  impactModel?: string;
-  climateModel?: string;
-  climateExperiment?: string;
 }
 
 export type FutureData = FutureDataForModel[];

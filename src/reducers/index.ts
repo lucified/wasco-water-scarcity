@@ -67,6 +67,13 @@ const defaultState: StateTree = {
       climateModel: undefined,
       population: undefined,
       climateExperiment: undefined,
+      yieldGap: undefined,
+      dietChange: undefined,
+      foodLossRed: undefined,
+      trade: undefined,
+      agriExp: undefined,
+      reuse: undefined,
+      alloc: undefined,
     },
     lockFutureScenario: false,
     worldRegion: 0, // 0 means global
