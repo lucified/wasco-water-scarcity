@@ -8,8 +8,8 @@ import {
   setSelectedScenario,
 } from '../../../actions';
 import {
-  FutureDataForModel,
   FutureData,
+  FutureDataForModel,
   FutureDataset,
   SelectedScen,
   WaterRegionGeoJSON,
@@ -17,11 +17,11 @@ import {
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
-  getSelectedScen,
   getSelectedDataType,
   getSelectedFutureDataset,
   getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
+  getSelectedScen,
   getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getWaterRegionData,
@@ -110,13 +110,13 @@ class FutureBody extends React.Component<Props> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    //TODO: seems a bit buggy depending on when redux store is changed?
+    // TODO: seems a bit buggy depending on when redux store is changed?
     if (
       prevProps.selectedFutureDataset !== this.props.selectedFutureDataset ||
       prevProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
       prevProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
     ) {
-      //Note: don't store, so no check if already loaded
+      // Note: don't store, so no check if already loaded
       if (this.props.selectedWaterRegionId) {
         this.props.loadFutureData(
           this.props.selectedFutureDataset,
@@ -247,7 +247,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
 
   if (futureData) {
     mapData = undefined;
-    const mapData_url = Object.keys(selectedScen).reduce(
+    const mapDataUrl = Object.keys(selectedScen).reduce(
       (prev: string, key: string) =>
         prev.replace(
           '{{' + key + '}}',
@@ -256,9 +256,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
       selectedFutureDataset.urlTemplateScenario,
     );
     const timeIndex = getSelectedFutureTimeIndex(state);
-    console.log(`Fetch mapData at ${timeIndex} from: ${mapData_url}`);
-    //TODO
-    //let futureScenarioData : Array<TimeAggregate<{stress:number,kcal:number}>>
+    console.error(`Fetch mapData at ${timeIndex} from: ${mapDataUrl}`);
+    // TODO
+    // let futureScenarioData : Array<TimeAggregate<{stress:number,kcal:number}>>
     // const { y0: startYear, y1: endYear, regions } = futureScenarioData[timeIndex];
     // mapData = {
     //   startYear,
@@ -273,12 +273,12 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     waterRegions: getWaterRegionData(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
-    selectedDataType: selectedDataType,
+    selectedDataType,
     allScenariosInSelectedDataset: getAllScenariosInSelectedFutureDataset(
       state,
     ),
-    selectedFutureDataset: selectedFutureDataset,
-    selectedScen: selectedScen,
+    selectedFutureDataset,
+    selectedScen,
   };
 }
 

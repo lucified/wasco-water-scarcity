@@ -33,12 +33,13 @@ export default function FutureModelDescription({
     climateExperiment === undefined ||
     climateModel === undefined ||
     population === undefined
-  )
+  ) {
     return (
       <div>
         Error: Scenario has an unexpected format and cannot be displayed
       </div>
     );
+  }
   return (
     <div className={className}>
       This scenario of blue water {estimateLabel} is produced using{' '}

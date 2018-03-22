@@ -62,7 +62,7 @@ const defaultState: StateTree = {
     timeScale: 'decadal',
     dataType: 'stress',
     selectedScen: {
-      //use default specified in dataset - note this causes flicker
+      // use default specified in dataset - note this causes flicker
       impactModel: undefined,
       climateModel: undefined,
       population: undefined,
@@ -326,22 +326,23 @@ function selectionsReducer(
       return state;
     case SET_SELECTED_SCENARIO:
       if (!state.lockFutureScenario) {
-        var newScen: SelectedScen = {};
-        //Only variables in the existing state are permitted, but partial updating is possible
+        const newScen: SelectedScen = {};
+        // Only variables in the existing state are permitted, but partial updating is possible
         Object.assign(newScen, state.selectedScen);
-        var need_update: boolean = false;
-        var k: keyof SelectedScen;
+        let needUpdate: boolean = false;
+        let k: keyof SelectedScen;
         for (k in state.selectedScen) {
           if (action.selectedScen[k] !== state.selectedScen[k]) {
-            need_update = true;
+            needUpdate = true;
             Object.assign(newScen, { [k]: action.selectedScen[k] });
           }
         }
-        if (need_update)
+        if (needUpdate) {
           return {
             ...state,
             selectedScen: newScen,
           };
+        }
       }
 
       return state;

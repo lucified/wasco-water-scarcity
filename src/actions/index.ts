@@ -7,8 +7,8 @@ import {
   fetchWorldRegionsData,
   FutureData,
   FutureDataset,
-  SelectedScen,
   generateWaterToWorldRegionsMap,
+  SelectedScen,
   WaterRegionGeoJSON,
 } from '../data';
 import {
@@ -252,7 +252,7 @@ export function loadFutureData(dataset: FutureDataset, featureId: string) {
     return fetchFutureData(url).then(futureData => {
       if (futureData) {
         dispatch(
-          //TODO: will be overwritten by new featureId, but we don't want to store them anyway
+          // TODO: will be overwritten by new featureId, but we don't want to store them anyway
           storeFutureData(dataset.variableName, dataset.timeScale, futureData),
         );
       }

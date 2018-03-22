@@ -190,7 +190,7 @@ const historicalDatasets: HistoricalDataset[] = [
 ];
 
 const futureDatasets: FutureDataset[] = [
-  //Note: there will be datasets for other variables
+  // Note: there will be datasets for other variables
   {
     default: true,
     urlTemplateEnsemble:

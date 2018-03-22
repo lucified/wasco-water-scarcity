@@ -55,7 +55,7 @@ export const getAllScenariosInSelectedFutureDataset = createSelector(
   getSelectedFutureDataset,
   (allFutureData, { variableName, timeScale }) => {
     return (
-      //TODO: probably shouldn't be storing all the data - this selector may be redundant
+      // TODO: probably shouldn't be storing all the data - this selector may be redundant
       allFutureData[variableName] && allFutureData[variableName][timeScale]
     );
   },

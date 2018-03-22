@@ -131,12 +131,13 @@ class FutureScenarioFilter extends React.Component<Props> {
       climateExperiment === undefined ||
       climateModel === undefined ||
       population === undefined
-    )
+    ) {
       return (
         <div>
           Error: Scenario has an unexpected format and cannot be displayed
         </div>
       );
+    }
     return (
       <div className={`row ${className}`}>
         <div className="col-xs-12 col-md-6">
