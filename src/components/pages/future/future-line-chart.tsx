@@ -46,7 +46,7 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  selectedDataType?: 'stress' | 'shortage';
+  selectedDataType: 'stress' | 'shortage';
   selectedWaterRegionId?: number;
   data?: FutureData;
   filteredData?: FutureData;
@@ -136,8 +136,9 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
+    // Note: Defaulting to stress makes future inconsistent with past
     selectedDataType:
-      selectedDataType === 'scarcity' ? undefined : selectedDataType,
+      selectedDataType === 'scarcity' ? 'stress' : selectedDataType,
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
     selectedFutureDataForScenario: getSelectedFutureScenario(state),
