@@ -102,7 +102,8 @@ class FutureBody extends React.Component<Props> {
     if (!allScenariosInSelectedDataset) {
       this.props.loadFutureData(
         selectedFutureDataset,
-        'world-' + String(selectedWorldRegionId),
+        // TODO: allow user to choose threshold
+        `world-${String(selectedWorldRegionId)}_0.2`,
       );
     }
 
@@ -125,7 +126,8 @@ class FutureBody extends React.Component<Props> {
       } else {
         this.props.loadFutureData(
           this.props.selectedFutureDataset,
-          'world-' + String(this.props.selectedWorldRegionId),
+          // TODO: allow user to choose threshold
+          `world-${String(this.props.selectedWorldRegionId)}_0.2`,
         );
       }
     }
