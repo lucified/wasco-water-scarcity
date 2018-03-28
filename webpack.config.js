@@ -51,34 +51,6 @@ const rules = [
     ],
   },
   {
-    test: /\.scss$/,
-    use: [
-      require.resolve('style-loader'),
-      {
-        loader: require.resolve('css-loader'),
-        options: {
-          modules: true,
-          importLoaders: 2,
-          localIdentName: '[name]__[local]___[hash:base64:5]',
-        },
-      },
-      {
-        loader: require.resolve('postcss-loader'),
-        options: {
-          ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
-          plugins: () => [
-            postCssFlexbugsFixer,
-            autoprefixer({
-              browsers,
-              flexbox: 'no-2009',
-            }),
-          ],
-        },
-      },
-      require.resolve('sass-loader'),
-    ],
-  },
-  {
     test: /\.css$/,
     use: [
       require.resolve('style-loader'),

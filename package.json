@@ -56,7 +56,6 @@
     "lucify-deploy-config": "^0.1.8",
     "lucify-notifier": "^0.1.17",
     "moment": "^2.17.1",
-    "node-sass": "^4.5.3",
     "normalize.css": "^8.0.0",
     "postcss-flexbugs-fixes": "^3.3.0",
     "postcss-loader": "^2.1.2",
@@ -75,7 +74,6 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
-    "sass-loader": "^6.0.7",
     "style-loader": "^0.20.3",
     "styled-components": "^3.2.3",
     "topojson": "^3.0.0",
@@ -99,8 +97,8 @@
     "deploy-chatops": "[ -z \"$AWS_TEMPORARY\" ] || yarn run deploy-and-notify",
     "upload": "atomic-s3 --verbose",
     "compile": "tsc",
-    "lint": "tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js' && prettier --single-quote --trailing-comma all --list-different \"src/**/*.ts?(x)\" \"src/**/*.scss\"",
-    "prettify": "prettier --single-quote --trailing-comma all --write \"src/**/*.ts?(x)\" \"src/**/*.scss\"",
+    "lint": "tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js' && prettier --single-quote --trailing-comma all --list-different \"src/**/*.ts?(x)\" \"src/**/*.css\"",
+    "prettify": "prettier --single-quote --trailing-comma all --write \"src/**/*.ts?(x)\" \"src/**/*.css\"",
     "upload-data": "atomic-s3 --path=data-external --bucket=lucify-large-files --region=eu-west-1"
   },
   "engines": {
