@@ -115,6 +115,16 @@ const rules = [
       },
     ],
   },
+  {
+    // Webpack 4 handles importing JSON files natively so this shouldn't be
+    // needed, but there's currently a bug that prevents us from using
+    // file-loader (i.e. including the JSON file in the bundle and returning)
+    // the filename for it) for certain files. This fixes it, remove it once
+    // this issue has been resolved: https://github.com/webpack/webpack/issues/6586
+    test: /\.json/,
+    type: 'javascript/auto',
+    use: [require.resolve('json-loader')],
+  },
 ];
 
 const config = {

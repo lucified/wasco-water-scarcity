@@ -20,14 +20,8 @@ import {
 } from './types';
 
 // tslint:disable:no-implicit-dependencies
-// FIXME: We needed to change the file extension for this in order to override
-// Webpack's built-in JSON imports because it currently seems that we can't
-// override JSON importing with inline loader declarations (e.g.
-// require('file-loader!file.json')). Once the following issue has been
-// resolved, change the filenames back to .json:
-// https://github.com/webpack/webpack/issues/6586
-const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
-const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
+const worldRegionsFilename = require('file-loader!../../data/worldRegion.json');
+const fpuFilename = require('file-loader!../../data/FPU.json');
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
