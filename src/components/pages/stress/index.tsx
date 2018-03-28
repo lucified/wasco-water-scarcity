@@ -1,21 +1,41 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
-
-import withPageData, { Props } from '../with-page-data';
-
+import styled from 'styled-components';
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
+import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
+import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 import MoreInformation from './more-information';
 
-import * as styles from './index.scss';
+const MapContainer = styled.div`
+  position: relative;
+`;
+
+const StyledYearLabel = styled(YearLabel)`
+  position: absolute;
+  right: 0;
+`;
+
+const StyledModelSelector = styled(ModelSelector)`
+  font-family: ${theme.bodyFontFamily};
+  font-size: 15px;
+  padding-left: ${theme.margin()};
+  padding-top: 5px;
+  border-left: 1px solid ${theme.colors.grayLight};
+  line-height: ${theme.bodyLineHeight};
+  color: ${theme.colors.grayDarker};
+
+  b {
+    color: ${theme.colors.grayDarkest};
+  }
+`;
 
 class StressBody extends React.Component<Props> {
   public componentDidMount() {
@@ -27,19 +47,13 @@ class StressBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1 className={styles['section-header']}>Water Stress</h1>
+        <SectionHeader>Water Stress</SectionHeader>
         <div className="row between-xs">
-          <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
-          >
+          <BodyText className="col-xs-12 col-md-6">
             <Description />
-          </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
-            <ModelSelector
-              className={styles['secondary-content']}
-              estimateLabel="stress"
-              includeConsumption
-            />
+          </BodyText>
+          <div className="col-xs-12 col-md-4">
+            <StyledModelSelector estimateLabel="stress" includeConsumption />
           </div>
         </div>
         {!selectedWaterData || !waterRegions ? (
@@ -59,9 +73,8 @@ class StressBody extends React.Component<Props> {
               </div>
             </div>
             <div className="row">
-              <div className={classNames(styles.map, 'col-xs-12')}>
-                <YearLabel
-                  className={styles['year-label']}
+              <MapContainer className="col-xs-12">
+                <StyledYearLabel
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
@@ -71,21 +84,15 @@ class StressBody extends React.Component<Props> {
                   waterRegions={waterRegions}
                 />
                 <WorldRegionSelector />
-              </div>
+              </MapContainer>
             </div>
             <div className="row">
               <SelectedRegionInformation dataType="stress" />
             </div>
             <div className="row">
-              <div
-                className={classNames(
-                  'col-xs-12',
-                  'col-md-6',
-                  styles['body-text'],
-                )}
-              >
+              <BodyText className="col-xs-12 col-md-6">
                 <MoreInformation />
-              </div>
+              </BodyText>
             </div>
           </div>
         )}

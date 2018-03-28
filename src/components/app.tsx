@@ -2,7 +2,7 @@ import * as React from 'react';
 import { hot } from 'react-hot-loader';
 import { connect, Dispatch } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
-
+import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
@@ -10,7 +10,6 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
-
 import Header from './header';
 import Future from './pages/future';
 import NotFound from './pages/not-found';
@@ -18,8 +17,35 @@ import Scarcity from './pages/scarcity';
 import Shortage from './pages/shortage';
 import Stress from './pages/stress';
 
+import 'normalize.css/normalize.css';
+// tslint:disable-next-line:ordered-imports
+import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'react-select/dist/react-select.css';
-import * as styles from './app.scss';
+import './app.css';
+import { theme } from './theme';
+
+// tslint:disable-next-line:no-unused-expression
+injectGlobal`
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: ${theme.headingFontFamily} !important;
+    color: ${theme.colors.grayDarkest};
+  }
+
+  a {
+    color: ${theme.colors.blueChillDarker};
+  }
+`;
+
+const Root = styled.div`
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+`;
 
 type PassedProps = RouteComponentProps<{}>;
 
@@ -78,7 +104,7 @@ class AppPlain extends React.Component<Props> {
 
   public render() {
     return (
-      <div className={styles.root}>
+      <Root>
         <Header />
         <div className="container">
           <Switch>
@@ -91,7 +117,7 @@ class AppPlain extends React.Component<Props> {
             <Route component={NotFound} />
           </Switch>
         </div>
-      </div>
+      </Root>
     );
   }
 }

@@ -1,8 +1,5 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
-
-import withPageData, { Props } from '../with-page-data';
-
+import styled from 'styled-components';
 import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import GapMinder from '../../gapminder';
@@ -10,14 +7,49 @@ import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
+import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
+import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 import MoreInformation from './more-information';
 
-import * as styles from './index.scss';
+const Selectors = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+// TODO: Don't repeat these on each page
+const StyledThresholdSelector = styled(ThresholdSelector)`
+  margin-bottom: ${theme.margin()};
+`;
+
+const StyledModelSelector = styled(ModelSelector)`
+  font-family: ${theme.bodyFontFamily};
+  font-size: 15px;
+  padding-left: ${theme.margin()};
+  padding-top: 5px;
+  border-left: 1px solid ${theme.colors.grayLight};
+  line-height: ${theme.bodyLineHeight};
+  color: ${theme.colors.grayDarker};
+
+  b {
+    color: ${theme.colors.grayDarkest};
+  }
+`;
+
+const MapContainer = styled.div`
+  position: relative;
+`;
+
+const StyledYearLabel = styled(YearLabel)`
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size;: 18px;
+`;
 
 class ScarcityBody extends React.Component<Props> {
   public componentDidMount() {
@@ -29,24 +61,17 @@ class ScarcityBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1 className={styles['section-header']}>
-          Blue Water Scarcity: stress and shortage
-        </h1>
+        <SectionHeader>Blue Water Scarcity: stress and shortage</SectionHeader>
         <div className="row between-xs">
-          <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
-          >
+          <BodyText className="col-xs-12 col-md-6">
             <Description />
-          </div>
-          <div
-            className={classNames('col-xs-12', 'col-md-4', styles['body-text'])}
-          >
-            <ModelSelector
-              className={styles['secondary-content']}
+          </BodyText>
+          <BodyText className="col-xs-12 col-md-4">
+            <StyledModelSelector
               estimateLabel="stress and shortage"
               includeConsumption
             />
-          </div>
+          </BodyText>
         </div>
         {!selectedWaterData || !waterRegions ? (
           <div className="row middle-xs">
@@ -61,30 +86,16 @@ class ScarcityBody extends React.Component<Props> {
                 <TimeSelector />
               </div>
               <div className="col-xs-12 col-md-4">
-                <div className={styles.selectors}>
-                  <ThresholdSelector
-                    className={styles['threshold-selector']}
-                    dataType="stress"
-                  />
-                  <ThresholdSelector
-                    className={styles['threshold-selector']}
-                    dataType="shortage"
-                  />
+                <Selectors>
+                  <StyledThresholdSelector dataType="stress" />
+                  <StyledThresholdSelector dataType="shortage" />
                   <DataTypeSelector />
-                </div>
+                </Selectors>
               </div>
             </div>
             <div className="row middle-xs">
-              <div
-                className={classNames(
-                  'col-xs-12',
-                  'col-md-6',
-                  'col-lg-8',
-                  styles.map,
-                )}
-              >
-                <YearLabel
-                  className={styles['year-label']}
+              <MapContainer className="col-xs-12 col-md-6 col-lg-8">
+                <StyledYearLabel
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
@@ -93,7 +104,7 @@ class ScarcityBody extends React.Component<Props> {
                   selectedData={selectedWaterData}
                   waterRegions={waterRegions}
                 />
-              </div>
+              </MapContainer>
               <div className="col-xs-12 col-md-6 col-lg-4">
                 <GapMinder />
               </div>
@@ -105,15 +116,9 @@ class ScarcityBody extends React.Component<Props> {
               <SelectedRegionInformation />
             </div>
             <div className="row">
-              <div
-                className={classNames(
-                  'col-xs-12',
-                  'col-md-6',
-                  styles['body-text'],
-                )}
-              >
+              <BodyText className="col-xs-12 col-md-6">
                 <MoreInformation />
-              </div>
+              </BodyText>
             </div>
           </div>
         )}

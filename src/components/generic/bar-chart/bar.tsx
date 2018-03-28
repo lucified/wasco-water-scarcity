@@ -3,8 +3,6 @@ import { select } from 'd3-selection';
 import { transition } from 'd3-transition'; // adds transition() to selections d3.select
 import * as React from 'react';
 
-import * as styles from './bar.scss';
-
 interface Props {
   y0: number;
   y1: number;
@@ -94,13 +92,7 @@ export default class Bar extends React.Component<Props, any> {
 
     return (
       <g ref={this.storeGroupRef}>
-        <rect
-          ref={this.storeBarRef}
-          className={styles.bar}
-          width={width}
-          fill={fill}
-          y={0}
-        />
+        <rect ref={this.storeBarRef} width={width} fill={fill} y={0} />
       </g>
     );
   }

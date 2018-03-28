@@ -4,7 +4,7 @@ import flattenDeep = require('lodash/flattenDeep');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-
+import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import {
   FutureData,
@@ -22,10 +22,22 @@ import {
   getThresholdsForDataType,
   isFutureScenarioLocked,
 } from '../../../selectors';
-
 import LineChart, { Data } from '../../generic/line-chart';
+import { theme } from '../../theme';
 
-import * as styles from './future-line-chart.scss';
+const Chart = styled(LineChart)`
+  overflow: visible !important;
+`;
+
+const Empty = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 243px;
+  font-weight: 200;
+  font-family: ${theme.labelFontFamily};
+  color: ${theme.colors.gray};
+`;
 
 interface GeneratedDispatchProps {
   onTimeIndexChange: (value: number) => void;
@@ -67,7 +79,7 @@ function FutureLineChart({
   height,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
-    return <div className={styles.empty}>Select a unit on the map</div>;
+    return <Empty>Select a unit on the map</Empty>;
   }
 
   if (!data || !filteredData || !selectedFutureDataForScenario) {
@@ -100,8 +112,7 @@ function FutureLineChart({
     .range(thresholdColors);
 
   return (
-    <LineChart
-      className={styles.chart}
+    <Chart
       data={chartData}
       width={width || 600}
       height={height || 240}

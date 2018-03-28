@@ -1,10 +1,53 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import Select from 'react-select';
-
+import styled from 'styled-components';
+import { theme } from '../../theme';
 import RadioSelector from '../radio-selector';
 
-import * as styles from './index.scss';
+const Radio = styled.div`
+  margin-bottom: ${theme.margin(0.5)};
+  display: inline-block;
+  width: 250px;
+`;
+
+const Link = styled.span`
+  cursor: pointer;
+  border-bottom: 1px dashed ${theme.colors.grayDarker};
+  white-space: nowrap;
+`;
+
+const StyledSelect = styled(Select)`
+  z-index: 10;
+  flex-grow: 1;
+  width: 120px;
+  height: 24px;
+  display: inline-block;
+  margin-bottom: -5px;
+
+  .Select-control {
+    height: 24px;
+  }
+
+  .Select-value {
+    line-height: 24px !important;
+  }
+
+  .Select-input {
+    height: 24px;
+  }
+`;
+
+const SelectArrow = styled.span`
+  border-color: ${theme.colors.grayDarker} transparent transparent;
+  border-style: solid;
+  border-width: 5px 5px 2.5px;
+  display: inline-block;
+  height: 0;
+  width: 0;
+  margin-left: ${theme.margin(0.2)};
+  margin-bottom: -1px;
+  position: relative;
+`;
 
 export interface Option {
   value: string;
@@ -60,20 +103,19 @@ export default class InlineSelector extends React.Component<
     if (editing) {
       if (selector === 'radio') {
         return (
-          <div className={styles.radio}>
+          <Radio>
             <RadioSelector
               selectedValue={selectedValue}
               values={options}
               onChange={this.handleChange}
               disabled={disabled}
             />
-          </div>
+          </Radio>
         );
       }
 
       return (
-        <Select
-          className={styles.select}
+        <StyledSelect
           name={name}
           options={options}
           value={selectedValue}
@@ -87,13 +129,10 @@ export default class InlineSelector extends React.Component<
     }
 
     return (
-      <span
-        onClick={this.showSelector}
-        className={classNames(styles.link, className)}
-      >
+      <Link onClick={this.showSelector} className={className}>
         {selectedValue}
-        <span className={styles['select-arrow']} />
-      </span>
+        <SelectArrow />
+      </Link>
     );
   }
 }

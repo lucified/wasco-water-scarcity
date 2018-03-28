@@ -1,8 +1,30 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
+import styled from 'styled-components';
+import { theme } from '../theme';
 
-const styles = require('./index.scss');
+const Root = styled.div`
+  margin-bottom: ${theme.margin(2)};
+  width: 100%;
+`;
+
+const Link = styled(NavLink)`
+  display: inline-block;
+  width: 100%;
+  min-height: 60px;
+  margin-right: ${theme.margin()};
+  margin-bottom: ${theme.margin()};
+  padding: ${theme.margin()};
+  border: 1px solid ${theme.colors.grayLightest};
+  color: ${theme.colors.grayDarker};
+  font-family: ${theme.headingFontFamily};
+  font-weight: 600;
+  text-decoration: none;
+
+  &:visited {
+    color: ${theme.colors.grayDark};
+  }
+`;
 
 interface Reference {
   title: string;
@@ -31,18 +53,18 @@ export default class Header extends React.Component<Props> {
     }
 
     return (
-      <div className={classNames('col-xs-12', styles.root)}>
+      <Root className="col-xs-12">
         <h3>Where to from here?</h3>
         <div className="row">
           {references[fromPage].map(link => (
             <div className="col-xs" key={`link-to-${link.url}`}>
-              <NavLink key={link.url} className={styles.link} to={link.url}>
+              <Link key={link.url} to={link.url}>
                 {link.title}
-              </NavLink>
+              </Link>
             </div>
           ))}
         </div>
-      </div>
+      </Root>
     );
   }
 }

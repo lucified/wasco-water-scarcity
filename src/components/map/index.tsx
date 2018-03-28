@@ -13,6 +13,7 @@ import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import styled from 'styled-components';
 import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
@@ -29,13 +30,52 @@ import {
   getThresholdsForDataType,
 } from '../../selectors';
 import { DataType, TimeAggregate, WorldRegion } from '../../types';
+import { theme } from '../theme';
 
 // TODO: import properly once types exist
 const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 const worldData = require('world-atlas/world/110m.json');
 
-const styles = require('./index.scss');
+const Land = styled.path`
+  fill: ${theme.colors.grayLighter};
+`;
+
+const SVG = styled.svg`
+  & .water-region {
+    stroke-width: 0.5px;
+    stroke: #ccc;
+    transition: opacity 0.2s ease-in;
+
+    &.selected {
+      stroke: black;
+      transition: opacity 0.2s ease-out;
+    }
+    &.unselected {
+      opacity: 0.5;
+      transition: opacity 0.2s ease-out;
+    }
+  }
+`;
+
+const SelectedRegion = styled.g`
+  & path {
+    stroke: ${theme.colors.grayDark};
+    stroke-width: 0.5px;
+    opacity: 0.8;
+    fill: none;
+  }
+`;
+
+const Legend = styled.g`
+  user-select: none;
+`;
+
+const LegendCaption = styled.text`
+  fill: #000;
+  text-anchor: start;
+  font-weight: bold;
+`;
 
 interface PassedProps {
   width: number;
@@ -192,11 +232,11 @@ class Map extends React.Component<Props> {
       .datum({ type: 'Sphere' })
       .attr('d', path as any); // TODO: fix typing
 
-    svg.select(`use.${styles['globe-fill']}`).on('click', clearSelectedRegion);
+    svg.select('use#globe-fill').on('click', clearSelectedRegion);
 
     // Countries land mass
     svg
-      .select<SVGPathElement>(`path.${styles.land}`)
+      .select<SVGPathElement>('path#land')
       .datum(feature(worldData, worldData.objects.land))
       .attr('d', path as any);
 
@@ -208,13 +248,13 @@ class Map extends React.Component<Props> {
       .data(features, d => String(d.properties.featureId))
       .enter()
       .append<SVGPathElement>('path')
-        .attr('class', styles['water-region'])
+        .attr('class', 'water-region')
         .classed(
-          styles.selected,
+          'selected',
           d => selectedWaterRegionId === d.properties.featureId,
         )
         .classed(
-          styles.unselected,
+          'unselected',
           d =>
             selectedWaterRegionId !== undefined &&
             selectedWaterRegionId !== d.properties.featureId,
@@ -385,11 +425,11 @@ class Map extends React.Component<Props> {
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => String(d.properties.featureId))
       .classed(
-        styles.selected,
+        'selected',
         d => selectedWaterRegionId === d.properties.featureId,
       )
       .classed(
-        styles.unselected,
+        'unselected',
         d =>
           selectedWaterRegionId !== undefined &&
           selectedWaterRegionId !== d.properties.featureId,
@@ -402,33 +442,28 @@ class Map extends React.Component<Props> {
     const { selectedDataType } = this.props;
 
     return (
-      <svg ref={this.saveSvgRef}>
+      <SVG innerRef={this.saveSvgRef}>
         <defs>
           <clipPath id="clip">
             <use xlinkHref="#sphere" />
           </clipPath>
           <path id="sphere" />
         </defs>
-        <use className={styles['globe-fill']} xlinkHref="#sphere" />
+        <use id="globe-fill" xlinkHref="#sphere" style={{ fill: 'white' }} />
         <g id="countries">
-          <path className={styles.land} clipPath="url(#clip)" />
+          <Land id="land" clipPath="url(#clip)" />
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
-        <g
-          id="selected-region"
-          className={styles['selected-region']}
-          clipPath="url(#clip)"
-        />
-        <g
+        <SelectedRegion id="selected-region" clipPath="url(#clip)" />
+        <Legend
           id="legend"
-          className={styles.legend}
           transform={`translate(${this.width * 0.6}, ${this.height - 40})`}
         >
-          <text className={styles['legend-caption']} x="0" y="-6">
+          <LegendCaption x="0" y="-6">
             {getLabel(selectedDataType)}
-          </text>
-        </g>
-      </svg>
+          </LegendCaption>
+        </Legend>
+      </SVG>
     );
   }
 }

@@ -1,11 +1,14 @@
 import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
-
+import styled from 'styled-components';
 import { StressShortageDatum } from '../../types';
-
 import LineChart, { Data } from '../generic/line-chart';
+import { theme } from '../theme';
 
-const styles = require('./data-line-chart.scss');
+const Chart = styled(LineChart)`
+  overflow: visible !important;
+  font-family: ${theme.labelFontFamily};
+`;
 
 interface PassedProps {
   dataType: 'shortage' | 'stress';
@@ -55,8 +58,7 @@ export default function DataLineChart({
   }
 
   return (
-    <LineChart
-      className={styles.chart}
+    <Chart
       data={chartData}
       width={400}
       height={180}
