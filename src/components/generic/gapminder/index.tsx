@@ -1,6 +1,5 @@
 // This is based on https://bost.ocks.org/mike/nations/
 
-import * as classNames from 'classnames';
 import { bisectRight, extent } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import {
@@ -18,8 +17,77 @@ import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import zip = require('lodash/zip');
 import * as React from 'react';
+import styled, { injectGlobal } from 'styled-components';
 
-const styles = require('./index.scss');
+const SVG = styled.svg`
+  overflow: visible !important;
+`;
+
+const Axis = styled.g`
+  & path,
+  & line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+`;
+
+const XAxis = Axis.extend`
+  & path {
+    display: none;
+  }
+`;
+
+const AxisLabel = styled.text`
+  fill: #807775;
+  font-size: 13px;
+  font-weight: lighter;
+`;
+
+const YearLabel = styled.text`
+  font: 600 50px 'Open Sans';
+  fill: #ddd;
+
+  &.gapminder-active {
+    fill: #aaa;
+  }
+`;
+
+const SelectedLine = styled.path`
+  fill: none;
+  stroke: darkcyan;
+  stroke-width: 1.5px;
+  stroke-dasharray: 3, 2;
+`;
+
+const Overlay = styled.rect`
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+`;
+
+// TODO: don't inject these globals. Use some other method
+// tslint:disable-next-line:no-unused-expression
+injectGlobal`
+  .gapminder-background-colors {
+    opacity: 0.5;
+  }
+
+  .gapminder-dot {
+    stroke: #000;
+    stroke-opacity: 0.4;
+    transition: opacity 100ms;
+    fill: #e5dddb;
+
+    &.gapminder-fade-out {
+      opacity: 0.1;
+    }
+  }
+
+  .gapminder-selected-series-dot {
+    fill: darkcyan;
+  }
+`;
 
 export interface CircleData {
   id: string;
@@ -280,12 +348,12 @@ class Gapminder extends React.Component<Props> {
     // prettier-ignore
     g
       .select('g#dots')
-      .selectAll<SVGGElement, ChartDatum>(`.${styles.dot}`)
+      .selectAll<SVGGElement, ChartDatum>(`.gapminder-dot`)
       .data(this.chartData, d => d.id)
       .enter()
         .append<SVGCircleElement>('circle')
-        .attr('class', styles.dot)
-        .classed(styles['fade-out'], shouldFadeOut as any)
+        .attr('class', 'gapminder-dot')
+        .classed('gapminder-fade-out', shouldFadeOut as any)
         .on('click', this.handleCircleClick)
         .call(this.drawCircle)
         .sort(this.circleOrder);
@@ -306,14 +374,14 @@ class Gapminder extends React.Component<Props> {
         .data(pathData)
         .enter()
         .append<SVGCircleElement>('circle')
-        .attr('class', styles['selected-series-dot'])
+        .attr('class', 'gapminder-selected-series-dot')
         .call(this.drawSelectedDataPoint);
     }
 
     // Add an overlay for the year label.
     const box = (label.node() as any).getBBox();
     g
-      .select<SVGRectElement>(`rect.${styles.overlay}`)
+      .select<SVGRectElement>(`#gapminder-overlay`)
       .attr('x', box.x)
       .attr('y', box.y)
       .attr('width', box.width)
@@ -374,7 +442,7 @@ class Gapminder extends React.Component<Props> {
       rectSelection
         .enter()
           .append<SVGRectElement>('rect')
-            .attr('class', styles['background-colors'])
+            .attr('class', 'gapminder-background-colors')
             .attr('y', 0)
             .attr('height', chartHeight)
         .merge(rectSelection)
@@ -402,7 +470,7 @@ class Gapminder extends React.Component<Props> {
       rectSelection
         .enter()
           .append<SVGRectElement>('rect')
-            .attr('class', styles['background-colors'])
+            .attr('class', 'gapminder-background-colors')
             .attr('x', 0)
             .attr('width', chartWidth)
         .merge(rectSelection)
@@ -445,18 +513,18 @@ class Gapminder extends React.Component<Props> {
       .clamp(true);
 
     g
-      .select<SVGRectElement>(`rect.${styles.overlay}`)
+      .select<SVGRectElement>('#gapminder-overlay')
       .on('mouseover', mouseover)
       .on('mouseout', mouseout)
       .on('mousemove', mousemove)
       .on('touchmove', mousemove);
 
     function mouseover() {
-      label.classed(styles.active, true);
+      label.classed('gapminder-active', true);
     }
 
     function mouseout() {
-      label.classed(styles.active, false);
+      label.classed('gapminder-active', false);
     }
 
     function mousemove(this: SVGRectElement) {
@@ -533,10 +601,10 @@ class Gapminder extends React.Component<Props> {
 
     // prettier-ignore
     g
-      .selectAll<SVGCircleElement, ChartDatum>(`circle.${styles.dot}`)
+      .selectAll<SVGCircleElement, ChartDatum>('circle.gapminder-dot')
       .data(this.chartData, d => d.id)
       .sort(this.circleOrder)
-      .classed(styles['fade-out'], shouldFadeOut as any)
+      .classed('gapminder-fade-out', shouldFadeOut as any)
       .transition(t as any)
         .call(this.drawCircle);
 
@@ -560,7 +628,7 @@ class Gapminder extends React.Component<Props> {
       circles
         .enter()
         .append<SVGCircleElement>('circle')
-        .attr('class', styles['selected-series-dot'])
+        .attr('class', 'gapminder-selected-series-dot')
         .merge(circles)
         .call(this.drawSelectedDataPoint);
       circles.exit().remove();
@@ -594,11 +662,11 @@ class Gapminder extends React.Component<Props> {
     } = this.props as PropsWithDefaults;
 
     return (
-      <svg
+      <SVG
         width={width}
         height={height}
-        className={classNames(styles.svg, className)}
-        ref={this.storeSvgRef}
+        className={className}
+        innerRef={this.storeSvgRef}
       >
         <defs>
           <clipPath id="chart-contents">
@@ -609,42 +677,35 @@ class Gapminder extends React.Component<Props> {
           </clipPath>
         </defs>
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <text
-            id="year-label"
-            className={styles['year-label']}
-            textAnchor="end"
-          />
-          <g
+          <YearLabel id="year-label" textAnchor="end" />
+          <XAxis
             id="x-axis"
-            className={classNames(styles.axis, styles.x)}
             transform={`translate(0,${height - marginTop - marginBottom})`}
           >
             {xAxisLabel && (
-              <text
+              <AxisLabel
                 id="x-axis-label"
-                className={styles['axis-label']}
                 textAnchor="end"
                 x={width - marginRight - marginLeft}
                 y={30}
               >
                 {xAxisLabel}
-              </text>
+              </AxisLabel>
             )}
-          </g>
-          <g id="y-axis" className={classNames(styles.axis, styles.y)}>
+          </XAxis>
+          <Axis id="y-axis">
             {yAxisLabel && (
-              <text
+              <AxisLabel
                 id="x-axis-label"
-                className={styles['axis-label']}
                 textAnchor="end"
                 x={0}
                 y={-20}
                 transform="rotate(-90)"
               >
                 {yAxisLabel}
-              </text>
+              </AxisLabel>
             )}
-          </g>
+          </Axis>
           <g clipPath="url(#chart-contents)">
             <g id="background-colors">
               <g id="x-colors" />
@@ -652,12 +713,12 @@ class Gapminder extends React.Component<Props> {
             </g>
             <g id="dots" />
             <g id="selected-data">
-              <path className={styles['selected-line']} />
+              <SelectedLine />
             </g>
           </g>
-          <rect className={styles.overlay} />
+          <Overlay id="gapminder-overlay" />
         </g>
-      </svg>
+      </SVG>
     );
   }
 }

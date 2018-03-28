@@ -1,15 +1,62 @@
-import * as classNames from 'classnames';
 import { max } from 'd3-array';
 import { Axis, axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
 import { scaleBand, ScaleBand, ScaleLinear, scaleLinear } from 'd3-scale';
 import * as React from 'react';
+import styled from 'styled-components';
 
 import AxisComponent from '../axis';
 import Bar from './bar';
 
-import * as styles from './bar-chart.scss';
 import { BarChartDatum } from './types';
+
+const SVGChart = styled.svg`
+  overflow: visible;
+`;
+
+const Background = styled.rect`
+  fill: transparent;
+`;
+
+const Axis = styled(AxisComponent)`
+  font: 0.65rem sans-serif;
+  overflow-y: hidden;
+
+  /* render tick marks */
+  line {
+    display: none;
+  }
+
+  /* do not render axis */
+  path {
+    fill: none;
+    stroke: lighten(#000, 80);
+  }
+`;
+
+const SelectionBackground = styled.rect`
+  fill: #eee;
+  opacity: 0.8;
+  ${({ locked }: { locked?: boolean }) =>
+    locked
+      ? `
+    stroke: darkgray;
+    stroke-width: 2px;
+  `
+      : ''}};
+`;
+
+const SelectionLabel = styled.text`
+  font-family: sans-serif;
+  font-size: 12px;
+  color: black;
+  text-shadow: -1px 1px 0 white, 1px 1px 0 white;
+`;
+
+const HoverArea = styled.rect`
+  fill: none;
+  pointer-events: all;
+`;
 
 export interface Props {
   data: BarChartDatum[];
@@ -69,8 +116,7 @@ class HoverRect extends React.PureComponent<HoverRectProps> {
     const { x, y, width, height } = this.props;
 
     return (
-      <rect
-        className={styles['hover-area']}
+      <HoverArea
         x={x}
         y={y}
         onMouseEnter={this.handleMouseEnter}
@@ -251,11 +297,8 @@ export default class BarChart extends React.Component<Props, {}> {
     const xScale = this.getXScale();
 
     return (
-      <rect
-        className={classNames(
-          styles['selection-background'],
-          indexLocked && styles.locked,
-        )}
+      <SelectionBackground
+        locked={indexLocked}
         x={
           xScale(String(selectedData.key))! -
           xScale.paddingInner() * xScale.step() / 2
@@ -279,15 +322,14 @@ export default class BarChart extends React.Component<Props, {}> {
     const yScale = this.getYScale();
 
     return (
-      <text
-        className={styles['selection-label']}
+      <SelectionLabel
         textAnchor="middle"
         x={xScale(String(selectedData.key))! + xScale.bandwidth() / 2}
         y={yScale(selectedData.total)}
         dy="-.35em"
       >
         {yTickFormat(selectedData.total)}
-      </text>
+      </SelectionLabel>
     );
   }
 
@@ -347,35 +389,29 @@ export default class BarChart extends React.Component<Props, {}> {
     const contentHeight = this.getContentHeight();
     const contentWidth = this.getContentWidth();
     return (
-      <svg
-        className={classNames(styles.chart, className)}
+      <SVGChart
+        className={className}
         height={height}
         width={width}
         onClick={this.handleMouseClick}
       >
         <g transform={`translate(${marginLeft}, ${marginTop})`}>
-          <rect
-            className={styles.background}
-            width={contentWidth}
-            height={contentHeight}
-          />
+          <Background width={contentWidth} height={contentHeight} />
           {this.getSelectionBackground()}
-          <AxisComponent
+          <Axis
             axis={this.getXAxis()}
-            className={`x ${styles.axis}`}
             transform={`translate(0,${contentHeight})`}
             transitionDuration={transitionDuration}
           />
-          <AxisComponent
+          <Axis
             axis={this.getYAxis()}
-            className={`y ${styles.axis}`}
             transitionDuration={transitionDuration}
           />
           {this.getBars()}
           {this.getSelectionLabel()}
           {this.getHoverAreas()}
         </g>
-      </svg>
+      </SVGChart>
     );
   }
 }
