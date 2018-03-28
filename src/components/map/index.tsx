@@ -13,7 +13,7 @@ import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
@@ -41,10 +41,8 @@ const Land = styled.path`
   fill: ${theme.colors.grayLighter};
 `;
 
-// TODO: don't inject globals. Find a better way.
-// tslint:disable-next-line:no-unused-expression
-injectGlobal`
-  .water-region {
+const SVG = styled.svg`
+  & .water-region {
     stroke-width: 0.5px;
     stroke: #ccc;
     transition: opacity 0.2s ease-in;
@@ -444,7 +442,7 @@ class Map extends React.Component<Props> {
     const { selectedDataType } = this.props;
 
     return (
-      <svg ref={this.saveSvgRef}>
+      <SVG innerRef={this.saveSvgRef}>
         <defs>
           <clipPath id="clip">
             <use xlinkHref="#sphere" />
@@ -465,7 +463,7 @@ class Map extends React.Component<Props> {
             {getLabel(selectedDataType)}
           </LegendCaption>
         </Legend>
-      </svg>
+      </SVG>
     );
   }
 }

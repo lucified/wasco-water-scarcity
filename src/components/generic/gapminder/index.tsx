@@ -17,10 +17,29 @@ import flatMap = require('lodash/flatMap');
 import values = require('lodash/values');
 import zip = require('lodash/zip');
 import * as React from 'react';
-import styled, { injectGlobal } from 'styled-components';
+import styled from 'styled-components';
 
 const SVG = styled.svg`
   overflow: visible !important;
+
+  & .gapminder-background-colors {
+    opacity: 0.5;
+  }
+
+  & .gapminder-dot {
+    stroke: #000;
+    stroke-opacity: 0.4;
+    transition: opacity 100ms;
+    fill: #e5dddb;
+
+    &.gapminder-fade-out {
+      opacity: 0.1;
+    }
+  }
+
+  & .gapminder-selected-series-dot {
+    fill: darkcyan;
+  }
 `;
 
 const Axis = styled.g`
@@ -64,29 +83,6 @@ const Overlay = styled.rect`
   fill: none;
   pointer-events: all;
   cursor: ew-resize;
-`;
-
-// TODO: don't inject these globals. Use some other method
-// tslint:disable-next-line:no-unused-expression
-injectGlobal`
-  .gapminder-background-colors {
-    opacity: 0.5;
-  }
-
-  .gapminder-dot {
-    stroke: #000;
-    stroke-opacity: 0.4;
-    transition: opacity 100ms;
-    fill: #e5dddb;
-
-    &.gapminder-fade-out {
-      opacity: 0.1;
-    }
-  }
-
-  .gapminder-selected-series-dot {
-    fill: darkcyan;
-  }
 `;
 
 export interface CircleData {
