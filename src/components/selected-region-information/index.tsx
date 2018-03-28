@@ -4,7 +4,7 @@ import { max } from 'd3-array';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-
+import styled from 'styled-components';
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../../actions';
 import { getDataTypeColors } from '../../data';
 import { StateTree } from '../../reducers';
@@ -24,13 +24,33 @@ import {
   StressShortageDatum,
   WorldRegion,
 } from '../../types';
-
+import { SectionHeader, theme } from '../theme';
 import AvailabilityChart from './availability-chart';
 import ConsumptionChart from './consumption-chart';
 import DataLineChart from './data-line-chart';
 import PopulationChart from './population-chart';
 
-const styles = require('./index.scss');
+const Heading = styled.h4`
+  margin-top: 0px;
+  margin-bottom: 5px;
+`;
+
+const Description = styled.p`
+  font-size: 0.8rem;
+  font-family: ${theme.labelFontFamily};
+  color: ${theme.colors.grayDark};
+  margin: 0 0 10px 1px;
+`;
+
+const Empty = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  font-weight: 200;
+  font-family: ${theme.labelFontFamily};
+  color: ${theme.colors.gray};
+`;
 
 interface PassedProps {
   dataType?: DataType;
@@ -119,8 +139,8 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{title}</h4>
-        <p className={styles.description}>Consumption / Availability</p>
+        <Heading>{title}</Heading>
+        <Description>Consumption / Availability</Description>
         {timeSeriesForSelectedWaterRegion ? (
           <DataLineChart
             dataType="stress"
@@ -135,7 +155,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <div className={styles.empty}>Select a unit</div>
+          <Empty>Select a unit</Empty>
         )}
       </div>
     );
@@ -159,8 +179,8 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{title}</h4>
-        <p className={styles.description}>Availability per person (m³)</p>
+        <Heading>{title}</Heading>
+        <Description>Availability per person (m³)</Description>
         {timeSeriesForSelectedWaterRegion ? (
           <DataLineChart
             dataType="shortage"
@@ -178,7 +198,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <div className={styles.empty}>Select a unit</div>
+          <Empty>Select a unit</Empty>
         )}
       </div>
     );
@@ -200,8 +220,8 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{this.getChartTitle('availability')}</h4>
-        <p className={styles.description}>Total availability (m³)</p>
+        <Heading>{this.getChartTitle('availability')}</Heading>
+        <Description>Total availability (m³)</Description>
         <AvailabilityChart
           data={
             timeSeriesForSelectedWaterRegion ||
@@ -233,8 +253,8 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{this.getChartTitle('consumption')}</h4>
-        <p className={styles.description}>Consumption (m³)</p>
+        <Heading>{this.getChartTitle('consumption')}</Heading>
+        <Description>Consumption (m³)</Description>
         <ConsumptionChart
           data={
             timeSeriesForSelectedWaterRegion ||
@@ -261,8 +281,8 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-4">
-        <h4 className={styles.heading}>{this.getChartTitle('population')}</h4>
-        <p className={styles.description}>Population</p>
+        <Heading>{this.getChartTitle('population')}</Heading>
+        <Description>Population</Description>
         <PopulationChart
           data={
             timeSeriesForSelectedWaterRegion ||
@@ -309,7 +329,7 @@ class SelectedRegionInformation extends React.Component<Props> {
 
     return (
       <div className="col-xs-12 col-md-12 col-lg-12">
-        <h3 className={styles['section-heading']}>{this.getTitle()}</h3>
+        <SectionHeader>{this.getTitle()}</SectionHeader>
         <div className="row">
           {this.getStressChart()}
           {this.getShortageChart()}

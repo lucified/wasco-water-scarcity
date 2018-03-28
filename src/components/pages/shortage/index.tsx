@@ -1,21 +1,34 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
-
-import withPageData, { Props } from '../with-page-data';
-
+import styled from 'styled-components';
 import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
+import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
+import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 import MoreInformation from './more-information';
 
-import * as styles from './index.scss';
+const MapContainer = styled.div`
+  position: relative;
+`;
+
+const StyledYearLabel = styled(YearLabel)`
+  position: absolute;
+  right: 0;
+`;
+
+const StyledModelSelector = styled(ModelSelector)`
+  font-size: 15px;
+  padding-left: ${theme.margin()};
+  padding-top: 5px;
+  border-left: 1px solid ${theme.colors.grayLight};
+`;
 
 class ShortageBody extends React.Component<Props> {
   public componentDidMount() {
@@ -27,18 +40,13 @@ class ShortageBody extends React.Component<Props> {
 
     return (
       <div>
-        <h1 className={styles['section-header']}>Water Shortage</h1>
+        <SectionHeader>Water Shortage</SectionHeader>
         <div className="row between-xs">
-          <div
-            className={classNames('col-xs-12', 'col-md-6', styles['body-text'])}
-          >
+          <BodyText className="col-xs-12 col-md-6">
             <Description />
-          </div>
-          <div className={classNames('col-xs-12', 'col-md-4')}>
-            <ModelSelector
-              className={styles['secondary-content']}
-              estimateLabel="shortage"
-            />
+          </BodyText>
+          <div className="col-xs-12 col-md-4">
+            <StyledModelSelector estimateLabel="shortage" />
           </div>
         </div>
         {!selectedWaterData || !waterRegions ? (
@@ -58,9 +66,8 @@ class ShortageBody extends React.Component<Props> {
               </div>
             </div>
             <div className="row middle-xs">
-              <div className={classNames(styles.map, 'col-xs-12')}>
-                <YearLabel
-                  className={styles['year-label']}
+              <MapContainer className="col-xs-12">
+                <StyledYearLabel
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
@@ -70,21 +77,15 @@ class ShortageBody extends React.Component<Props> {
                   waterRegions={waterRegions}
                 />
                 <WorldRegionSelector />
-              </div>
+              </MapContainer>
             </div>
             <div className="row">
               <SelectedRegionInformation dataType="shortage" />
             </div>
             <div className="row">
-              <div
-                className={classNames(
-                  'col-xs-12',
-                  'col-md-6',
-                  styles['body-text'],
-                )}
-              >
+              <BodyText className="col-xs-12 col-md-6">
                 <MoreInformation />
-              </div>
+              </BodyText>
             </div>
           </div>
         )}

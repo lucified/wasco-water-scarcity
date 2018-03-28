@@ -66,7 +66,7 @@ const defaultMargin = 20;
 
 // REPEATING ELEMENTS
 
-export const SectionHeader = styled.div`
+export const SectionHeader = styled.h1`
   margin-top: ${defaultMargin * 2}px;
 `;
 

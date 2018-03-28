@@ -3,16 +3,110 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as ReactSlider from 'react-slider';
 import { Dispatch } from 'redux';
-
+import styled from 'styled-components';
 import { setThresholdsForDataType } from '../actions';
 import {
   defaultDataTypeThresholdMaxValues,
   defaultDataTypeThresholds,
+  getDataTypeColors,
 } from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
+import { theme } from './theme';
 
-const styles = require('./threshold-selector.scss');
+const Header = styled.div`
+  margin-bottom: 4px;
+  font-family: ${theme.labelFontFamily};
+`;
+
+const stressColors = getDataTypeColors('stress');
+const shortageColors = getDataTypeColors('shortage');
+
+const StyledReactSlider = styled(ReactSlider)`
+  width: 100%;
+  height: 26px;
+
+  & .bar-stress,
+  & .bar-shortage {
+    position: relative;
+    top: 2px;
+    background: #d2e3e5;
+    height: 16px;
+    border-radius: 8px;
+    margin: 0 6px;
+
+    &.bar-stress-1 {
+      background: ${stressColors[0]};
+    }
+
+    &.bar-stress-2 {
+      background: ${stressColors[1]};
+    }
+
+    &.bar-stress-3 {
+      background: ${stressColors[2]};
+    }
+
+    &.bar-shortage-0 {
+      background: ${shortageColors[2]};
+    }
+
+    &.bar-shortage-1 {
+      background: ${shortageColors[1]};
+    }
+
+    &.bar-shortage-2 {
+      background: ${shortageColors[0]};
+    }
+  }
+
+  & .threshold-selector-handle {
+    background-color: #aaa;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid white;
+  }
+
+  & .threshold-selector-active {
+    border: 4px solid white !important;
+  }
+`;
+
+const Labels = styled.div`
+  position: relative;
+  font-size: 14px;
+  font-family: ${theme.labelFontFamily};
+  color: ${theme.colors.grayDarker};
+  margin: 0 10px;
+`;
+
+const Label = styled.span`
+  position: absolute;
+  top: -4px;
+  transform: translate(-50%);
+  padding-left: 2px;
+`;
+
+const Reset = styled.div`
+  position: relative;
+`;
+
+const ResetLink = styled.span`
+  position: absolute;
+  right: 5px;
+  top: -5px;
+  cursor: pointer;
+  color: ${theme.colors.grayDark};
+  font-size: 14px;
+  font-weight: lighter;
+  font-family: ${theme.labelFontFamily};
+
+  &:hover {
+    color: ${theme.colors.grayDarker};
+  }
+`;
 
 interface PassedProps {
   dataType: 'stress' | 'shortage';
@@ -71,8 +165,8 @@ function ThresholdSelector({
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
     <div className={className}>
-      <div className={styles.header}>{getHeaderText(dataType)}</div>
-      <ReactSlider
+      <Header>{getHeaderText(dataType)}</Header>
+      <StyledReactSlider
         min={min}
         max={slidingMax}
         value={thresholds.slice()}
@@ -81,33 +175,30 @@ function ThresholdSelector({
         step={step}
         withBars
         snapDragDisabled
-        handleClassName={styles.handle}
-        handleActiveClassName={styles.active}
+        handleClassName="threshold-selector-handle"
+        handleActiveClassName="threshold-selector-active"
         barClassName={dataType === 'stress' ? 'bar-stress' : 'bar-shortage'}
-        className={styles.slider}
         onChange={setThresholds}
       />
-      <div className={styles.labels}>
+      <Labels>
         {thresholds.map((d, i) => (
-          <span
-            className={styles.label}
+          <Label
             style={{ left: `${(d - min) / (slidingMax - min) * 100}%` }}
             key={`${dataType}-threshold-label-${i}`}
           >
             {formatter(d)}
-          </span>
+          </Label>
         ))}
-      </div>
-      <div className={styles.reset}>
-        <span
-          className={styles['reset-link']}
+      </Labels>
+      <Reset>
+        <ResetLink
           onClick={() => {
             setThresholds(defaultDataTypeThresholds[dataType]);
           }}
         >
           Reset
-        </span>
-      </div>
+        </ResetLink>
+      </Reset>
     </div>
   );
 }

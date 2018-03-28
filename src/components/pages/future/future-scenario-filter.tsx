@@ -2,7 +2,6 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import Select, { Option } from 'react-select';
-
 import { setSelectedFutureFilters } from '../../../actions';
 import { FutureDataset } from '../../../data';
 import { StateTree } from '../../../reducers';
@@ -10,8 +9,30 @@ import {
   getSelectedFutureDataset,
   getSelectedFutureFilters,
 } from '../../../selectors';
+import styled from 'styled-components';
+import { theme } from '../../theme';
 
-import * as styles from './future-scenario-filter.scss';
+const Parameter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 14px;
+  font-family: ${theme.labelFontFamily};
+  line-height: 1.1;
+`;
+
+const Dropdown = styled(Select)`
+  width: 260px;
+
+  & .Select-value-label {
+    font-weight: bold;
+  }
+
+  & .Select-value-icon + .Select-value-label {
+    font-weight: normal;
+  }
+`;
 
 interface PassedProps {
   climateModel: string;
@@ -110,10 +131,9 @@ class FutureScenarioFilter extends React.Component<Props> {
       <div className={classNames('row', className)}>
         <div className="col-xs-12 col-md-6">
           <h2>Actions</h2>
-          <div className={styles.parameter}>
+          <Parameter>
             Climate scenario:
-            <Select
-              className={styles.dropdown}
+            <Dropdown
               options={toOptions(
                 selectedFutureDataset.climateExperiments,
                 climateExperiment,
@@ -122,28 +142,26 @@ class FutureScenarioFilter extends React.Component<Props> {
               clearable={false}
               multi
               value={selectedFutureFilters.climateExperiments}
-              onChange={this.createChangeHandler('climateExperiments')}
+              onChange={this.createChangeHandler('climateExperiments') as any}
             />
-          </div>
-          <div className={styles.parameter}>
+          </Parameter>
+          <Parameter>
             Population scenarios:
-            <Select
-              className={styles.dropdown}
+            <Dropdown
               options={toOptions(selectedFutureDataset.populations, population)}
               name="Populations"
               clearable={false}
               multi
               value={selectedFutureFilters.populations}
-              onChange={this.createChangeHandler('populations')}
+              onChange={this.createChangeHandler('populations') as any}
             />
-          </div>
+          </Parameter>
         </div>
         <div className="col-xs-12 col-md-6">
           <h2>Uncertainties</h2>
-          <div className={styles.parameter}>
+          <Parameter>
             Impact models:
-            <Select
-              className={styles.dropdown}
+            <Dropdown
               options={toOptions(
                 selectedFutureDataset.impactModels,
                 impactModel,
@@ -152,13 +170,12 @@ class FutureScenarioFilter extends React.Component<Props> {
               multi
               clearable={false}
               value={selectedFutureFilters.impactModels}
-              onChange={this.createChangeHandler('impactModels')}
+              onChange={this.createChangeHandler('impactModels') as any}
             />
-          </div>
-          <div className={styles.parameter}>
+          </Parameter>
+          <Parameter>
             Climate models:
-            <Select
-              className={styles.dropdown}
+            <Dropdown
               options={toOptions(
                 selectedFutureDataset.climateModels,
                 climateModel,
@@ -167,9 +184,9 @@ class FutureScenarioFilter extends React.Component<Props> {
               clearable={false}
               multi
               value={selectedFutureFilters.climateModels}
-              onChange={this.createChangeHandler('climateModels')}
+              onChange={this.createChangeHandler('climateModels') as any}
             />
-          </div>
+          </Parameter>
         </div>
       </div>
     );

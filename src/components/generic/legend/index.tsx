@@ -1,7 +1,43 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
+import styled from 'styled-components';
+import { theme } from '../../theme';
 
-const styles = require('./index.scss');
+const LegendContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
+  flex-wrap: wrap;
+`;
+
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-family: ${theme.labelFontFamily};
+  ${({ hovered }: { hovered: boolean }) =>
+    hovered ? `background: #ddd;` : ''};
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+`;
+
+const Box = styled.div`
+  width: 10px;
+  height: 10px;
+  margin-left: 10px;
+`;
+
+const Title = styled.div`
+  padding-left;: 5;px;
+  font-size;: 0.8;rem;
+`;
 
 export interface LegendItem {
   color: string;
@@ -37,7 +73,7 @@ export default class Legend extends React.Component<Props, State> {
     const { onHover } = this.props;
     if (onHover) {
       const titleElements = e.target.parentElement.getElementsByClassName(
-        styles.title,
+        'legend-item-title',
       );
       const title = titleElements[0] && titleElements[0].textContent;
       if (title) {
@@ -57,30 +93,24 @@ export default class Legend extends React.Component<Props, State> {
     }
   }
 
-  private getLegendItem(text: string, color: string, index: number) {
+  private getLegendItem(text: string, color: string) {
     const style = { backgroundColor: color };
     const { hoveredItemTitle } = this.state;
     return (
-      <div
-        key={index}
-        className={classNames(styles['legend-item'], {
-          [styles.hovered]: text === hoveredItemTitle,
-        })}
-      >
-        <div className={styles.box} style={style} />
-        <div className={styles.title}>{text}</div>
-        <div
-          className={styles.overlay}
+      <Item hovered={text === hoveredItemTitle} key={text}>
+        <Box style={style} />
+        <Title className="legend-item-title">{text}</Title>
+        <Overlay
           onMouseEnter={this.onHoverEnter}
           onMouseOut={this.onHoverLeave}
         />
-      </div>
+      </Item>
     );
   }
 
   private getLegendItems() {
-    const items = this.props.items.map((item, index) =>
-      this.getLegendItem(item.title, item.color, index),
+    const items = this.props.items.map(item =>
+      this.getLegendItem(item.title, item.color),
     );
 
     if (this.props.reverse) {
@@ -94,9 +124,9 @@ export default class Legend extends React.Component<Props, State> {
     const { className } = this.props;
 
     return (
-      <div className={classNames(styles.legend, className)}>
+      <LegendContainer className={className}>
         {this.getLegendItems()}
-      </div>
+      </LegendContainer>
     );
   }
 }

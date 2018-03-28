@@ -1,9 +1,8 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
-
+import styled from 'styled-components';
 import {
   loadFutureData,
   setSelectedClimateModel,
@@ -26,18 +25,29 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
-
 import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
+import { theme } from '../../theme';
 import TimeScaleSelector from '../../time-scale-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioDescription from './future-scenario-description';
 import FutureScenarioFilter from './future-scenario-filter';
 
-import * as styles from './index.scss';
+const DataSelectors = styled.div`
+  padding-top: ${theme.margin(1.5)};
+`;
+
+const StyledSpinner = styled(Spinner)`
+  margin-top: 40px;
+`;
+
+const Error = styled.div`
+  margin-top: 40px;
+  text-align: center;
+`;
 
 type PassedProps = RouteComponentProps<void>;
 
@@ -186,20 +196,13 @@ class FutureBody extends React.Component<Props> {
               population={selectedPopulation}
             />
           </div>
-          <div
-            className={classNames(
-              'col-xs-12',
-              'col-md-offset-1',
-              'col-md-3',
-              styles['data-selectors'],
-            )}
-          >
+          <DataSelectors className="col-xs-12 col-md-offset-1 col-md-3">
             <DataTypeSelector hideScarcity />
             <TimeScaleSelector />
-          </div>
+          </DataSelectors>
         </div>
         {!waterRegions || !allScenariosInSelectedDataset ? (
-          <Spinner className={styles.spinner} />
+          <StyledSpinner />
         ) : (
           <div>
             <div className="row bottom-xs between-xs">
@@ -212,7 +215,6 @@ class FutureBody extends React.Component<Props> {
               </div>
               <div className="col-xs-12 col-md-4">
                 <FutureScenarioDescription
-                  className={styles['secondary-content']}
                   estimateLabel={selectedDataType}
                   includeConsumption={selectedDataType === 'stress'}
                   climateModel={selectedClimateModel}
@@ -226,9 +228,7 @@ class FutureBody extends React.Component<Props> {
               <div className="col-xs-12">
                 <h2>Selected scenario{yearLabel}</h2>
                 {!mapData ? (
-                  <div className={styles.error}>
-                    No data found for selected model.
-                  </div>
+                  <Error>No data found for selected model.</Error>
                 ) : (
                   <div>
                     <Map

@@ -1,14 +1,32 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-
+import styled from 'styled-components';
 import { setSelectedWorldRegion } from '../../actions';
 import { StateTree } from '../../reducers';
 import { getSelectedWorldRegionId, getWorldRegionData } from '../../selectors';
 import { WorldRegion } from '../../types';
+import { theme } from '../theme';
 
-const styles = require('./index.scss');
+const RegionsList = styled.div`
+  line-height: 2;
+  padding: ${theme.margin()} 0;
+`;
+
+const Region = styled.a`
+  font-size: 0.73rem;
+  font-family: ${theme.labelFontFamily}';
+  padding: 0.3rem 0.3rem;
+  cursor: pointer;
+  color: ${({ selected }: { selected: boolean }) =>
+    selected ? 'white' : theme.colors.grayDarkest};
+  ${({ selected }: { selected: boolean }) =>
+    selected ? `background-color: ${theme.colors.grayDarkest};` : ''};
+`;
+
+const RegionName = styled.span`
+  white-space: nowrap;
+`;
 
 interface StateProps {
   selectedWorldRegionId: number;
@@ -33,22 +51,20 @@ class WorldRegionSelector extends React.Component<Props> {
     const { selectedWorldRegionId, worldRegions } = this.props;
 
     return (
-      <div className={styles['regions-list']}>
+      <RegionsList>
         {[
           { id: 0, name: 'Global', color: 'black' },
           ...(worldRegions || []),
         ].map(({ id, name }) => (
-          <a
+          <Region
             key={`world-region-selector-${id}`}
             onClick={this.generateClickCallback(id)}
-            className={classNames(styles.region, {
-              [styles.selected]: selectedWorldRegionId === id,
-            })}
+            selected={selectedWorldRegionId === id}
           >
-            <span className={styles['region-name']}>{name}</span>
-          </a>
+            <RegionName>{name}</RegionName>
+          </Region>
         ))}
-      </div>
+      </RegionsList>
     );
   }
 }

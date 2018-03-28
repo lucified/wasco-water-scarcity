@@ -1,6 +1,9 @@
 import * as React from 'react';
+import styled from 'styled-components';
 
-import * as styles from './future-scenario-description.scss';
+const Assumption = styled.span`
+  font-weight: bold;
+`;
 
 interface PassedProps {
   className?: string;
@@ -26,22 +29,18 @@ export default function FutureModelDescription({
   return (
     <div className={className}>
       This scenario of blue water {estimateLabel} is produced using{' '}
-      <span className={styles.assumption}>blue water availability</span>
+      <Assumption>blue water availability</Assumption>
       {includeConsumption && (
         <span>
           {' '}
-          and <span className={styles.assumption}>consumption</span>
+          and <Assumption>consumption</Assumption>
         </span>
       )}{' '}
-      estimates from the water model{' '}
-      <span className={styles.assumption}>{impactModel}</span>, driven by
-      climate data from{' '}
-      <span className={styles.assumption}>{climateModel}</span> and{' '}
-      <span className={styles.assumption}>{climateExperiment}</span> and
-      calculated for{' '}
-      <span className={styles.assumption}>food production units</span>.
-      Population estimates are from{' '}
-      <span className={styles.assumption}>{population}</span>.
+      estimates from the water model <Assumption>{impactModel}</Assumption>,
+      driven by climate data from <Assumption>{climateModel}</Assumption> and{' '}
+      <Assumption>{climateExperiment}</Assumption> and calculated for{' '}
+      <Assumption>food production units</Assumption>. Population estimates are
+      from <Assumption>{population}</Assumption>.
     </div>
   );
 }

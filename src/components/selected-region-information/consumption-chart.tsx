@@ -3,15 +3,27 @@ import { format } from 'd3-format';
 import { schemeBlues } from 'd3-scale-chromatic';
 import range = require('lodash/range');
 import * as React from 'react';
-
-import BarChart, { BarChartDatum } from '../generic/bar-chart';
-import Legend, { LegendItem } from '../generic/legend';
-
+import styled from 'styled-components';
 import memoize from '../../memoize';
 import { Datum } from '../../types';
 import { formatYearRange } from '../../utils';
+import BarChart, { BarChartDatum } from '../generic/bar-chart';
+import Legend, { LegendItem } from '../generic/legend';
+import { theme } from '../theme';
 
-import * as styles from './consumption-chart.scss';
+const LegendContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Instructions = styled.span`
+  white-space: nowrap;
+  font-family: ${theme.labelFontFamily};
+  font-size: 12px;
+  color: ${theme.colors.textMenu};
+  position: relative;
+  top: 4px;
+`;
 
 interface PassedProps {
   data: Datum[];
@@ -151,10 +163,10 @@ class ConsumptionChart extends React.Component<Props, State> {
           onMouseEnter={this.handleBarHover}
           transitionDuration={100}
         />
-        <div className={styles.legend}>
-          <span className={styles.instructions}>Hover to filter:</span>
+        <LegendContainer>
+          <Instructions>Hover to filter:</Instructions>
           <Legend items={legendItems} onHover={this.handleLegendHover} />
-        </div>
+        </LegendContainer>
       </div>
     );
   }
