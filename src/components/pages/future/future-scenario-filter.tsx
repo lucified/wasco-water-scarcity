@@ -1,4 +1,3 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import Select, { Option } from 'react-select';
@@ -128,7 +127,7 @@ class FutureScenarioFilter extends React.Component<Props> {
       className,
     } = this.props;
     return (
-      <div className={classNames('row', className)}>
+      <div className={`row ${className}`}>
         <div className="col-xs-12 col-md-6">
           <h2>Actions</h2>
           <Parameter>
