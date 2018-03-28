@@ -28,7 +28,7 @@ const Disclaimer = styled.div`
   justify-content: center;
   font-size: 14px;
   text-align: right;
-  color: $color-darker-gray;
+  color: ${theme.colors.grayDarker};
   font-weight: lighter;
 `;
 
@@ -41,7 +41,7 @@ const Label = styled.div`
 const Heading = styled.div`
   font-size: 48px;
   font-weight: 300;
-  margin: $default-margin;
+  margin: ${theme.margin()};
 `;
 
 const Navigation = styled.div`

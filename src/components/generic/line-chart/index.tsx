@@ -13,8 +13,45 @@ import { curveLinear, line, Line } from 'd3-shape';
 import { transition } from 'd3-transition';
 import flatMap = require('lodash/flatMap');
 import * as React from 'react';
+import styled from 'styled-components';
 
-const styles = require('./index.scss');
+const XAxis = styled.g`
+  path {
+    display: none;
+  }
+`;
+
+const YAxisLabel = styled.text`
+  fill: black;
+`;
+
+const SVG = styled.svg`
+  .line {
+    fill: none;
+    stroke-width: 1.5px;
+  }
+
+  .background-colors {
+    opacity: 0.5;
+  }
+
+  .selected-area {
+    fill: rgba(238, 238, 238, 0.5);
+    stroke: darkgray;
+  }
+
+  .selected-label {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: black;
+    text-shadow: -1px 1px 0 white, 1px 1px 0 white;
+  }
+
+  .overlay {
+    fill: none;
+    pointer-events: all;
+  }
+`;
 
 export interface Datum {
   value: number;
@@ -207,7 +244,7 @@ class LineChart extends React.Component<Props> {
         .data(colorAreas)
         .enter()
           .append('rect')
-          .attr('class', styles['background-colors'])
+          .attr('class', 'background-colors')
           .attr('x', 0)
           .attr('y', d => yScale(d.upperBound))
           .attr('width', chartWidth)
@@ -234,13 +271,13 @@ class LineChart extends React.Component<Props> {
           xScale(selectedDataPoint.end) - xScale(selectedDataPoint.start),
         )
         .attr('stroke-width', selectedTimeIndexLocked ? 2 : 0)
-        .attr('class', styles['selected-area']);
+        .attr('class', 'selected-area');
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
     g
       .append('rect')
-      .attr('class', styles.overlay)
+      .attr('class', 'overlay')
       .attr('width', chartWidth)
       .attr('height', chartHeight)
       .on('mousemove', this.handleMouseMove);
@@ -255,7 +292,7 @@ class LineChart extends React.Component<Props> {
 
     lineGroup
       .append('path')
-      .attr('class', styles.line)
+      .attr('class', 'line')
       .attr('d', d => this.lineGenerator!(d.series))
       .style(
         'opacity',
@@ -278,7 +315,7 @@ class LineChart extends React.Component<Props> {
       g
         .append('text')
         .attr('id', 'selected-label')
-        .attr('class', styles['selected-label'])
+        .attr('class', 'selected-label')
         .attr('x', 9)
         .attr('dy', '.35em')
         .attr(
@@ -390,7 +427,7 @@ class LineChart extends React.Component<Props> {
       colorRects
         .enter()
           .append('rect')
-          .attr('class', styles['background-colors'])
+          .attr('class', 'background-colors')
           .attr('x', 0)
           .attr('y', d => yScale(d.upperBound))
           .attr('width', chartWidth)
@@ -425,7 +462,7 @@ class LineChart extends React.Component<Props> {
       .append('g')
         .attr('class', 'line-group')
         .append('path')
-          .attr('class', styles.line)
+          .attr('class', 'line')
           .on('mouseenter', d => {
             if (onLineHover) {
               onLineHover(d.id);
@@ -494,33 +531,27 @@ class LineChart extends React.Component<Props> {
     } = this.props as PropsWithDefaults;
 
     return (
-      <svg
+      <SVG
         width={width}
         height={height}
         className={className}
-        ref={this.storeSvgRef}
+        innerRef={this.storeSvgRef}
         onClick={onClick}
       >
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <g
+          <XAxis
             id="x-axis"
-            className={styles['x-axis']}
             transform={`translate(0,${height - marginTop - marginBottom})`}
           />
           <g id="y-axis">
             {yAxisLabel && (
-              <text
-                transform="rotate(-90)"
-                y="6"
-                dy="0.71em"
-                className={styles['y-axis-label']}
-              >
+              <YAxisLabel transform="rotate(-90)" y="6" dy="0.71em">
                 {yAxisLabel}
-              </text>
+              </YAxisLabel>
             )}
           </g>
         </g>
-      </svg>
+      </SVG>
     );
   }
 }

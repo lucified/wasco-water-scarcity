@@ -62,7 +62,7 @@ injectGlobal`
 
 const SelectedRegion = styled.g`
   & path {
-    stroke: $color-dark-gray;
+    stroke: ${theme.colors.grayDark};
     stroke-width: 0.5px;
     opacity: 0.8;
     fill: none;
