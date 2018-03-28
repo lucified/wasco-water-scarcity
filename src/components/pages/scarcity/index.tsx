@@ -1,7 +1,4 @@
 import * as React from 'react';
-
-import withPageData, { Props } from '../with-page-data';
-
 import styled from 'styled-components';
 import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
@@ -15,6 +12,7 @@ import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
+import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 import MoreInformation from './more-information';
 
@@ -23,15 +21,23 @@ const Selectors = styled.div`
   flex-direction: column;
 `;
 
+// TODO: Don't repeat these on each page
 const StyledThresholdSelector = styled(ThresholdSelector)`
   margin-bottom: ${theme.margin()};
 `;
 
 const StyledModelSelector = styled(ModelSelector)`
+  font-family: ${theme.bodyFontFamily};
   font-size: 15px;
   padding-left: ${theme.margin()};
   padding-top: 5px;
   border-left: 1px solid ${theme.colors.grayLight};
+  line-height: ${theme.bodyLineHeight};
+  color: ${theme.colors.grayDarker};
+
+  b {
+    color: ${theme.colors.grayDarkest};
+  }
 `;
 
 const MapContainer = styled.div`

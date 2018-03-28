@@ -2,6 +2,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import Select, { Option } from 'react-select';
+import styled from 'styled-components';
 import { setSelectedFutureFilters } from '../../../actions';
 import { FutureDataset } from '../../../data';
 import { StateTree } from '../../../reducers';
@@ -9,7 +10,6 @@ import {
   getSelectedFutureDataset,
   getSelectedFutureFilters,
 } from '../../../selectors';
-import styled from 'styled-components';
 import { theme } from '../../theme';
 
 const Parameter = styled.div`

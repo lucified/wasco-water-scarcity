@@ -15,7 +15,7 @@ const RegionsList = styled.div`
 
 const Region = styled.a`
   font-size: 0.73rem;
-  font-family: ${theme.labelFontFamily}';
+  font-family: ${theme.labelFontFamily};
   padding: 0.3rem 0.3rem;
   cursor: pointer;
   color: ${({ selected }: { selected: boolean }) =>

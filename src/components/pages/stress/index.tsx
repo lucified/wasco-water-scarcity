@@ -24,10 +24,17 @@ const StyledYearLabel = styled(YearLabel)`
 `;
 
 const StyledModelSelector = styled(ModelSelector)`
+  font-family: ${theme.bodyFontFamily};
   font-size: 15px;
   padding-left: ${theme.margin()};
   padding-top: 5px;
   border-left: 1px solid ${theme.colors.grayLight};
+  line-height: ${theme.bodyLineHeight};
+  color: ${theme.colors.grayDarker};
+
+  b {
+    color: ${theme.colors.grayDarkest};
+  }
 `;
 
 class StressBody extends React.Component<Props> {

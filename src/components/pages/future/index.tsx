@@ -44,6 +44,21 @@ const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
 `;
 
+// TODO: Don't repeat this
+const StyledFutureScenarioDescription = styled(FutureScenarioDescription)`
+  font-family: ${theme.bodyFontFamily};
+  font-size: 15px;
+  padding-left: ${theme.margin()};
+  padding-top: 5px;
+  border-left: 1px solid ${theme.colors.grayLight};
+  line-height: ${theme.bodyLineHeight};
+  color: ${theme.colors.grayDarker};
+
+  b {
+    color: ${theme.colors.grayDarkest};
+  }
+`;
+
 const Error = styled.div`
   margin-top: 40px;
   text-align: center;
@@ -214,7 +229,7 @@ class FutureBody extends React.Component<Props> {
                 />
               </div>
               <div className="col-xs-12 col-md-4">
-                <FutureScenarioDescription
+                <StyledFutureScenarioDescription
                   estimateLabel={selectedDataType}
                   includeConsumption={selectedDataType === 'stress'}
                   climateModel={selectedClimateModel}
