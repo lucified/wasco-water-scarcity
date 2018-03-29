@@ -7,8 +7,8 @@ import {
   fetchWorldRegionsData,
   FutureData,
   FutureDataset,
+  FutureScenario,
   generateWaterToWorldRegionsMap,
-  SelectedScen,
   WaterRegionGeoJSON,
 } from '../data';
 import {
@@ -117,11 +117,11 @@ export function setSelectedClimateModel(
 }
 
 export function setSelectedScenario(
-  selectedScen: SelectedScen,
+  selectedScenario: FutureScenario,
 ): SetSelectedScenarioAction {
   return {
     type: SET_SELECTED_SCENARIO,
-    selectedScen,
+    selectedScenario,
   };
 }
 

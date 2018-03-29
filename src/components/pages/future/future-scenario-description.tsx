@@ -1,16 +1,15 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { FutureScenario } from '../../../data';
 
 const Assumption = styled.span`
   font-weight: bold;
 `;
 
-import { SelectedScen } from '../../../data';
-
 interface PassedProps {
   className?: string;
   estimateLabel: string;
-  selectedScen: SelectedScen;
+  selectedScenario: FutureScenario;
   includeConsumption?: boolean;
 }
 
@@ -19,7 +18,7 @@ type Props = PassedProps;
 export default function FutureModelDescription({
   className,
   estimateLabel,
-  selectedScen,
+  selectedScenario,
   includeConsumption,
 }: Props) {
   const {
@@ -27,7 +26,7 @@ export default function FutureModelDescription({
     impactModel,
     climateExperiment,
     population,
-  } = selectedScen;
+  } = selectedScenario;
   if (
     impactModel === undefined ||
     climateExperiment === undefined ||

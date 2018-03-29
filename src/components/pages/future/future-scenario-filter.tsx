@@ -3,7 +3,7 @@ import { connect, Dispatch } from 'react-redux';
 import Select, { Option } from 'react-select';
 import styled from 'styled-components';
 import { setSelectedFutureFilters } from '../../../actions';
-import { FutureDataset, SelectedScen } from '../../../data';
+import { FutureDataset, FutureScenario } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedFutureDataset,
@@ -34,7 +34,7 @@ const Dropdown = styled(Select)`
 `;
 
 interface PassedProps {
-  selectedScen: SelectedScen;
+  selectedScenario: FutureScenario;
   className?: string;
 }
 
@@ -117,7 +117,7 @@ class FutureScenarioFilter extends React.Component<Props> {
     const {
       selectedFutureFilters,
       selectedFutureDataset,
-      selectedScen,
+      selectedScenario,
       className,
     } = this.props;
     const {
@@ -125,7 +125,7 @@ class FutureScenarioFilter extends React.Component<Props> {
       climateExperiment,
       climateModel,
       population,
-    } = selectedScen;
+    } = selectedScenario;
     if (
       impactModel === undefined ||
       climateExperiment === undefined ||

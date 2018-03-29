@@ -14,9 +14,9 @@ import {
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
+  getDataForSelectedFutureScenario,
   getFilteredScenariosInSelectedFutureDataset,
   getSelectedDataType,
-  getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
@@ -141,7 +141,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
       selectedDataType === 'scarcity' ? 'stress' : selectedDataType,
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
-    selectedFutureDataForScenario: getSelectedFutureScenario(state),
+    selectedFutureDataForScenario: getDataForSelectedFutureScenario(state),
     thresholds: getThresholdsForDataType(state, selectedDataType),
     futureScenarioLocked: isFutureScenarioLocked(state),
   };

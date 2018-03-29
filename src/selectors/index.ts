@@ -1,6 +1,6 @@
+import isEqual = require('lodash/isEqual');
 import keyBy = require('lodash/keyBy');
 import { createSelector } from 'reselect';
-
 import { Data as GapminderData } from '../components/generic/gapminder';
 import { StateTree } from '../reducers';
 import {
@@ -10,8 +10,6 @@ import {
   TimeAggregate,
   WorldRegion,
 } from '../types';
-
-import { SelectedScen } from '../data';
 
 function getStressShortageData(
   state: StateTree,
@@ -50,16 +48,11 @@ export function isFutureScenarioLocked(state: StateTree) {
   return state.selections.lockFutureScenario;
 }
 
-export const getAllScenariosInSelectedFutureDataset = createSelector(
-  getFutureData,
-  getSelectedFutureDataset,
-  (allFutureData, { variableName, timeScale }) => {
-    return (
-      // TODO: probably shouldn't be storing all the data - this selector may be redundant
-      allFutureData[variableName] && allFutureData[variableName][timeScale]
-    );
-  },
-);
+export function getAllScenariosInSelectedFutureDataset(state: StateTree) {
+  const allFutureData = getFutureData(state);
+  const { variableName, timeScale } = getSelectedFutureDataset(state);
+  return allFutureData[variableName] && allFutureData[variableName][timeScale];
+}
 
 export const getFilteredScenariosInSelectedFutureDataset = createSelector(
   getAllScenariosInSelectedFutureDataset,
@@ -78,21 +71,11 @@ export const getFilteredScenariosInSelectedFutureDataset = createSelector(
   },
 );
 
-export const getSelectedFutureScenario = createSelector(
+export const getDataForSelectedFutureScenario = createSelector(
   getAllScenariosInSelectedFutureDataset,
-  getSelectedScen,
-  (datasetData, selectedScen) => {
-    return (
-      datasetData &&
-      datasetData.find(d =>
-        Object.keys(selectedScen).every(
-          k =>
-            d[k as keyof SelectedScen] ===
-            selectedScen[k as keyof SelectedScen],
-        ),
-      )
-    );
-  },
+  getSelectedFutureScenario,
+  (datasetData, scenario) =>
+    datasetData && datasetData.find(d => isEqual(d, scenario)),
 );
 
 const getAggregateData = createSelector(
@@ -272,8 +255,8 @@ export function getSelectedClimateModel(state: StateTree) {
   return state.selections.climateModel;
 }
 
-export function getSelectedScen(state: StateTree) {
-  return state.selections.selectedScen;
+export function getSelectedFutureScenario(state: StateTree) {
+  return state.selections.selectedFutureScenario;
 }
 
 export function getSelectedTimeScale(state: StateTree) {

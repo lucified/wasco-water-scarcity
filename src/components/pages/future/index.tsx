@@ -11,17 +11,17 @@ import {
   FutureData,
   FutureDataForModel,
   FutureDataset,
-  SelectedScen,
+  FutureScenario,
   WaterRegionGeoJSON,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
+  getDataForSelectedFutureScenario,
   getSelectedDataType,
   getSelectedFutureDataset,
   getSelectedFutureScenario,
   getSelectedFutureTimeIndex,
-  getSelectedScen,
   getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getWaterRegionData,
@@ -68,7 +68,7 @@ const Error = styled.div`
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
   loadFutureData: (dataset: FutureDataset, featureId: string) => void;
-  setSelectedScenario: (scen: SelectedScen) => void;
+  setSelectedScenario: (scen: FutureScenario) => void;
 }
 
 interface GeneratedStateProps {
@@ -78,7 +78,7 @@ interface GeneratedStateProps {
   selectedFutureDataset: FutureDataset;
   allScenariosInSelectedDataset?: FutureData;
   futureData?: FutureDataForModel;
-  selectedScen: SelectedScen;
+  selectedScenario: FutureScenario;
   mapData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
@@ -173,7 +173,7 @@ class FutureBody extends React.Component<Props> {
       waterRegions,
       selectedDataType,
       allScenariosInSelectedDataset,
-      selectedScen,
+      selectedScenario,
     } = this.props;
 
     const yearString =
@@ -188,7 +188,7 @@ class FutureBody extends React.Component<Props> {
         <div className="row between-xs">
           <div className="col-xs-12 col-md-8">
             <h1>The Future?</h1>
-            <FutureScenarioFilter selectedScen={selectedScen} />
+            <FutureScenarioFilter selectedScenario={selectedScenario} />
           </div>
           <DataSelectors className="col-xs-12 col-md-offset-1 col-md-3">
             <DataTypeSelector hideScarcity />
@@ -211,7 +211,7 @@ class FutureBody extends React.Component<Props> {
                 <StyledFutureScenarioDescription
                   estimateLabel={selectedDataType}
                   includeConsumption={selectedDataType === 'stress'}
-                  selectedScen={selectedScen}
+                  selectedScenario={selectedScenario}
                 />
               </div>{' '}
             </div>
@@ -240,20 +240,20 @@ class FutureBody extends React.Component<Props> {
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const futureData = getSelectedFutureScenario(state);
+  const futureData = getDataForSelectedFutureScenario(state);
   let mapData: TimeAggregate<number> | undefined;
 
-  const selectedScen = getSelectedScen(state);
+  const selectedScenario = getSelectedFutureScenario(state);
   const selectedFutureDataset = getSelectedFutureDataset(state);
   const selectedDataType = getSelectedDataType(state);
 
   if (futureData) {
     mapData = undefined;
-    const mapDataUrl = Object.keys(selectedScen).reduce(
+    const mapDataUrl = Object.keys(selectedScenario).reduce(
       (prev: string, key: string) =>
         prev.replace(
           '{{' + key + '}}',
-          String(selectedScen[key as keyof SelectedScen]),
+          String(selectedScenario[key as keyof FutureScenario]),
         ),
       selectedFutureDataset.urlTemplateScenario,
     );
@@ -280,7 +280,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
       state,
     ),
     selectedFutureDataset,
-    selectedScen,
+    selectedScenario,
   };
 }
 
@@ -292,7 +292,7 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
     loadFutureData: (dataset: FutureDataset, featureId: string) => {
       dispatch(loadFutureData(dataset, featureId));
     },
-    setSelectedScenario: (scen: SelectedScen) => {
+    setSelectedScenario: (scen: FutureScenario) => {
       dispatch(setSelectedScenario(scen));
     },
   };

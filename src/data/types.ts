@@ -52,7 +52,7 @@ export interface FutureDataset {
    and allow partial updates of a scenario.
  Check that all are present in the reducers selections tree
 */
-export interface SelectedScen {
+export interface FutureScenario {
   population?: string;
   impactModel?: string;
   climateModel?: string;
@@ -66,7 +66,7 @@ export interface SelectedScen {
   alloc?: string;
 }
 
-export interface FutureDataForModel extends SelectedScen {
+export interface FutureDataForModel extends FutureScenario {
   scenarioId: string;
   default?: boolean;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';

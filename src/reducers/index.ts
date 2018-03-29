@@ -30,7 +30,6 @@ import {
   getDefaultHistoricalImpactModel,
   getFutureDataset,
   getHistoricalClimateModels,
-  SelectedScen,
 } from '../data';
 import { TimeScale } from '../types';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
@@ -61,7 +60,7 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
-    selectedScen: {
+    selectedFutureScenario: {
       // use default specified in dataset - note this causes flicker
       impactModel: undefined,
       climateModel: undefined,
@@ -325,24 +324,14 @@ function selectionsReducer(
 
       return state;
     case SET_SELECTED_SCENARIO:
-      if (!state.lockFutureScenario) {
-        const newScen: SelectedScen = {};
-        // Only variables in the existing state are permitted, but partial updating is possible
-        Object.assign(newScen, state.selectedScen);
-        let needUpdate: boolean = false;
-        let k: keyof SelectedScen;
-        for (k in state.selectedScen) {
-          if (action.selectedScen[k] !== state.selectedScen[k]) {
-            needUpdate = true;
-            Object.assign(newScen, { [k]: action.selectedScen[k] });
-          }
-        }
-        if (needUpdate) {
-          return {
-            ...state,
-            selectedScen: newScen,
-          };
-        }
+      if (
+        !state.lockFutureScenario &&
+        !isEqual(state.selectedFutureScenario, action.selectedScenario)
+      ) {
+        return {
+          ...state,
+          selectedFutureScenario: { ...action.selectedScenario },
+        };
       }
 
       return state;
