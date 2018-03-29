@@ -1,29 +1,44 @@
-# WASCO water shortage visualisation
+# WASCO Global Water Atlas visualizations
+
+This project contains three separate buildable apps: a tool for looking at
+historical data, a tool for looking at future predictions, and embeddable
+single visualizations.
 
 ## Development
 
-Requires Node 6 or greater and `yarn`.
+Requires Node 8 or greater and `yarn`.
 
 Set up the development environment with:
+
 ```shell
 yarn
 ```
 
 Start a local development server with mock data:
+
 ```shell
 yarn start
 ```
 
 Then open http://localhost:3000 in your web browser.
 
+By default, the history app is built. To build a different app, use the `APP`
+environment variable with `future` or `embed`:
+
+```shell
+APP=future yarn start
+```
+
 ### Linting & Prettier
 
 To lint the code, run:
+
 ```shell
 yarn run lint
 ```
 
 To prettify the whole code base, run:
+
 ```shell
 yarn run prettify
 ```
@@ -36,6 +51,7 @@ appropriately.
 
 To upload new datasets to Lucify hostiung, assume the AWS admin role, place the
 data in the appropriate folder under `data-external/wasco` and run:
+
 ```shell
 yarn run upload-data
 ```
@@ -57,7 +73,15 @@ Upload these files to your hosting server to deploy.
 yarn run build
 ```
 
+By default, the history app is built. To build a different app, use the `APP`
+environment variable with `future` or `embed`:
+
+```shell
+APP=future yarn run build
+```
+
 You can test a distribution by:
+
 ```shell
 cd dist
 ws
@@ -65,6 +89,7 @@ ws
 
 This will start a light-weight local server at [http://localhost:8000](http://localhost:8000).
 To use the `ws` command, you need to install `local-web-server`
+
 ```shell
 yarn add global local-web-server
 ```
@@ -75,6 +100,7 @@ The production environment is currently managed by Lucify.
 Production deployments require Lucify's production credentials.
 
 Run a production deployment locally with:
-```
+
+```shell
 yarn run deploy
 ```

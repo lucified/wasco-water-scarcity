@@ -6,8 +6,6 @@ const postCssFlexbugsFixer = require('postcss-flexbugs-fixes');
 const webpack = require('webpack');
 const deployConfig = require('./deploy-config');
 
-const name = '[name]-[hash:8].[ext]';
-
 const browsers = ['> 0.5%', 'last 4 versions', 'Firefox ESR', 'not ie <= 10'];
 
 const rules = [
@@ -45,7 +43,7 @@ const rules = [
       {
         loader: require.resolve('file-loader'),
         options: {
-          name,
+          name: '[name]-[hash:8].[ext]',
         },
       },
     ],
@@ -89,6 +87,30 @@ const rules = [
   },
 ];
 
+function getAppType() {
+  switch (process.env.APP) {
+    case 'future':
+    case 'embed':
+      return process.env.APP;
+    default:
+      // Default to 'past'
+      return 'past';
+  }
+}
+
+function getAppEntrypoint(appType) {
+  switch (appType) {
+    case 'future':
+      return './src/future-entry.tsx';
+    case 'embed':
+      return './src/embed-entry.tsx';
+    case 'past':
+      return './src/past-entry.tsx';
+  }
+}
+
+console.log(`Building the ${getAppType()} app`);
+
 const config = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -102,7 +124,7 @@ const config = {
     path: path.resolve(deployConfig.base.dest),
     publicPath: deployConfig.base.publicPath,
   },
-  entry: [require.resolve('babel-polyfill'), './src/index.tsx'],
+  entry: [require.resolve('babel-polyfill'), getAppEntrypoint(getAppType())],
   plugins: [
     new HtmlWebpackPlugin({
       template: require.resolve(`${__dirname}/src/index-template.tsx`),
