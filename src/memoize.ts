@@ -20,12 +20,12 @@ const memoize: Memoizer = <TFunc extends GenericFunction>(
   func: TFunc,
   equalityCheck = defaultEqualityCheck,
 ) => {
-  let lastArgs: any[] | null = null;
-  let lastResult: any = null;
+  let lastArgs: any[];
+  let lastResult: ReturnType<TFunc>;
 
   return ((...args: any[]) => {
     if (
-      lastArgs === null ||
+      !lastArgs ||
       lastArgs.length !== args.length ||
       !equalityCheck(lastArgs, args)
     ) {
@@ -33,7 +33,7 @@ const memoize: Memoizer = <TFunc extends GenericFunction>(
     }
     lastArgs = args;
     return lastResult;
-  }) as any; // TODO: fix this ugly hack
+  }) as TFunc;
 };
 
 export default memoize;
