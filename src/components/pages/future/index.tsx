@@ -25,7 +25,6 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
-import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
@@ -254,11 +253,6 @@ class FutureBody extends React.Component<Props> {
                     <WorldRegionSelector />
                   </div>
                 )}
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-xs-12">
-                <CrossReferences fromPage="future" />
               </div>
             </div>
           </div>

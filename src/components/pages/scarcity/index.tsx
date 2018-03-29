@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import GapMinder from '../../gapminder';
 import Spinner from '../../generic/spinner';
@@ -122,9 +121,6 @@ class ScarcityBody extends React.Component<Props> {
             </div>
           </div>
         )}
-        <div className="row">
-          <CrossReferences fromPage="scarcity" />
-        </div>
       </div>
     );
   }

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
@@ -96,9 +95,6 @@ class StressBody extends React.Component<Props> {
             </div>
           </div>
         )}
-        <div className="row">
-          <CrossReferences fromPage="stress" />
-        </div>
       </div>
     );
   }
