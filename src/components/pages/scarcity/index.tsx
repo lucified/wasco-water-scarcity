@@ -13,7 +13,6 @@ import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import withPageData, { Props } from '../with-page-data';
 import Description from './description';
-import MoreInformation from './more-information';
 
 const Selectors = styled.div`
   display: flex;
@@ -113,11 +112,6 @@ class ScarcityBody extends React.Component<Props> {
             </div>
             <div className="row">
               <SelectedRegionInformation />
-            </div>
-            <div className="row">
-              <BodyText className="col-xs-12 col-md-6">
-                <MoreInformation />
-              </BodyText>
             </div>
           </div>
         )}
