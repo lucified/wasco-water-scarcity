@@ -58,9 +58,6 @@ export default function Header() {
               <NavigationItem to="/scarcity" activeClassName="selected">
                 Water scarcity
               </NavigationItem>
-              <NavigationItem to="/future" activeClassName="selected">
-                Future actions
-              </NavigationItem>
             </div>
           </div>
         </div>

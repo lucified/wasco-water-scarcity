@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import {
@@ -63,8 +62,6 @@ const Error = styled.div`
   text-align: center;
 `;
 
-type PassedProps = RouteComponentProps<void>;
-
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
   loadFutureData: (dataset: FutureDataset) => void;
@@ -90,7 +87,7 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type Props = PassedProps & GeneratedStateProps & GeneratedDispatchProps;
+type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 class FutureBody extends React.Component<Props> {
   public componentDidMount() {
@@ -323,9 +320,11 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<
+const Future = connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps,
+  {},
   StateTree
 >(mapStateToProps, mapDispatchToProps)(FutureBody);
+
+export default Future;

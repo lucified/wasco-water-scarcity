@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { hot } from 'react-hot-loader';
 import { connect, Dispatch } from 'react-redux';
-import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
@@ -10,11 +9,7 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
-import Header from './header';
-import NotFound from './pages/not-found';
-import Scarcity from './pages/scarcity';
-import Shortage from './pages/shortage';
-import Stress from './pages/stress';
+import Future from './pages/future';
 
 import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
@@ -46,8 +41,6 @@ const Root = styled.div`
   height: 100%;
 `;
 
-type PassedProps = RouteComponentProps<{}>;
-
 interface GeneratedDispatchProps {
   loadMapData: () => void;
   loadModelData: (
@@ -63,9 +56,9 @@ interface GeneratedStateProps {
   selectedTimeScale: string;
 }
 
-type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
+type Props = GeneratedDispatchProps & GeneratedStateProps;
 
-class AppPlain extends React.Component<Props> {
+class AppFuturePlain extends React.Component<Props> {
   public componentDidMount() {
     const {
       selectedClimateModel,
@@ -104,24 +97,16 @@ class AppPlain extends React.Component<Props> {
   public render() {
     return (
       <Root>
-        <Header />
         <div className="container">
-          <Switch>
-            {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={Stress} />
-            <Route path="/shortage" component={Shortage} />
-            <Route path="/scarcity" component={Scarcity} />
-            <Route path="/" exact render={() => <Redirect to="/stress" />} />
-            <Route component={NotFound} />
-          </Switch>
+          <Future />
         </div>
       </Root>
     );
   }
 }
 
-export const App = hot(module)(
-  connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
+export const AppFuture = hot(module)(
+  connect<GeneratedStateProps, GeneratedDispatchProps, {}, StateTree>(
     (state: StateTree): GeneratedStateProps => ({
       selectedClimateModel: getSelectedClimateModel(state),
       selectedImpactModel: getSelectedImpactModel(state),
@@ -139,5 +124,5 @@ export const App = hot(module)(
         dispatch(loadModelData(climateModel, impactModel, timeScale));
       },
     }),
-  )(AppPlain),
+  )(AppFuturePlain),
 );
