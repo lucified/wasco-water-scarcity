@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import CrossReferences from '../../cross-references';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
 import ModelSelector from '../../model-selector';
@@ -12,7 +11,6 @@ import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import withPageData, { Props } from '../with-page-data';
 import Description from './description';
-import MoreInformation from './more-information';
 
 const MapContainer = styled.div`
   position: relative;
@@ -89,16 +87,8 @@ class ShortageBody extends React.Component<Props> {
             <div className="row">
               <SelectedRegionInformation dataType="shortage" />
             </div>
-            <div className="row">
-              <BodyText className="col-xs-12 col-md-6">
-                <MoreInformation />
-              </BodyText>
-            </div>
           </div>
         )}
-        <div className="row">
-          <CrossReferences fromPage="shortage" />
-        </div>
       </div>
     );
   }

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import {
@@ -25,7 +24,6 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { DataType, TimeAggregate } from '../../../types';
-import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import Spinner from '../../generic/spinner';
 import Map from '../../map';
@@ -64,8 +62,6 @@ const Error = styled.div`
   text-align: center;
 `;
 
-type PassedProps = RouteComponentProps<void>;
-
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: DataType) => void;
   loadFutureData: (dataset: FutureDataset) => void;
@@ -91,7 +87,7 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type Props = PassedProps & GeneratedStateProps & GeneratedDispatchProps;
+type Props = GeneratedStateProps & GeneratedDispatchProps;
 
 class FutureBody extends React.Component<Props> {
   public componentDidMount() {
@@ -256,11 +252,6 @@ class FutureBody extends React.Component<Props> {
                 )}
               </div>
             </div>
-            <div className="row">
-              <div className="col-xs-12">
-                <CrossReferences fromPage="future" />
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -329,9 +320,11 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
   };
 }
 
-export default connect<
+const Future = connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  PassedProps,
+  {},
   StateTree
 >(mapStateToProps, mapDispatchToProps)(FutureBody);
+
+export default Future;

@@ -11,7 +11,6 @@ import {
   getSelectedTimeScale,
 } from '../selectors';
 import Header from './header';
-import Future from './pages/future';
 import NotFound from './pages/not-found';
 import Scarcity from './pages/scarcity';
 import Shortage from './pages/shortage';
@@ -112,7 +111,6 @@ class AppPlain extends React.Component<Props> {
             <Route path="/stress" component={Stress} />
             <Route path="/shortage" component={Shortage} />
             <Route path="/scarcity" component={Scarcity} />
-            <Route path="/future" component={Future} />
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
             <Route component={NotFound} />
           </Switch>

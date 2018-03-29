@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import CrossReferences from '../../cross-references';
 import DataTypeSelector from '../../data-type-selector';
 import GapMinder from '../../gapminder';
 import Spinner from '../../generic/spinner';
@@ -14,7 +13,6 @@ import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import withPageData, { Props } from '../with-page-data';
 import Description from './description';
-import MoreInformation from './more-information';
 
 const Selectors = styled.div`
   display: flex;
@@ -115,16 +113,8 @@ class ScarcityBody extends React.Component<Props> {
             <div className="row">
               <SelectedRegionInformation />
             </div>
-            <div className="row">
-              <BodyText className="col-xs-12 col-md-6">
-                <MoreInformation />
-              </BodyText>
-            </div>
           </div>
         )}
-        <div className="row">
-          <CrossReferences fromPage="scarcity" />
-        </div>
       </div>
     );
   }
