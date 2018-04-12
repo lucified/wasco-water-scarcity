@@ -24,12 +24,12 @@ import {
 } from '../../data';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedDataType,
+  getSelectedHistoricalDataType,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
 } from '../../selectors';
-import { DataType, TimeAggregate, WorldRegion } from '../../types';
+import { HistoricalDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
 
 // TODO: import properly once types exist
@@ -86,7 +86,7 @@ interface PassedProps {
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegion?: WorldRegion;
-  selectedDataType: DataType;
+  selectedDataType: HistoricalDataType;
   colorScale: ScaleThreshold<number, string>;
   thresholds: number[];
   stressThresholds: number[];
@@ -100,7 +100,7 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
-function getColorScale(dataType: DataType, thresholds: number[]) {
+function getColorScale(dataType: HistoricalDataType, thresholds: number[]) {
   const emptyColor = '#D2E3E5';
 
   const colors =
@@ -113,7 +113,7 @@ function getColorScale(dataType: DataType, thresholds: number[]) {
     .range(colors);
 }
 
-function getLabel(dataType: DataType) {
+function getLabel(dataType: HistoricalDataType) {
   switch (dataType) {
     case 'stress':
       return 'Water stress';
@@ -469,7 +469,7 @@ class Map extends React.Component<Props> {
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const selectedDataType = getSelectedDataType(state);
+  const selectedDataType = getSelectedHistoricalDataType(state);
   const thresholds = getThresholdsForDataType(state, selectedDataType);
 
   return {

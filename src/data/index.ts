@@ -1,9 +1,11 @@
 import groupBy = require('lodash/groupBy');
 import keyBy = require('lodash/keyBy');
+import pick = require('lodash/pick');
 import uniq = require('lodash/uniq');
 import values = require('lodash/values');
 import {
-  DataType,
+  FutureDataType,
+  HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
   TimeScale,
@@ -11,8 +13,12 @@ import {
 } from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
-  FutureData,
   FutureDataset,
+  FutureEnsembleData,
+  FutureScenario,
+  FutureScenarioData,
+  futureScenarioKeys,
+  FutureScenarioWithData,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
   WaterRegionGeoJSON,
@@ -71,15 +77,48 @@ export async function fetchHistoricalStressShortageData(
   }
 }
 
-export async function fetchFutureData(
+export async function fetchFutureEnsembleData(
   dataset: FutureDataset,
-): Promise<FutureData | undefined> {
+  featureId: string,
+): Promise<FutureEnsembleData | undefined> {
+  const url = getFutureEnsembleURL(dataset, featureId);
   try {
-    const response = await fetch(dataset.url, { credentials: 'same-origin' });
-    const parsedResult: FutureData = await response.json();
+    const response = await fetch(url, { credentials: 'same-origin' });
+    const parsedResult: FutureEnsembleData = await response.json();
     return parsedResult;
   } catch (error) {
-    console.error('Unable to fetch future data', error);
+    console.error('Unable to fetch future ensemble data', error);
+    return undefined;
+  }
+}
+
+export function toScenarioId(scenario: FutureScenario) {
+  return Object.keys(scenario)
+    .filter(key => !!futureScenarioKeys.find(d => d === key))
+    .sort()
+    .reduce(
+      (result, key) => `${result}-${scenario[key as keyof FutureScenario]}`,
+      '',
+    );
+}
+
+export function removeDataFromScenario(
+  scenarioWithData: FutureScenarioWithData,
+): FutureScenario {
+  return pick(scenarioWithData, futureScenarioKeys);
+}
+
+export async function fetchFutureScenarioData(
+  dataset: FutureDataset,
+  scenario: FutureScenario,
+): Promise<FutureScenarioData | undefined> {
+  const url = getFutureScenarioURL(dataset, scenario);
+  try {
+    const response = await fetch(url, { credentials: 'same-origin' });
+    const parsedResult: FutureScenarioData = await response.json();
+    return parsedResult;
+  } catch (error) {
+    console.error('Unable to fetch future scenario data', error);
     return undefined;
   }
 }
@@ -114,6 +153,24 @@ export function getFutureDatasets() {
 
 export function getDefaultFutureDataset() {
   return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
+}
+
+function getFutureEnsembleURL(dataset: FutureDataset, featureId: string) {
+  return dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
+}
+
+function getFutureScenarioURL(
+  dataset: FutureDataset,
+  scenario: FutureScenario,
+) {
+  return Object.keys(scenario).reduce(
+    (url: string, variable: string) =>
+      url.replace(
+        `{{${variable}}}`,
+        scenario[variable as keyof FutureScenario]!,
+      ),
+    dataset.urlTemplateScenario,
+  );
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
@@ -187,18 +244,8 @@ export async function fetchWaterRegionsData(): Promise<
   }
 }
 
-export function getFutureDataset(
-  dataType: 'stress' | 'shortage',
-  timeScale: TimeScale,
-) {
-  const dataset = getFutureDatasets()
-    .filter(d => d.timeScale === timeScale)
-    .find(
-      d =>
-        dataType === 'shortage'
-          ? d.variableName === 'short'
-          : d.variableName === 'stress',
-    );
+export function getFutureDataset(dataType: FutureDataType) {
+  const dataset = getFutureDatasets().find(d => dataType === d.variableName);
 
   if (!dataset) {
     console.error('No future dataset found for dataType:', dataType);
@@ -207,7 +254,7 @@ export function getFutureDataset(
   return dataset;
 }
 
-export function getDataTypeColors(dataType: DataType) {
+export function getDataTypeColors(dataType: HistoricalDataType) {
   switch (dataType) {
     case 'stress':
       // From d3-scale-chromatic's schemePurple

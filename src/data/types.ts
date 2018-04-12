@@ -1,4 +1,5 @@
-import { StressShortageDatum, TimeScale } from '../types';
+import { Omit } from 'recompose';
+import { FutureDataType, StressShortageDatum, TimeScale } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
   geometry: any;
@@ -28,26 +29,56 @@ export interface HistoricalDataset {
 
 export interface FutureDataset {
   default?: boolean;
-  url: string;
-  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
-  timeScale: TimeScale;
+  urlTemplateEnsemble: string;
+  urlTemplateScenario: string;
+  variableName: FutureDataType;
   impactModels: string[];
   climateModels: string[];
   populations: string[];
   climateExperiments: string[];
+  yieldGaps: string[];
+  dietChanges: string[];
+  foodLossReds: string[];
+  trades: string[];
+  agriExps: string[];
+  reuses: string[];
+  allocs: string[];
 }
 
-export interface FutureDataForModel {
+export interface FutureScenario {
+  population?: string;
+  impactModel?: string;
+  climateModel?: string;
+  climateExperiment?: string;
+  yieldGap?: string;
+  dietChange?: string;
+  foodLossRed?: string;
+  trade?: string;
+  agriExp?: string;
+  reuse?: string;
+  alloc?: string;
+}
+
+export const futureScenarioKeys: Array<keyof FutureScenario> = [
+  'population',
+  'impactModel',
+  'climateModel',
+  'climateExperiment',
+  'yieldGap',
+  'dietChange',
+  'foodLossRed',
+  'trade',
+  'agriExp',
+  'reuse',
+  'alloc',
+];
+
+export interface FutureScenarioWithData extends FutureScenario {
   scenarioId: string;
   default?: boolean;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   spatialUnit: string;
-  timeScale: TimeScale;
-  dataType: string;
-  population: string;
-  impactModel: string;
-  climateModel: string;
-  climateExperiment: string;
+  timeScale: TimeScale; // Should only be decadal
   socialForcing: string;
   co2Forcing: string;
   startYear: string;
@@ -55,13 +86,18 @@ export interface FutureDataForModel {
   data: Array<{
     y0: number; // start year
     y1: number; // end year
-    regions: {
-      [regionId: number]: number;
-    };
+    value: number;
   }>;
 }
 
-export type FutureData = FutureDataForModel[];
+export type FutureEnsembleData = FutureScenarioWithData[];
+export type FutureScenarioData = Array<{
+  y0: number; // start year
+  y1: number; // end year
+  data: {
+    [regionId: string]: Omit<RawRegionStressShortageDatum, 'y0' | 'y1' | 'id'>;
+  };
+}>;
 
 export interface WorldRegionGeoJSON {
   type: 'FeatureCollection';

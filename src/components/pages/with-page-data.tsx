@@ -2,19 +2,23 @@ import mapValues = require('lodash/mapValues');
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
-import { setSelectedDataType } from '../../actions';
+import { setSelectedHistoricalDataType } from '../../actions';
 import { scarcitySelector, WaterRegionGeoJSON } from '../../data';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedDataType,
+  getSelectedHistoricalDataType,
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
 } from '../../selectors';
-import { DataType, StressShortageDatum, TimeAggregate } from '../../types';
+import {
+  HistoricalDataType,
+  StressShortageDatum,
+  TimeAggregate,
+} from '../../types';
 
 interface GeneratedDispatchProps {
-  setSelectedDataType: (dataType: DataType) => void;
+  setSelectedDataType: (dataType: HistoricalDataType) => void;
 }
 
 interface GeneratedStateProps {
@@ -29,7 +33,7 @@ export type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 export default function withPageData(
   Component: React.ComponentType<Props>,
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
-  componentDataType?: DataType,
+  componentDataType?: HistoricalDataType,
 ) {
   return connect<
     GeneratedStateProps,
@@ -38,7 +42,8 @@ export default function withPageData(
     StateTree
   >(
     state => {
-      const dataType = componentDataType || getSelectedDataType(state);
+      const dataType =
+        componentDataType || getSelectedHistoricalDataType(state);
       const selectedData = getSelectedStressShortageData(state);
       const selector =
         dataType === 'scarcity'
@@ -59,8 +64,8 @@ export default function withPageData(
     },
     dispatch => {
       return {
-        setSelectedDataType: (newDataType: DataType) => {
-          dispatch(setSelectedDataType(newDataType));
+        setSelectedDataType: (newDataType: HistoricalDataType) => {
+          dispatch(setSelectedHistoricalDataType(newDataType));
         },
       };
     },

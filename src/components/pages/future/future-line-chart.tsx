@@ -7,21 +7,23 @@ import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import {
-  FutureData,
-  FutureDataForModel,
+  FutureEnsembleData,
+  FutureScenarioWithData,
   getDataTypeColors,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
+  getEnsembleDataForSelectedFutureScenario,
   getFilteredScenariosInSelectedFutureDataset,
-  getSelectedDataType,
-  getSelectedFutureScenario,
+  getSelectedFutureDataType,
   getSelectedFutureTimeIndex,
+  getSelectedHistoricalDataType,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
   isFutureScenarioLocked,
 } from '../../../selectors';
+import { FutureDataType } from '../../../types';
 import LineChart, { Data } from '../../generic/line-chart';
 import { theme } from '../../theme';
 
@@ -46,11 +48,11 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  selectedDataType?: 'stress' | 'shortage';
+  selectedDataType: FutureDataType;
   selectedWaterRegionId?: number;
-  data?: FutureData;
-  filteredData?: FutureData;
-  selectedFutureDataForScenario?: FutureDataForModel;
+  data?: FutureEnsembleData;
+  filteredData?: FutureEnsembleData;
+  selectedFutureDataForScenario?: FutureScenarioWithData;
   thresholds: number[];
   futureScenarioLocked: boolean;
 }
@@ -87,16 +89,14 @@ function FutureLineChart({
   }
 
   const dataValueExtent = extent(
-    flattenDeep<number>(
-      data.map(d => d.data.map(c => c.regions[selectedWaterRegionId])),
-    ),
+    flattenDeep<number>(data.map(d => d.data.map(c => c.value))),
   );
 
   const chartData: Data[] = filteredData.map(series => ({
     id: series.scenarioId,
     color: 'darkcyan',
     series: series.data.map(d => ({
-      value: d.regions[selectedWaterRegionId],
+      value: d.value,
       start: new Date(d.y0, 0, 1),
       end: new Date(d.y1, 11, 31),
     })),
@@ -133,16 +133,17 @@ function FutureLineChart({
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const selectedDataType = getSelectedDataType(state);
+  const selectedDataType = getSelectedHistoricalDataType(state);
 
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
-    selectedDataType:
-      selectedDataType === 'scarcity' ? undefined : selectedDataType,
+    selectedDataType: getSelectedFutureDataType(state),
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
-    selectedFutureDataForScenario: getSelectedFutureScenario(state),
+    selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
+      state,
+    ),
     thresholds: getThresholdsForDataType(state, selectedDataType),
     futureScenarioLocked: isFutureScenarioLocked(state),
   };

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { FutureScenario } from '../../../data';
 
 const Assumption = styled.span`
   font-weight: bold;
@@ -8,10 +9,7 @@ const Assumption = styled.span`
 interface PassedProps {
   className?: string;
   estimateLabel: string;
-  climateModel: string;
-  impactModel: string;
-  climateExperiment: string;
-  population: string;
+  selectedScenario: FutureScenario;
   includeConsumption?: boolean;
 }
 
@@ -20,12 +18,27 @@ type Props = PassedProps;
 export default function FutureModelDescription({
   className,
   estimateLabel,
-  climateModel,
-  impactModel,
-  climateExperiment,
-  population,
+  selectedScenario,
   includeConsumption,
 }: Props) {
+  const {
+    climateModel,
+    impactModel,
+    climateExperiment,
+    population,
+  } = selectedScenario;
+  if (
+    impactModel === undefined ||
+    climateExperiment === undefined ||
+    climateModel === undefined ||
+    population === undefined
+  ) {
+    return (
+      <div>
+        Error: Scenario has an unexpected format and cannot be displayed
+      </div>
+    );
+  }
   return (
     <div className={className}>
       This scenario of blue water {estimateLabel} is produced using{' '}

@@ -7,13 +7,17 @@ import { getDataTypeColors } from '../data';
 import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
-  getSelectedDataType,
+  getSelectedHistoricalDataType,
   getSelectedHistoricalTimeIndex,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
   isHistoricalTimeIndexLocked,
 } from '../selectors';
-import { AggregateStressShortageDatum, DataType, WorldRegion } from '../types';
+import {
+  AggregateStressShortageDatum,
+  HistoricalDataType,
+  WorldRegion,
+} from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
 
 import BarChart, { BarChartDatum } from './generic/bar-chart';
@@ -22,7 +26,7 @@ interface GeneratedStateProps {
   selectedIndex: number;
   currentIndexLabel: string;
   data?: AggregateStressShortageDatum[];
-  dataType: DataType;
+  dataType: HistoricalDataType;
   selectedWorldRegion?: WorldRegion;
   timeIndexLocked: boolean;
 }
@@ -34,7 +38,10 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
 
-function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
+function getValues(
+  dataType: HistoricalDataType,
+  datum: AggregateStressShortageDatum,
+) {
   const emptyColor = '#D2E3E5';
   const colors = [emptyColor, ...getDataTypeColors(dataType)];
 
@@ -111,7 +118,7 @@ function getValues(dataType: DataType, datum: AggregateStressShortageDatum) {
   }
 }
 
-function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
+function getTitle(dataType: HistoricalDataType, worldRegion?: WorldRegion) {
   if (worldRegion == null) {
     return `Global population living in water ${dataType}`;
   }
@@ -121,7 +128,7 @@ function getTitle(dataType: DataType, worldRegion?: WorldRegion) {
 
 class TimeSelector extends React.PureComponent<Props> {
   private generateBarChartData = memoize(
-    (data: AggregateStressShortageDatum[], dataType: DataType) =>
+    (data: AggregateStressShortageDatum[], dataType: HistoricalDataType) =>
       data.map((d, i) => ({
         key: i,
         total: d.population,
@@ -197,7 +204,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedIndex,
     currentIndexLabel: label,
     data,
-    dataType: getSelectedDataType(state),
+    dataType: getSelectedHistoricalDataType(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
     timeIndexLocked: isHistoricalTimeIndexLocked(state),
   };

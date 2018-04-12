@@ -61,5 +61,6 @@ export interface StressShortageDatum extends Datum {
   stress: number;
 }
 
-export type DataType = 'stress' | 'shortage' | 'scarcity';
+export type HistoricalDataType = 'stress' | 'shortage' | 'scarcity';
+export type FutureDataType = 'stress' | 'shortage';
 export type TimeScale = 'decadal' | 'annual';
