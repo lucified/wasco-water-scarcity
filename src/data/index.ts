@@ -19,6 +19,7 @@ import {
   FutureScenarioData,
   futureScenarioKeys,
   FutureScenarioWithData,
+  LocalData,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
   WaterRegionGeoJSON,
@@ -144,6 +145,24 @@ export function getDefaultHistoricalClimateModel() {
 export function getDefaultHistoricalImpactModel() {
   const defaultDataset = historicalDatasets.find(d => !!d.default);
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
+}
+
+export async function getLocalRegionData(regionId: number) {
+  try {
+    const result = await fetch(
+      // tslint:disable-next-line:max-line-length
+      `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`,
+    );
+    const parsedData: LocalData = await result.json();
+    return parsedData;
+  } catch (error) {
+    console.error(
+      'Unable to fetch local region data for region:',
+      regionId,
+      error,
+    );
+    return undefined;
+  }
 }
 
 /* Future */

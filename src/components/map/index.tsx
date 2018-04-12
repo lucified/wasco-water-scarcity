@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { ExtendedFeature, ExtendedFeatureCollection, geoPath } from 'd3-geo';
+import { ExtendedFeature, geoPath } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -10,7 +10,6 @@ import {
 import { event, select, Selection } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
-import * as GeoJSON from 'geojson';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -20,6 +19,9 @@ import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
   defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
+  getLocalRegionData,
+  GridData,
+  LocalData,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
 } from '../../data';
@@ -37,72 +39,6 @@ import { theme } from '../theme';
 const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 const worldData = require('world-atlas/world/110m.json');
-
-interface RiverData {
-  scalerank: string;
-  featurecla: string;
-  name: string;
-  note?: string;
-}
-
-interface CountryBorder {
-  featureid: number;
-  countryName: string;
-}
-
-interface Basin {
-  featureid: number;
-  basinName: string;
-}
-
-interface PopulatedPlaces {
-  name: string;
-}
-
-interface DrainageDirection {
-  strahler: number;
-  basin: number;
-}
-
-interface GridData {
-  centre: [number, number];
-  dom?: { [startYear: string]: number };
-  man?: { [startYear: string]: number };
-  live?: { [startYear: string]: number };
-  elec?: { [startYear: string]: number };
-  irri?: { [startYear: string]: number };
-  pop?: { [startYear: string]: number };
-}
-
-interface GridQuintile {
-  [key: string]: number[] | undefined;
-  dom?: number[];
-  man?: number[];
-  live?: number[];
-  elec?: number[];
-  irri?: number[];
-  pop?: number[];
-}
-
-interface LocalData {
-  basins?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.MultiPolygon, Basin>
-  >;
-  places?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.Point, PopulatedPlaces>
-  >;
-  countries?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.MultiPolygon, CountryBorder>
-  >;
-  rivers?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.MultiLineString, RiverData>
-  >;
-  ddm?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.Point, DrainageDirection>
-  >;
-  grid: GridData[];
-  gridQuintiles: GridQuintile;
-}
 
 const Land = styled.path`
   fill: ${theme.colors.grayLighter};
@@ -194,6 +130,9 @@ type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 interface State {
   zoomInToRegion: boolean;
+  regionData: {
+    [id: string]: LocalData;
+  };
 }
 
 function getColorScale(dataType: HistoricalDataType, thresholds: number[]) {
@@ -226,6 +165,7 @@ class Map extends React.Component<Props, State> {
 
     this.state = {
       zoomInToRegion: false,
+      regionData: {},
     };
 
     this.width = props.width;
@@ -292,13 +232,15 @@ class Map extends React.Component<Props, State> {
       this.zoomToGlobalArea();
     }
 
-    // TODO this is a little ugly
+    // TODO: this is a little ugly
     if (
-      (!prevState.zoomInToRegion && zoomInToRegion) ||
-      (zoomInToRegion &&
-        prevProps.selectedWaterRegionId !== selectedWaterRegionId) ||
-      (zoomInToRegion && prevProps.selectedData !== selectedData) ||
-      (zoomInToRegion && prevProps.selectedDataType !== selectedDataType)
+      zoomInToRegion &&
+      (!prevState.zoomInToRegion ||
+        prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
+        prevProps.selectedData !== selectedData ||
+        prevProps.selectedDataType !== selectedDataType ||
+        (this.state.regionData[selectedWaterRegionId!] &&
+          !prevState.regionData[selectedWaterRegionId!]))
     ) {
       this.zoomToWaterRegion();
     } else if (prevState.zoomInToRegion && !zoomInToRegion) {
@@ -575,13 +517,25 @@ class Map extends React.Component<Props, State> {
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
   }
 
+  private async fetchRegionData(regionId: number) {
+    const data = await getLocalRegionData(regionId);
+    if (data) {
+      this.setState(state => ({
+        regionData: {
+          ...state.regionData,
+          [regionId]: data,
+        },
+      }));
+    }
+  }
+
   private zoomToWaterRegion() {
     const { selectedWaterRegionId, waterRegions: { features } } = this.props;
     const svg = select<SVGElement, undefined>(this.svgRef!);
 
-    const selectedWaterRegion = features.find(
-      r => r.properties.featureId === selectedWaterRegionId,
-    );
+    const selectedWaterRegion =
+      selectedWaterRegionId &&
+      features.find(r => r.properties.featureId === selectedWaterRegionId);
 
     // TODO: projection should be specific to spatial unit
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
@@ -629,9 +583,18 @@ class Map extends React.Component<Props, State> {
       .selectAll('path')
       .remove();
 
-    if (this.state.zoomInToRegion && selectedWaterRegion != null) {
-      // FIXME: fetch data
-      const localData: LocalData = require('./3.json');
+    if (
+      this.state.zoomInToRegion &&
+      selectedWaterRegionId != null &&
+      selectedWaterRegion != null
+    ) {
+      const localData: LocalData | undefined = this.state.regionData[
+        selectedWaterRegionId
+      ];
+      if (!localData) {
+        this.fetchRegionData(selectedWaterRegionId);
+        return;
+      }
 
       if (localData.ddm != null) {
         svg
