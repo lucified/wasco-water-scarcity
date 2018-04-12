@@ -12,6 +12,7 @@ import {
 } from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
+import { FutureDataType } from '../types';
 import { theme } from './theme';
 
 const Header = styled.div`
@@ -109,7 +110,7 @@ const ResetLink = styled.span`
 `;
 
 interface PassedProps {
-  dataType: 'stress' | 'shortage';
+  dataType: FutureDataType;
   className?: string;
 }
 
@@ -138,7 +139,7 @@ const configurations = {
   },
 };
 
-function getHeaderText(dataType: 'stress' | 'shortage') {
+function getHeaderText(dataType: FutureDataType) {
   const text =
     dataType === 'shortage'
       ? 'Available water per capita (m³)'

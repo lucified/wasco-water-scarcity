@@ -1,15 +1,16 @@
-import isEqual = require('lodash/isEqual');
 import keyBy = require('lodash/keyBy');
+import mapValues = require('lodash/mapValues');
 import { createSelector } from 'reselect';
-import { Data as GapminderData } from '../components/generic/gapminder';
-import { StateTree } from '../reducers';
+import { Data as GapminderData } from './components/generic/gapminder';
+import { FutureScenario, FutureScenarioWithData, toScenarioId } from './data';
+import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
-  DataType,
+  HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
   WorldRegion,
-} from '../types';
+} from './types';
 
 function getStressShortageData(
   state: StateTree,
@@ -32,8 +33,12 @@ export function getSelectedFutureDataset(state: StateTree) {
   return state.selections.futureDataset;
 }
 
-function getFutureData(state: StateTree) {
-  return state.data.futureData;
+function getFutureEnsembleData(state: StateTree) {
+  return state.data.futureEnsembleData;
+}
+
+function getFutureScenarioData(state: StateTree) {
+  return state.data.futureScenarioData;
 }
 
 export function getSelectedFutureFilters(state: StateTree) {
@@ -48,34 +53,68 @@ export function isFutureScenarioLocked(state: StateTree) {
   return state.selections.lockFutureScenario;
 }
 
-export function getAllScenariosInSelectedFutureDataset(state: StateTree) {
-  const allFutureData = getFutureData(state);
-  const { variableName, timeScale } = getSelectedFutureDataset(state);
-  return allFutureData[variableName] && allFutureData[variableName][timeScale];
+export function getAllScenariosInSelectedFutureDataset(
+  state: StateTree,
+): FutureScenarioWithData[] | undefined {
+  const allFutureData = getFutureEnsembleData(state);
+  const { variableName } = getSelectedFutureDataset(state);
+  return allFutureData[variableName];
 }
 
 export const getFilteredScenariosInSelectedFutureDataset = createSelector(
   getAllScenariosInSelectedFutureDataset,
   getSelectedFutureFilters,
-  (datasetData, filters) => {
-    return (
-      datasetData &&
-      datasetData.filter(
-        d =>
-          !!filters.climateExperiments.find(f => f === d.climateExperiment) &&
-          !!filters.climateModels.find(f => f === d.climateModel) &&
-          !!filters.impactModels.find(f => f === d.impactModel) &&
-          !!filters.populations.find(f => f === d.population),
-      )
-    );
-  },
+  (scenarios, filters) =>
+    scenarios &&
+    scenarios.filter(
+      d =>
+        !!filters.climateExperiments.find(f => f === d.climateExperiment) &&
+        !!filters.climateModels.find(f => f === d.climateModel) &&
+        !!filters.impactModels.find(f => f === d.impactModel) &&
+        !!filters.populations.find(f => f === d.population),
+    ),
 );
 
-export const getDataForSelectedFutureScenario = createSelector(
+export const getEnsembleDataForSelectedFutureScenario = createSelector(
   getAllScenariosInSelectedFutureDataset,
   getSelectedFutureScenario,
   (datasetData, scenario) =>
-    datasetData && datasetData.find(d => isEqual(d, scenario)),
+    datasetData &&
+    scenario &&
+    datasetData.find(d =>
+      Object.keys(scenario).every(
+        key =>
+          d[key as keyof FutureScenario] ===
+          scenario[key as keyof FutureScenario],
+      ),
+    ),
+);
+
+export const getMapDataForSelectedFutureScenario = createSelector(
+  getFutureScenarioData,
+  getSelectedFutureScenario,
+  getSelectedFutureTimeIndex,
+  getSelectedFutureDataType,
+  (data, scenario, timeIndex, dataType) => {
+    if (!scenario) {
+      return undefined;
+    }
+
+    const scenarioData = data[toScenarioId(scenario)];
+    if (!scenarioData) {
+      return undefined;
+    }
+
+    const { y0: startYear, y1: endYear, data: timeData } = scenarioData[
+      timeIndex
+    ];
+    return {
+      startYear,
+      endYear,
+      // TODO: dataType can be e.g. "shortage" which does not exist on d
+      data: mapValues(timeData, d => d[dataType as keyof typeof d] as number),
+    };
+  },
 );
 
 const getAggregateData = createSelector(
@@ -243,8 +282,12 @@ export const getSelectedWorldRegion = createSelector<
   (id, regions) => regions && regions.find(r => r.id === id),
 );
 
-export function getSelectedDataType(state: StateTree) {
-  return state.selections.dataType;
+export function getSelectedHistoricalDataType(state: StateTree) {
+  return state.selections.historicalDataType;
+}
+
+export function getSelectedFutureDataType(state: StateTree) {
+  return state.selections.futureDataType;
 }
 
 export function getSelectedImpactModel(state: StateTree) {
@@ -301,7 +344,10 @@ function getThresholds(state: StateTree) {
   return state.thresholds;
 }
 
-export function getThresholdsForDataType(state: StateTree, dataType: DataType) {
+export function getThresholdsForDataType(
+  state: StateTree,
+  dataType: HistoricalDataType,
+) {
   return getThresholds(state)[dataType];
 }
 

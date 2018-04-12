@@ -1,28 +1,6 @@
 import isEqual = require('lodash/isEqual');
 import { combineReducers } from 'redux';
-
-import {
-  Action,
-  SET_FUTURE_TIME_INDEX,
-  SET_HISTORICAL_TIME_INDEX,
-  SET_SELECTED_CLIMATE_MODEL,
-  SET_SELECTED_DATA_TYPE,
-  SET_SELECTED_FUTURE_FILTERS,
-  SET_SELECTED_IMPACT_MODEL,
-  SET_SELECTED_REGION,
-  SET_SELECTED_SCENARIO,
-  SET_SELECTED_TIME_SCALE,
-  SET_SELECTED_WORLD_REGION,
-  SET_THRESHOLDS_FOR_DATA_TYPE,
-  STORE_FUTURE_DATA,
-  STORE_WATER_DATA,
-  STORE_WATER_REGION_DATA,
-  STORE_WATER_TO_WORLD_REGION_MAP,
-  STORE_WORLD_REGION_DATA,
-  TOGGLE_FUTURE_SCENARIO_LOCK,
-  TOGGLE_HISTORICAL_TIME_INDEX_LOCK,
-  TOGGLE_SELECTED_REGION,
-} from '../actions';
+import { Action } from '../actions';
 import {
   defaultDataTypeThresholds,
   getDefaultFutureDataset,
@@ -30,15 +8,17 @@ import {
   getDefaultHistoricalImpactModel,
   getFutureDataset,
   getHistoricalClimateModels,
+  toScenarioId,
 } from '../data';
-import { TimeScale } from '../types';
+import { FutureDataType } from '../types';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 
 const defaultFutureDataset = getDefaultFutureDataset();
 
 const defaultState: StateTree = {
   data: {
-    futureData: {},
+    futureEnsembleData: {},
+    futureScenarioData: {},
   },
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
@@ -59,7 +39,8 @@ const defaultState: StateTree = {
     impactModel: getDefaultHistoricalImpactModel(),
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
-    dataType: 'stress',
+    historicalDataType: 'stress',
+    futureDataType: 'stress',
     selectedFutureScenario: undefined,
     lockFutureScenario: false,
     worldRegion: 0, // 0 means global
@@ -70,36 +51,39 @@ export const initialState = defaultState;
 
 function dataReducer(state = initialState.data, action: Action): DataTree {
   switch (action.type) {
-    case STORE_WATER_DATA:
+    case 'STORE_WATER_DATA':
       return {
         ...state,
         stressShortageData: action.data,
       };
-    case STORE_WATER_REGION_DATA:
+    case 'STORE_WATER_REGION_DATA':
       return {
         ...state,
         waterRegions: action.data,
       };
-    case STORE_WORLD_REGION_DATA:
+    case 'STORE_WORLD_REGION_DATA':
       return {
         ...state,
         worldRegions: action.data,
       };
-    case STORE_WATER_TO_WORLD_REGION_MAP:
+    case 'STORE_WATER_TO_WORLD_REGION_MAP':
       return {
         ...state,
         waterToWorldRegionsMap: action.map,
       };
-    case STORE_FUTURE_DATA:
-      const existingVariableData = state.futureData[action.variableName] || {};
+    case 'STORE_FUTURE_ENSEMBLE_DATA':
       return {
         ...state,
-        futureData: {
-          ...state.futureData,
-          [action.variableName]: {
-            ...existingVariableData,
-            [action.timeScale]: action.data,
-          },
+        futureEnsembleData: {
+          ...state.futureEnsembleData,
+          [action.variableName]: action.data,
+        },
+      };
+    case 'STORE_FUTURE_SCENARIO_DATA':
+      return {
+        ...state,
+        futureScenarioData: {
+          [toScenarioId(action.scenario)]: [...action.data],
         },
       };
   }
@@ -111,7 +95,7 @@ function thresholdsReducer(
   action: Action,
 ): ThresholdsTree {
   switch (action.type) {
-    case SET_THRESHOLDS_FOR_DATA_TYPE:
+    case 'SET_THRESHOLDS_FOR_DATA_TYPE':
       if (!isEqual(state[action.dataType], action.thresholds)) {
         return {
           ...state,
@@ -123,8 +107,7 @@ function thresholdsReducer(
 }
 
 function getDatasetAndFilters(
-  dataType: 'stress' | 'shortage',
-  timeScale: TimeScale,
+  dataType: FutureDataType,
   existingFilters: {
     impactModels: string[];
     climateModels: string[];
@@ -132,7 +115,7 @@ function getDatasetAndFilters(
     populations: string[];
   },
 ) {
-  const dataset = getFutureDataset(dataType, timeScale);
+  const dataset = getFutureDataset(dataType);
   let filters = existingFilters;
   if (dataset) {
     // If the existing filters contain a value that's not in the new dataset,
@@ -168,7 +151,7 @@ function selectionsReducer(
   action: Action,
 ): SelectionsTree {
   switch (action.type) {
-    case SET_HISTORICAL_TIME_INDEX:
+    case 'SET_HISTORICAL_TIME_INDEX':
       if (
         !state.lockHistoricalTimeIndex &&
         action.value !== state.historicalTimeIndex
@@ -180,14 +163,14 @@ function selectionsReducer(
       }
 
       return state;
-    case STORE_WATER_DATA:
+    case 'STORE_WATER_DATA':
       // When we load a new data set, set the selected time index to the latest
       // time period
       return {
         ...state,
         historicalTimeIndex: action.data.length - 1,
       };
-    case TOGGLE_SELECTED_REGION:
+    case 'TOGGLE_SELECTED_REGION':
       if (state.region === action.id) {
         return {
           ...state,
@@ -199,7 +182,7 @@ function selectionsReducer(
         ...state,
         region: action.id,
       };
-    case SET_SELECTED_REGION:
+    case 'SET_SELECTED_REGION':
       if (action.id !== state.region) {
         return {
           ...state,
@@ -208,7 +191,7 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_WORLD_REGION:
+    case 'SET_SELECTED_WORLD_REGION':
       if (action.id !== state.worldRegion) {
         return {
           ...state,
@@ -219,31 +202,37 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_DATA_TYPE:
-      if (action.dataType !== state.dataType) {
+    case 'SET_SELECTED_HISTORICAL_DATA_TYPE':
+      if (action.dataType !== state.historicalDataType) {
+        return {
+          ...state,
+          historicalDataType: action.dataType,
+        };
+      }
+
+      return state;
+    case 'SET_SELECTED_FUTURE_DATA_TYPE':
+      if (action.dataType !== state.historicalDataType) {
         let { futureDataset, futureFilters } = state;
-        if (action.dataType !== 'scarcity') {
-          const { dataset, filters } = getDatasetAndFilters(
-            action.dataType,
-            state.timeScale,
-            futureFilters,
-          );
-          if (dataset) {
-            futureDataset = dataset;
-            futureFilters = filters;
-          }
+        const { dataset, filters } = getDatasetAndFilters(
+          action.dataType,
+          futureFilters,
+        );
+        if (dataset) {
+          futureDataset = dataset;
+          futureFilters = filters;
         }
 
         return {
           ...state,
           futureFilters,
           futureDataset,
-          dataType: action.dataType,
+          futureDataType: action.dataType,
         };
       }
 
       return state;
-    case SET_SELECTED_IMPACT_MODEL:
+    case 'SET_SELECTED_IMPACT_MODEL':
       if (action.impactModel !== state.impactModel) {
         let { climateModel } = state;
 
@@ -263,7 +252,7 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_CLIMATE_MODEL:
+    case 'SET_SELECTED_CLIMATE_MODEL':
       if (action.climateModel !== state.climateModel) {
         let { impactModel, timeScale } = state;
 
@@ -281,36 +270,21 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_TIME_SCALE:
+    case 'SET_SELECTED_TIME_SCALE':
       if (action.timeScale !== state.timeScale) {
         if (action.timeScale === 'annual' && state.climateModel === 'watch') {
           // WATCH dataset only has decadal data
           return state;
         }
 
-        let { futureDataset, futureFilters } = state;
-        if (state.dataType !== 'scarcity') {
-          const { dataset, filters } = getDatasetAndFilters(
-            state.dataType,
-            action.timeScale,
-            futureFilters,
-          );
-          if (dataset) {
-            futureDataset = dataset;
-            futureFilters = filters;
-          }
-        }
-
         return {
           ...state,
-          futureFilters,
-          futureDataset,
           timeScale: action.timeScale,
         };
       }
 
       return state;
-    case SET_SELECTED_SCENARIO:
+    case 'SET_SELECTED_SCENARIO':
       if (
         !state.lockFutureScenario &&
         !isEqual(state.selectedFutureScenario, action.selectedScenario)
@@ -322,7 +296,7 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_SELECTED_FUTURE_FILTERS:
+    case 'SET_SELECTED_FUTURE_FILTERS':
       if (
         !isEqual(action.climateModels, state.futureFilters.climateModels) ||
         !isEqual(
@@ -344,7 +318,7 @@ function selectionsReducer(
       }
 
       return state;
-    case SET_FUTURE_TIME_INDEX:
+    case 'SET_FUTURE_TIME_INDEX':
       if (action.index !== state.futureTimeIndex) {
         return {
           ...state,
@@ -353,12 +327,12 @@ function selectionsReducer(
       }
 
       return state;
-    case TOGGLE_HISTORICAL_TIME_INDEX_LOCK:
+    case 'TOGGLE_HISTORICAL_TIME_INDEX_LOCK':
       return {
         ...state,
         lockHistoricalTimeIndex: !state.lockHistoricalTimeIndex,
       };
-    case TOGGLE_FUTURE_SCENARIO_LOCK:
+    case 'TOGGLE_FUTURE_SCENARIO_LOCK':
       return {
         ...state,
         lockFutureScenario: !state.lockFutureScenario,

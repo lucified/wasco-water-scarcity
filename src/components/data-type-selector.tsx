@@ -2,15 +2,15 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setSelectedDataType } from '../actions';
+import { setSelectedHistoricalDataType } from '../actions';
 import { StateTree } from '../reducers';
-import { getSelectedDataType } from '../selectors';
-import { DataType } from '../types';
+import { getSelectedHistoricalDataType } from '../selectors';
+import { HistoricalDataType } from '../types';
 
 import RadioSelector from './generic/radio-selector';
 
 interface StateProps {
-  dataType: DataType;
+  dataType: HistoricalDataType;
 }
 
 interface DispatchProps {
@@ -27,7 +27,7 @@ type Props = StateProps & DispatchProps & PassedProps;
 class DataTypeSelector extends React.Component<Props> {
   public render() {
     const { className, dataType, onChange, hideScarcity } = this.props;
-    const values: Array<{ value: DataType; label: string }> = [
+    const values: Array<{ value: HistoricalDataType; label: string }> = [
       {
         value: 'stress',
         label: 'Stress',
@@ -57,12 +57,12 @@ class DataTypeSelector extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: StateTree): StateProps => ({
-  dataType: getSelectedDataType(state),
+  dataType: getSelectedHistoricalDataType(state),
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   onChange: (option: { value: string; label: string }) => {
-    dispatch(setSelectedDataType(option.value as DataType)); // TODO: validate
+    dispatch(setSelectedHistoricalDataType(option.value as HistoricalDataType)); // TODO: validate
   },
 });
 

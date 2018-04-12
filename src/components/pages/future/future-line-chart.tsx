@@ -7,21 +7,23 @@ import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import {
-  FutureData,
-  FutureDataForModel,
+  FutureEnsembleData,
+  FutureScenarioWithData,
   getDataTypeColors,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getAllScenariosInSelectedFutureDataset,
-  getDataForSelectedFutureScenario,
+  getEnsembleDataForSelectedFutureScenario,
   getFilteredScenariosInSelectedFutureDataset,
-  getSelectedDataType,
+  getSelectedFutureDataType,
   getSelectedFutureTimeIndex,
+  getSelectedHistoricalDataType,
   getSelectedWaterRegionId,
   getThresholdsForDataType,
   isFutureScenarioLocked,
 } from '../../../selectors';
+import { FutureDataType } from '../../../types';
 import LineChart, { Data } from '../../generic/line-chart';
 import { theme } from '../../theme';
 
@@ -46,11 +48,11 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
-  selectedDataType: 'stress' | 'shortage';
+  selectedDataType: FutureDataType;
   selectedWaterRegionId?: number;
-  data?: FutureData;
-  filteredData?: FutureData;
-  selectedFutureDataForScenario?: FutureDataForModel;
+  data?: FutureEnsembleData;
+  filteredData?: FutureEnsembleData;
+  selectedFutureDataForScenario?: FutureScenarioWithData;
   thresholds: number[];
   futureScenarioLocked: boolean;
 }
@@ -131,17 +133,17 @@ function FutureLineChart({
 }
 
 function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const selectedDataType = getSelectedDataType(state);
+  const selectedDataType = getSelectedHistoricalDataType(state);
 
   return {
     selectedTimeIndex: getSelectedFutureTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
-    // Note: Defaulting to stress makes future inconsistent with past
-    selectedDataType:
-      selectedDataType === 'scarcity' ? 'stress' : selectedDataType,
+    selectedDataType: getSelectedFutureDataType(state),
     data: getAllScenariosInSelectedFutureDataset(state),
     filteredData: getFilteredScenariosInSelectedFutureDataset(state),
-    selectedFutureDataForScenario: getDataForSelectedFutureScenario(state),
+    selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
+      state,
+    ),
     thresholds: getThresholdsForDataType(state, selectedDataType),
     futureScenarioLocked: isFutureScenarioLocked(state),
   };

@@ -19,8 +19,8 @@ import {
 } from '../../selectors';
 import {
   AggregateStressShortageDatum,
-  DataType,
   Datum,
+  HistoricalDataType,
   StressShortageDatum,
   WorldRegion,
 } from '../../types';
@@ -53,7 +53,7 @@ const Empty = styled.div`
 `;
 
 interface PassedProps {
-  dataType?: DataType;
+  dataType?: HistoricalDataType;
 }
 
 interface GeneratedStateProps {
@@ -73,7 +73,7 @@ interface GeneratedDispatchProps {
 }
 
 interface DefaultProps {
-  dataType: DataType;
+  dataType: HistoricalDataType;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;

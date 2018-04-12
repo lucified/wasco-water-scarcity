@@ -200,7 +200,6 @@ const futureDatasets: FutureDataset[] = [
       'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc_2011_2090/' +
       '{{yieldGap}}_{{dietChange}}_{{foodLossRed}}_{{population}}_{{trade}}_{{agriExp}}_{{reuse}}_{{alloc}}.json',
     variableName: 'stress',
-    timeScale: 'decadal',
     impactModels: ['h08', 'pcrglobwb', 'watergap'],
     climateModels: ['gfdl-esm2m', 'hadgem2-es'],
     climateExperiments: ['rcp4p5', 'rcp8p5'],
