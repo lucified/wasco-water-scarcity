@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -12,6 +13,7 @@ import {
   FutureDataForModel,
   FutureDataset,
   FutureScenario,
+  getFutureScenarioURL,
   WaterRegionGeoJSON,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
@@ -78,7 +80,7 @@ interface GeneratedStateProps {
   selectedFutureDataset: FutureDataset;
   allScenariosInSelectedDataset?: FutureData;
   futureData?: FutureDataForModel;
-  selectedScenario: FutureScenario;
+  selectedScenario?: FutureScenario;
   mapData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
 }
@@ -113,21 +115,24 @@ class FutureBody extends React.Component<Props> {
   public componentDidUpdate(prevProps: Props) {
     // TODO: seems a bit buggy depending on when redux store is changed?
     if (
-      prevProps.selectedFutureDataset !== this.props.selectedFutureDataset ||
       prevProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
-      prevProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
+      prevProps.selectedWorldRegionId !== this.props.selectedWorldRegionId ||
+      !isEqual(
+        prevProps.selectedFutureDataset,
+        this.props.selectedFutureDataset,
+      )
     ) {
       // Note: don't store, so no check if already loaded
       if (this.props.selectedWaterRegionId) {
         this.props.loadFutureData(
           this.props.selectedFutureDataset,
-          String(this.props.selectedWaterRegionId),
+          this.props.selectedWaterRegionId.toString(),
         );
       } else {
         this.props.loadFutureData(
           this.props.selectedFutureDataset,
           // TODO: allow user to choose threshold
-          `world-${String(this.props.selectedWorldRegionId)}_0.2`,
+          `world-${this.props.selectedWorldRegionId}_0.2`,
         );
       }
     }
@@ -195,7 +200,9 @@ class FutureBody extends React.Component<Props> {
             <TimeScaleSelector />
           </DataSelectors>
         </div>
-        {!waterRegions || !allScenariosInSelectedDataset ? (
+        {!waterRegions ||
+        !allScenariosInSelectedDataset ||
+        !selectedScenario ? (
           <StyledSpinner />
         ) : (
           <div>
@@ -247,15 +254,11 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
   const selectedFutureDataset = getSelectedFutureDataset(state);
   const selectedDataType = getSelectedDataType(state);
 
-  if (futureData) {
+  if (futureData && selectedScenario) {
     mapData = undefined;
-    const mapDataUrl = Object.keys(selectedScenario).reduce(
-      (prev: string, key: string) =>
-        prev.replace(
-          '{{' + key + '}}',
-          String(selectedScenario[key as keyof FutureScenario]),
-        ),
-      selectedFutureDataset.urlTemplateScenario,
+    const mapDataUrl = getFutureScenarioURL(
+      selectedFutureDataset,
+      selectedScenario,
     );
     const timeIndex = getSelectedFutureTimeIndex(state);
     console.error(`Fetch mapData at ${timeIndex} from: ${mapDataUrl}`);

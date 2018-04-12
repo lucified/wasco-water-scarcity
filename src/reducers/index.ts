@@ -60,20 +60,7 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     dataType: 'stress',
-    selectedFutureScenario: {
-      // use default specified in dataset - note this causes flicker
-      impactModel: undefined,
-      climateModel: undefined,
-      population: undefined,
-      climateExperiment: undefined,
-      yieldGap: undefined,
-      dietChange: undefined,
-      foodLossRed: undefined,
-      trade: undefined,
-      agriExp: undefined,
-      reuse: undefined,
-      alloc: undefined,
-    },
+    selectedFutureScenario: undefined,
     lockFutureScenario: false,
     worldRegion: 0, // 0 means global
   },

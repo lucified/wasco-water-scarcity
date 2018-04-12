@@ -9,6 +9,7 @@ import {
   FutureDataset,
   FutureScenario,
   generateWaterToWorldRegionsMap,
+  getFutureEnsembleURL,
   WaterRegionGeoJSON,
 } from '../data';
 import {
@@ -248,7 +249,7 @@ export function loadModelData(
 
 export function loadFutureData(dataset: FutureDataset, featureId: string) {
   return (dispatch: Dispatch<any>) => {
-    const url = dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
+    const url = getFutureEnsembleURL(dataset, featureId);
     return fetchFutureData(url).then(futureData => {
       if (futureData) {
         dispatch(

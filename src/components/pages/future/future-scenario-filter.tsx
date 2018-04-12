@@ -34,7 +34,7 @@ const Dropdown = styled(Select)`
 `;
 
 interface PassedProps {
-  selectedScenario: FutureScenario;
+  selectedScenario?: FutureScenario;
   className?: string;
 }
 
@@ -120,6 +120,11 @@ class FutureScenarioFilter extends React.Component<Props> {
       selectedScenario,
       className,
     } = this.props;
+
+    if (!selectedScenario) {
+      return null;
+    }
+
     const {
       impactModel,
       climateExperiment,

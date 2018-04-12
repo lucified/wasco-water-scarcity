@@ -28,9 +28,7 @@ export interface HistoricalDataset {
 
 export interface FutureDataset {
   default?: boolean;
-  // {{featureId}} interpolated by loadFutureData
   urlTemplateEnsemble: string;
-  // TODO: SelectedScen variables interpolated by future/index.ts to obtain mapData
   urlTemplateScenario: string;
   variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   timeScale: TimeScale;
@@ -47,23 +45,18 @@ export interface FutureDataset {
   allocs: string[];
 }
 
-/*
- Scenario variables are optional to allow mixing scenario types
-   and allow partial updates of a scenario.
- Check that all are present in the reducers selections tree
-*/
 export interface FutureScenario {
-  population?: string;
-  impactModel?: string;
-  climateModel?: string;
-  climateExperiment?: string;
-  yieldGap?: string;
-  dietChange?: string;
-  foodLossRed?: string;
-  trade?: string;
-  agriExp?: string;
-  reuse?: string;
-  alloc?: string;
+  population: string;
+  impactModel: string;
+  climateModel: string;
+  climateExperiment: string;
+  yieldGap: string;
+  dietChange: string;
+  foodLossRed: string;
+  trade: string;
+  agriExp: string;
+  reuse: string;
+  alloc: string;
 }
 
 export interface FutureDataForModel extends FutureScenario {

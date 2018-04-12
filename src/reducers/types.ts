@@ -26,7 +26,7 @@ export interface SelectionsTree {
   dataType: DataType;
   impactModel: string; // Only used in Historical pages
   climateModel: string; // Only used in Historical pages
-  selectedFutureScenario: FutureScenario; // Only used in Future page
+  selectedFutureScenario?: FutureScenario; // Only used in Future page
   lockFutureScenario: boolean;
   timeScale: TimeScale;
   worldRegion: number;

@@ -12,6 +12,8 @@ import {
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
   FutureData,
+  FutureDataset,
+  FutureScenario,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
   WaterRegionGeoJSON,
@@ -113,6 +115,27 @@ export function getFutureDatasets() {
 
 export function getDefaultFutureDataset() {
   return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
+}
+
+export function getFutureEnsembleURL(
+  dataset: FutureDataset,
+  featureId: string,
+) {
+  return dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
+}
+
+export function getFutureScenarioURL(
+  dataset: FutureDataset,
+  scenario: FutureScenario,
+) {
+  return Object.keys(scenario).reduce(
+    (url: string, variable: string) =>
+      url.replace(
+        `{{${variable}}}`,
+        scenario[variable as keyof FutureScenario]!,
+      ),
+    dataset.urlTemplateScenario,
+  );
 }
 
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
