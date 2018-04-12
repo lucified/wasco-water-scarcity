@@ -1,5 +1,5 @@
 import { Omit } from 'recompose';
-import { FutureDataType, StressShortageDatum, TimeScale } from '../types';
+import { StressShortageDatum, TimeScale } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
   geometry: any;
@@ -31,7 +31,7 @@ export interface FutureDataset {
   default?: boolean;
   urlTemplateEnsemble: string;
   urlTemplateScenario: string;
-  variableName: FutureDataType;
+  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   impactModels: string[];
   climateModels: string[];
   populations: string[];

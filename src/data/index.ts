@@ -245,7 +245,12 @@ export async function fetchWaterRegionsData(): Promise<
 }
 
 export function getFutureDataset(dataType: FutureDataType) {
-  const dataset = getFutureDatasets().find(d => dataType === d.variableName);
+  const dataset = getFutureDatasets().find(
+    d =>
+      dataType === 'shortage'
+        ? d.variableName === 'short'
+        : d.variableName === 'stress',
+  );
 
   if (!dataset) {
     console.error('No future dataset found for dataType:', dataType);

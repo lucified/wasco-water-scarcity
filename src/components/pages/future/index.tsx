@@ -82,7 +82,7 @@ interface GeneratedStateProps {
   selectedWorldRegionId?: number;
   selectedDataType: FutureDataType;
   selectedFutureDataset: FutureDataset;
-  allScenariosInSelectedDataset?: FutureEnsembleData;
+  allEnsemblesInSelectedDataset?: FutureEnsembleData;
   futureEnsembleData?: FutureScenarioWithData;
   selectedScenario?: FutureScenario;
   mapData?: TimeAggregate<number>;
@@ -95,11 +95,11 @@ class FutureBody extends React.Component<Props> {
   public componentDidMount() {
     const {
       selectedFutureDataset,
-      allScenariosInSelectedDataset,
+      allEnsemblesInSelectedDataset,
       selectedWorldRegionId,
     } = this.props;
 
-    if (!allScenariosInSelectedDataset) {
+    if (!allEnsemblesInSelectedDataset) {
       this.props.loadFutureEnsembleData(
         selectedFutureDataset,
         // TODO: allow user to choose threshold
@@ -121,18 +121,12 @@ class FutureBody extends React.Component<Props> {
       )
     ) {
       // Note: don't store, so no check if already loaded
-      if (this.props.selectedWaterRegionId) {
-        this.props.loadFutureEnsembleData(
-          this.props.selectedFutureDataset,
-          this.props.selectedWaterRegionId.toString(),
-        );
-      } else {
-        this.props.loadFutureEnsembleData(
-          this.props.selectedFutureDataset,
-          // TODO: allow user to choose threshold
-          `world-${this.props.selectedWorldRegionId}_0.2`,
-        );
-      }
+      this.props.loadFutureEnsembleData(
+        this.props.selectedFutureDataset,
+        this.props.selectedWaterRegionId
+          ? this.props.selectedWaterRegionId.toString()
+          : `world-${this.props.selectedWorldRegionId}_0.2`, // TODO: allow user to choose threshold
+      );
     }
     this.verifyDataExistsForSelectedScenario();
   }
@@ -140,22 +134,22 @@ class FutureBody extends React.Component<Props> {
   private verifyDataExistsForSelectedScenario() {
     const {
       futureEnsembleData,
-      allScenariosInSelectedDataset,
+      allEnsemblesInSelectedDataset,
       mapData,
       selectedScenario,
       selectedFutureDataset,
     } = this.props;
 
-    if (allScenariosInSelectedDataset) {
+    if (allEnsemblesInSelectedDataset) {
       if (!futureEnsembleData) {
         // This means we have fetched the data but have currently selected a
         // scenario for which data does not exist. Switch to the default one.
-        let defaultScenario = allScenariosInSelectedDataset.find(
+        let defaultScenario = allEnsemblesInSelectedDataset.find(
           d => !!d.default,
         );
         if (!defaultScenario) {
           console.warn('Missing default scenario for dataset');
-          defaultScenario = allScenariosInSelectedDataset[0];
+          defaultScenario = allEnsemblesInSelectedDataset[0];
         }
         if (!defaultScenario) {
           console.error('No scenarios for dataset!');
@@ -174,7 +168,7 @@ class FutureBody extends React.Component<Props> {
   }
 
   private handleLineHover = (scenarioId: string) => {
-    const hoveredData = this.props.allScenariosInSelectedDataset!.find(
+    const hoveredData = this.props.allEnsemblesInSelectedDataset!.find(
       d => d.scenarioId === scenarioId,
     );
 
@@ -190,7 +184,7 @@ class FutureBody extends React.Component<Props> {
       mapData,
       waterRegions,
       selectedDataType,
-      allScenariosInSelectedDataset,
+      allEnsemblesInSelectedDataset,
       selectedScenario,
     } = this.props;
 
@@ -213,7 +207,7 @@ class FutureBody extends React.Component<Props> {
           </DataSelectors>
         </div>
         {!waterRegions ||
-        !allScenariosInSelectedDataset ||
+        !allEnsemblesInSelectedDataset ||
         !selectedScenario ? (
           <StyledSpinner />
         ) : (
@@ -232,7 +226,7 @@ class FutureBody extends React.Component<Props> {
                   includeConsumption={selectedDataType === 'stress'}
                   selectedScenario={selectedScenario}
                 />
-              </div>{' '}
+              </div>
             </div>
             <div className="row">
               <div className="col-xs-12">
@@ -265,7 +259,7 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     waterRegions: getWaterRegionData(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
-    allScenariosInSelectedDataset: getAllScenariosInSelectedFutureDataset(
+    allEnsemblesInSelectedDataset: getAllScenariosInSelectedFutureDataset(
       state,
     ),
     selectedScenario: getSelectedFutureScenario(state),
