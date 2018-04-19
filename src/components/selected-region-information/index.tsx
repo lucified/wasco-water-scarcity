@@ -155,7 +155,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <Empty>Select a unit</Empty>
+          <Empty>Select an area</Empty>
         )}
       </div>
     );
@@ -198,7 +198,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <Empty>Select a unit</Empty>
+          <Empty>Select an area</Empty>
         )}
       </div>
     );

@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { geoPath } from 'd3-geo';
+import { ExtendedFeature, geoPath } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -19,6 +19,9 @@ import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
   defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
+  getLocalRegionData,
+  GridData,
+  LocalData,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
 } from '../../data';
@@ -77,6 +80,31 @@ const LegendCaption = styled.text`
   font-weight: bold;
 `;
 
+const CountryBorders = styled.g`
+  stroke-width: 1px;
+  stroke: black;
+  fill: none;
+`;
+
+const DDM = styled.g`
+  stroke-width: 0.25px;
+  stroke: #71bcd5;
+  opacity: 0.8;
+  fill: none;
+`;
+
+const Rivers = styled.g`
+  stroke-width: 0.5px;
+  stroke: blue;
+  fill: none;
+`;
+
+const Basins = styled.g`
+  stroke-width: 0.5px;
+  stroke: purple;
+  fill: none;
+`;
+
 interface PassedProps {
   width: number;
   selectedData: TimeAggregate<number>;
@@ -99,6 +127,13 @@ interface GeneratedDispatchProps {
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
+
+interface State {
+  zoomInToRegion: boolean;
+  regionData: {
+    [id: string]: LocalData;
+  };
+}
 
 function getColorScale(dataType: HistoricalDataType, thresholds: number[]) {
   const emptyColor = '#D2E3E5';
@@ -124,9 +159,14 @@ function getLabel(dataType: HistoricalDataType) {
   }
 }
 
-class Map extends React.Component<Props> {
+class Map extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
+
+    this.state = {
+      zoomInToRegion: false,
+      regionData: {},
+    };
 
     this.width = props.width;
     this.height = this.width / 1.9;
@@ -156,27 +196,55 @@ class Map extends React.Component<Props> {
     this.zoomToGlobalArea(false);
   }
 
-  public componentDidUpdate(prevProps: Props) {
+  public componentDidUpdate(prevProps: Props, prevState: State) {
+    const {
+      selectedData,
+      selectedWaterRegionId,
+      selectedDataType,
+      shortageThresholds,
+      stressThresholds,
+      thresholds,
+      selectedWorldRegion,
+    } = this.props;
+    const { zoomInToRegion } = this.state;
+
     if (
-      prevProps.selectedData !== this.props.selectedData ||
-      prevProps.selectedWaterRegionId !== this.props.selectedWaterRegionId
+      prevProps.selectedData !== selectedData ||
+      prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
+      (prevState.zoomInToRegion && !this.state.zoomInToRegion)
     ) {
       this.redrawFillsAndBorders();
     }
 
     if (
-      prevProps.selectedDataType !== this.props.selectedDataType ||
-      prevProps.thresholds !== this.props.thresholds ||
-      (this.props.selectedDataType === 'scarcity' &&
-        (prevProps.stressThresholds !== this.props.stressThresholds ||
-          prevProps.shortageThresholds !== this.props.shortageThresholds))
+      prevProps.selectedDataType !== selectedDataType ||
+      prevProps.thresholds !== thresholds ||
+      (selectedDataType === 'scarcity' &&
+        (prevProps.stressThresholds !== stressThresholds ||
+          prevProps.shortageThresholds !== shortageThresholds))
     ) {
       this.generateScales();
       this.redrawFillsAndBorders();
       this.redrawLegend();
     }
 
-    if (prevProps.selectedWorldRegion !== this.props.selectedWorldRegion) {
+    if (prevProps.selectedWorldRegion !== selectedWorldRegion) {
+      this.zoomToGlobalArea();
+    }
+
+    // TODO: this is a little ugly
+    if (
+      zoomInToRegion &&
+      (!prevState.zoomInToRegion ||
+        prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
+        prevProps.selectedData !== selectedData ||
+        prevProps.selectedDataType !== selectedDataType ||
+        (this.state.regionData[selectedWaterRegionId!] &&
+          !prevState.regionData[selectedWaterRegionId!]))
+    ) {
+      this.zoomToWaterRegion();
+    } else if (prevState.zoomInToRegion && !zoomInToRegion) {
+      this.zoomToWaterRegion();
       this.zoomToGlobalArea();
     }
   }
@@ -409,7 +477,15 @@ class Map extends React.Component<Props> {
   }
 
   private handleRegionClick(d: WaterRegionGeoJSONFeature) {
-    this.props.toggleSelectedRegion(d.properties.featureId);
+    if (d.properties.featureId === this.props.selectedWaterRegionId) {
+      this.toggleZoomInToRegion();
+    } else {
+      this.props.toggleSelectedRegion(d.properties.featureId);
+    }
+  }
+
+  private toggleZoomInToRegion() {
+    this.setState(state => ({ zoomInToRegion: !state.zoomInToRegion }));
   }
 
   private getColorForWaterRegion(featureId: number): string {
@@ -438,6 +514,326 @@ class Map extends React.Component<Props> {
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
   }
 
+  private async fetchRegionData(regionId: number) {
+    const data = await getLocalRegionData(regionId);
+    if (data) {
+      this.setState(state => ({
+        regionData: {
+          ...state.regionData,
+          [regionId]: data,
+        },
+      }));
+    }
+  }
+
+  private zoomToWaterRegion() {
+    const { selectedWaterRegionId, waterRegions: { features } } = this.props;
+    const svg = select<SVGElement, undefined>(this.svgRef!);
+
+    const selectedWaterRegion =
+      selectedWaterRegionId &&
+      features.find(r => r.properties.featureId === selectedWaterRegionId);
+
+    // TODO: projection should be specific to spatial unit
+    // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
+    const projection = geoNaturalEarth2()
+      .precision(0.1)
+      .scale(this.width / 4.6)
+      .translate([this.width / 2.2, this.height / 1.7]);
+
+    const path = geoPath().projection(projection);
+
+    svg
+      .select('g#ddm')
+      .selectAll('path')
+      .remove();
+    svg
+      .select('g#rivers')
+      .selectAll('path')
+      .remove();
+    svg
+      .select('g#country-borders')
+      .selectAll('path')
+      .remove();
+    svg
+      .select('g#country-labels')
+      .selectAll('text')
+      .remove();
+    svg
+      .select('g#basins')
+      .selectAll('path')
+      .remove();
+    svg
+      .select('g#basin-labels')
+      .selectAll('text')
+      .remove();
+    svg
+      .select('g#places')
+      .selectAll('path')
+      .remove();
+    svg
+      .select('g#places-labels')
+      .selectAll('text')
+      .remove();
+    svg
+      .select('g#griddata')
+      .selectAll('path')
+      .remove();
+
+    if (
+      this.state.zoomInToRegion &&
+      selectedWaterRegionId != null &&
+      selectedWaterRegion != null
+    ) {
+      const localData: LocalData | undefined = this.state.regionData[
+        selectedWaterRegionId
+      ];
+      if (!localData) {
+        this.fetchRegionData(selectedWaterRegionId);
+        return;
+      }
+
+      if (localData.ddm != null) {
+        svg
+          .select('g#ddm')
+          .selectAll('path')
+          .data(localData.ddm.features)
+          .enter()
+          .append('path')
+          .attr('d', path);
+      }
+
+      if (localData.rivers != null) {
+        svg
+          .select('g#rivers')
+          .selectAll('path')
+          .data(localData.rivers.features)
+          .enter()
+          .append('path')
+          .attr('d', path);
+      }
+
+      if (localData.countries != null) {
+        svg
+          .select('g#country-borders')
+          .selectAll('path')
+          .data(localData.countries.features)
+          .enter()
+          .append('path')
+          .attr('d', path);
+
+        svg
+          .select('g#country-labels')
+          .selectAll('text')
+          .data(localData.countries.features)
+          .enter()
+          .append('text')
+          .attr('x', d => path.centroid(d)[0])
+          .attr('y', d => path.centroid(d)[1])
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '12px')
+          .text(d => d.properties.countryName);
+      }
+
+      if (localData.basins != null) {
+        svg
+          .select('g#basins')
+          .selectAll('path')
+          .data(localData.basins.features)
+          .enter()
+          .append('path')
+          .attr('d', path);
+
+        svg
+          .select('g#basin-labels')
+          .selectAll('text')
+          .data(localData.basins.features)
+          .enter()
+          .append('text')
+          .attr('x', d => path.centroid(d)[0])
+          .attr('y', d => path.centroid(d)[1])
+          .style('fill', 'purple')
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '12px')
+          .text(d => d.properties.basinName);
+      }
+
+      if (localData.places != null) {
+        svg
+          .select('g#places')
+          .selectAll('path')
+          .data(localData.places.features)
+          .enter()
+          .append('path')
+          .attr('d', path.pointRadius(5))
+          .attr('fill', 'grey');
+
+        svg
+          .select('g#places-labels')
+          .selectAll('text')
+          .data(localData.places.features)
+          .enter()
+          .append('text')
+          .attr('x', d => projection(d.geometry.coordinates)[0])
+          .attr('y', d => projection(d.geometry.coordinates)[1])
+          .attr('text-anchor', 'left')
+          .attr('dx', 2)
+          .attr('font-size', '10px')
+          .text(d => d.properties.name);
+      }
+
+      // TODO: add selector for variable
+      const selectedGridVariable:
+        | 'pop'
+        | 'elec'
+        | 'dom'
+        | 'man'
+        | 'live'
+        | 'irri' =
+        'pop';
+      const quintiles = localData.gridQuintiles[selectedGridVariable];
+      if (quintiles != null) {
+        // TODO: might be a more efficient way of doing this?
+        const griddataPoly: any = {
+          type: 'FeatureCollection',
+          features: localData.grid.map((d: GridData) => ({
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                ],
+              ],
+            },
+            properties: {
+              data:
+                d[selectedGridVariable] &&
+                d[selectedGridVariable]![this.props.selectedData.startYear],
+            },
+          })),
+        };
+
+        // TODO: may want different color scales for each variable
+        const colorScale = scaleThreshold<number, string>()
+          .domain(quintiles)
+          .range([
+            'none',
+            '#edf8e9',
+            '#bae4b3',
+            '#74c476',
+            '#31a354',
+            '#006d2c',
+          ]);
+
+        svg
+          .select<SVGGElement>('g#griddata')
+          .selectAll<
+            SVGPathElement,
+            ExtendedFeature<GeoJSON.Polygon, { data: number }>
+          >('path')
+          .data<ExtendedFeature<GeoJSON.Polygon, { data: number }>>(
+            griddataPoly.features,
+          )
+          .enter()
+          .append<SVGPathElement>('path')
+          .attr('d', path as any)
+          .attr(
+            'fill',
+            (d: ExtendedFeature<GeoJSON.Polygon, { data: number }>) =>
+              d.properties.data == null
+                ? 'none'
+                : colorScale(d.properties.data),
+          );
+      }
+
+      // TODO: is this zoom still suitable if we change projection at the same time?
+      const bounds = path.bounds(selectedWaterRegion as any);
+      const dx = bounds[1][0] - bounds[0][0];
+      const dy = bounds[1][1] - bounds[0][1];
+      const x = (bounds[0][0] + bounds[1][0]) / 2;
+      const y = (bounds[0][1] + bounds[1][1]) / 2;
+
+      const scale = 0.9 / Math.max(dx / this.width, dy / this.height);
+      const translate = [
+        this.width / 2 - scale * x,
+        this.height / 2 - scale * y,
+      ];
+
+      const ourZoom = zoom().on('zoom', zoomed);
+
+      const t = transition('zoom').duration(750);
+      svg
+        .transition(t as any)
+        .call(
+          ourZoom.transform as any,
+          zoomIdentity.translate(translate[0], translate[1]).scale(scale),
+        );
+    }
+
+    function zoomed() {
+      select<SVGGElement, undefined>('g#water-regions').attr(
+        'transform',
+        event.transform,
+      );
+      // TODO: There's probably a better way of clearing the water region fill
+      svg
+        .select<SVGGElement>('g#water-regions')
+        .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+        .attr('fill', 'none')
+        .attr('pointer-events', 'visible');
+      select<SVGGElement, undefined>('g#countries').attr(
+        'transform',
+        event.transform,
+      );
+      select<SVGGElement, undefined>('g#selected-region').attr(
+        'transform',
+        event.transform,
+      );
+      select<SVGGElement, undefined>('g#ddm')
+        .attr('transform', event.transform)
+        .selectAll('path')
+        .attr('stroke-width', `${1.5 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#rivers')
+        .attr('transform', event.transform)
+        .selectAll('path')
+        .attr('stroke-width', `${1.5 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#country-borders')
+        .attr('transform', event.transform)
+        .selectAll('path')
+        .attr('stroke-width', `${1 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#country-labels')
+        .attr('transform', event.transform)
+        .selectAll('text')
+        .attr('font-size', `${12 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#basins')
+        .attr('transform', event.transform)
+        .selectAll('path')
+        .attr('stroke-width', `${1 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#basin-labels')
+        .attr('transform', event.transform)
+        .selectAll('text')
+        .attr('font-size', `${12 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#places')
+        .attr('transform', event.transform)
+        .selectAll('path')
+        .attr('d', path.pointRadius(5 / event.transform.k) as any);
+      select<SVGGElement, undefined>('g#places-labels')
+        .attr('transform', event.transform)
+        .selectAll('text')
+        .attr('dx', 8 / event.transform.k)
+        .attr('font-size', `${10 / event.transform.k}px`);
+      select<SVGGElement, undefined>('g#griddata').attr(
+        'transform',
+        event.transform,
+      );
+    }
+  }
+
   public render() {
     const { selectedDataType } = this.props;
 
@@ -455,6 +851,14 @@ class Map extends React.Component<Props> {
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
         <SelectedRegion id="selected-region" clipPath="url(#clip)" />
+        <CountryBorders id="country-borders" clipPath="url(#clip)" />
+        <Basins id="basins" clipPath="url(#clip)" />
+        <g id="basin-labels" clipPath="url(#clip)" />
+        <g id="country-labels" clipPath="url(#clip)" />
+        <DDM id="ddm" clipPath="url(#clip)" />
+        <Rivers id="rivers" clipPath="url(#clip)" />
+        <g id="places" clipPath="url(#clip)" />
+        <g id="places-labels" clipPath="url(#clip)" />
         <Legend
           id="legend"
           transform={`translate(${this.width * 0.6}, ${this.height - 40})`}

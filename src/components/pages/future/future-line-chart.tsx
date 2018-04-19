@@ -81,7 +81,7 @@ function FutureLineChart({
   height,
 }: Props) {
   if (!selectedDataType || selectedWaterRegionId == null) {
-    return <Empty>Select a unit on the map</Empty>;
+    return <Empty>Select an area on the map</Empty>;
   }
 
   if (!data || !filteredData || !selectedFutureDataForScenario) {

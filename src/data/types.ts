@@ -1,3 +1,5 @@
+import { ExtendedFeature, ExtendedFeatureCollection } from 'd3-geo';
+import * as GeoJSON from 'geojson';
 import { Omit } from 'recompose';
 import { StressShortageDatum, TimeScale } from '../types';
 
@@ -190,4 +192,70 @@ export function toStressShortageDatum({
     shortage: short,
     population: pop,
   };
+}
+
+interface RiverData {
+  scalerank: string;
+  featurecla: string;
+  name: string;
+  note?: string;
+}
+
+interface CountryBorder {
+  featureid: number;
+  countryName: string;
+}
+
+interface Basin {
+  featureid: number;
+  basinName: string;
+}
+
+interface PopulatedPlaces {
+  name: string;
+}
+
+interface DrainageDirection {
+  strahler: number;
+  basin: number;
+}
+
+export interface GridData {
+  centre: [number, number];
+  dom?: { [startYear: string]: number };
+  man?: { [startYear: string]: number };
+  live?: { [startYear: string]: number };
+  elec?: { [startYear: string]: number };
+  irri?: { [startYear: string]: number };
+  pop?: { [startYear: string]: number };
+}
+
+interface GridQuintile {
+  [key: string]: number[] | undefined;
+  dom?: number[];
+  man?: number[];
+  live?: number[];
+  elec?: number[];
+  irri?: number[];
+  pop?: number[];
+}
+
+export interface LocalData {
+  basins?: ExtendedFeatureCollection<
+    ExtendedFeature<GeoJSON.MultiPolygon, Basin>
+  >;
+  places?: ExtendedFeatureCollection<
+    ExtendedFeature<GeoJSON.Point, PopulatedPlaces>
+  >;
+  countries?: ExtendedFeatureCollection<
+    ExtendedFeature<GeoJSON.MultiPolygon, CountryBorder>
+  >;
+  rivers?: ExtendedFeatureCollection<
+    ExtendedFeature<GeoJSON.MultiLineString, RiverData>
+  >;
+  ddm?: ExtendedFeatureCollection<
+    ExtendedFeature<GeoJSON.Point, DrainageDirection>
+  >;
+  grid: GridData[];
+  gridQuintiles: GridQuintile;
 }
