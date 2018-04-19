@@ -203,10 +203,16 @@ class Map extends React.Component<Props, State> {
       stressThresholds,
       thresholds,
       selectedWorldRegion,
+      width,
     } = this.props;
     const { zoomInToRegion } = this.state;
 
-    if (
+    if (prevProps.width !== width) {
+      this.generateScales();
+      this.clearMapAndLegend();
+      this.drawMap();
+      this.drawLegend();
+    } else if (
       prevProps.selectedDataType !== selectedDataType ||
       prevProps.thresholds !== thresholds ||
       (selectedDataType === 'scarcity' &&
@@ -219,12 +225,15 @@ class Map extends React.Component<Props, State> {
     } else if (
       prevProps.selectedData !== selectedData ||
       prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-      (prevState.zoomInToRegion && !this.state.zoomInToRegion)
+      (prevState.zoomInToRegion && !zoomInToRegion)
     ) {
       this.redrawFillsAndBorders();
     }
 
-    if (prevProps.selectedWorldRegion !== selectedWorldRegion) {
+    if (
+      prevProps.selectedWorldRegion !== selectedWorldRegion ||
+      (!zoomInToRegion && width !== prevProps.width)
+    ) {
       this.zoomToGlobalArea();
     }
 
@@ -234,6 +243,7 @@ class Map extends React.Component<Props, State> {
       (!prevState.zoomInToRegion ||
         prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
         prevProps.selectedData !== selectedData ||
+        prevProps.width !== width ||
         prevProps.selectedDataType !== selectedDataType ||
         (this.state.regionData[selectedWaterRegionId!] &&
           !prevState.regionData[selectedWaterRegionId!]))
@@ -279,6 +289,23 @@ class Map extends React.Component<Props, State> {
     return this.props.width / 1.9;
   }
 
+  private clearMapAndLegend() {
+    const svg = select<SVGElement, undefined>(this.svgRef!);
+    svg.select('use#globe-fill').on('click', null);
+    svg
+      .select<SVGGElement>('g#water-regions')
+      .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+      .remove();
+    svg
+      .select<SVGGElement>('g#clickable-water-regions')
+      .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+      .remove();
+    svg
+      .select<SVGGElement>('g#legend')
+      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
+      .remove();
+  }
+
   private drawMap() {
     const {
       clearSelectedRegion,
@@ -295,9 +322,7 @@ class Map extends React.Component<Props, State> {
       .translate([width / 2.2, height / 1.7]);
     const path = geoPath().projection(projection);
 
-    const svg = select<SVGElement, undefined>(this.svgRef!)
-      .attr('width', width)
-      .attr('height', height);
+    const svg = select<SVGElement, undefined>(this.svgRef!);
     svg
       .select<SVGPathElement>('#sphere')
       .datum({ type: 'Sphere' })
@@ -855,7 +880,7 @@ class Map extends React.Component<Props, State> {
     const height = this.getHeight();
 
     return (
-      <SVG innerRef={this.saveSvgRef}>
+      <SVG width={width} height={height} innerRef={this.saveSvgRef}>
         <defs>
           <clipPath id="clip">
             <use xlinkHref="#sphere" />
@@ -880,7 +905,9 @@ class Map extends React.Component<Props, State> {
         <g id="clickable-water-regions" clipPath="url(#clip)" />
         <Legend
           id="legend"
-          transform={`translate(${width * 0.6}, ${height - 40})`}
+          transform={`translate(${Math.round(width * 0.6)}, ${Math.round(
+            height - 26,
+          )})`}
         >
           <LegendCaption x="0" y="-6">
             {getLabel(selectedDataType)}
