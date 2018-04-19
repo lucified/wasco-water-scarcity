@@ -478,7 +478,6 @@ class Map extends React.Component<Props, State> {
 
   private handleRegionClick(d: WaterRegionGeoJSONFeature) {
     if (
-      !this.state.zoomInToRegion &&
       d.properties.featureId === this.props.selectedWaterRegionId
     ) {
       this.toggleZoomInToRegion();
