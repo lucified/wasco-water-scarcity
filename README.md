@@ -110,3 +110,21 @@ Run a production deployment locally with:
 ```shell
 yarn run deploy
 ```
+
+## Embedding a visualization in a page
+
+In order to embed a visualization, the host page needs to have the
+[iframe-resizer](https://github.com/davidjbradshaw/iframe-resizer) code on the
+embedding page with either:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
+```
+
+or by placing the contents of this file inside a `<script>` tag. Once that's
+done, something like the below should be done per embed:
+
+```html
+<iframe id="myIframe" src="http://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
+<script>iFrameResize({}, '#myIframe')</script>
+```
