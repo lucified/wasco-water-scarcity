@@ -43,6 +43,12 @@ To prettify the whole code base, run:
 yarn run prettify
 ```
 
+### Testing embeds
+
+To test embeds inside an iframe, start the development server for the `embed`
+APP (`APP=embed yarn start`) and open the `src/embed-test.html` page in a
+browser.
+
 ## Using new datasets
 
 The datasets are defined in `src/data/datasets.ts`. The URL defined in the `url`

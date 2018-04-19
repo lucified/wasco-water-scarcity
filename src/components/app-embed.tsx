@@ -6,6 +6,8 @@ import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 
+require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
+
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'normalize.css/normalize.css';
