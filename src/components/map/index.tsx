@@ -845,6 +845,7 @@ class Map extends React.Component<Props, State> {
           <Land id="land" clipPath="url(#clip)" />
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
+        <g id="griddata" clipPath="url(#clip)" />
         <SelectedRegion id="selected-region" clipPath="url(#clip)" />
         <CountryBorders id="country-borders" clipPath="url(#clip)" />
         <Basins id="basins" clipPath="url(#clip)" />
