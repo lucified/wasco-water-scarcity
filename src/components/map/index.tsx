@@ -59,6 +59,12 @@ const SVG = styled.svg`
       transition: opacity 0.2s ease-out;
     }
   }
+
+  & .clickable-water-region {
+    fill: none;
+    stroke: none;
+    pointer-events: all;
+  }
 `;
 
 const SelectedRegion = styled.g`
@@ -310,7 +316,7 @@ class Map extends React.Component<Props, State> {
     svg
       .select<SVGGElement>('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-      .data(features, d => String(d.properties.featureId))
+      .data(features, d => d.properties.featureId.toString())
       .enter()
       .append<SVGPathElement>('path')
         .attr('class', 'water-region')
@@ -326,8 +332,16 @@ class Map extends React.Component<Props, State> {
         )
         .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
-        .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId))
-        .on('click', this.handleRegionClick);
+        .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
+    svg
+      .select<SVGGElement>('g#clickable-water-regions')
+      .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+      .data(features, d => d.properties.featureId.toString())
+      .enter()
+      .append<SVGPathElement>('path')
+      .attr('class', 'clickable-water-region')
+      .attr('d', path)
+      .on('click', this.handleRegionClick);
   }
 
   private drawLegend() {
@@ -465,6 +479,10 @@ class Map extends React.Component<Props, State> {
         'transform',
         event.transform,
       );
+      select<SVGGElement, undefined>('g#clickable-water-regions').attr(
+        'transform',
+        event.transform,
+      );
       select<SVGGElement, undefined>('g#countries').attr(
         'transform',
         event.transform,
@@ -562,7 +580,7 @@ class Map extends React.Component<Props, State> {
       .selectAll('text')
       .remove();
     svg
-      .select('g#griddata')
+      .select('g#grid-data')
       .selectAll('path')
       .remove();
   }
@@ -731,7 +749,7 @@ class Map extends React.Component<Props, State> {
         .range(['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c']);
 
       svg
-        .select<SVGGElement>('g#griddata')
+        .select<SVGGElement>('g#grid-data')
         .selectAll<
           SVGPathElement,
           ExtendedFeature<GeoJSON.Polygon, { data: number }>
@@ -780,6 +798,10 @@ class Map extends React.Component<Props, State> {
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
         .attr('fill', 'none')
         .attr('pointer-events', 'visible');
+      select<SVGGElement, undefined>('g#clickable-water-regions').attr(
+        'transform',
+        event.transform,
+      );
       select<SVGGElement, undefined>('g#countries').attr(
         'transform',
         event.transform,
@@ -821,7 +843,7 @@ class Map extends React.Component<Props, State> {
         .selectAll('text')
         .attr('dx', 8 / event.transform.k)
         .attr('font-size', `${10 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#griddata').attr(
+      select<SVGGElement, undefined>('g#grid-data').attr(
         'transform',
         event.transform,
       );
@@ -845,7 +867,7 @@ class Map extends React.Component<Props, State> {
           <Land id="land" clipPath="url(#clip)" />
         </g>
         <g id="water-regions" clipPath="url(#clip)" />
-        <g id="griddata" clipPath="url(#clip)" />
+        <g id="grid-data" clipPath="url(#clip)" />
         <SelectedRegion id="selected-region" clipPath="url(#clip)" />
         <CountryBorders id="country-borders" clipPath="url(#clip)" />
         <Basins id="basins" clipPath="url(#clip)" />
@@ -855,6 +877,7 @@ class Map extends React.Component<Props, State> {
         <Rivers id="rivers" clipPath="url(#clip)" />
         <g id="places" clipPath="url(#clip)" />
         <g id="places-labels" clipPath="url(#clip)" />
+        <g id="clickable-water-regions" clipPath="url(#clip)" />
         <Legend
           id="legend"
           transform={`translate(${width * 0.6}, ${height - 40})`}
