@@ -8,19 +8,25 @@ import { WorldRegion } from '../../types';
 import { theme } from '../theme';
 
 const RegionsList = styled.div`
-  line-height: 2;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   padding: ${theme.margin()} 0;
 `;
 
-const Region = styled.a`
+const Region = styled.div`
+  line-height: 1.3;
+`;
+
+const RegionLink = styled.a`
   font-size: 0.73rem;
   font-family: ${theme.labelFontFamily};
-  padding: 0.3rem 0.3rem;
+  padding: 0.3rem 0.5rem;
   cursor: pointer;
-  color: ${({ selected }: { selected: boolean }) =>
-    selected ? 'white' : theme.colors.grayDarkest};
   ${({ selected }: { selected: boolean }) =>
-    selected ? `background-color: ${theme.colors.grayDarkest};` : ''};
+    selected
+      ? `background-color: ${theme.colors.grayDarkest}; color: white`
+      : `color: ${theme.colors.grayDarkest}`};
 `;
 
 const RegionName = styled.span`
@@ -39,13 +45,6 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 class WorldRegionSelector extends React.Component<Props> {
-  private generateClickCallback(id: number) {
-    return () =>
-      this.props.onSetWorldRegion(
-        this.props.selectedWorldRegionId === id ? 0 : id,
-      );
-  }
-
   public render() {
     const { selectedWorldRegionId, worldRegions } = this.props;
 
@@ -55,12 +54,17 @@ class WorldRegionSelector extends React.Component<Props> {
           { id: 0, name: 'Global', color: 'black' },
           ...(worldRegions || []),
         ].map(({ id, name }) => (
-          <Region
-            key={`world-region-selector-${id}`}
-            onClick={this.generateClickCallback(id)}
-            selected={selectedWorldRegionId === id}
-          >
-            <RegionName>{name}</RegionName>
+          <Region key={`world-region-selector-${id}`}>
+            <RegionLink
+              onClick={() =>
+                this.props.onSetWorldRegion(
+                  this.props.selectedWorldRegionId === id ? 0 : id,
+                )
+              }
+              selected={selectedWorldRegionId === id}
+            >
+              <RegionName>{name}</RegionName>
+            </RegionLink>
           </Region>
         ))}
       </RegionsList>
