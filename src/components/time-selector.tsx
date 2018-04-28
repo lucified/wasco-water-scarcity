@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
 import { getDataTypeColors } from '../data';
 import memoize from '../memoize';
@@ -18,22 +19,12 @@ import {
 } from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
 import BarChart, { BarChartDatum } from './generic/bar-chart';
+import PlayButton from './generic/play-button';
+import responsive, { ResponsiveProps } from './generic/responsive';
 
-interface GeneratedStateProps {
-  selectedIndex: number;
-  currentIndexLabel: string;
-  data?: AggregateStressShortageDatum[];
-  dataType: HistoricalDataType;
-  selectedWorldRegion?: WorldRegion;
-  timeIndexLocked: boolean;
-}
-
-interface GeneratedDispatchProps {
-  setSelectedTime: (value: number) => void;
-  onToggleLock: () => void;
-}
-
-type Props = GeneratedDispatchProps & GeneratedStateProps;
+const StyledPlayButton = styled(PlayButton)`
+  float: right;
+`;
 
 function getValues(
   dataType: HistoricalDataType,
@@ -123,7 +114,40 @@ function getTitle(dataType: HistoricalDataType, worldRegion?: WorldRegion) {
   return `Population living in water ${dataType} in ${worldRegion.name}`;
 }
 
-class TimeSelector extends React.PureComponent<Props> {
+interface GeneratedStateProps {
+  selectedIndex: number;
+  currentIndexLabel: string;
+  data?: AggregateStressShortageDatum[];
+  dataType: HistoricalDataType;
+  selectedWorldRegion?: WorldRegion;
+  timeIndexLocked: boolean;
+}
+
+interface GeneratedDispatchProps {
+  setSelectedTime: (value: number) => void;
+  onToggleLock: () => void;
+}
+
+interface PassedProps {
+  showPlayButton?: boolean;
+}
+
+type Props = GeneratedDispatchProps &
+  GeneratedStateProps &
+  PassedProps &
+  ResponsiveProps;
+
+interface State {
+  isPlaying: boolean;
+}
+
+class TimeSelector extends React.PureComponent<Props, State> {
+  public state = {
+    isPlaying: false,
+  };
+
+  private timerReference: any;
+
   private generateBarChartData = memoize(
     (data: AggregateStressShortageDatum[], dataType: HistoricalDataType) =>
       data.map((d, i) => ({
@@ -141,31 +165,78 @@ class TimeSelector extends React.PureComponent<Props> {
     setSelectedTime(item.key);
   };
 
+  private handleHover = (item: BarChartDatum) => {
+    this.props.setSelectedTime(item.key);
+  };
+
+  private handleToggle = () => {
+    if (this.state.isPlaying) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  };
+
+  private pause() {
+    clearInterval(this.timerReference);
+    this.setState({ isPlaying: false });
+  }
+
+  private play() {
+    const { setSelectedTime, selectedIndex, data } = this.props;
+    if (!data) {
+      console.warn('No time information to play.');
+      return;
+    }
+    this.setState({ isPlaying: true });
+    if (selectedIndex === data.length - 1) {
+      setSelectedTime(0);
+    } else {
+      setSelectedTime(selectedIndex + 1);
+    }
+    this.timerReference = setInterval(this.setNextPeriod, 500);
+  }
+
+  private setNextPeriod = () => {
+    const { setSelectedTime, selectedIndex, data } = this.props;
+    if (!data) {
+      console.warn('No time information to play.');
+      return;
+    }
+    if (selectedIndex === data.length - 1) {
+      this.pause();
+    } else {
+      setSelectedTime(selectedIndex + 1);
+    }
+  };
+
   public render() {
     const {
       data,
       dataType,
       selectedIndex,
       selectedWorldRegion,
-      setSelectedTime,
       timeIndexLocked,
+      width,
+      showPlayButton,
     } = this.props;
+    const { isPlaying } = this.state;
+
     if (!data) {
       return null;
     }
 
-    function handleHover(item: BarChartDatum) {
-      setSelectedTime(item.key);
-    }
-
-    function xTickFormatter(i: string) {
-      const d = data![Number(i)];
-      return formatYearRange(d, data!.length <= 20);
-    }
-
     return (
       <div>
-        <h3>{getTitle(dataType, selectedWorldRegion)}</h3>
+        <h3>
+          {getTitle(dataType, selectedWorldRegion)}
+          {showPlayButton && (
+            <StyledPlayButton
+              isPlaying={isPlaying}
+              onToggle={this.handleToggle}
+            />
+          )}
+        </h3>
         <BarChart
           data={this.generateBarChartData(data, dataType)}
           height={120}
@@ -174,10 +245,14 @@ class TimeSelector extends React.PureComponent<Props> {
           marginTop={5}
           marginLeft={40}
           yTickFormat={formatPopulation}
-          xTickFormat={xTickFormatter}
+          xTickFormat={i => {
+            const d = data[parseInt(i, 10)];
+            // Should have at least 70px per long-form title
+            return formatYearRange(d, data.length * 70 < width);
+          }}
           selectedIndex={selectedIndex}
           indexLocked={timeIndexLocked}
-          onMouseEnter={handleHover}
+          onMouseEnter={this.handleHover}
           onClick={this.handleClick}
           hideSelectedLabel
           transitionDuration={100}
@@ -220,4 +295,4 @@ export default connect<
       dispatch(toggleHistoricalTimeIndexLock());
     },
   }),
-)(TimeSelector);
+)(responsive(TimeSelector));

@@ -27,8 +27,8 @@ interface GeneratedStateProps {
 
 export type Props = GeneratedDispatchProps & GeneratedStateProps;
 
-export default function withMapData(
-  Component: React.ComponentType<Props>,
+export default function withMapData<T extends Props>(
+  Component: React.ComponentType<T>,
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
   componentDataType?: HistoricalDataType,
 ) {
