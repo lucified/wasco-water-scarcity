@@ -36,12 +36,6 @@ const rules = [
             'lodash',
             // Required for hot reloading. Should be disabled for production builds.
             'react-hot-loader/babel',
-            // Outdated (?):
-            // transform-regenerator is needed in order to transform generators.
-            // Babelification can be removed once TypeScript supports generators,
-            // probably in TS 2.3. When that is done, also change the output of
-            // TS to 'es5' in tsconfig.json
-            'transform-regenerator',
           ],
         },
       },

@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { ExtendedFeature, geoPath } from 'd3-geo';
+import { ExtendedFeature, geoNaturalEarth1, geoPath } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -33,9 +33,6 @@ import {
 } from '../../selectors';
 import { HistoricalDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
-
-// TODO: import properly once types exist
-const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 const worldData = require('world-atlas/world/110m.json');
 
@@ -311,7 +308,7 @@ class Map extends React.Component<Props, State> {
     const height = this.getHeight();
 
     // Based on https://gist.github.com/mbostock/4448587
-    const projection = geoNaturalEarth2()
+    const projection = geoNaturalEarth1()
       .precision(0.1)
       .scale(width / 4.6)
       .translate([width / 2.2, height / 1.7]);
@@ -454,7 +451,7 @@ class Map extends React.Component<Props, State> {
     const svg = select<SVGElement, undefined>(this.svgRef);
 
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
-    const projection = geoNaturalEarth2()
+    const projection = geoNaturalEarth1()
       .precision(0.1)
       .scale(width / 4.6)
       .translate([width / 2.2, height / 1.7]);
@@ -647,7 +644,7 @@ class Map extends React.Component<Props, State> {
 
     // TODO?: projection should be specific to spatial unit
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
-    const projection = geoNaturalEarth2()
+    const projection = geoNaturalEarth1()
       .precision(0.1)
       .scale(width / 4.6)
       .translate([width / 2.2, height / 1.7]);
@@ -735,8 +732,14 @@ class Map extends React.Component<Props, State> {
         .data(localData.places.features)
         .enter()
         .append('text')
-        .attr('x', d => projection(d.geometry.coordinates)[0])
-        .attr('y', d => projection(d.geometry.coordinates)[1])
+        .attr(
+          'x',
+          d => projection(d.geometry.coordinates as [number, number])![0],
+        )
+        .attr(
+          'y',
+          d => projection(d.geometry.coordinates as [number, number])![1],
+        )
         .attr('text-anchor', 'left')
         .attr('dx', 2)
         .attr('font-size', '10px')

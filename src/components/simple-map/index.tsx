@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { geoPath } from 'd3-geo';
+import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -28,9 +28,6 @@ import {
 } from '../../selectors';
 import { HistoricalDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
-
-// TODO: import properly once types exist
-const { geoNaturalEarth2 } = require('d3-geo-projection');
 
 const worldData = require('world-atlas/world/110m.json');
 
@@ -216,7 +213,7 @@ class SimpleMap extends React.Component<Props> {
     const height = this.getHeight();
 
     // Based on https://gist.github.com/mbostock/4448587
-    const projection = geoNaturalEarth2()
+    const projection = geoNaturalEarth1()
       .precision(0.1)
       .scale(width / 4.6)
       .translate([width / 2.2, height / 1.7]);
@@ -338,7 +335,7 @@ class SimpleMap extends React.Component<Props> {
     const svg = select<SVGElement, undefined>(this.svgRef);
 
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
-    const projection = geoNaturalEarth2()
+    const projection = geoNaturalEarth1()
       .precision(0.1)
       .scale(width / 4.6)
       .translate([width / 2.2, height / 1.7]);
