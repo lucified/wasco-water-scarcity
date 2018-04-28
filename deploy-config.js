@@ -2,10 +2,17 @@
 
 const lucifyDeployConfig = require('lucify-deploy-config').default; // eslint-disable-line
 
-// TODO: different deployment locations depending on app
 const opts = {
-  bucket: 'lucify-wasco',
-  baseUrl: 'https://wasco.lucify.com',
+  bucket:
+    process.env.APP === 'embed'
+      ? 'lucify-wasco-embed'
+      : process.env.APP === 'future' ? 'lucify-wasco-future' : 'lucify-wasco',
+  baseUrl:
+    process.env.APP === 'embed'
+      ? 'https://wasco-embed.lucify.com'
+      : process.env.APP === 'future'
+        ? 'https://wasco-future.lucify.com'
+        : 'https://wasco.lucify.com',
   publicPath: '/',
 };
 

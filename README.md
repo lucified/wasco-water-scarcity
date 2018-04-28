@@ -108,7 +108,13 @@ Production deployments require Lucify's production credentials.
 Run a production deployment locally with:
 
 ```shell
-yarn run deploy
+NODE_ENV=production yarn run deploy
+```
+
+To deploy the `future` or `embed` apps, add them as environment variables:
+
+```shell
+APP=embed NODE_ENV=production yarn run deploy
 ```
 
 ## Embedding a visualization in a page
