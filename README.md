@@ -85,14 +85,14 @@ The following command builds a production distribution bundle into `dist`.
 Upload these files to your hosting server to deploy.
 
 ```shell
-yarn run build
+NODE_ENV=production yarn run build
 ```
 
 By default, the history app is built. To build a different app, use the `APP`
 environment variable with `future` or `embed`:
 
 ```shell
-APP=future yarn run build
+APP=future NODE_ENV=production yarn run build
 ```
 
 You can test a distribution by:
