@@ -85,7 +85,7 @@ class AppEmbedPlain extends React.Component<Props> {
           <Route path="/shortage/:play?" component={ShortageEmbed} />
           <Route path="/scarcity/:play?" component={ScarcityEmbed} />
           {/* Default to stress */}
-          <Route path="/:ignored/:play?" component={StressEmbed} />
+          <Route path="/:ignored?/:play?" component={StressEmbed} />
         </Switch>
       </Root>
     );
