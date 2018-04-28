@@ -176,15 +176,11 @@ class Map extends React.Component<Props, State> {
     };
   }
 
-  private svgRef?: SVGElement;
+  private svgRef!: SVGElement;
   private legendWidth = 200;
   private colorScale?: ScaleThreshold<number, string>;
   private legendXScale?: ScaleLinear<number, number>;
   private legendExtentPairs?: Array<[number, number]>;
-
-  private saveSvgRef = (ref: SVGSVGElement) => {
-    this.svgRef = ref;
-  };
 
   public componentDidMount() {
     this.generateScales();
@@ -289,7 +285,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private clearMapAndLegend() {
-    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const svg = select<SVGElement, undefined>(this.svgRef);
     svg.select('use#globe-fill').on('click', null);
     svg
       .select<SVGGElement>('g#water-regions')
@@ -321,7 +317,7 @@ class Map extends React.Component<Props, State> {
       .translate([width / 2.2, height / 1.7]);
     const path = geoPath().projection(projection);
 
-    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const svg = select<SVGElement, undefined>(this.svgRef);
     svg
       .select<SVGPathElement>('#sphere')
       .datum({ type: 'Sphere' })
@@ -369,7 +365,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private drawLegend() {
-    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+    const g = select<SVGElement, undefined>(this.svgRef).select<SVGGElement>(
       'g#legend',
     );
 
@@ -439,7 +435,7 @@ class Map extends React.Component<Props, State> {
   };
 
   private redrawLegend() {
-    const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
+    const g = select<SVGElement, undefined>(this.svgRef).select<SVGGElement>(
       'g#legend',
     );
 
@@ -455,7 +451,7 @@ class Map extends React.Component<Props, State> {
   private zoomToGlobalArea(useTransition = true) {
     const { selectedWorldRegion, width } = this.props;
     const height = this.getHeight();
-    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const svg = select<SVGElement, undefined>(this.svgRef);
 
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
     const projection = geoNaturalEarth2()
@@ -577,7 +573,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private removeZoomedInElements() {
-    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const svg = select<SVGElement, undefined>(this.svgRef);
 
     svg
       .select('g#ddm')
@@ -647,7 +643,7 @@ class Map extends React.Component<Props, State> {
     }
 
     const height = this.getHeight();
-    const svg = select<SVGElement, undefined>(this.svgRef!);
+    const svg = select<SVGElement, undefined>(this.svgRef);
 
     // TODO?: projection should be specific to spatial unit
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
@@ -794,12 +790,11 @@ class Map extends React.Component<Props, State> {
         .attr('d', path)
         .attr(
           'fill',
-          (d: ExtendedFeature<GeoJSON.Polygon, { data: number }>) =>
+          d =>
             d.properties.data == null ? 'none' : colorScale(d.properties.data),
         );
     }
 
-    // TODO: is this zoom still suitable if we change projection at the same time?
     const bounds = path.bounds(selectedWaterRegion);
     const dx = bounds[1][0] - bounds[0][0];
     const dy = bounds[1][1] - bounds[0][1];
@@ -887,7 +882,13 @@ class Map extends React.Component<Props, State> {
     const height = this.getHeight();
 
     return (
-      <SVG width={width} height={height} innerRef={this.saveSvgRef}>
+      <SVG
+        width={width}
+        height={height}
+        innerRef={ref => {
+          this.svgRef = ref;
+        }}
+      >
         <defs>
           <clipPath id="clip">
             <use xlinkHref="#sphere" />

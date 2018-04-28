@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import responsive, { ResponsiveProps } from '../../generic/responsive';
 import Spinner from '../../generic/spinner';
-import Map from '../../map';
+import SimpleMap from '../../simple-map';
 import TimeSelector from '../../time-selector';
 import withMapData, { Props as MapDataProps } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
@@ -48,7 +48,7 @@ class ShortageEmbedPlain extends React.Component<Props> {
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
-                <Map
+                <SimpleMap
                   width={width}
                   selectedData={selectedWaterData}
                   waterRegions={waterRegions}
