@@ -2,7 +2,11 @@
 
 This project contains three separate buildable apps: a tool for looking at
 historical data, a tool for looking at future predictions, and embeddable
-single visualizations.
+single visualizations. They are available at:
+
+Historical: https://wasco.lucify.com
+Future: https://wasco-future.lucify.com
+Embeds: https://wasco-embed.lucify.com
 
 ## Development
 
