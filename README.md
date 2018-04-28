@@ -135,6 +135,6 @@ or by placing the contents of this file inside a `<script>` tag. Once that's
 done, something like the below should be done per embed:
 
 ```html
-<iframe id="myIframe" src="http://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
+<iframe id="myIframe" src="https://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
 <script>iFrameResize({}, '#myIframe')</script>
 ```

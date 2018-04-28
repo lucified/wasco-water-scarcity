@@ -132,7 +132,7 @@ const config = {
   },
   output: {
     filename: 'index-[hash].js',
-    chunkFilename: '[name].chunk.js',
+    chunkFilename: '[name]-[hash].chunk.js',
     path: path.resolve(deployConfig.base.dest),
     publicPath: deployConfig.base.publicPath,
   },
