@@ -1,7 +1,6 @@
 import { format } from 'd3-format';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import * as ReactSlider from 'react-slider';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setThresholdsForDataType } from '../actions';
@@ -14,6 +13,10 @@ import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
 import { FutureDataType } from '../types';
 import { theme } from './theme';
+
+// Using esnext modules with TypeScript doesn't allow us to do
+// "import * as ... from '...'" imports. We unfortunately lose types here.
+const ReactSlider = require('react-slider');
 
 const Header = styled.div`
   margin-bottom: 4px;

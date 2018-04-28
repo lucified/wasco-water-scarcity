@@ -7,9 +7,9 @@ import SelectedRegionInformation from '../../selected-region-information';
 import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
+import withMapData, { Props } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
-import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 
 const MapContainer = styled.div`
@@ -94,4 +94,4 @@ class ShortageBody extends React.Component<Props> {
   }
 }
 
-export default withPageData(ShortageBody, 'shortage');
+export default withMapData(ShortageBody, 'shortage');

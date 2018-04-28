@@ -1,5 +1,5 @@
 import { format } from 'd3-format';
-import range = require('lodash/range');
+import { range } from 'lodash';
 import * as React from 'react';
 
 import memoize from '../../memoize';

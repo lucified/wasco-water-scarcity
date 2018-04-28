@@ -2,7 +2,11 @@
 
 This project contains three separate buildable apps: a tool for looking at
 historical data, a tool for looking at future predictions, and embeddable
-single visualizations.
+single visualizations. They are available at:
+
+Historical: https://wasco.lucify.com
+Future: https://wasco-future.lucify.com
+Embeds: https://wasco-embed.lucify.com
 
 ## Development
 
@@ -42,6 +46,12 @@ To prettify the whole code base, run:
 ```shell
 yarn run prettify
 ```
+
+### Testing embeds
+
+To test embeds inside an iframe, start the development server for the `embed`
+APP (`APP=embed yarn start`) and open the `src/embed-test.html` page in a
+browser.
 
 ## Using new datasets
 
@@ -102,5 +112,29 @@ Production deployments require Lucify's production credentials.
 Run a production deployment locally with:
 
 ```shell
-yarn run deploy
+NODE_ENV=production yarn run deploy
+```
+
+To deploy the `future` or `embed` apps, add them as environment variables:
+
+```shell
+APP=embed NODE_ENV=production yarn run deploy
+```
+
+## Embedding a visualization in a page
+
+In order to embed a visualization, the host page needs to have the
+[iframe-resizer](https://github.com/davidjbradshaw/iframe-resizer) code on the
+embedding page with either:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
+```
+
+or by placing the contents of this file inside a `<script>` tag. Once that's
+done, something like the below should be done per embed:
+
+```html
+<iframe id="myIframe" src="http://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
+<script>iFrameResize({}, '#myIframe')</script>
 ```

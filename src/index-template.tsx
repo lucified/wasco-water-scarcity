@@ -2,7 +2,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import { contextToHelmet, DOCUMENT } from './template-utils';
 
 // Render for HtmlWebpackPlugin
-export = (context: {
+export default (context: {
   compilation: any;
   htmlWebpackPlugin: { files: any; options: any };
 }) => {

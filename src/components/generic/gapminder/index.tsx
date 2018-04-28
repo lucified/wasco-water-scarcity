@@ -13,9 +13,7 @@ import {
 import { mouse, select, Selection } from 'd3-selection';
 import { curveLinear, line } from 'd3-shape';
 import { transition, Transition } from 'd3-transition';
-import flatMap = require('lodash/flatMap');
-import values = require('lodash/values');
-import zip = require('lodash/zip');
+import { flatMap, values, zip } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 

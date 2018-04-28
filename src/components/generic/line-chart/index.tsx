@@ -11,7 +11,7 @@ import {
 import { mouse, select } from 'd3-selection';
 import { curveLinear, line, Line } from 'd3-shape';
 import { transition } from 'd3-transition';
-import flatMap = require('lodash/flatMap');
+import { flatMap } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 

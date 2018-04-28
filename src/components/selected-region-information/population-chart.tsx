@@ -1,6 +1,5 @@
-import range = require('lodash/range');
+import { range } from 'lodash';
 import * as React from 'react';
-
 import memoize from '../../memoize';
 import { Datum } from '../../types';
 import { formatPopulation, formatYearRange } from '../../utils';

@@ -1,6 +1,6 @@
 import { extent } from 'd3-array';
 import { scaleThreshold } from 'd3-scale';
-import flattenDeep = require('lodash/flattenDeep');
+import { flattenDeep } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

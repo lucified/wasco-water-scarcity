@@ -9,9 +9,9 @@ import SelectedRegionInformation from '../../selected-region-information';
 import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
+import withMapData, { Props } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
-import withPageData, { Props } from '../with-page-data';
 import Description from './description';
 
 const Selectors = styled.div`
@@ -120,4 +120,4 @@ class ScarcityBody extends React.Component<Props> {
   }
 }
 
-export default withPageData(ScarcityBody);
+export default withMapData(ScarcityBody);

@@ -1,8 +1,4 @@
-import groupBy = require('lodash/groupBy');
-import keyBy = require('lodash/keyBy');
-import pick = require('lodash/pick');
-import uniq = require('lodash/uniq');
-import values = require('lodash/values');
+import { groupBy, keyBy, pick, uniq, values } from 'lodash';
 import {
   FutureDataType,
   HistoricalDataType,
