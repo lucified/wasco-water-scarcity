@@ -1,7 +1,7 @@
 import { max } from 'd3-array';
 import { format } from 'd3-format';
 import { schemeBlues } from 'd3-scale-chromatic';
-import range = require('lodash/range');
+import { range } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import memoize from '../../memoize';

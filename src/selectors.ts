@@ -1,5 +1,4 @@
-import keyBy = require('lodash/keyBy');
-import mapValues = require('lodash/mapValues');
+import { keyBy, mapValues } from 'lodash';
 import { createSelector } from 'reselect';
 import { Data as GapminderData } from './components/generic/gapminder';
 import { FutureScenario, FutureScenarioWithData, toScenarioId } from './data';

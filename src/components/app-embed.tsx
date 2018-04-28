@@ -18,6 +18,7 @@ import {
   getSelectedTimeScale,
 } from '../selectors';
 import './app.css';
+import { ShortageEmbed } from './embeds/shortage';
 import { StressEmbed } from './embeds/stress';
 import { theme } from './theme';
 
@@ -80,6 +81,7 @@ class AppEmbedPlain extends React.Component<Props> {
     return (
       <Root>
         <Switch>
+          <Route path="/shortage" component={ShortageEmbed} />
           <Route component={StressEmbed} />
         </Switch>
       </Root>

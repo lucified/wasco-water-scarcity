@@ -28,10 +28,21 @@ const rules = [
             ],
             'react',
           ],
-          // Needed in order to transform generators. Babelification can be removed
-          // once TypeScript supports generators, probably in TS 2.3.
-          // When that is done, also change the output of TS to 'es5' in tsconfig.json
-          plugins: ['react-hot-loader/babel', 'transform-regenerator'],
+          plugins: [
+            // syntax-dynamic-import is needed for code-splitting:
+            // https://reacttraining.com/react-router/web/guides/code-splitting
+            'syntax-dynamic-import',
+            // Reduces bundle size by not importing unused functions.
+            'lodash',
+            // Required for hot reloading. Should be disabled for production builds.
+            'react-hot-loader/babel',
+            // Outdated (?):
+            // transform-regenerator is needed in order to transform generators.
+            // Babelification can be removed once TypeScript supports generators,
+            // probably in TS 2.3. When that is done, also change the output of
+            // TS to 'es5' in tsconfig.json
+            'transform-regenerator',
+          ],
         },
       },
       { loader: require.resolve('ts-loader') },
@@ -121,6 +132,7 @@ const config = {
   },
   output: {
     filename: 'index-[hash].js',
+    chunkFilename: '[name].chunk.js',
     path: path.resolve(deployConfig.base.dest),
     publicPath: deployConfig.base.publicPath,
   },

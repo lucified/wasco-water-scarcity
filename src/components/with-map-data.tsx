@@ -1,21 +1,20 @@
-import mapValues = require('lodash/mapValues');
+import { mapValues } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router-dom';
-import { setSelectedHistoricalDataType } from '../../actions';
-import { scarcitySelector, WaterRegionGeoJSON } from '../../data';
-import { StateTree } from '../../reducers';
+import { setSelectedHistoricalDataType } from '../actions';
+import { scarcitySelector, WaterRegionGeoJSON } from '../data';
+import { StateTree } from '../reducers';
 import {
   getSelectedHistoricalDataType,
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
-} from '../../selectors';
+} from '../selectors';
 import {
   HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
-} from '../../types';
+} from '../types';
 
 interface GeneratedDispatchProps {
   setSelectedDataType: (dataType: HistoricalDataType) => void;
@@ -26,21 +25,14 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-type PassedProps = RouteComponentProps<{}>;
+export type Props = GeneratedDispatchProps & GeneratedStateProps;
 
-export type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
-
-export default function withPageData(
+export default function withMapData(
   Component: React.ComponentType<Props>,
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
   componentDataType?: HistoricalDataType,
 ) {
-  return connect<
-    GeneratedStateProps,
-    GeneratedDispatchProps,
-    PassedProps,
-    StateTree
-  >(
+  return connect<GeneratedStateProps, GeneratedDispatchProps, {}, StateTree>(
     state => {
       const dataType =
         componentDataType || getSelectedHistoricalDataType(state);
