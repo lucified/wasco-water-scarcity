@@ -6,10 +6,12 @@ single visualizations. They are available at:
 
 * Historical: https://wasco.lucify.com
 * Future: https://wasco-future.lucify.com
-* Embeds:
-  * Stress: https://wasco-embed.lucify.com
-  * Shortage: https://wasco-embed.lucify.com/shortage
-  * Scarcity: https://wasco-embed.lucify.com/scarcity
+* Embeds: https://wasco-embed.lucify.com
+
+The URL format for embeds is: `https://wasco-embed.lucify.com/PAGE/AUTOPLAY`,
+where `PAGE` can be either `stress`, `shortage` or `scarcity`, with a fallback
+of `stress`. If `AUTOPLAY` is not empty, the visualization will start playing
+automatically.
 
 ## Development
 

@@ -1,8 +1,14 @@
 import * as React from 'react';
 import CommonEmbedLayout from '../common-embed-layout';
 
-function ScarcityEmbed() {
-  return <CommonEmbedLayout dataType="scarcity" />;
+interface Props {
+  autoplay: boolean;
+}
+
+// Note: if we continue using one common embed layout for all embeds, this
+// component could be removed and just used directly inside index.tsx
+function ScarcityEmbed({ autoplay }: Props) {
+  return <CommonEmbedLayout dataType="scarcity" autoplay={autoplay} />;
 }
 
 export default ScarcityEmbed;

@@ -1,8 +1,14 @@
 import * as React from 'react';
 import CommonEmbedLayout from '../common-embed-layout';
 
-function ShortageEmbed() {
-  return <CommonEmbedLayout dataType="shortage" />;
+interface Props {
+  autoplay: boolean;
+}
+
+// Note: if we continue using one common embed layout for all embeds, this
+// component could be removed and just used directly inside index.tsx
+function ShortageEmbed({ autoplay }: Props) {
+  return <CommonEmbedLayout dataType="shortage" autoplay={autoplay} />;
 }
 
 export default ShortageEmbed;

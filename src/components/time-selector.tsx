@@ -130,6 +130,7 @@ interface GeneratedDispatchProps {
 
 interface PassedProps {
   showPlayButton?: boolean;
+  autoplay?: boolean;
 }
 
 type Props = GeneratedDispatchProps &
@@ -145,6 +146,18 @@ class TimeSelector extends React.PureComponent<Props, State> {
   public state = {
     isPlaying: false,
   };
+
+  public componentDidMount() {
+    if (this.props.autoplay && this.props.data) {
+      this.play();
+    }
+  }
+
+  public componentDidUpdate(prevProps: Props) {
+    if (this.props.autoplay && !prevProps.data && this.props.data) {
+      this.play();
+    }
+  }
 
   private timerReference: any;
 

@@ -32,7 +32,12 @@ export default function withMapData<T extends Props>(
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
   componentDataType?: HistoricalDataType,
 ) {
-  return connect<GeneratedStateProps, GeneratedDispatchProps, {}, StateTree>(
+  return connect<
+    GeneratedStateProps,
+    GeneratedDispatchProps,
+    Pick<T, Exclude<keyof T, keyof Props>>,
+    StateTree
+  >(
     state => {
       const dataType =
         componentDataType || getSelectedHistoricalDataType(state);

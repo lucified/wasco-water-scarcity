@@ -20,6 +20,7 @@ const StyledYearLabel = styled(YearLabel)`
 
 interface PassedProps {
   dataType: HistoricalDataType;
+  autoplay: boolean;
 }
 
 type Props = MapDataProps & ResponsiveProps & PassedProps;
@@ -30,7 +31,7 @@ class CommonEmbedLayout extends React.Component<Props> {
   }
 
   public render() {
-    const { selectedWaterData, waterRegions, width } = this.props;
+    const { selectedWaterData, waterRegions, width, autoplay } = this.props;
 
     return (
       <div>
@@ -44,7 +45,7 @@ class CommonEmbedLayout extends React.Component<Props> {
           <div>
             <div className="row middle-xs">
               <div className="col-xs-12">
-                <TimeSelector showPlayButton />
+                <TimeSelector showPlayButton autoplay={autoplay} />
               </div>
             </div>
             <div className="row">
