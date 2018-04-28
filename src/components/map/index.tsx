@@ -12,7 +12,6 @@ import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
@@ -411,7 +410,9 @@ class Map extends React.Component<Props, State> {
               d =>
                 d === 0.25
                   ? 'Stress'
-                  : d === 0.75 ? 'Shortage' : 'Stress + Shortage',
+                  : d === 0.75
+                    ? 'Shortage'
+                    : 'Stress + Shortage',
             ),
         )
         .select('.domain')
@@ -532,13 +533,19 @@ class Map extends React.Component<Props, State> {
   }
 
   private getColorForWaterRegion(featureId: number): string {
-    const { colorScale, selectedData: { data } } = this.props;
+    const {
+      colorScale,
+      selectedData: { data },
+    } = this.props;
     const value = data[featureId];
     return value != null ? colorScale(value) : '#807775';
   }
 
   private redrawFillsAndBorders() {
-    const { selectedWaterRegionId, waterRegions: { features } } = this.props;
+    const {
+      selectedWaterRegionId,
+      waterRegions: { features },
+    } = this.props;
     const t = transition('waterRegion').duration(100);
     select<SVGGElement, undefined>('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
@@ -918,35 +925,32 @@ class Map extends React.Component<Props, State> {
   }
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const selectedDataType = getSelectedHistoricalDataType(state);
-  const thresholds = getThresholdsForDataType(state, selectedDataType);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps,
+  StateTree
+>(
+  state => {
+    const selectedDataType = getSelectedHistoricalDataType(state);
+    const thresholds = getThresholdsForDataType(state, selectedDataType);
 
-  return {
-    selectedWaterRegionId: getSelectedWaterRegionId(state),
-    selectedDataType,
-    selectedWorldRegion: getSelectedWorldRegion(state),
-    thresholds,
-    colorScale: getColorScale(selectedDataType, thresholds),
-    stressThresholds: getThresholdsForDataType(state, 'stress'),
-    shortageThresholds: getThresholdsForDataType(state, 'shortage'),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+    return {
+      selectedWaterRegionId: getSelectedWaterRegionId(state),
+      selectedDataType,
+      selectedWorldRegion: getSelectedWorldRegion(state),
+      thresholds,
+      colorScale: getColorScale(selectedDataType, thresholds),
+      stressThresholds: getThresholdsForDataType(state, 'stress'),
+      shortageThresholds: getThresholdsForDataType(state, 'shortage'),
+    };
+  },
+  dispatch => ({
     toggleSelectedRegion: (regionId: number) => {
       dispatch(toggleSelectedRegion(regionId));
     },
     clearSelectedRegion: () => {
       dispatch(setSelectedRegion());
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(mapStateToProps, mapDispatchToProps)(Map);
+  }),
+)(Map);

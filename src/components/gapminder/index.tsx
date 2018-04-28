@@ -1,8 +1,6 @@
 import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-
 import {
   setTimeIndex as setTimeIndexAction,
   toggleSelectedRegion as toggleSelectedRegionAction,
@@ -112,8 +110,13 @@ function GapminderWrapper({
   );
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  return {
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(
+  state => ({
     selectedTimeIndex: getSelectedHistoricalTimeIndex(state),
     selectedRegion: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
@@ -121,23 +124,13 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     data: getDataByRegion(state),
     stressThresholds: getThresholdsForDataType(state, 'stress'),
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+  }),
+  dispatch => ({
     setTimeIndex: (value: number) => {
       dispatch(setTimeIndexAction(value));
     },
     toggleSelectedRegion: (id: string) => {
       dispatch(toggleSelectedRegionAction(Number(id)));
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  {},
-  StateTree
->(mapStateToProps, mapDispatchToProps)(GapminderWrapper);
+  }),
+)(GapminderWrapper);

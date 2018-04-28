@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
 import { getDataTypeColors } from '../data';
 import memoize from '../memoize';
@@ -19,7 +17,6 @@ import {
   WorldRegion,
 } from '../types';
 import { formatPopulation, formatYearRange } from '../utils';
-
 import BarChart, { BarChartDatum } from './generic/bar-chart';
 
 interface GeneratedStateProps {
@@ -190,40 +187,37 @@ class TimeSelector extends React.PureComponent<Props> {
   }
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const data = getTimeSeriesForSelectedGlobalRegion(state);
-  const selectedIndex = getSelectedHistoricalTimeIndex(state);
-  const currentSelectedData = data && data[selectedIndex];
-  const label = currentSelectedData
-    ? currentSelectedData.startYear !== currentSelectedData.endYear
-      ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
-      : String(currentSelectedData.startYear)
-    : '';
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(
+  state => {
+    const data = getTimeSeriesForSelectedGlobalRegion(state);
+    const selectedIndex = getSelectedHistoricalTimeIndex(state);
+    const currentSelectedData = data && data[selectedIndex];
+    const label = currentSelectedData
+      ? currentSelectedData.startYear !== currentSelectedData.endYear
+        ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
+        : String(currentSelectedData.startYear)
+      : '';
 
-  return {
-    selectedIndex,
-    currentIndexLabel: label,
-    data,
-    dataType: getSelectedHistoricalDataType(state),
-    selectedWorldRegion: getSelectedWorldRegion(state),
-    timeIndexLocked: isHistoricalTimeIndexLocked(state),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+    return {
+      selectedIndex,
+      currentIndexLabel: label,
+      data,
+      dataType: getSelectedHistoricalDataType(state),
+      selectedWorldRegion: getSelectedWorldRegion(state),
+      timeIndexLocked: isHistoricalTimeIndexLocked(state),
+    };
+  },
+  dispatch => ({
     setSelectedTime: (value: number) => {
       dispatch(setTimeIndex(value));
     },
     onToggleLock: () => {
       dispatch(toggleHistoricalTimeIndexLock());
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  {},
-  StateTree
->(mapStateToProps, mapDispatchToProps)(TimeSelector);
+  }),
+)(TimeSelector);

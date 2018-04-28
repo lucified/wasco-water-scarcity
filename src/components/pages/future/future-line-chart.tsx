@@ -3,7 +3,6 @@ import { scaleThreshold } from 'd3-scale';
 import { flattenDeep } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
 import {
@@ -132,37 +131,34 @@ function FutureLineChart({
   );
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  const selectedDataType = getSelectedHistoricalDataType(state);
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps,
+  StateTree
+>(
+  state => {
+    const selectedDataType = getSelectedHistoricalDataType(state);
 
-  return {
-    selectedTimeIndex: getSelectedFutureTimeIndex(state),
-    selectedWaterRegionId: getSelectedWaterRegionId(state),
-    selectedDataType: getSelectedFutureDataType(state),
-    data: getAllScenariosInSelectedFutureDataset(state),
-    filteredData: getFilteredScenariosInSelectedFutureDataset(state),
-    selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
-      state,
-    ),
-    thresholds: getThresholdsForDataType(state, selectedDataType),
-    futureScenarioLocked: isFutureScenarioLocked(state),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+    return {
+      selectedTimeIndex: getSelectedFutureTimeIndex(state),
+      selectedWaterRegionId: getSelectedWaterRegionId(state),
+      selectedDataType: getSelectedFutureDataType(state),
+      data: getAllScenariosInSelectedFutureDataset(state),
+      filteredData: getFilteredScenariosInSelectedFutureDataset(state),
+      selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
+        state,
+      ),
+      thresholds: getThresholdsForDataType(state, selectedDataType),
+      futureScenarioLocked: isFutureScenarioLocked(state),
+    };
+  },
+  dispatch => ({
     onTimeIndexChange: (value: number) => {
       dispatch(setFutureTimeIndex(value));
     },
     onToggleLock: () => {
       dispatch(toggleFutureScenarioLock());
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(mapStateToProps, mapDispatchToProps)(FutureLineChart);
+  }),
+)(FutureLineChart);

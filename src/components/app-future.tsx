@@ -63,7 +63,8 @@ export const AppFuture = hot(module)(
     null,
     (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
       loadMapData: () => {
-        dispatch(loadMapData());
+        // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+        dispatch(loadMapData() as any);
       },
     }),
   )(AppFuturePlain),

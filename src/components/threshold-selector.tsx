@@ -1,7 +1,6 @@
 import { format } from 'd3-format';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setThresholdsForDataType } from '../actions';
 import {
@@ -207,31 +206,20 @@ function ThresholdSelector({
   );
 }
 
-function mapStateToProps(
-  state: StateTree,
-  ownProps: PassedProps,
-): GeneratedStateProps {
-  return {
-    thresholds: getThresholdsForDataType(state, ownProps.dataType),
-  };
-}
-
-function mapDispatchToProps(
-  dispatch: Dispatch<any>,
-  ownProps: PassedProps,
-): GeneratedDispatchProps {
-  return {
-    setThresholds: (values: number[] | number) => {
-      // ReactSlider modifies the contents of the values array
-      const thresholds = Array.isArray(values) ? values.slice() : [values];
-      dispatch(setThresholdsForDataType(ownProps.dataType, thresholds));
-    },
-  };
-}
-
 export default connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
   PassedProps,
   StateTree
->(mapStateToProps, mapDispatchToProps)(ThresholdSelector);
+>(
+  (state, ownProps) => ({
+    thresholds: getThresholdsForDataType(state, ownProps.dataType),
+  }),
+  (dispatch, ownProps) => ({
+    setThresholds: (values: number[] | number) => {
+      // ReactSlider modifies the contents of the values array
+      const thresholds = Array.isArray(values) ? values.slice() : [values];
+      dispatch(setThresholdsForDataType(ownProps.dataType, thresholds));
+    },
+  }),
+)(ThresholdSelector);

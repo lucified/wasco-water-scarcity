@@ -111,7 +111,7 @@ export const getMapDataForSelectedFutureScenario = createSelector(
       startYear,
       endYear,
       // TODO: dataType can be e.g. "shortage" which does not exist on d
-      data: mapValues(timeData, d => d[dataType as keyof typeof d] as number),
+      data: mapValues(timeData, d => d[dataType as 'stress'] as number),
     };
   },
 );
