@@ -98,14 +98,16 @@ export const AppEmbed = hot(module)(
     }),
     dispatch => ({
       loadMapData: () => {
-        dispatch(loadMapData());
+        // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+        dispatch(loadMapData() as any);
       },
       loadModelData: (
         climateModel: string,
         impactModel: string,
         timeScale: string,
       ) => {
-        dispatch(loadModelData(climateModel, impactModel, timeScale));
+        // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+        dispatch(loadModelData(climateModel, impactModel, timeScale) as any);
       },
     }),
   )(AppEmbedPlain),

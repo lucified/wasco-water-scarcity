@@ -33,7 +33,9 @@ const Button = styled.a`
   color: ${({ selected, disabled }: ButtonProps) =>
     disabled
       ? theme.colors.grayLight
-      : selected ? theme.colors.textSelection : theme.colors.textMenu};
+      : selected
+        ? theme.colors.textSelection
+        : theme.colors.textMenu};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -67,7 +69,9 @@ const Button = styled.a`
     border-radius: 5px;
     background-color: ${({ disabled, selected }: ButtonProps) =>
       selected
-        ? disabled ? theme.colors.gray : theme.colors.red
+        ? disabled
+          ? theme.colors.gray
+          : theme.colors.red
         : 'transparent'};
   }
 
@@ -82,7 +86,9 @@ const Button = styled.a`
     background-color: ${({ disabled, selected }: ButtonProps) =>
       disabled
         ? 'white'
-        : selected ? theme.colors.red : theme.colors.grayLight};
+        : selected
+          ? theme.colors.red
+          : theme.colors.grayLight};
   }
 
   &:first-child {

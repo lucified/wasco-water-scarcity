@@ -3,7 +3,6 @@
 import { max } from 'd3-array';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../../actions';
 import { getDataTypeColors } from '../../data';
@@ -343,8 +342,13 @@ class SelectedRegionInformation extends React.Component<Props> {
   }
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  return {
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps,
+  StateTree
+>(
+  state => ({
     selectedTimeIndex: getSelectedHistoricalTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
@@ -357,23 +361,13 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     timeIndexLocked: isHistoricalTimeIndexLocked(state),
     stressThresholds: getThresholdsForDataType(state, 'stress'),
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+  }),
+  dispatch => ({
     setTimeIndex: (value: number) => {
       dispatch(setTimeIndex(value));
     },
     toggleTimeIndexLock: () => {
       dispatch(toggleHistoricalTimeIndexLock());
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(mapStateToProps, mapDispatchToProps)(SelectedRegionInformation);
+  }),
+)(SelectedRegionInformation);

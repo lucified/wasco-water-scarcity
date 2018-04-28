@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-
 import { setSelectedTimeScale } from '../actions';
 import { StateTree } from '../reducers';
 import { getSelectedTimeScale } from '../selectors';
@@ -45,17 +43,13 @@ function TimeScaleSelector({ className, timeScale, onChange }: Props) {
   );
 }
 
-const mapStateToProps = (state: StateTree): StateProps => ({
-  timeScale: getSelectedTimeScale(state),
-});
-
-const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onChange: (option: { value: string; label: string }) => {
-    dispatch(setSelectedTimeScale(option.value as TimeScale)); // TODO: validate
-  },
-});
-
 export default connect<StateProps, DispatchProps, PassedProps, StateTree>(
-  mapStateToProps,
-  mapDispatchToProps,
+  state => ({
+    timeScale: getSelectedTimeScale(state),
+  }),
+  dispatch => ({
+    onChange: (option: { value: string; label: string }) => {
+      dispatch(setSelectedTimeScale(option.value as TimeScale)); // TODO: validate
+    },
+  }),
 )(TimeScaleSelector);

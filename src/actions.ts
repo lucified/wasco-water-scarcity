@@ -12,6 +12,7 @@ import {
   generateWaterToWorldRegionsMap,
   WaterRegionGeoJSON,
 } from './data';
+import { StateTree } from './reducers';
 import {
   FutureDataType,
   HistoricalDataType,
@@ -301,7 +302,7 @@ export function loadModelData(
   impactModel: string,
   timeScale: string,
 ) {
-  return (dispatch: Dispatch<any>) => {
+  return (dispatch: Dispatch<Action, StateTree>) => {
     return fetchHistoricalStressShortageData(
       climateModel,
       impactModel,
@@ -318,7 +319,7 @@ export function loadFutureEnsembleData(
   dataset: FutureDataset,
   featureId: string,
 ) {
-  return (dispatch: Dispatch<any>) => {
+  return (dispatch: Dispatch<Action, StateTree>) => {
     return fetchFutureEnsembleData(dataset, featureId).then(futureData => {
       if (futureData) {
         dispatch(
@@ -334,7 +335,7 @@ export function loadFutureScenarioData(
   dataset: FutureDataset,
   scenario: FutureScenario,
 ) {
-  return (dispatch: Dispatch<any>) => {
+  return (dispatch: Dispatch<Action, StateTree>) => {
     return fetchFutureScenarioData(dataset, scenario).then(futureData => {
       if (futureData) {
         dispatch(
@@ -347,7 +348,7 @@ export function loadFutureScenarioData(
 }
 
 export function loadMapData() {
-  return (dispatch: Dispatch<any>) => {
+  return (dispatch: Dispatch<Action, StateTree>) => {
     return Promise.all([fetchWaterRegionsData(), fetchWorldRegionsData()]).then(
       ([waterRegionData, worldRegionsData]) => {
         if (waterRegionData) {

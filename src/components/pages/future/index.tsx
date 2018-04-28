@@ -1,7 +1,6 @@
 import { isEqual } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import {
   loadFutureEnsembleData,
@@ -252,8 +251,13 @@ class FutureBody extends React.Component<Props> {
   }
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  return {
+const Future = connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  {},
+  StateTree
+>(
+  state => ({
     futureEnsembleData: getEnsembleDataForSelectedFutureScenario(state),
     mapData: getMapDataForSelectedFutureScenario(state),
     waterRegions: getWaterRegionData(state),
@@ -265,34 +269,26 @@ function mapStateToProps(state: StateTree): GeneratedStateProps {
     selectedScenario: getSelectedFutureScenario(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
     selectedDataType: getSelectedFutureDataType(state),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+  }),
+  dispatch => ({
     setSelectedDataType: (dataType: FutureDataType) => {
       dispatch(setSelectedFutureDataType(dataType));
     },
     loadFutureEnsembleData: (dataset: FutureDataset, featureId: string) => {
-      dispatch(loadFutureEnsembleData(dataset, featureId));
+      // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+      dispatch(loadFutureEnsembleData(dataset, featureId) as any);
     },
     loadFutureScenarioData: (
       dataset: FutureDataset,
       scenario: FutureScenario,
     ) => {
-      dispatch(loadFutureScenarioData(dataset, scenario));
+      // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+      dispatch(loadFutureScenarioData(dataset, scenario) as any);
     },
     setSelectedScenario: (scen: FutureScenario) => {
       dispatch(setSelectedScenario(scen));
     },
-  };
-}
-
-const Future = connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  {},
-  StateTree
->(mapStateToProps, mapDispatchToProps)(FutureBody);
+  }),
+)(FutureBody);
 
 export default Future;

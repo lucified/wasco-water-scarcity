@@ -164,13 +164,6 @@ const config = {
     new webpack.DefinePlugin({
       'process.env.ENV': JSON.stringify(deployConfig.env),
     }),
-    // This skips adding all locales to moment. NOTE: If more locales then 'en'
-    // are needed, another approach will need to be used.
-    // https://github.com/moment/moment/issues/2373#issuecomment-279785426
-    // See also:
-    // https://github.com/webpack/webpack/issues/3128
-    // https://github.com/moment/moment/issues/2517
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

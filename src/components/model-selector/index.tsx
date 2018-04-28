@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 import {
   setSelectedClimateModel,
@@ -121,25 +120,21 @@ function ModelSelector({
   );
 }
 
-const mapStateToProps = (state: StateTree): StateProps => ({
-  impactModel: getSelectedImpactModel(state),
-  climateModel: getSelectedClimateModel(state),
-  timeScale: getSelectedTimeScale(state),
-});
-
-const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  onImpactModelChange: (option: Option) => {
-    dispatch(setSelectedImpactModel(option.value));
-  },
-  onClimateModelChange: (option: Option) => {
-    dispatch(setSelectedClimateModel(option.value));
-  },
-  onTimeScaleChange: (option: Option) => {
-    dispatch(setSelectedTimeScale(option.value as TimeScale));
-  },
-});
-
 export default connect<StateProps, DispatchProps, PassedProps, StateTree>(
-  mapStateToProps,
-  mapDispatchToProps,
+  state => ({
+    impactModel: getSelectedImpactModel(state),
+    climateModel: getSelectedClimateModel(state),
+    timeScale: getSelectedTimeScale(state),
+  }),
+  dispatch => ({
+    onImpactModelChange: (option: Option) => {
+      dispatch(setSelectedImpactModel(option.value));
+    },
+    onClimateModelChange: (option: Option) => {
+      dispatch(setSelectedClimateModel(option.value));
+    },
+    onTimeScaleChange: (option: Option) => {
+      dispatch(setSelectedTimeScale(option.value as TimeScale));
+    },
+  }),
 )(ModelSelector);
