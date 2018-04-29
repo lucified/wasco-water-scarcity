@@ -1,18 +1,13 @@
-import { extent } from 'd3-array';
-import { scaleThreshold } from 'd3-scale';
-import { flattenDeep } from 'lodash';
+// import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
-import {
-  FutureEnsembleData,
-  FutureScenarioWithData,
-  getDataTypeColors,
-} from '../../../data';
+import { FutureScenarioWithData /*, getDataTypeColors */ } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
-  getAllScenariosInSelectedFutureDataset,
+  getDataExtentForAllScenariosInSelectedFutureDataset,
   getEnsembleDataForSelectedFutureScenario,
   getFilteredScenariosInSelectedFutureDataset,
   getSelectedFutureDataType,
@@ -23,12 +18,8 @@ import {
   isFutureScenarioLocked,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
-import LineChart, { Data } from '../../generic/line-chart';
+import { CanvasLineChart, Series } from '../../generic/canvas-line-chart';
 import { theme } from '../../theme';
-
-const Chart = styled(LineChart)`
-  overflow: visible !important;
-`;
 
 const Empty = styled.div`
   display: flex;
@@ -49,8 +40,8 @@ interface GeneratedStateProps {
   selectedTimeIndex: number;
   selectedDataType: FutureDataType;
   selectedWaterRegionId?: number;
-  data?: FutureEnsembleData;
-  filteredData?: FutureEnsembleData;
+  dataValueExtent?: [number, number];
+  chartData?: Series[];
   selectedFutureDataForScenario?: FutureScenarioWithData;
   thresholds: number[];
   futureScenarioLocked: boolean;
@@ -64,18 +55,32 @@ interface PassedProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
+const getChartData = createSelector(
+  getFilteredScenariosInSelectedFutureDataset,
+  filteredData =>
+    filteredData &&
+    filteredData.map(series => ({
+      id: series.scenarioId,
+      color: theme.colors.blueAalto,
+      points: series.data.map(d => ({
+        value: d.value,
+        time: new Date((d.y0 + d.y1) / 2, 0),
+      })),
+    })),
+);
+
 function FutureLineChart({
-  data,
-  filteredData,
+  dataValueExtent,
+  chartData,
   selectedDataType,
-  thresholds,
+  // thresholds,
   selectedFutureDataForScenario,
-  selectedTimeIndex,
+  // selectedTimeIndex,
   selectedWaterRegionId,
-  onTimeIndexChange,
-  onLineHover,
-  onToggleLock,
-  futureScenarioLocked,
+  // onTimeIndexChange,
+  // onLineHover,
+  // onToggleLock,
+  // futureScenarioLocked,
   width,
   height,
 }: Props) {
@@ -83,50 +88,24 @@ function FutureLineChart({
     return <Empty>Select an area on the map</Empty>;
   }
 
-  if (!data || !filteredData || !selectedFutureDataForScenario) {
+  if (!dataValueExtent || !chartData || !selectedFutureDataForScenario) {
     return null;
   }
 
-  const dataValueExtent = extent(
-    flattenDeep<number>(data.map(d => d.data.map(c => c.value))),
-  );
+  // const thresholdColors =
+  //   selectedDataType === 'shortage'
+  //     ? ['none', ...getDataTypeColors('shortage')].reverse()
+  //     : ['none', ...getDataTypeColors('stress')];
 
-  const chartData: Data[] = filteredData.map(series => ({
-    id: series.scenarioId,
-    color: 'darkcyan',
-    series: series.data.map(d => ({
-      value: d.value,
-      start: new Date(d.y0, 0, 1),
-      end: new Date(d.y1, 11, 31),
-    })),
-  }));
-
-  const thresholdColors =
-    selectedDataType === 'shortage'
-      ? ['none', ...getDataTypeColors('shortage')].reverse()
-      : ['none', ...getDataTypeColors('stress')];
-
-  const backgroundColorScale = scaleThreshold<number, string>()
-    .domain(thresholds)
-    .range(thresholdColors);
+  // const backgroundColorScale = scaleThreshold<number, string>()
+  //   .domain(thresholds)
+  //   .range(thresholdColors);
 
   return (
-    <Chart
+    <CanvasLineChart
       data={chartData}
       width={width || 600}
       height={height || 240}
-      minY={dataValueExtent[0]}
-      maxY={dataValueExtent[1]}
-      selectedTimeIndex={selectedTimeIndex}
-      selectedDataSeries={selectedFutureDataForScenario.scenarioId}
-      selectedDataSeriesLocked={futureScenarioLocked}
-      onChartHover={onTimeIndexChange}
-      onLineHover={onLineHover}
-      onClick={onToggleLock}
-      backgroundColorScale={backgroundColorScale}
-      marginRight={0}
-      marginTop={15}
-      marginLeft={40}
     />
   );
 }
@@ -144,8 +123,10 @@ export default connect<
       selectedTimeIndex: getSelectedFutureTimeIndex(state),
       selectedWaterRegionId: getSelectedWaterRegionId(state),
       selectedDataType: getSelectedFutureDataType(state),
-      data: getAllScenariosInSelectedFutureDataset(state),
-      filteredData: getFilteredScenariosInSelectedFutureDataset(state),
+      dataValueExtent: getDataExtentForAllScenariosInSelectedFutureDataset(
+        state,
+      ),
+      chartData: getChartData(state),
       selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
         state,
       ),

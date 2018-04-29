@@ -1,4 +1,5 @@
-import { keyBy, mapValues } from 'lodash';
+import { extent } from 'd3-array';
+import { flatMap, keyBy, mapValues } from 'lodash';
 import { createSelector } from 'reselect';
 import { Data as GapminderData } from './components/generic/gapminder';
 import { FutureScenario, FutureScenarioWithData, toScenarioId } from './data';
@@ -59,6 +60,13 @@ export function getAllScenariosInSelectedFutureDataset(
   const { variableName } = getSelectedFutureDataset(state);
   return allFutureData[variableName];
 }
+
+export const getDataExtentForAllScenariosInSelectedFutureDataset = createSelector(
+  getAllScenariosInSelectedFutureDataset,
+  data =>
+    data &&
+    (extent(flatMap(data, d => d.data.map(c => c.value))) as [number, number]),
+);
 
 export const getFilteredScenariosInSelectedFutureDataset = createSelector(
   getAllScenariosInSelectedFutureDataset,
