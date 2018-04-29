@@ -74,6 +74,7 @@
     "react-router-dom": "^4.3.1",
     "react-select": "^1.2.1",
     "react-slider": "^0.11.2",
+    "react-stickynode": "^2.0.1",
     "recompose": "^0.27.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",

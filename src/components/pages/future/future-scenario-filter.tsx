@@ -11,6 +11,17 @@ import {
 } from '../../../selectors';
 import { theme } from '../../theme';
 
+const Main = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const Section = styled.div`
+  margin-bottom: ${theme.defaultMargin * 2}px;
+  width: 100%;
+`;
+
 const Parameter = styled.div`
   display: flex;
   justify-content: space-between;
@@ -35,7 +46,6 @@ const Dropdown = styled(Select)`
 
 interface PassedProps {
   selectedScenario?: FutureScenario;
-  className?: string;
 }
 
 interface GeneratedDispatchProps {
@@ -118,7 +128,6 @@ class FutureScenarioFilter extends React.Component<Props> {
       selectedFutureFilters,
       selectedFutureDataset,
       selectedScenario,
-      className,
     } = this.props;
 
     if (!selectedScenario) {
@@ -144,8 +153,13 @@ class FutureScenarioFilter extends React.Component<Props> {
       );
     }
     return (
-      <div className={`row ${className}`}>
-        <div className="col-xs-12 col-md-6">
+      <Main>
+        <div>
+          The future depends on the actions we take, with outcomes that are also
+          uncertain. We provide two starting points to explore the future of
+          water scarcity, and how it relates to food (xx% of global water use):
+        </div>
+        <Section>
           <h2>Actions</h2>
           <Parameter>
             Climate scenario:
@@ -172,8 +186,8 @@ class FutureScenarioFilter extends React.Component<Props> {
               onChange={this.createChangeHandler('populations') as any}
             />
           </Parameter>
-        </div>
-        <div className="col-xs-12 col-md-6">
+        </Section>
+        <Section>
           <h2>Uncertainties</h2>
           <Parameter>
             Impact models:
@@ -203,8 +217,8 @@ class FutureScenarioFilter extends React.Component<Props> {
               onChange={this.createChangeHandler('climateModels') as any}
             />
           </Parameter>
-        </div>
-      </div>
+        </Section>
+      </Main>
     );
   }
 }
