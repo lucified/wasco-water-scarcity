@@ -1,5 +1,5 @@
 import { extent } from 'd3-array';
-import { scaleLinear, scaleTime } from 'd3-scale';
+import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
 import * as React from 'react';
@@ -116,8 +116,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.translate(marginLeft, marginTop);
 
-    xAxis();
-    yAxis();
+    this.drawXAxis(context, x);
+    this.drawYAxis(context, y);
 
     context.globalAlpha = 0.2;
     context.lineWidth = 0.2;
@@ -130,65 +130,73 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       }
       context.stroke();
     });
+  }
 
-    function xAxis() {
-      const tickCount = 10;
-      const tickSize = 6;
-      const ticks = x.ticks(tickCount);
-      const tickFormat = x.tickFormat();
+  private drawXAxis(
+    context: CanvasRenderingContext2D,
+    x: ScaleTime<number, number>,
+  ) {
+    const chartHeight = this.chartHeight();
+    const tickCount = 10;
+    const tickSize = 6;
+    const ticks = x.ticks(tickCount);
+    const tickFormat = x.tickFormat();
 
-      context.beginPath();
-      ticks.forEach(d => {
-        context.moveTo(x(d), chartHeight);
-        context.lineTo(x(d), chartHeight + tickSize);
-      });
-      context.strokeStyle = 'black';
-      context.stroke();
+    context.beginPath();
+    ticks.forEach(d => {
+      context.moveTo(x(d), chartHeight);
+      context.lineTo(x(d), chartHeight + tickSize);
+    });
+    context.strokeStyle = 'black';
+    context.stroke();
 
-      context.textAlign = 'center';
-      context.textBaseline = 'top';
-      ticks.forEach(d => {
-        context.fillText(tickFormat(d), x(d), chartHeight + tickSize);
-      });
-    }
+    context.textAlign = 'center';
+    context.textBaseline = 'top';
+    ticks.forEach(d => {
+      context.fillText(tickFormat(d), x(d), chartHeight + tickSize);
+    });
+  }
 
-    function yAxis() {
-      const tickCount = 10;
-      const tickSize = 6;
-      const tickPadding = 3;
-      const ticks = y.ticks(tickCount);
-      const tickFormat = y.tickFormat(tickCount);
+  private drawYAxis(
+    context: CanvasRenderingContext2D,
+    y: ScaleLinear<number, number>,
+  ) {
+    const chartHeight = this.chartHeight();
+    const tickCount = 10;
+    const tickSize = 6;
+    const tickPadding = 3;
+    const ticks = y.ticks(tickCount);
+    const tickFormat = y.tickFormat(tickCount);
 
-      context.beginPath();
-      ticks.forEach(d => {
-        context.moveTo(0, y(d));
-        context.lineTo(-6, y(d));
-      });
-      context.strokeStyle = 'black';
-      context.stroke();
+    context.beginPath();
+    ticks.forEach(d => {
+      context.moveTo(0, y(d));
+      context.lineTo(-6, y(d));
+    });
+    context.strokeStyle = 'black';
+    context.stroke();
 
-      context.beginPath();
-      context.moveTo(-tickSize, 0);
-      context.lineTo(0.5, 0);
-      context.lineTo(0.5, chartHeight);
-      context.lineTo(-tickSize, chartHeight);
-      context.strokeStyle = 'black';
-      context.stroke();
+    context.beginPath();
+    context.moveTo(-tickSize, 0);
+    context.lineTo(0.5, 0);
+    context.lineTo(0.5, chartHeight);
+    context.lineTo(-tickSize, chartHeight);
+    context.strokeStyle = 'black';
+    context.stroke();
 
-      context.textAlign = 'right';
-      context.textBaseline = 'middle';
-      ticks.forEach(d => {
-        context.fillText(tickFormat(d), -tickSize - tickPadding, y(d));
-      });
+    context.textAlign = 'right';
+    context.textBaseline = 'middle';
+    ticks.forEach(d => {
+      context.fillText(tickFormat(d), -tickSize - tickPadding, y(d));
+    });
 
-      // context.save();
-      // context.rotate(-Math.PI / 2);
-      // context.textAlign = 'right';
-      // context.textBaseline = 'top';
-      // context.font = 'bold 10px sans-serif';
-      // context.fillText('Price (US$)', -10, 10);
-      // context.restore();
-    }
+    // context.save();
+    // context.rotate(-Math.PI / 2);
+    // context.textAlign = 'right';
+    // context.textBaseline = 'top';
+    // context.font = 'bold 10px sans-serif';
+    // context.fillText('Price (US$)', -10, 10);
+    // context.restore();
   }
 
   public render() {
