@@ -1,18 +1,13 @@
-import { extent } from 'd3-array';
 import { scaleThreshold } from 'd3-scale';
-import { flattenDeep } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
 import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
-import {
-  FutureEnsembleData,
-  FutureScenarioWithData,
-  getDataTypeColors,
-} from '../../../data';
+import { FutureScenarioWithData, getDataTypeColors } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
-  getAllScenariosInSelectedFutureDataset,
+  getDataExtentForAllScenariosInSelectedFutureDataset,
   getEnsembleDataForSelectedFutureScenario,
   getFilteredScenariosInSelectedFutureDataset,
   getSelectedFutureDataType,
@@ -49,8 +44,8 @@ interface GeneratedStateProps {
   selectedTimeIndex: number;
   selectedDataType: FutureDataType;
   selectedWaterRegionId?: number;
-  data?: FutureEnsembleData;
-  filteredData?: FutureEnsembleData;
+  dataValueExtent?: [number, number];
+  chartData?: Data[];
   selectedFutureDataForScenario?: FutureScenarioWithData;
   thresholds: number[];
   futureScenarioLocked: boolean;
@@ -64,9 +59,24 @@ interface PassedProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
+const getChartData = createSelector(
+  getFilteredScenariosInSelectedFutureDataset,
+  filteredData =>
+    filteredData &&
+    filteredData.map(series => ({
+      id: series.scenarioId,
+      color: 'darkcyan',
+      series: series.data.map(d => ({
+        value: d.value,
+        start: new Date(d.y0, 0, 1),
+        end: new Date(d.y1, 11, 31),
+      })),
+    })),
+);
+
 function FutureLineChart({
-  data,
-  filteredData,
+  dataValueExtent,
+  chartData,
   selectedDataType,
   thresholds,
   selectedFutureDataForScenario,
@@ -83,23 +93,9 @@ function FutureLineChart({
     return <Empty>Select an area on the map</Empty>;
   }
 
-  if (!data || !filteredData || !selectedFutureDataForScenario) {
+  if (!dataValueExtent || !chartData || !selectedFutureDataForScenario) {
     return null;
   }
-
-  const dataValueExtent = extent(
-    flattenDeep<number>(data.map(d => d.data.map(c => c.value))),
-  );
-
-  const chartData: Data[] = filteredData.map(series => ({
-    id: series.scenarioId,
-    color: 'darkcyan',
-    series: series.data.map(d => ({
-      value: d.value,
-      start: new Date(d.y0, 0, 1),
-      end: new Date(d.y1, 11, 31),
-    })),
-  }));
 
   const thresholdColors =
     selectedDataType === 'shortage'
@@ -144,8 +140,10 @@ export default connect<
       selectedTimeIndex: getSelectedFutureTimeIndex(state),
       selectedWaterRegionId: getSelectedWaterRegionId(state),
       selectedDataType: getSelectedFutureDataType(state),
-      data: getAllScenariosInSelectedFutureDataset(state),
-      filteredData: getFilteredScenariosInSelectedFutureDataset(state),
+      dataValueExtent: getDataExtentForAllScenariosInSelectedFutureDataset(
+        state,
+      ),
+      chartData: getChartData(state),
       selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
         state,
       ),
