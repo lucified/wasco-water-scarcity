@@ -54,7 +54,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
   private canvasRef!: HTMLCanvasElement;
 
   public static defaultProps: DefaultProps = {
-    marginLeft: 20,
+    marginLeft: 40,
     marginRight: 20,
     marginTop: 10,
     marginBottom: 40,
