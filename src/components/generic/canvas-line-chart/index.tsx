@@ -4,6 +4,21 @@ import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
 import * as React from 'react';
 
+// From: https://stackoverflow.com/a/15666143
+const PIXEL_RATIO = (() => {
+  const ctx: any = document.createElement('canvas').getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const bsr =
+    ctx.webkitBackingStorePixelRatio ||
+    ctx.mozBackingStorePixelRatio ||
+    ctx.msBackingStorePixelRatio ||
+    ctx.oBackingStorePixelRatio ||
+    ctx.backingStorePixelRatio ||
+    1;
+
+  return dpr / bsr;
+})();
+
 export interface Point {
   time: Date;
   value: number;
@@ -76,6 +91,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const chartHeight = this.chartHeight();
     const context = this.canvasRef.getContext('2d')!;
 
+    context.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
+    context.globalAlpha = 1.0;
     context.clearRect(0, 0, width, height);
 
     const x = scaleTime()
@@ -113,10 +130,6 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       }
       context.stroke();
     });
-
-    // Reset transformations
-    context.globalAlpha = 1.0;
-    context.setTransform(1, 0, 0, 1, 0, 0);
 
     function xAxis() {
       const tickCount = 10;
@@ -182,8 +195,9 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const { width, height } = this.props;
     return (
       <canvas
-        width={width}
-        height={height}
+        width={width * PIXEL_RATIO}
+        height={height * PIXEL_RATIO}
+        style={{ width, height }}
         ref={ref => (this.canvasRef = ref!)}
       />
     );
