@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { hot } from 'react-hot-loader';
+// tslint:disable-next-line:ordered-imports
+import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import styled, { injectGlobal } from 'styled-components';
 import { loadMapData } from '../actions';
