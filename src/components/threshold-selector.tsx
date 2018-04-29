@@ -17,6 +17,10 @@ import { theme } from './theme';
 // "import * as ... from '...'" imports. We unfortunately lose types here.
 const ReactSlider = require('react-slider');
 
+const Root = styled.div`
+  margin-bottom: ${theme.margin(2)};
+`;
+
 const Header = styled.div`
   margin-bottom: 4px;
   font-family: ${theme.labelFontFamily};
@@ -167,7 +171,7 @@ function ThresholdSelector({
 
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
-    <div className={className}>
+    <Root className={className}>
       <Header>{getHeaderText(dataType)}</Header>
       <StyledReactSlider
         min={min}
@@ -202,7 +206,7 @@ function ThresholdSelector({
           Reset
         </ResetLink>
       </Reset>
-    </div>
+    </Root>
   );
 }
 

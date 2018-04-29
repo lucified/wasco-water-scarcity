@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import DataTypeSelector from '../../data-type-selector';
 import GapMinder from '../../gapminder';
 import Spinner from '../../generic/spinner';
-import Map from '../../map';
+import { ResponsiveMap } from '../../map/responsive';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
 import { BodyText, SectionHeader, theme } from '../../theme';
@@ -97,8 +97,7 @@ class ScarcityBody extends React.Component<Props> {
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
-                <Map
-                  width={800}
+                <ResponsiveMap
                   selectedData={selectedWaterData}
                   waterRegions={waterRegions}
                 />

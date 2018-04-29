@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import Spinner from '../../generic/spinner';
-import Map from '../../map';
+import { ResponsiveMap } from '../../map/responsive';
 import ModelSelector from '../../model-selector';
 import SelectedRegionInformation from '../../selected-region-information';
 import { BodyText, SectionHeader, theme } from '../../theme';
@@ -76,8 +76,7 @@ class StressBody extends React.Component<Props> {
                   startYear={selectedWaterData.startYear}
                   endYear={selectedWaterData.endYear}
                 />
-                <Map
-                  width={1200}
+                <ResponsiveMap
                   selectedData={selectedWaterData}
                   waterRegions={waterRegions}
                 />
