@@ -61,7 +61,7 @@ const getChartData = createSelector(
     filteredData &&
     filteredData.map(series => ({
       id: series.scenarioId,
-      color: 'darkcyan',
+      color: theme.colors.blueAalto,
       points: series.data.map(d => ({
         value: d.value,
         time: new Date((d.y0 + d.y1) / 2, 0),
