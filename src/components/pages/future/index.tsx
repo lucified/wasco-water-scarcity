@@ -31,34 +31,59 @@ import {
 import { FutureDataType, TimeAggregate } from '../../../types';
 import DataTypeSelector from '../../data-type-selector';
 import Spinner from '../../generic/spinner';
-import Map from '../../map';
+import { ResponsiveMap } from '../../map/responsive';
 import { theme } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
-import FutureScenarioDescription from './future-scenario-description';
 import FutureScenarioFilter from './future-scenario-filter';
+const Sticky = require('react-stickynode');
 
-const DataSelectors = styled.div`
-  padding-top: ${theme.margin(1.5)};
+const HeaderRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: ${theme.defaultMargin}px;
 `;
+
+const Title = styled.h1`
+  margin: 0;
+`;
+
+const Container = styled.div`
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  margin-top: ${theme.defaultMargin}px;
+`;
+
+const Scroll = styled.div`
+  position: relative;
+  display: block;
+`;
+
+const selectorsWidth = '40%';
+
+const SelectorsContent = styled.div`
+  position: relative;
+  width: ${selectorsWidth};
+  padding-right: ${theme.defaultMargin}px;
+`;
+
+const StickyGraphics = styled(Sticky)`
+  left: calc(100% - ${selectorsWidth});
+  width: calc(100% - ${selectorsWidth});
+  height: 100%;
+  float: right;
+`;
+
+const DataSelectors = styled.div``;
 
 const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
-`;
-
-// TODO: Don't repeat this
-const StyledFutureScenarioDescription = styled(FutureScenarioDescription)`
-  font-family: ${theme.bodyFontFamily};
-  font-size: 15px;
-  padding-left: ${theme.margin()};
-  padding-top: 5px;
-  border-left: 1px solid ${theme.colors.grayLight};
-  line-height: ${theme.bodyLineHeight};
-  color: ${theme.colors.grayDarker};
-
-  b {
-    color: ${theme.colors.grayDarkest};
-  }
 `;
 
 const Error = styled.div`
@@ -182,7 +207,6 @@ class FutureBody extends React.Component<Props> {
     const {
       mapData,
       waterRegions,
-      selectedDataType,
       allEnsemblesInSelectedDataset,
       selectedScenario,
     } = this.props;
@@ -196,55 +220,42 @@ class FutureBody extends React.Component<Props> {
 
     return (
       <div>
-        <div className="row between-xs">
-          <div className="col-xs-12 col-md-8">
-            <h1>The Future?</h1>
-            <FutureScenarioFilter selectedScenario={selectedScenario} />
-          </div>
-          <DataSelectors className="col-xs-12 col-md-offset-1 col-md-3">
+        <HeaderRow>
+          <Title>How do you view the Future?</Title>
+          <DataSelectors>
             <DataTypeSelector hideScarcity />
           </DataSelectors>
-        </div>
+        </HeaderRow>
         {!waterRegions ||
         !allEnsemblesInSelectedDataset ||
         !selectedScenario ? (
           <StyledSpinner />
         ) : (
-          <div>
-            <div className="row bottom-xs between-xs">
-              <div className="col-xs-12 col-md-8">
+          <Container>
+            <Scroll>
+              <StickyGraphics>
                 <FutureLineChart
                   onLineHover={this.handleLineHover}
-                  width={790}
-                  height={240}
+                  height={220}
                 />
-              </div>
-              <div className="col-xs-12 col-md-4">
-                <StyledFutureScenarioDescription
-                  estimateLabel={selectedDataType}
-                  includeConsumption={selectedDataType === 'stress'}
-                  selectedScenario={selectedScenario}
-                />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-xs-12">
                 <h2>Selected scenario{yearLabel}</h2>
                 {!mapData ? (
                   <Error>No data found for selected model.</Error>
                 ) : (
                   <div>
-                    <Map
-                      width={1000}
+                    <ResponsiveMap
                       selectedData={mapData}
                       waterRegions={waterRegions}
                     />
                     <WorldRegionSelector />
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
+              </StickyGraphics>
+              <SelectorsContent>
+                <FutureScenarioFilter selectedScenario={selectedScenario} />
+              </SelectorsContent>
+            </Scroll>
+          </Container>
         )}
       </div>
     );

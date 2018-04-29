@@ -19,6 +19,7 @@ import {
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
 import { CanvasLineChart, Series } from '../../generic/canvas-line-chart';
+import responsive from '../../generic/responsive';
 import { theme } from '../../theme';
 
 const Empty = styled.div`
@@ -142,4 +143,4 @@ export default connect<
       dispatch(toggleFutureScenarioLock());
     },
   }),
-)(FutureLineChart);
+)(responsive(FutureLineChart));
