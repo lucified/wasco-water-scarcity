@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import Select, { Option } from 'react-select';
 import styled from 'styled-components';
 import { setSelectedFutureFilters } from '../../../actions';
 import { FutureDataset, FutureScenario } from '../../../data';
@@ -9,7 +8,8 @@ import {
   getSelectedFutureDataset,
   getSelectedFutureFilters,
 } from '../../../selectors';
-import { theme } from '../../theme';
+import MultiSelector, { Option } from '../../generic/multi-selector';
+import { BodyText, SectionHeader, SelectorHeader, theme } from '../../theme';
 
 const Main = styled.div`
   display: flex;
@@ -24,24 +24,18 @@ const Section = styled.div`
 
 const Parameter = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: ${theme.defaultMargin}px;
 
   font-size: 14px;
   font-family: ${theme.labelFontFamily};
   line-height: 1.1;
 `;
 
-const Dropdown = styled(Select)`
-  width: 260px;
-
-  & .Select-value-label {
-    font-weight: bold;
-  }
-
-  & .Select-value-icon + .Select-value-label {
-    font-weight: normal;
-  }
+const StyledMultiSelector = styled(MultiSelector)`
+  margin-top: ${theme.defaultMargin / 2}px;
 `;
 
 interface PassedProps {
@@ -69,11 +63,10 @@ interface GeneratedStateProps {
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
 
-function toOptions(values: string[], selectedValue: string): Option[] {
+function toOptions(values: string[]): Option[] {
   return values.map(value => ({
     value,
     label: value,
-    clearableValue: value !== selectedValue,
   }));
 }
 
@@ -86,14 +79,12 @@ class FutureScenarioFilter extends React.Component<Props> {
       | 'populations',
   ) => {
     // tslint:disable:prefer-conditional-expression
-    return (options: Option[] | Option | null) => {
+    return (values: string[] | string | null) => {
       let results: string[];
-      if (Array.isArray(options)) {
-        results = options
-          .filter(option => option.value)
-          .map(option => String(option.value!));
-      } else if (options) {
-        results = [String(options.value)];
+      if (Array.isArray(values)) {
+        results = values;
+      } else if (values) {
+        results = [values];
       } else {
         results = [];
       }
@@ -154,67 +145,50 @@ class FutureScenarioFilter extends React.Component<Props> {
     }
     return (
       <Main>
-        <div>
+        <BodyText>
           The future depends on the actions we take, with outcomes that are also
           uncertain. We provide two starting points to explore the future of
           water scarcity, and how it relates to food (xx% of global water use):
-        </div>
+        </BodyText>
         <Section>
-          <h2>Actions</h2>
+          <SectionHeader>Actions</SectionHeader>
           <Parameter>
-            Climate scenario:
-            <Dropdown
-              options={toOptions(
-                selectedFutureDataset.climateExperiments,
-                climateExperiment,
-              )}
-              name="Climate experiments"
-              clearable={false}
-              multi
-              value={selectedFutureFilters.climateExperiments}
+            <SelectorHeader>Climate scenario</SelectorHeader>
+            <StyledMultiSelector
+              options={toOptions(selectedFutureDataset.climateExperiments)}
+              selectedValues={selectedFutureFilters.climateExperiments}
               onChange={this.createChangeHandler('climateExperiments') as any}
             />
           </Parameter>
           <Parameter>
-            Population scenarios:
-            <Dropdown
-              options={toOptions(selectedFutureDataset.populations, population)}
-              name="Populations"
-              clearable={false}
-              multi
-              value={selectedFutureFilters.populations}
+            <SelectorHeader>Population scenarios</SelectorHeader>
+            <StyledMultiSelector
+              options={toOptions(selectedFutureDataset.populations)}
+              selectedValues={selectedFutureFilters.populations}
               onChange={this.createChangeHandler('populations') as any}
             />
           </Parameter>
         </Section>
         <Section>
-          <h2>Uncertainties</h2>
+          <SectionHeader>Scientific Uncertainties</SectionHeader>
           <Parameter>
-            Impact models:
-            <Dropdown
-              options={toOptions(
-                selectedFutureDataset.impactModels,
-                impactModel,
-              )}
-              name="Impact models"
-              multi
-              clearable={false}
-              value={selectedFutureFilters.impactModels}
+            <SelectorHeader>Water models</SelectorHeader>
+            <BodyText>
+              We use three different global water models, which use different
+              methods to estimate water availability and use.
+            </BodyText>
+            <StyledMultiSelector
+              options={toOptions(selectedFutureDataset.impactModels)}
+              selectedValues={selectedFutureFilters.impactModels}
               onChange={this.createChangeHandler('impactModels') as any}
             />
           </Parameter>
           <Parameter>
-            Climate models:
-            <Dropdown
-              options={toOptions(
-                selectedFutureDataset.climateModels,
-                climateModel,
-              )}
-              name="Climate models"
-              clearable={false}
-              multi
-              value={selectedFutureFilters.climateModels}
+            <SelectorHeader>Climate models</SelectorHeader>
+            <StyledMultiSelector
+              options={toOptions(selectedFutureDataset.climateModels)}
               onChange={this.createChangeHandler('climateModels') as any}
+              selectedValues={selectedFutureFilters.climateModels}
             />
           </Parameter>
         </Section>

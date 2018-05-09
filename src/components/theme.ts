@@ -70,6 +70,10 @@ export const SectionHeader = styled.h1`
   margin-top: ${defaultMargin * 2}px;
 `;
 
+export const SelectorHeader = styled.h2`
+  margin-top: ${defaultMargin}px;
+`;
+
 export const BodyText = styled.div`
   font-family: ${bodyFontFamily};
   font-size: ${bodyFontSize}px;
