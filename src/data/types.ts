@@ -47,9 +47,7 @@ export interface FutureDataset {
   allocs: string[];
 }
 
-export type FutureScenario = {
-  [variable in FutureScenarioVariable]: string | undefined
-};
+export type FutureScenario = { [variable in FutureScenarioVariable]?: string };
 
 export type FutureScenarioVariable =
   | 'population'
@@ -228,10 +226,10 @@ export type GridData = {
 } & GridDataContents;
 
 type GridDataContents = {
-  [key in GridVariable]: { [startYear: string]: number } | undefined
+  [key in GridVariable]?: { [startYear: string]: number }
 };
 
-type GridQuintile = { [key in GridVariable]: number[] | undefined };
+type GridQuintile = { [key in GridVariable]?: number[] };
 
 export type GridVariable = 'pop' | 'elec' | 'dom' | 'man' | 'live' | 'irri';
 
