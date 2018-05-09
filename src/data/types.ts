@@ -47,21 +47,24 @@ export interface FutureDataset {
   allocs: string[];
 }
 
-export interface FutureScenario {
-  population?: string;
-  impactModel?: string;
-  climateModel?: string;
-  climateExperiment?: string;
-  yieldGap?: string;
-  dietChange?: string;
-  foodLossRed?: string;
-  trade?: string;
-  agriExp?: string;
-  reuse?: string;
-  alloc?: string;
-}
+export type FutureScenario = {
+  [variable in FutureScenarioVariable]: string | undefined
+};
 
-export const futureScenarioKeys: Array<keyof FutureScenario> = [
+export type FutureScenarioVariable =
+  | 'population'
+  | 'impactModel'
+  | 'climateModel'
+  | 'climateExperiment'
+  | 'yieldGap'
+  | 'dietChange'
+  | 'foodLossRed'
+  | 'trade'
+  | 'agriExp'
+  | 'reuse'
+  | 'alloc';
+
+export const futureScenarioKeys: FutureScenarioVariable[] = [
   'population',
   'impactModel',
   'climateModel',
@@ -220,25 +223,17 @@ interface DrainageDirection {
   basin: number;
 }
 
-export interface GridData {
+export type GridData = {
   centre: [number, number];
-  dom?: { [startYear: string]: number };
-  man?: { [startYear: string]: number };
-  live?: { [startYear: string]: number };
-  elec?: { [startYear: string]: number };
-  irri?: { [startYear: string]: number };
-  pop?: { [startYear: string]: number };
-}
+} & GridDataContents;
 
-interface GridQuintile {
-  [key: string]: number[] | undefined;
-  dom?: number[];
-  man?: number[];
-  live?: number[];
-  elec?: number[];
-  irri?: number[];
-  pop?: number[];
-}
+type GridDataContents = {
+  [key in GridVariable]: { [startYear: string]: number } | undefined
+};
+
+type GridQuintile = { [key in GridVariable]: number[] | undefined };
+
+export type GridVariable = 'pop' | 'elec' | 'dom' | 'man' | 'live' | 'irri';
 
 export interface LocalData {
   basins?: ExtendedFeatureCollection<

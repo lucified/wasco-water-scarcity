@@ -20,6 +20,7 @@ import {
   getDataTypeColors,
   getLocalRegionData,
   GridData,
+  GridVariable,
   LocalData,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
@@ -127,8 +128,6 @@ interface GeneratedDispatchProps {
   toggleSelectedRegion: (regionId: number) => void;
   clearSelectedRegion: () => void;
 }
-
-type GridVariable = 'pop' | 'elec' | 'dom' | 'man' | 'live' | 'irri';
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
