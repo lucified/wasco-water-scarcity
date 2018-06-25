@@ -149,13 +149,19 @@ class TimeSelector extends React.PureComponent<Props, State> {
 
   public componentDidMount() {
     if (this.props.autoplay && this.props.data) {
-      this.play();
+      this.props.setSelectedTime(0);
+      setTimeout(() => {
+        this.play();
+      }, 1000);
     }
   }
 
   public componentDidUpdate(prevProps: Props) {
     if (this.props.autoplay && !prevProps.data && this.props.data) {
-      this.play();
+      this.props.setSelectedTime(0);
+      setTimeout(() => {
+        this.play();
+      }, 1000);
     }
   }
 
