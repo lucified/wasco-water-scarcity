@@ -223,7 +223,8 @@ class SimpleMap extends React.Component<Props> {
     svg
       .select<SVGPathElement>('#sphere')
       .datum({ type: 'Sphere' })
-      .attr('d', path as any);
+      .attr('d', path as any)
+      .attr('fill', 'none');
 
     // Countries land mass
     svg
