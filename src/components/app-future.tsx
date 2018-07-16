@@ -1,7 +1,7 @@
 import { hot } from 'react-hot-loader';
 // tslint:disable-next-line:ordered-imports
 import * as React from 'react';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import styled, { injectGlobal } from 'styled-components';
 import { loadMapData } from '../actions';
 import { StateTree } from '../reducers';
@@ -62,7 +62,7 @@ class AppFuturePlain extends React.Component<Props> {
 export const AppFuture = hot(module)(
   connect<{}, GeneratedDispatchProps, {}, StateTree>(
     null,
-    (dispatch: Dispatch<any>): GeneratedDispatchProps => ({
+    dispatch => ({
       loadMapData: () => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
         dispatch(loadMapData() as any);

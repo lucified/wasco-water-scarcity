@@ -25,9 +25,9 @@ interface GeneratedStateProps {
   waterRegions?: WaterRegionGeoJSON;
 }
 
-export type Props = GeneratedDispatchProps & GeneratedStateProps;
+export type MapProps = GeneratedDispatchProps & GeneratedStateProps;
 
-export default function withMapData<T extends Props>(
+export default function withMapData<T extends MapProps>(
   Component: React.ComponentType<T>,
   // Force the dataType for certain pages, otherwise use the data type from the Redux state.
   componentDataType?: HistoricalDataType,
@@ -35,7 +35,7 @@ export default function withMapData<T extends Props>(
   return connect<
     GeneratedStateProps,
     GeneratedDispatchProps,
-    Pick<T, Exclude<keyof T, keyof Props>>,
+    Pick<T, Exclude<keyof T, keyof MapProps>>,
     StateTree
   >(
     state => {
@@ -59,12 +59,10 @@ export default function withMapData<T extends Props>(
         waterRegions: getWaterRegionData(state),
       };
     },
-    dispatch => {
-      return {
-        setSelectedDataType: (newDataType: HistoricalDataType) => {
-          dispatch(setSelectedHistoricalDataType(newDataType));
-        },
-      };
-    },
-  )(Component);
+    dispatch => ({
+      setSelectedDataType: (newDataType: HistoricalDataType) => {
+        dispatch(setSelectedHistoricalDataType(newDataType));
+      },
+    }),
+  )(Component as any); // TODO: Fix typings
 }
