@@ -9,7 +9,7 @@ import SelectedRegionInformation from '../../selected-region-information';
 import { BodyText, SectionHeader, theme } from '../../theme';
 import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
-import withMapData, { Props } from '../../with-map-data';
+import withMapData, { MapProps } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import Description from './description';
@@ -49,7 +49,7 @@ const StyledYearLabel = styled(YearLabel)`
   font-size;: 18px;
 `;
 
-class ScarcityBody extends React.Component<Props> {
+class ScarcityBody extends React.Component<MapProps> {
   public componentDidMount() {
     this.props.setSelectedDataType('scarcity');
   }

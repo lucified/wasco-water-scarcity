@@ -323,12 +323,12 @@ class Gapminder extends React.Component<Props> {
 
     g.call(this.drawBackgroundColors);
 
-    g
-      .select<SVGGElement>('g#x-axis')
-      .call(axisBottom(this.xScale!).ticks(3, '.1r'));
-    g
-      .select<SVGGElement>('g#y-axis')
-      .call(axisLeft(this.yScale!).ticks(3, '.1r'));
+    g.select<SVGGElement>('g#x-axis').call(
+      axisBottom(this.xScale!).ticks(3, '.1r'),
+    );
+    g.select<SVGGElement>('g#y-axis').call(
+      axisLeft(this.yScale!).ticks(3, '.1r'),
+    );
 
     const label = g
       .select<SVGTextElement>('text#year-label')
@@ -374,8 +374,7 @@ class Gapminder extends React.Component<Props> {
 
     // Add an overlay for the year label.
     const box = (label.node() as any).getBBox();
-    g
-      .select<SVGRectElement>(`#gapminder-overlay`)
+    g.select<SVGRectElement>(`#gapminder-overlay`)
       .attr('x', box.x)
       .attr('y', box.y)
       .attr('width', box.width)
@@ -506,8 +505,7 @@ class Gapminder extends React.Component<Props> {
       .range([box.x + 10, box.x + box.width - 10])
       .clamp(true);
 
-    g
-      .select<SVGRectElement>('#gapminder-overlay')
+    g.select<SVGRectElement>('#gapminder-overlay')
       .on('mouseover', mouseover)
       .on('mouseout', mouseout)
       .on('mousemove', mousemove)

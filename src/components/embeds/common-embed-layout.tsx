@@ -5,7 +5,7 @@ import responsive, { ResponsiveProps } from '../generic/responsive';
 import Spinner from '../generic/spinner';
 import SimpleMap from '../simple-map';
 import TimeSelector from '../time-selector';
-import withMapData, { Props as MapDataProps } from '../with-map-data';
+import withMapData, { MapProps } from '../with-map-data';
 import WorldRegionSelector from '../world-region-selector';
 import YearLabel from '../year-label';
 
@@ -23,7 +23,7 @@ interface PassedProps {
   autoplay: boolean;
 }
 
-type Props = MapDataProps & ResponsiveProps & PassedProps;
+type Props = MapProps & ResponsiveProps & PassedProps;
 
 class CommonEmbedLayout extends React.Component<Props> {
   public componentDidMount() {

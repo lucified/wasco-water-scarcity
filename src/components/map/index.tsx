@@ -393,38 +393,35 @@ class Map extends React.Component<Props, State> {
     const { selectedDataType } = this.props;
     if (selectedDataType === 'scarcity') {
       // TODO: fix this ugly hack
-      g
-        .call(
-          axisBottom(this.legendXScale!)
-            .tickSize(10)
-            .tickValues([0.25, 0.75, 1.5])
-            .tickFormat(
-              d =>
-                d === 0.25
-                  ? 'Stress'
-                  : d === 0.75
-                    ? 'Shortage'
-                    : 'Stress + Shortage',
-            ),
-        )
+      g.call(
+        axisBottom(this.legendXScale!)
+          .tickSize(10)
+          .tickValues([0.25, 0.75, 1.5])
+          .tickFormat(
+            d =>
+              d === 0.25
+                ? 'Stress'
+                : d === 0.75
+                  ? 'Shortage'
+                  : 'Stress + Shortage',
+          ),
+      )
         .select('.domain')
         .remove();
-      g
-        .selectAll('.tick')
+      g.selectAll('.tick')
         .select('line')
         .remove();
     } else {
-      g
-        .call(
-          axisBottom(this.legendXScale!)
-            .tickSize(13)
-            .tickValues(this.colorScale!.domain())
-            .tickFormat(
-              selectedDataType === 'stress'
-                ? format('.2f')
-                : (format('d') as any), // TODO: fix typing
-            ),
-        )
+      g.call(
+        axisBottom(this.legendXScale!)
+          .tickSize(13)
+          .tickValues(this.colorScale!.domain())
+          .tickFormat(
+            selectedDataType === 'stress'
+              ? format('.2f')
+              : (format('d') as any), // TODO: fix typing
+          ),
+      )
         .select('.domain')
         .remove();
     }

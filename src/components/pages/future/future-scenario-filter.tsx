@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import Select, { Option } from 'react-select';
 import styled from 'styled-components';
 import { setSelectedFutureFilters } from '../../../actions';
@@ -209,15 +209,17 @@ class FutureScenarioFilter extends React.Component<Props> {
   }
 }
 
-function mapStateToProps(state: StateTree): GeneratedStateProps {
-  return {
+export default connect<
+  GeneratedStateProps,
+  GeneratedDispatchProps,
+  PassedProps,
+  StateTree
+>(
+  state => ({
     selectedFutureFilters: getSelectedFutureFilters(state),
     selectedFutureDataset: getSelectedFutureDataset(state),
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
-  return {
+  }),
+  dispatch => ({
     setSelectedFutureFilters: (
       climateModels: string[],
       climateExperiments: string[],
@@ -233,12 +235,5 @@ function mapDispatchToProps(dispatch: Dispatch<any>): GeneratedDispatchProps {
         ),
       );
     },
-  };
-}
-
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(mapStateToProps, mapDispatchToProps)(FutureScenarioFilter);
+  }),
+)(FutureScenarioFilter);

@@ -190,7 +190,7 @@ function ThresholdSelector({
       <Labels>
         {thresholds.map((d, i) => (
           <Label
-            style={{ left: `${(d - min) / (slidingMax - min) * 100}%` }}
+            style={{ left: `${((d - min) / (slidingMax - min)) * 100}%` }}
             key={`${dataType}-threshold-label-${i}`}
           >
             {formatter(d)}

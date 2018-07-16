@@ -252,16 +252,15 @@ class LineChart extends React.Component<Props> {
           .attr('fill', d => backgroundColorScale(d.lowerBound));
     }
 
-    g
-      .select<SVGGElement>('g#x-axis')
-      .call(axisBottom(xScale).ticks(Math.round(chartWidth / 50)));
-    g
-      .select<SVGGElement>('g#y-axis')
-      .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)));
+    g.select<SVGGElement>('g#x-axis').call(
+      axisBottom(xScale).ticks(Math.round(chartWidth / 50)),
+    );
+    g.select<SVGGElement>('g#y-axis').call(
+      axisLeft(yScale).ticks(Math.round(chartHeight / 30)),
+    );
 
     if (selectedDataPoint) {
-      g
-        .append('rect')
+      g.append('rect')
         .attr('id', 'selected-group')
         .attr('x', xScale(selectedDataPoint.start))
         .attr('y', 0)
@@ -275,8 +274,7 @@ class LineChart extends React.Component<Props> {
     }
 
     // TODO: the hover handler needs to be removed and readded if the size or x-axis values are changed
-    g
-      .append('rect')
+    g.append('rect')
       .attr('class', 'overlay')
       .attr('width', chartWidth)
       .attr('height', chartHeight)
@@ -312,8 +310,7 @@ class LineChart extends React.Component<Props> {
       });
 
     if (selectedDataPoint) {
-      g
-        .append('text')
+      g.append('text')
         .attr('id', 'selected-label')
         .attr('class', 'selected-label')
         .attr('x', 9)
