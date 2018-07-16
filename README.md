@@ -4,9 +4,9 @@ This project contains three separate buildable apps: a tool for looking at
 historical data, a tool for looking at future predictions, and embeddable
 single visualizations. They are available at:
 
-* Historical: https://wasco.lucify.com
-* Future: https://wasco-future.lucify.com
-* Embeds: https://wasco-embed.lucify.com
+- Historical: https://wasco.lucify.com
+- Future: https://wasco-future.lucify.com
+- Embeds: https://wasco-embed.lucify.com
 
 The URL format for embeds is: `https://wasco-embed.lucify.com/PAGE/AUTOPLAY`,
 where `PAGE` can be either `stress`, `shortage` or `scarcity`, with a fallback
@@ -133,7 +133,7 @@ In order to embed a visualization, the host page needs to have the
 embedding page with either:
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.0/iframeResizer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.6.1/iframeResizer.min.js"></script>
 ```
 
 or by placing the contents of this file inside a `<script>` tag. Once that's
