@@ -241,4 +241,7 @@ export default connect<
   GeneratedDispatchProps,
   PassedProps,
   StateTree
->(mapStateToProps, mapDispatchToProps)(FutureScenarioFilter);
+>(
+  mapStateToProps,
+  mapDispatchToProps,
+)(FutureScenarioFilter);

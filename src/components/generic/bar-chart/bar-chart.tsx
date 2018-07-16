@@ -301,7 +301,7 @@ export default class BarChart extends React.Component<Props, {}> {
         locked={indexLocked}
         x={
           xScale(String(selectedData.key))! -
-          xScale.paddingInner() * xScale.step() / 2
+          (xScale.paddingInner() * xScale.step()) / 2
         }
         y={0}
         width={xScale.step()}
