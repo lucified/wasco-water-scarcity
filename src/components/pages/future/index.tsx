@@ -13,7 +13,7 @@ import {
   FutureScenarioData,
   getDefaultFutureScenario,
   getFutureDataset,
-  // toEnsembleRegionId,
+  toEnsembleRegionId,
   toEnsembleWorldId,
   toScenarioId,
   WaterRegionGeoJSON,
@@ -289,8 +289,13 @@ class FutureBody extends React.Component<Props, State> {
       selectedDataset,
       comparisonVariables,
       isLoadingScenario,
+      isLoadingEnsemble,
+      ensembleData,
     } = this.state;
     const mapData = this.getMapData(this.state);
+    const ensembleAreaId = selectedWaterRegionId
+      ? toEnsembleRegionId(selectedWaterRegionId)
+      : toEnsembleWorldId(selectedWorldRegionId!);
 
     const yearString =
       mapData &&
@@ -308,21 +313,12 @@ class FutureBody extends React.Component<Props, State> {
           <Container>
             <Scroll>
               <StickyGraphics>
-                <FutureLineChart
-                  height={220}
-                  selectedTimeIndex={selectedTimeIndex}
-                  selectedDataType={selectedDataType}
-                  selectedWaterRegionId={selectedWaterRegionId}
-                  selectedWorldRegionId={selectedWorldRegionId}
-                  thresholds={[]} // TODO
-                  onTimeIndexChange={this.handleTimeIndexChange}
-                />
                 <h2>Selected scenario{yearLabel}</h2>
                 {!mapData ? (
                   isLoadingScenario === toScenarioId(selectedScenario) ? (
                     <StyledSpinner />
                   ) : (
-                    <Error>No data found for selected model.</Error>
+                    <Error>No data found for selected scenario.</Error>
                   )
                 ) : (
                   <div>
@@ -332,6 +328,27 @@ class FutureBody extends React.Component<Props, State> {
                     />
                     <WorldRegionSelector />
                   </div>
+                )}
+                {!ensembleData[selectedDataType][ensembleAreaId] ? (
+                  isLoadingEnsemble === ensembleAreaId ? (
+                    <StyledSpinner />
+                  ) : (
+                    <Error>No data found for selected area.</Error>
+                  )
+                ) : (
+                  <FutureLineChart
+                    height={220}
+                    selectedTimeIndex={selectedTimeIndex}
+                    selectedDataType={selectedDataType}
+                    selectedWaterRegionId={selectedWaterRegionId}
+                    selectedWorldRegionId={selectedWorldRegionId}
+                    ensembleData={
+                      ensembleData[selectedDataType][ensembleAreaId]!
+                    }
+                    comparisonVariables={comparisonVariables}
+                    selectedScenario={selectedScenario}
+                    onTimeIndexChange={this.handleTimeIndexChange}
+                  />
                 )}
               </StickyGraphics>
               <SelectorsContent>

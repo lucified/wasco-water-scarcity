@@ -9,11 +9,13 @@ import {
 } from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
+  ComparisonVariables,
   FutureDataset,
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
   futureScenarioKeys,
+  FutureScenarioVariable,
   FutureScenarioWithData,
   LocalData,
   RawRegionStressShortageDatum,
@@ -220,6 +222,52 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
     name: region.properties.featureName,
     feature: region,
   }));
+}
+
+function toBooleanHash(arr: string[]) {
+  return arr.reduce<{ [d: string]: true }>((result, d) => {
+    result[d] = true;
+    return result;
+  }, {});
+}
+
+export function isFutureScenarioVariable(
+  type: string,
+): type is FutureScenarioVariable {
+  return futureScenarioKeys.indexOf(type as FutureScenarioVariable) > -1;
+}
+
+export function isScenarioEqual(a: FutureScenario, b: FutureScenario) {
+  return futureScenarioKeys.every(key => a[key] === b[key]);
+}
+
+export function isFutureScenarioInComparisonVariables(
+  comparisonVariables: ComparisonVariables,
+) {
+  const variablesHash: {
+    [type in FutureScenarioVariable]: {
+      [value: string]: boolean | undefined;
+    }
+  } = {
+    population: toBooleanHash(comparisonVariables.populations),
+    impactModel: toBooleanHash(comparisonVariables.impactModels),
+    climateModel: toBooleanHash(comparisonVariables.climateModels),
+    climateExperiment: toBooleanHash(comparisonVariables.climateExperiments),
+    yieldGap: toBooleanHash(comparisonVariables.yieldGaps),
+    dietChange: toBooleanHash(comparisonVariables.dietChanges),
+    foodLossRed: toBooleanHash(comparisonVariables.foodLossReds),
+    trade: toBooleanHash(comparisonVariables.trades),
+    agriExp: toBooleanHash(comparisonVariables.agriExps),
+    reuse: toBooleanHash(comparisonVariables.reuses),
+    alloc: toBooleanHash(comparisonVariables.allocs),
+  };
+  return (scenario: FutureScenario) => {
+    // Note that scenario may be a FutureScenarioWithData, which means we can't
+    // just go over the keys
+    return Object.keys(scenario)
+      .filter(isFutureScenarioVariable)
+      .every(type => !!variablesHash[type][scenario[type]]);
+  };
 }
 
 export async function fetchWorldRegionsData(): Promise<

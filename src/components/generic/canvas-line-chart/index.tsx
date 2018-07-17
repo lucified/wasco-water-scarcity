@@ -37,7 +37,9 @@ interface PassedProps {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  data: Series[];
+  series: Series[];
+  selectedSeries?: Series;
+  hoveredSeries?: Series[];
 }
 
 interface DefaultProps {
@@ -80,10 +82,17 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart() {
-    const { data, marginLeft, marginTop, width, height } = this
-      .props as PropsWithDefaults;
+    const {
+      series,
+      selectedSeries,
+      hoveredSeries,
+      marginLeft,
+      marginTop,
+      width,
+      height,
+    } = this.props as PropsWithDefaults;
 
-    if (data.length === 0) {
+    if (series.length === 0) {
       return;
     }
 
@@ -96,13 +105,13 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context.clearRect(0, 0, width, height);
 
     const x = scaleTime()
-      .domain(extent(flatMap(data, d => d.points.map(p => p.time))) as [
+      .domain(extent(flatMap(series, d => d.points.map(p => p.time))) as [
         Date,
         Date
       ])
       .range([0, chartWidth]);
     const y = scaleLinear()
-      .domain(extent(flatMap(data, d => d.points.map(p => p.value))) as [
+      .domain(extent(flatMap(series, d => d.points.map(p => p.value))) as [
         number,
         number
       ])
@@ -121,8 +130,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.globalAlpha = 0.2;
     context.lineWidth = 0.2;
-    context.strokeStyle = data[0].color;
-    data.forEach(d => {
+    context.strokeStyle = series[0].color;
+    series.forEach(d => {
       context.beginPath();
       lineGenerator(d.points);
       if (context.strokeStyle !== d.color) {
@@ -130,6 +139,29 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       }
       context.stroke();
     });
+
+    if (hoveredSeries) {
+      context.globalAlpha = 0.8;
+      hoveredSeries.forEach(d => {
+        context.beginPath();
+        lineGenerator(d.points);
+        if (context.strokeStyle !== d.color) {
+          context.strokeStyle = d.color;
+        }
+        context.stroke();
+      });
+    }
+
+    if (selectedSeries) {
+      context.globalAlpha = 1;
+      context.lineWidth = 0.5;
+      context.beginPath();
+      lineGenerator(selectedSeries.points);
+      if (context.strokeStyle !== selectedSeries.color) {
+        context.strokeStyle = selectedSeries.color;
+      }
+      context.stroke();
+    }
   }
 
   private drawXAxis(
