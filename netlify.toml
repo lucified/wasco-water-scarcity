@@ -1,0 +1,13 @@
+[build]
+  # This is the directory that you are publishing from (relative to root of your repo)
+  publish = "dist/"
+  command = "yarn build"
+
+[build.environment]
+  LUCIFY_ENV = "staging"
+
+[context."netlify/future".environment]
+  APP = "future"
+
+[context."netlify/embed".environment]
+  APP = "embed"
