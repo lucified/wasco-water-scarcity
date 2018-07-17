@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const bodyFontSize = 18;
 const bodyFontFamily =
-  "'Source Serif Pro', 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif";
+  "'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif";
 const headingFontFamily =
   "'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif";
 const labelFontFamily = headingFontFamily;
