@@ -34,10 +34,6 @@ import {
 const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
 const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
 
-// TODO: Remove this, only for development!
-// tslint:disable-next-line:max-line-length
-const developmentAllData = require('file-loader!../../data-external/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/world-0_0.2/all.jsonfix');
-
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
 ): Array<TimeAggregate<StressShortageDatum>> {
@@ -84,11 +80,7 @@ export async function fetchFutureEnsembleData(
   dataset: FutureDataset,
   featureId: string,
 ): Promise<FutureEnsembleData | undefined> {
-  const url =
-    // TODO: remove this, only for development!
-    featureId === 'world-0_0.2'
-      ? developmentAllData
-      : getFutureEnsembleURL(dataset, featureId);
+  const url = getFutureEnsembleURL(dataset, featureId);
   try {
     const response = await fetch(url, { credentials: 'same-origin' });
     const parsedResult: FutureEnsembleData = await response.json();
