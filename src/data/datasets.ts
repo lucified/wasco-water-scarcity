@@ -3,7 +3,7 @@
 import { FutureDataset, HistoricalDataset } from './types';
 
 // prettier-ignore
-const historicalDatasets: HistoricalDataset[] = [
+export const historicalDatasets: HistoricalDataset[] = [
   {
     spatialUnit: 'FPU',
     timeScale: 'annual',
@@ -189,10 +189,9 @@ const historicalDatasets: HistoricalDataset[] = [
   },
 ];
 
-const futureDatasets: FutureDataset[] = [
+export const futureDatasets: FutureDataset[] = [
   // Note: there will be datasets for other variables
   {
-    default: true,
     urlTemplateEnsemble:
       'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/{{featureId}}/all.json',
     urlTemplateScenario:
@@ -213,5 +212,3 @@ const futureDatasets: FutureDataset[] = [
     allocs: ['runoff', 'discharge'],
   },
 ];
-
-export { historicalDatasets, futureDatasets };

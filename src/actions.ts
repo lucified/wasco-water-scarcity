@@ -1,19 +1,12 @@
 import { Dispatch } from 'redux';
 import {
-  fetchFutureEnsembleData,
-  fetchFutureScenarioData,
   fetchHistoricalStressShortageData,
   fetchWaterRegionsData,
   fetchWorldRegionsData,
-  FutureDataset,
-  FutureEnsembleData,
-  FutureScenario,
-  FutureScenarioData,
   generateWaterToWorldRegionsMap,
   WaterRegionGeoJSON,
 } from './data';
 import {
-  FutureDataType,
   HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
@@ -80,19 +73,6 @@ export function setSelectedHistoricalDataType(
   };
 }
 
-export interface SetSelectedFutureDataTypeAction {
-  type: 'SET_SELECTED_FUTURE_DATA_TYPE';
-  dataType: FutureDataType;
-}
-export function setSelectedFutureDataType(
-  dataType: FutureDataType,
-): SetSelectedFutureDataTypeAction {
-  return {
-    type: 'SET_SELECTED_FUTURE_DATA_TYPE',
-    dataType,
-  };
-}
-
 export interface SetSelectedImpactModelAction {
   type: 'SET_SELECTED_IMPACT_MODEL';
   impactModel: string;
@@ -116,41 +96,6 @@ export function setSelectedClimateModel(
   return {
     type: 'SET_SELECTED_CLIMATE_MODEL',
     climateModel,
-  };
-}
-
-export interface SetSelectedScenarioAction {
-  type: 'SET_SELECTED_SCENARIO';
-  selectedScenario: FutureScenario;
-}
-export function setSelectedScenario(
-  selectedScenario: FutureScenario,
-): SetSelectedScenarioAction {
-  return {
-    type: 'SET_SELECTED_SCENARIO',
-    selectedScenario,
-  };
-}
-
-export interface SetSelectedFutureFiltersAction {
-  type: 'SET_SELECTED_FUTURE_FILTERS';
-  climateModels: string[];
-  climateExperiments: string[];
-  impactModels: string[];
-  populations: string[];
-}
-export function setSelectedFutureFilters(
-  climateModels: string[],
-  climateExperiments: string[],
-  impactModels: string[],
-  populations: string[],
-): SetSelectedFutureFiltersAction {
-  return {
-    type: 'SET_SELECTED_FUTURE_FILTERS',
-    climateModels,
-    climateExperiments,
-    impactModels,
-    populations,
   };
 }
 
@@ -180,17 +125,6 @@ export function setThresholdsForDataType(
     type: 'SET_THRESHOLDS_FOR_DATA_TYPE',
     dataType,
     thresholds,
-  };
-}
-
-export interface SetFutureTimeIndexAction {
-  type: 'SET_FUTURE_TIME_INDEX';
-  index: number;
-}
-export function setFutureTimeIndex(index: number): SetFutureTimeIndexAction {
-  return {
-    type: 'SET_FUTURE_TIME_INDEX',
-    index,
   };
 }
 
@@ -255,47 +189,6 @@ export function toggleHistoricalTimeIndexLock(): ToggleHistoricalTimeIndexLockAc
   };
 }
 
-export interface ToggleFutureScenarioLockAction {
-  type: 'TOGGLE_FUTURE_SCENARIO_LOCK';
-}
-export function toggleFutureScenarioLock(): ToggleFutureScenarioLockAction {
-  return {
-    type: 'TOGGLE_FUTURE_SCENARIO_LOCK',
-  };
-}
-
-export interface StoreFutureEnsembleDataAction {
-  type: 'STORE_FUTURE_ENSEMBLE_DATA';
-  variableName: string;
-  data: FutureEnsembleData;
-}
-function storeFutureEnsembleData(
-  variableName: string,
-  data: FutureEnsembleData,
-): StoreFutureEnsembleDataAction {
-  return {
-    type: 'STORE_FUTURE_ENSEMBLE_DATA',
-    variableName,
-    data,
-  };
-}
-
-export interface StoreFutureScenarioDataAction {
-  type: 'STORE_FUTURE_SCENARIO_DATA';
-  scenario: FutureScenario;
-  data: FutureScenarioData;
-}
-function storeFutureScenarioData(
-  data: FutureScenarioData,
-  scenario: FutureScenario,
-): StoreFutureScenarioDataAction {
-  return {
-    type: 'STORE_FUTURE_SCENARIO_DATA',
-    scenario,
-    data,
-  };
-}
-
 export function loadModelData(
   climateModel: string,
   impactModel: string,
@@ -309,38 +202,6 @@ export function loadModelData(
     ).then(waterData => {
       if (waterData) {
         dispatch(storeWaterData(waterData));
-      }
-    });
-  };
-}
-
-export function loadFutureEnsembleData(
-  dataset: FutureDataset,
-  featureId: string,
-) {
-  return (dispatch: Dispatch<Action>) => {
-    return fetchFutureEnsembleData(dataset, featureId).then(futureData => {
-      if (futureData) {
-        dispatch(
-          // FIXME: will be overwritten on each fetch. Cache?
-          storeFutureEnsembleData(dataset.variableName, futureData),
-        );
-      }
-    });
-  };
-}
-
-export function loadFutureScenarioData(
-  dataset: FutureDataset,
-  scenario: FutureScenario,
-) {
-  return (dispatch: Dispatch<Action>) => {
-    return fetchFutureScenarioData(dataset, scenario).then(futureData => {
-      if (futureData) {
-        dispatch(
-          // FIXME: Only cached on scenario level. Should be with dataset as well?
-          storeFutureScenarioData(futureData, scenario),
-        );
       }
     });
   };
@@ -370,22 +231,15 @@ export function loadMapData() {
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
-  | SetSelectedScenarioAction
-  | SetSelectedFutureFiltersAction
   | SetSelectedHistoricalDataTypeAction
-  | SetSelectedFutureDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
-  | SetFutureTimeIndexAction
-  | StoreFutureEnsembleDataAction
-  | StoreFutureScenarioDataAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction
   | StoreWaterToWorldRegionMapAction
   | ToggleHistoricalTimeIndexLockAction
-  | ToggleFutureScenarioLockAction
   | ToggleSelectedRegionAction;

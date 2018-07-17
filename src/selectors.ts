@@ -1,8 +1,6 @@
-import { extent } from 'd3-array';
-import { flatMap, keyBy, mapValues } from 'lodash';
+import { keyBy } from 'lodash';
 import { createSelector } from 'reselect';
 import { Data as GapminderData } from './components/generic/gapminder';
-import { FutureScenario, FutureScenarioWithData, toScenarioId } from './data';
 import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
@@ -25,104 +23,9 @@ export function getSelectedStressShortageData(
   return data && data[getSelectedHistoricalTimeIndex(state)];
 }
 
-export function getSelectedFutureTimeIndex(state: StateTree) {
-  return state.selections.futureTimeIndex;
-}
-
-export function getSelectedFutureDataset(state: StateTree) {
-  return state.selections.futureDataset;
-}
-
-function getFutureEnsembleData(state: StateTree) {
-  return state.data.futureEnsembleData;
-}
-
-function getFutureScenarioData(state: StateTree) {
-  return state.data.futureScenarioData;
-}
-
-export function getSelectedFutureFilters(state: StateTree) {
-  return state.selections.futureFilters;
-}
-
 export function isHistoricalTimeIndexLocked(state: StateTree) {
   return state.selections.lockHistoricalTimeIndex;
 }
-
-export function isFutureScenarioLocked(state: StateTree) {
-  return state.selections.lockFutureScenario;
-}
-
-export function getAllScenariosInSelectedFutureDataset(
-  state: StateTree,
-): FutureScenarioWithData[] | undefined {
-  const allFutureData = getFutureEnsembleData(state);
-  const { variableName } = getSelectedFutureDataset(state);
-  return allFutureData[variableName];
-}
-
-export const getDataExtentForAllScenariosInSelectedFutureDataset = createSelector(
-  getAllScenariosInSelectedFutureDataset,
-  data =>
-    data &&
-    (extent(flatMap(data, d => d.data.map(c => c.value))) as [number, number]),
-);
-
-export const getFilteredScenariosInSelectedFutureDataset = createSelector(
-  getAllScenariosInSelectedFutureDataset,
-  getSelectedFutureFilters,
-  (scenarios, filters) =>
-    scenarios &&
-    scenarios.filter(
-      d =>
-        !!filters.climateExperiments.find(f => f === d.climateExperiment) &&
-        !!filters.climateModels.find(f => f === d.climateModel) &&
-        !!filters.impactModels.find(f => f === d.impactModel) &&
-        !!filters.populations.find(f => f === d.population),
-    ),
-);
-
-export const getEnsembleDataForSelectedFutureScenario = createSelector(
-  getAllScenariosInSelectedFutureDataset,
-  getSelectedFutureScenario,
-  (datasetData, scenario) =>
-    datasetData &&
-    scenario &&
-    datasetData.find(d =>
-      Object.keys(scenario).every(
-        key =>
-          d[key as keyof FutureScenario] ===
-          scenario[key as keyof FutureScenario],
-      ),
-    ),
-);
-
-export const getMapDataForSelectedFutureScenario = createSelector(
-  getFutureScenarioData,
-  getSelectedFutureScenario,
-  getSelectedFutureTimeIndex,
-  getSelectedFutureDataType,
-  (data, scenario, timeIndex, dataType) => {
-    if (!scenario) {
-      return undefined;
-    }
-
-    const scenarioData = data[toScenarioId(scenario)];
-    if (!scenarioData) {
-      return undefined;
-    }
-
-    const { y0: startYear, y1: endYear, data: timeData } = scenarioData[
-      timeIndex
-    ];
-    return {
-      startYear,
-      endYear,
-      // TODO: dataType can be e.g. "shortage" which does not exist on d
-      data: mapValues(timeData, d => d[dataType as 'stress'] as number),
-    };
-  },
-);
 
 const getAggregateData = createSelector(
   getStressShortageData,
@@ -293,20 +196,12 @@ export function getSelectedHistoricalDataType(state: StateTree) {
   return state.selections.historicalDataType;
 }
 
-export function getSelectedFutureDataType(state: StateTree) {
-  return state.selections.futureDataType;
-}
-
 export function getSelectedImpactModel(state: StateTree) {
   return state.selections.impactModel;
 }
 
 export function getSelectedClimateModel(state: StateTree) {
   return state.selections.climateModel;
-}
-
-export function getSelectedFutureScenario(state: StateTree) {
-  return state.selections.selectedFutureScenario;
 }
 
 export function getSelectedTimeScale(state: StateTree) {

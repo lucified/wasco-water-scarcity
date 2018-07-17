@@ -32,6 +32,10 @@ import {
 const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
 const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
 
+// TODO: Remove this, only for development!
+// tslint:disable-next-line:max-line-length
+const developmentAllData = require('file-loader!../../data-external/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/world-0_0.2/all.jsonfix');
+
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
 ): Array<TimeAggregate<StressShortageDatum>> {
@@ -78,7 +82,11 @@ export async function fetchFutureEnsembleData(
   dataset: FutureDataset,
   featureId: string,
 ): Promise<FutureEnsembleData | undefined> {
-  const url = getFutureEnsembleURL(dataset, featureId);
+  const url =
+    // TODO: remove this, only for development!
+    featureId === 'world-0_0.2'
+      ? developmentAllData
+      : getFutureEnsembleURL(dataset, featureId);
   try {
     const response = await fetch(url, { credentials: 'same-origin' });
     const parsedResult: FutureEnsembleData = await response.json();
@@ -87,6 +95,14 @@ export async function fetchFutureEnsembleData(
     console.error('Unable to fetch future ensemble data', error);
     return undefined;
   }
+}
+
+export function toEnsembleWorldId(worldRegionId: number) {
+  return `world-${worldRegionId}_0.2`;
+}
+
+export function toEnsembleRegionId(regionId: number) {
+  return regionId.toString();
 }
 
 export function toScenarioId(scenario: FutureScenario) {
@@ -143,6 +159,24 @@ export function getDefaultHistoricalImpactModel() {
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
 }
 
+export function getDefaultFutureScenario(): FutureScenario {
+  return {
+    yieldGap: 'current',
+    dietChange: 'current',
+    foodLossRed: 'current',
+    trade: 'current volume',
+    agriExp: 'current',
+    reuse: 'meetfood',
+    // Social uncertainties
+    population: 'SSP2',
+    climateExperiment: 'rcp4p5',
+    alloc: 'discharge',
+    // Scientific uncertainties
+    impactModel: 'watergap', // TODO: change to mean
+    climateModel: 'hadgem2-es', // TODO: change to mean
+  };
+}
+
 export async function getLocalRegionData(regionId: number) {
   try {
     const result = await fetch(
@@ -162,14 +196,6 @@ export async function getLocalRegionData(regionId: number) {
 }
 
 /* Future */
-export function getFutureDatasets() {
-  return futureDatasets;
-}
-
-export function getDefaultFutureDataset() {
-  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
-}
-
 function getFutureEnsembleURL(dataset: FutureDataset, featureId: string) {
   return dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
 }
@@ -182,7 +208,7 @@ function getFutureScenarioURL(
     (url: string, variable: string) =>
       url.replace(
         `{{${variable}}}`,
-        scenario[variable as keyof FutureScenario]!,
+        scenario[variable as keyof FutureScenario],
       ),
     dataset.urlTemplateScenario,
   );
@@ -260,12 +286,7 @@ export async function fetchWaterRegionsData(): Promise<
 }
 
 export function getFutureDataset(dataType: FutureDataType) {
-  const dataset = getFutureDatasets().find(
-    d =>
-      dataType === 'shortage'
-        ? d.variableName === 'short'
-        : d.variableName === 'stress',
-  );
+  const dataset = futureDatasets.find(d => d.variableName === dataType);
 
   if (!dataset) {
     console.error('No future dataset found for dataType:', dataType);

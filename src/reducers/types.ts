@@ -1,12 +1,5 @@
+import { WaterRegionGeoJSON } from '../data';
 import {
-  FutureDataset,
-  FutureEnsembleData,
-  FutureScenario,
-  FutureScenarioData,
-  WaterRegionGeoJSON,
-} from '../data';
-import {
-  FutureDataType,
   HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
@@ -17,21 +10,10 @@ import {
 export interface SelectionsTree {
   historicalTimeIndex: number;
   lockHistoricalTimeIndex: boolean;
-  futureTimeIndex: number;
-  futureDataset: FutureDataset;
-  futureFilters: {
-    impactModels: string[];
-    climateModels: string[];
-    climateExperiments: string[];
-    populations: string[];
-  };
   historicalDataType: HistoricalDataType;
-  futureDataType: FutureDataType;
-  impactModel: string; // Only used in Historical pages
-  climateModel: string; // Only used in Historical pages
-  selectedFutureScenario?: FutureScenario; // Only used in Future page
-  lockFutureScenario: boolean;
-  timeScale: TimeScale;
+  impactModel: string; // Only used in Past pages
+  climateModel: string; // Only used in Past pages
+  timeScale: TimeScale; // Only used in Past pages
   worldRegion: number;
   region?: number;
 }
@@ -44,12 +26,6 @@ export interface ThresholdsTree {
 
 export interface DataTree {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
-  futureEnsembleData: {
-    [variableName: string]: FutureEnsembleData;
-  };
-  futureScenarioData: {
-    [scenarioId: string]: FutureScenarioData;
-  };
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };

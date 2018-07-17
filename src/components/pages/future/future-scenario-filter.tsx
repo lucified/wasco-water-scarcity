@@ -1,13 +1,10 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { setSelectedFutureFilters } from '../../../actions';
-import { FutureDataset, FutureScenario } from '../../../data';
-import { StateTree } from '../../../reducers';
 import {
-  getSelectedFutureDataset,
-  getSelectedFutureFilters,
-} from '../../../selectors';
+  ComparisonVariables,
+  FutureDataset,
+  FutureScenario,
+} from '../../../data';
 import MultiSelector, { Option } from '../../generic/multi-selector';
 import { BodyText, SectionHeader, SelectorHeader, theme } from '../../theme';
 
@@ -39,46 +36,26 @@ const StyledMultiSelector = styled(MultiSelector)`
 `;
 
 interface PassedProps {
-  selectedScenario?: FutureScenario;
-}
-
-interface GeneratedDispatchProps {
-  setSelectedFutureFilters: (
-    climateModels: string[],
-    climateExperiments: string[],
-    impactModels: string[],
-    populations: string[],
-  ) => void;
-}
-
-interface GeneratedStateProps {
-  selectedFutureFilters: {
-    climateModels: string[];
-    climateExperiments: string[];
-    impactModels: string[];
-    populations: string[];
-  };
+  selectedScenario: FutureScenario;
   selectedFutureDataset: FutureDataset;
+  setScenario: (scenario: FutureScenario) => void;
+  comparisonVariables: ComparisonVariables;
+  setComparisonVariables: (variables: ComparisonVariables) => void;
 }
 
-type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
+type Props = PassedProps;
 
-function toOptions(values: string[]): Option[] {
-  return values.map(value => ({
+function toOption(value: string): Option {
+  return {
     value,
     label: value,
-  }));
+  };
 }
 
 class FutureScenarioFilter extends React.Component<Props> {
-  private createChangeHandler = (
-    field:
-      | 'climateModels'
-      | 'climateExperiments'
-      | 'impactModels'
-      | 'populations',
+  private createChangeComparisonHandler = (
+    field: keyof ComparisonVariables,
   ) => {
-    // tslint:disable:prefer-conditional-expression
     return (values: string[] | string | null) => {
       let results: string[];
       if (Array.isArray(values)) {
@@ -89,60 +66,29 @@ class FutureScenarioFilter extends React.Component<Props> {
         results = [];
       }
 
-      this.handleChange({
+      this.props.setComparisonVariables({
+        ...this.props.comparisonVariables,
         [field]: results,
       });
     };
   };
 
-  private handleChange = (newFilters: {
-    climateModels?: string[];
-    climateExperiments?: string[];
-    impactModels?: string[];
-    populations?: string[];
-  }) => {
-    const filters = {
-      ...this.props.selectedFutureFilters,
-      ...newFilters,
+  private createChangeScenarioHandler = (field: keyof FutureScenario) => {
+    return (value: string) => {
+      this.props.setScenario({
+        ...this.props.selectedScenario,
+        [field]: value,
+      });
     };
-
-    this.props.setSelectedFutureFilters(
-      filters.climateModels,
-      filters.climateExperiments,
-      filters.impactModels,
-      filters.populations,
-    );
   };
 
   public render() {
     const {
-      selectedFutureFilters,
       selectedFutureDataset,
       selectedScenario,
+      comparisonVariables,
     } = this.props;
 
-    if (!selectedScenario) {
-      return null;
-    }
-
-    const {
-      impactModel,
-      climateExperiment,
-      climateModel,
-      population,
-    } = selectedScenario;
-    if (
-      impactModel === undefined ||
-      climateExperiment === undefined ||
-      climateModel === undefined ||
-      population === undefined
-    ) {
-      return (
-        <div>
-          Error: Scenario has an unexpected format and cannot be displayed
-        </div>
-      );
-    }
     return (
       <Main>
         <BodyText>
@@ -155,17 +101,27 @@ class FutureScenarioFilter extends React.Component<Props> {
           <Parameter>
             <SelectorHeader>Climate scenario</SelectorHeader>
             <StyledMultiSelector
-              options={toOptions(selectedFutureDataset.climateExperiments)}
-              selectedValues={selectedFutureFilters.climateExperiments}
-              onChange={this.createChangeHandler('climateExperiments') as any}
+              multiSelectedValues={comparisonVariables.climateExperiments}
+              options={selectedFutureDataset.climateExperiments.map(toOption)}
+              selectedValue={selectedScenario.climateExperiment}
+              onChangeMultiSelect={this.createChangeComparisonHandler(
+                'climateExperiments',
+              )}
+              onChangeSelect={this.createChangeScenarioHandler(
+                'climateExperiment',
+              )}
             />
           </Parameter>
           <Parameter>
             <SelectorHeader>Population scenarios</SelectorHeader>
             <StyledMultiSelector
-              options={toOptions(selectedFutureDataset.populations)}
-              selectedValues={selectedFutureFilters.populations}
-              onChange={this.createChangeHandler('populations') as any}
+              multiSelectedValues={comparisonVariables.populations}
+              options={selectedFutureDataset.populations.map(toOption)}
+              selectedValue={selectedScenario.population}
+              onChangeMultiSelect={this.createChangeComparisonHandler(
+                'populations',
+              )}
+              onChangeSelect={this.createChangeScenarioHandler('population')}
             />
           </Parameter>
         </Section>
@@ -178,17 +134,25 @@ class FutureScenarioFilter extends React.Component<Props> {
               methods to estimate water availability and use.
             </BodyText>
             <StyledMultiSelector
-              options={toOptions(selectedFutureDataset.impactModels)}
-              selectedValues={selectedFutureFilters.impactModels}
-              onChange={this.createChangeHandler('impactModels') as any}
+              multiSelectedValues={comparisonVariables.impactModels}
+              options={selectedFutureDataset.impactModels.map(toOption)}
+              selectedValue={selectedScenario.impactModel}
+              onChangeMultiSelect={this.createChangeComparisonHandler(
+                'impactModels',
+              )}
+              onChangeSelect={this.createChangeScenarioHandler('impactModel')}
             />
           </Parameter>
           <Parameter>
             <SelectorHeader>Climate models</SelectorHeader>
             <StyledMultiSelector
-              options={toOptions(selectedFutureDataset.climateModels)}
-              onChange={this.createChangeHandler('climateModels') as any}
-              selectedValues={selectedFutureFilters.climateModels}
+              multiSelectedValues={comparisonVariables.climateModels}
+              options={selectedFutureDataset.climateModels.map(toOption)}
+              selectedValue={selectedScenario.climateModel}
+              onChangeMultiSelect={this.createChangeComparisonHandler(
+                'climateModels',
+              )}
+              onChangeSelect={this.createChangeScenarioHandler('climateModel')}
             />
           </Parameter>
         </Section>
@@ -197,31 +161,4 @@ class FutureScenarioFilter extends React.Component<Props> {
   }
 }
 
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(
-  state => ({
-    selectedFutureFilters: getSelectedFutureFilters(state),
-    selectedFutureDataset: getSelectedFutureDataset(state),
-  }),
-  dispatch => ({
-    setSelectedFutureFilters: (
-      climateModels: string[],
-      climateExperiments: string[],
-      impactModels: string[],
-      populations: string[],
-    ) => {
-      dispatch(
-        setSelectedFutureFilters(
-          climateModels,
-          climateExperiments,
-          impactModels,
-          populations,
-        ),
-      );
-    },
-  }),
-)(FutureScenarioFilter);
+export default FutureScenarioFilter;
