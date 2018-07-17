@@ -11,6 +11,7 @@ import {
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
+  FutureScenarioVariableName,
   getDefaultFutureScenario,
   getFutureDataset,
   toEnsembleRegionId,
@@ -89,6 +90,8 @@ interface State {
   selectedDataset: FutureDataset;
   selectedTimeIndex: number;
   comparisonVariables: FutureDatasetVariables;
+  hoveredVariable?: FutureScenarioVariableName;
+  hoveredValue?: string;
   isLoadingEnsemble?: string;
   isLoadingScenario?: string;
   ensembleData: {
@@ -284,6 +287,30 @@ class FutureBody extends React.Component<Props, State> {
     this.setState({ comparisonVariables });
   };
 
+  private handleHoverEnterScenarioVariable = (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => {
+    if (
+      this.state.hoveredValue !== hoveredValue ||
+      this.state.hoveredVariable !== hoveredVariable
+    ) {
+      this.setState({ hoveredValue, hoveredVariable });
+    }
+  };
+
+  private handleHoverLeaveScenarioVariable = (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => {
+    if (
+      this.state.hoveredValue === hoveredValue ||
+      this.state.hoveredVariable === hoveredVariable
+    ) {
+      this.setState({ hoveredValue: undefined, hoveredVariable: undefined });
+    }
+  };
+
   private handleSetSelectedScenario = (scenario: FutureScenario) => {
     const { selectedScenario, scenarioData, selectedDataset } = this.state;
     if (!isEqual(selectedScenario, scenario)) {
@@ -315,6 +342,8 @@ class FutureBody extends React.Component<Props, State> {
       isLoadingScenario,
       isLoadingEnsemble,
       ensembleData,
+      hoveredValue,
+      hoveredVariable,
     } = this.state;
     const mapData = this.getMapData(this.state);
     const ensembleAreaId = selectedWaterRegionId
@@ -370,6 +399,8 @@ class FutureBody extends React.Component<Props, State> {
                     comparisonVariables={comparisonVariables}
                     selectedScenario={selectedScenario}
                     onTimeIndexChange={this.handleTimeIndexChange}
+                    hoveredValue={hoveredValue}
+                    hoveredVariable={hoveredVariable}
                   />
                 )}
               </StickyGraphics>
@@ -380,6 +411,12 @@ class FutureBody extends React.Component<Props, State> {
                   selectedScenario={selectedScenario}
                   comparisonVariables={comparisonVariables}
                   setComparisonVariables={this.handleSetComparisonVariables}
+                  onEnterHoverScenarioVariable={
+                    this.handleHoverEnterScenarioVariable
+                  }
+                  onLeaveHoverScenarioVariable={
+                    this.handleHoverLeaveScenarioVariable
+                  }
                 />
               </SelectorsContent>
             </Scroll>

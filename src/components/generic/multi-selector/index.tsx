@@ -135,6 +135,8 @@ interface PassedProps {
   multiSelectedValues: string[];
   selectedValue: string;
   disabled?: boolean;
+  onEnterHoverRow?: (value: string) => void;
+  onLeaveHoverRow?: (value: string) => void;
 }
 
 export default class MultiSelector extends React.Component<PassedProps> {
@@ -162,6 +164,8 @@ export default class MultiSelector extends React.Component<PassedProps> {
       disabled: groupDisabled,
       className,
       selectedValue,
+      onEnterHoverRow,
+      onLeaveHoverRow,
     } = this.props;
 
     return (
@@ -169,6 +173,18 @@ export default class MultiSelector extends React.Component<PassedProps> {
         {options.map(({ value, disabled, description, title }) => (
           <Row
             key={`selector-${value}`}
+            onMouseEnter={
+              onEnterHoverRow &&
+              (() => {
+                onEnterHoverRow(value);
+              })
+            }
+            onMouseLeave={
+              onLeaveHoverRow &&
+              (() => {
+                onLeaveHoverRow(value);
+              })
+            }
           >
             <Button
               onClick={this.generateClickCallback(value)}

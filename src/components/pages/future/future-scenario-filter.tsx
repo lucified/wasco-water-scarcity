@@ -310,6 +310,14 @@ interface PassedProps {
   setScenario: (scenario: FutureScenario) => void;
   comparisonVariables: FutureDatasetVariables;
   setComparisonVariables: (variables: FutureDatasetVariables) => void;
+  onEnterHoverScenarioVariable: (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => void;
+  onLeaveHoverScenarioVariable: (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => void;
 }
 
 type Props = PassedProps;
@@ -332,6 +340,20 @@ class FutureScenarioFilter extends React.Component<Props> {
         ...this.props.selectedScenario,
         [field]: value,
       });
+    };
+  };
+
+  private createHoverEnterHandler = (variable: FutureScenarioVariableName) => {
+    return (value: string) => {
+      this.props.onEnterHoverScenarioVariable(variable, value);
+    };
+  };
+
+  private createHoverLeaveHandler = (variable: FutureScenarioVariableName) => {
+    return (value: string) => {
+      // setTimeout(() => {
+      this.props.onLeaveHoverScenarioVariable(variable, value);
+      // }, 100);
     };
   };
 
@@ -370,6 +392,8 @@ class FutureScenarioFilter extends React.Component<Props> {
                       variable,
                     )}
                     onChangeSelect={this.createChangeScenarioHandler(variable)}
+                    onEnterHoverRow={this.createHoverEnterHandler(variable)}
+                    onLeaveHoverRow={this.createHoverLeaveHandler(variable)}
                   />
                 </Variable>
               ),

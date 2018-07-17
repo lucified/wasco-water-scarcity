@@ -4,6 +4,7 @@ import {
   FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
+  FutureScenarioVariableName,
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
 } from '../../../data';
@@ -16,6 +17,8 @@ interface PassedProps {
   selectedScenario: FutureScenario;
   ensembleData: FutureEnsembleData;
   comparisonVariables: FutureDatasetVariables;
+  hoveredValue?: string;
+  hoveredVariable?: FutureScenarioVariableName;
   onTimeIndexChange: (value: number) => void;
   width?: number;
   height?: number;
@@ -65,11 +68,33 @@ const getSelectedSeries = createSelector(
   },
 );
 
+// We only have one globally created memoized selector which won't
+// work if we ever decide to add a second future line chart
+const getHoveredSeries = createSelector(
+  (props: Props) => props.ensembleData,
+  (props: Props) => props.hoveredValue,
+  (props: Props) => props.hoveredVariable,
+  (data, hoveredValue, hoveredVariable) => {
+    if (!hoveredValue || !hoveredVariable) {
+      return undefined;
+    }
+    return data.filter(d => d[hoveredVariable] === hoveredValue).map(datum => ({
+      id: datum.scenarioId,
+      color: theme.colors.textHover,
+      points: datum.data.map(d => ({
+        value: d.value,
+        time: new Date((d.y0 + d.y1) / 2, 0),
+      })),
+    }));
+  },
+);
+
 function FutureLineChart(props: Props) {
   const { width, height } = props;
 
   const comparisonSeries = getComparisonSeries(props);
   const selectedSeries = getSelectedSeries(props);
+  const hoveredSeries = getHoveredSeries(props);
 
   // const thresholdColors =
   //   selectedDataType === 'shortage'
@@ -80,6 +105,7 @@ function FutureLineChart(props: Props) {
     <CanvasLineChart
       series={comparisonSeries}
       selectedSeries={selectedSeries}
+      hoveredSeries={hoveredSeries}
       width={width || 600}
       height={height || 240}
     />
