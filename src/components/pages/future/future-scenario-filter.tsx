@@ -351,9 +351,7 @@ class FutureScenarioFilter extends React.Component<Props> {
 
   private createHoverLeaveHandler = (variable: FutureScenarioVariableName) => {
     return (value: string) => {
-      // setTimeout(() => {
       this.props.onLeaveHoverScenarioVariable(variable, value);
-      // }, 100);
     };
   };
 

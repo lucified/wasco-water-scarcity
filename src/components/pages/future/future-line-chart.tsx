@@ -96,11 +96,6 @@ function FutureLineChart(props: Props) {
   const selectedSeries = getSelectedSeries(props);
   const hoveredSeries = getHoveredSeries(props);
 
-  // const thresholdColors =
-  //   selectedDataType === 'shortage'
-  //     ? ['none', ...getDataTypeColors('shortage')].reverse()
-  //     : ['none', ...getDataTypeColors('stress')];
-
   return (
     <CanvasLineChart
       series={comparisonSeries}
