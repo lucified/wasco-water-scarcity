@@ -1,4 +1,4 @@
-import { groupBy, keyBy, mapValues, pick, uniq, values } from 'lodash';
+import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
 import {
   FutureDataType,
   HistoricalDataType,
@@ -167,7 +167,7 @@ export function getDefaultFutureScenario(): FutureScenario {
     alloc: 'discharge',
     // Scientific uncertainties
     impactModel: 'watergap', // TODO: change to mean
-    climateModel: 'hadgem2-es', // TODO: change to mean
+    climateModel: 'gfdl-esm2m', // TODO: change to mean
   };
 }
 
@@ -319,6 +319,33 @@ export function getFutureDataset(dataType: FutureDataType) {
   }
 
   return dataset;
+}
+
+export enum StartingPoint {
+  ANYTHING_POSSIBLE,
+  CHANGE_THE_WORLD,
+}
+
+export function getDefaultComparison(
+  startingPoint: StartingPoint,
+): FutureDatasetVariables {
+  const allOptions = omit<FutureDatasetVariables>(
+    getFutureDataset('stress')!,
+    'urlTemplateEnsemble',
+    'urlTemplateScenario',
+    'variableName',
+  );
+  switch (startingPoint) {
+    case StartingPoint.ANYTHING_POSSIBLE:
+      return allOptions;
+    case StartingPoint.CHANGE_THE_WORLD:
+      return {
+        ...allOptions,
+        // TODO: change these to mean
+        impactModel: ['watergap'],
+        climateModel: ['gfdl-esm2m'],
+      };
+  }
 }
 
 export function getDataTypeColors(dataType: HistoricalDataType) {

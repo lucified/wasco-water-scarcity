@@ -5,6 +5,8 @@ import {
   FutureDatasetVariables,
   FutureScenario,
   FutureScenarioVariableName,
+  getDefaultComparison,
+  StartingPoint,
 } from '../../../data';
 import MultiSelector, { Option } from '../../generic/multi-selector';
 import {
@@ -39,6 +41,27 @@ const Variable = styled.div`
 
 const StyledMultiSelector = styled(MultiSelector)`
   margin-top: ${theme.defaultMargin / 2}px;
+`;
+
+const StartingPointSelector = styled.div`
+  margin: ${theme.defaultMargin}px auto;
+  display: flex;
+  justify-content: center;
+`;
+
+const StartingPointValue = styled.a`
+  display: block;
+  flex-basis: 0;
+  flex-grow: 1;
+  font-size: 14px;
+  border-radius: 4px;
+  color: ${({ selected }: { selected: boolean }) =>
+    selected ? 'white' : theme.colors.text};
+  background-color: ${({ selected }: { selected: boolean }) =>
+    selected ? 'black' : 'white'};
+  text-align: center;
+  padding: 10px 20px;
+  cursor: pointer;
 `;
 
 const sections: {
@@ -323,7 +346,15 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-class FutureScenarioFilter extends React.Component<Props> {
+interface State {
+  selectedStartingPoint: StartingPoint;
+}
+
+class FutureScenarioFilter extends React.Component<Props, State> {
+  public state: State = {
+    selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
+  };
+
   private createChangeComparisonHandler = (
     field: FutureScenarioVariableName,
   ) => {
@@ -371,7 +402,40 @@ class FutureScenarioFilter extends React.Component<Props> {
           uncertain. We provide two starting points to explore the future of
           water scarcity:
         </BodyText>
-        <p>[TODO selector]</p>
+        <StartingPointSelector>
+          <StartingPointValue
+            selected={
+              this.state.selectedStartingPoint ===
+              StartingPoint.CHANGE_THE_WORLD
+            }
+            onClick={() => {
+              this.setState({
+                selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
+              });
+              this.props.setComparisonVariables(
+                getDefaultComparison(StartingPoint.CHANGE_THE_WORLD),
+              );
+            }}
+          >
+            Let's change the world
+          </StartingPointValue>
+          <StartingPointValue
+            selected={
+              this.state.selectedStartingPoint ===
+              StartingPoint.ANYTHING_POSSIBLE
+            }
+            onClick={() => {
+              this.setState({
+                selectedStartingPoint: StartingPoint.ANYTHING_POSSIBLE,
+              });
+              this.props.setComparisonVariables(
+                getDefaultComparison(StartingPoint.ANYTHING_POSSIBLE),
+              );
+            }}
+          >
+            Anything is possible
+          </StartingPointValue>
+        </StartingPointSelector>
         {Object.keys(sections).map(sectionTitle => (
           <Section key={sectionTitle}>
             <SectionHeader>{sectionTitle}</SectionHeader>

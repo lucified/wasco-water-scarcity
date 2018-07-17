@@ -1,4 +1,4 @@
-import { isEqual, mapValues, omit } from 'lodash';
+import { isEqual, mapValues } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -12,8 +12,10 @@ import {
   FutureScenario,
   FutureScenarioData,
   FutureScenarioVariableName,
+  getDefaultComparison,
   getDefaultFutureScenario,
   getFutureDataset,
+  StartingPoint,
   toEnsembleRegionId,
   toEnsembleWorldId,
   toScenarioId,
@@ -112,12 +114,7 @@ class FutureBody extends React.Component<Props, State> {
     selectedScenario: getDefaultFutureScenario(),
     selectedDataset: getFutureDataset('stress')!,
     selectedTimeIndex: 0,
-    comparisonVariables: omit(
-      getFutureDataset('stress')!,
-      'urlTemplateEnsemble',
-      'urlTemplateScenario',
-      'variableName',
-    ),
+    comparisonVariables: getDefaultComparison(StartingPoint.CHANGE_THE_WORLD),
     ensembleData: { stress: {}, kcal: {} },
     scenarioData: {},
   };

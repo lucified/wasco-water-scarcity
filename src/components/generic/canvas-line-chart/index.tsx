@@ -142,7 +142,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     });
 
     if (hoveredSeries) {
-      context.globalAlpha = 0.8;
+      context.globalAlpha = 0.5;
       hoveredSeries.forEach(d => {
         context.beginPath();
         lineGenerator(d.points);
