@@ -27,28 +27,34 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-// We only have one globally created memoized selector which won't
-// work if we ever decide to add a second future line chart
-const getComparisonSeries = createSelector(
+// NOTE: We only have global memoized selectors which won't work if we ever
+// decide to add a second future line chart.
+
+/**
+ * Returns the comparison series.
+ */
+const getFilteredSeries = createSelector(
   (props: Props) => props.ensembleData,
   (props: Props) => props.comparisonVariables,
   (data, comparisonVariables) => {
     const scenarioFilter = isFutureScenarioInComparisonVariables(
       comparisonVariables,
     );
-    return data.filter(scenarioFilter).map(series => ({
-      id: series.scenarioId,
-      color: theme.colors.grayLight,
-      points: series.data.map(d => ({
-        value: d.value,
-        time: new Date((d.y0 + d.y1) / 2, 0),
-      })),
-    }));
+    return data.filter(scenarioFilter);
   },
 );
 
-// We only have one globally created memoized selector which won't
-// work if we ever decide to add a second future line chart
+const getComparisonSeries = createSelector(getFilteredSeries, filteredData =>
+  filteredData.map(series => ({
+    id: series.scenarioId,
+    color: theme.colors.grayLight,
+    points: series.data.map(d => ({
+      value: d.value,
+      time: new Date((d.y0 + d.y1) / 2, 0),
+    })),
+  })),
+);
+
 const getSelectedSeries = createSelector(
   (props: Props) => props.ensembleData,
   (props: Props) => props.selectedScenario,
@@ -69,24 +75,24 @@ const getSelectedSeries = createSelector(
   },
 );
 
-// We only have one globally created memoized selector which won't
-// work if we ever decide to add a second future line chart
 const getHoveredSeries = createSelector(
-  (props: Props) => props.ensembleData,
+  getFilteredSeries,
   (props: Props) => props.hoveredValue,
   (props: Props) => props.hoveredVariable,
-  (data, hoveredValue, hoveredVariable) => {
+  (filteredData, hoveredValue, hoveredVariable) => {
     if (!hoveredValue || !hoveredVariable) {
       return undefined;
     }
-    return data.filter(d => d[hoveredVariable] === hoveredValue).map(datum => ({
-      id: datum.scenarioId,
-      color: theme.colors.textHover,
-      points: datum.data.map(d => ({
-        value: d.value,
-        time: new Date((d.y0 + d.y1) / 2, 0),
-      })),
-    }));
+    return filteredData
+      .filter(d => d[hoveredVariable] === hoveredValue)
+      .map(datum => ({
+        id: datum.scenarioId,
+        color: theme.colors.textHover,
+        points: datum.data.map(d => ({
+          value: d.value,
+          time: new Date((d.y0 + d.y1) / 2, 0),
+        })),
+      }));
   },
 );
 
