@@ -199,6 +199,25 @@ class FutureBody extends React.Component<Props, State> {
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
   }
 
+  public componentWillReceiveProps(nextProps: Props) {
+    if (
+      nextProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
+      nextProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
+    ) {
+      const ensembleAreaId = nextProps.selectedWaterRegionId
+        ? toEnsembleRegionId(nextProps.selectedWaterRegionId)
+        : toEnsembleWorldId(nextProps.selectedWorldRegionId!);
+      if (
+        !this.state.ensembleData[this.state.selectedDataType][ensembleAreaId]
+      ) {
+        this.fetchFutureEnsembleData(
+          this.state.selectedDataset,
+          ensembleAreaId,
+        );
+      }
+    }
+  }
+
   // private setDataType(dataType: FutureDataType) {
   //   const { selectedDataType, ensembleData } = this.state;
   //   const { selectedWaterRegionId, selectedWorldRegionId } = this.props;
@@ -339,9 +358,6 @@ class FutureBody extends React.Component<Props, State> {
                   <FutureLineChart
                     height={220}
                     selectedTimeIndex={selectedTimeIndex}
-                    selectedDataType={selectedDataType}
-                    selectedWaterRegionId={selectedWaterRegionId}
-                    selectedWorldRegionId={selectedWorldRegionId}
                     ensembleData={
                       ensembleData[selectedDataType][ensembleAreaId]!
                     }
