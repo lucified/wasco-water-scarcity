@@ -13,6 +13,7 @@ import responsive from '../../generic/responsive';
 import { theme } from '../../theme';
 
 interface PassedProps {
+  className?: string;
   selectedTimeIndex: number;
   selectedScenario: FutureScenario;
   ensembleData: FutureEnsembleData;
@@ -90,7 +91,7 @@ const getHoveredSeries = createSelector(
 );
 
 function FutureLineChart(props: Props) {
-  const { width, height } = props;
+  const { width, height, className } = props;
 
   const comparisonSeries = getComparisonSeries(props);
   const selectedSeries = getSelectedSeries(props);
@@ -98,6 +99,7 @@ function FutureLineChart(props: Props) {
 
   return (
     <CanvasLineChart
+      className={className}
       series={comparisonSeries}
       selectedSeries={selectedSeries}
       hoveredSeries={hoveredSeries}

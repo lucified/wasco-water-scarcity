@@ -305,6 +305,7 @@ const sections: {
 };
 
 interface PassedProps {
+  className?: string;
   selectedScenario: FutureScenario;
   selectedFutureDataset: FutureDataset;
   setScenario: (scenario: FutureScenario) => void;
@@ -360,10 +361,11 @@ class FutureScenarioFilter extends React.Component<Props> {
       selectedFutureDataset,
       selectedScenario,
       comparisonVariables,
+      className,
     } = this.props;
 
     return (
-      <Main>
+      <Main className={className}>
         <BodyText>
           The future depends on the actions we take, with outcomes that are also
           uncertain. We provide two starting points to explore the future of

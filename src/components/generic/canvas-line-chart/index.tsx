@@ -31,6 +31,7 @@ export interface Series {
 }
 
 interface PassedProps {
+  className?: string;
   width: number;
   height: number;
   marginLeft?: number;
@@ -232,9 +233,10 @@ export class CanvasLineChart extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { width, height } = this.props;
+    const { width, height, className } = this.props;
     return (
       <canvas
+        className={className}
         width={width * PIXEL_RATIO}
         height={height * PIXEL_RATIO}
         style={{ width, height }}
