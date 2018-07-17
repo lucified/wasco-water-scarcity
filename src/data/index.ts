@@ -1,4 +1,4 @@
-import { groupBy, keyBy, pick, uniq, values } from 'lodash';
+import { groupBy, keyBy, mapValues, pick, uniq, values } from 'lodash';
 import {
   FutureDataType,
   HistoricalDataType,
@@ -9,13 +9,13 @@ import {
 } from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
-  ComparisonVariables,
+  allFutureScenarioVariables,
   FutureDataset,
+  FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
-  futureScenarioKeys,
-  FutureScenarioVariable,
+  FutureScenarioVariableName,
   FutureScenarioWithData,
   LocalData,
   RawRegionStressShortageDatum,
@@ -109,7 +109,7 @@ export function toEnsembleRegionId(regionId: number) {
 
 export function toScenarioId(scenario: FutureScenario) {
   return Object.keys(scenario)
-    .filter(key => !!futureScenarioKeys.find(d => d === key))
+    .filter(key => !!allFutureScenarioVariables.find(d => d === key))
     .sort()
     .reduce(
       (result, key) => `${result}-${scenario[key as keyof FutureScenario]}`,
@@ -120,7 +120,7 @@ export function toScenarioId(scenario: FutureScenario) {
 export function removeDataFromScenario(
   scenarioWithData: FutureScenarioWithData,
 ): FutureScenario {
-  return pick(scenarioWithData, futureScenarioKeys);
+  return pick(scenarioWithData, allFutureScenarioVariables);
 }
 
 export async function fetchFutureScenarioData(
@@ -168,7 +168,7 @@ export function getDefaultFutureScenario(): FutureScenario {
     foodLossRed: 'current',
     trade: 'current volume',
     agriExp: 'current',
-    reuse: 'meetfood',
+    reuse: 'minwater',
     // Social uncertainties
     population: 'SSP2',
     climateExperiment: 'rcp4p5',
@@ -224,6 +224,18 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   }));
 }
 
+export function isFutureScenarioVariable(
+  type: string,
+): type is FutureScenarioVariableName {
+  return (
+    allFutureScenarioVariables.indexOf(type as FutureScenarioVariableName) > -1
+  );
+}
+
+export function isScenarioEqual(a: FutureScenario, b: FutureScenario) {
+  return allFutureScenarioVariables.every(key => a[key] === b[key]);
+}
+
 function toBooleanHash(arr: string[]) {
   return arr.reduce<{ [d: string]: true }>((result, d) => {
     result[d] = true;
@@ -231,36 +243,10 @@ function toBooleanHash(arr: string[]) {
   }, {});
 }
 
-export function isFutureScenarioVariable(
-  type: string,
-): type is FutureScenarioVariable {
-  return futureScenarioKeys.indexOf(type as FutureScenarioVariable) > -1;
-}
-
-export function isScenarioEqual(a: FutureScenario, b: FutureScenario) {
-  return futureScenarioKeys.every(key => a[key] === b[key]);
-}
-
 export function isFutureScenarioInComparisonVariables(
-  comparisonVariables: ComparisonVariables,
+  comparisonVariables: FutureDatasetVariables,
 ) {
-  const variablesHash: {
-    [type in FutureScenarioVariable]: {
-      [value: string]: boolean | undefined;
-    }
-  } = {
-    population: toBooleanHash(comparisonVariables.populations),
-    impactModel: toBooleanHash(comparisonVariables.impactModels),
-    climateModel: toBooleanHash(comparisonVariables.climateModels),
-    climateExperiment: toBooleanHash(comparisonVariables.climateExperiments),
-    yieldGap: toBooleanHash(comparisonVariables.yieldGaps),
-    dietChange: toBooleanHash(comparisonVariables.dietChanges),
-    foodLossRed: toBooleanHash(comparisonVariables.foodLossReds),
-    trade: toBooleanHash(comparisonVariables.trades),
-    agriExp: toBooleanHash(comparisonVariables.agriExps),
-    reuse: toBooleanHash(comparisonVariables.reuses),
-    alloc: toBooleanHash(comparisonVariables.allocs),
-  };
+  const variablesHash = mapValues(comparisonVariables, toBooleanHash);
   return (scenario: FutureScenario) => {
     // Note that scenario may be a FutureScenarioWithData, which means we can't
     // just go over the keys

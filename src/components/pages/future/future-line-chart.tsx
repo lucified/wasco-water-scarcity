@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createSelector } from '../../../../node_modules/reselect';
 import {
-  ComparisonVariables,
+  FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
   isFutureScenarioInComparisonVariables,
@@ -15,7 +15,7 @@ interface PassedProps {
   selectedTimeIndex: number;
   selectedScenario: FutureScenario;
   ensembleData: FutureEnsembleData;
-  comparisonVariables: ComparisonVariables;
+  comparisonVariables: FutureDatasetVariables;
   onTimeIndexChange: (value: number) => void;
   width?: number;
   height?: number;
@@ -34,7 +34,7 @@ const getComparisonSeries = createSelector(
     );
     return data.filter(scenarioFilter).map(series => ({
       id: series.scenarioId,
-      color: theme.colors.gray,
+      color: theme.colors.grayLight,
       points: series.data.map(d => ({
         value: d.value,
         time: new Date((d.y0 + d.y1) / 2, 0),
@@ -56,7 +56,7 @@ const getSelectedSeries = createSelector(
     }
     return {
       id: datum.scenarioId,
-      color: theme.colors.blueAalto,
+      color: theme.colors.textSelection,
       points: datum.data.map(d => ({
         value: d.value,
         time: new Date((d.y0 + d.y1) / 2, 0),

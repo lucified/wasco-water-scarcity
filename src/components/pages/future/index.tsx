@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { createSelector } from '../../../../node_modules/reselect';
 import {
-  ComparisonVariables,
   fetchFutureEnsembleData,
   fetchFutureScenarioData,
   FutureDataset,
+  FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
@@ -33,7 +33,10 @@ import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
 const Sticky = require('react-stickynode');
 
-const Title = styled.h1``;
+const Title = styled.h1`
+  font-weight: 800;
+  font-size: 28px;
+`;
 
 const Container = styled.div`
   position: relative;
@@ -85,7 +88,7 @@ interface State {
   selectedDataType: FutureDataType;
   selectedDataset: FutureDataset;
   selectedTimeIndex: number;
-  comparisonVariables: ComparisonVariables;
+  comparisonVariables: FutureDatasetVariables;
   isLoadingEnsemble?: string;
   isLoadingScenario?: string;
   ensembleData: {
@@ -146,22 +149,23 @@ class FutureBody extends React.Component<Props, State> {
     }
     this.setState({ isLoadingEnsemble: featureId });
     const ensembleData = await fetchFutureEnsembleData(dataset, featureId);
-    if (ensembleData) {
-      const dataType = dataset.variableName;
-      // TODO: check that memory usage doesn't explode if we store all responses
-      this.setState(state => ({
-        ensembleData: {
-          ...state.ensembleData,
-          [dataType]: {
-            ...state.ensembleData[dataType],
-            [featureId]: ensembleData,
-          },
-        },
-        isLoadingEnsemble: undefined,
-      }));
-    } else {
-      this.setState({ isLoadingEnsemble: undefined });
-    }
+    const dataType = dataset.variableName;
+    // TODO: check that memory usage doesn't explode if we store all responses
+    this.setState(state => ({
+      ensembleData: ensembleData
+        ? {
+            ...state.ensembleData,
+            [dataType]: {
+              ...state.ensembleData[dataType],
+              [featureId]: ensembleData,
+            },
+          }
+        : state.ensembleData,
+      isLoadingEnsemble:
+        state.isLoadingEnsemble === featureId
+          ? undefined
+          : state.isLoadingEnsemble,
+    }));
   }
 
   private async fetchFutureScenarioData(
@@ -175,17 +179,18 @@ class FutureBody extends React.Component<Props, State> {
     }
     this.setState({ isLoadingScenario: scenarioId });
     const scenarioData = await fetchFutureScenarioData(dataset, scenario);
-    if (scenarioData) {
-      this.setState(state => ({
-        scenarioData: {
-          ...state.scenarioData,
-          [scenarioId]: scenarioData,
-        },
-        isLoadingScenario: undefined,
-      }));
-    } else {
-      this.setState({ isLoadingScenario: undefined });
-    }
+    this.setState(state => ({
+      scenarioData: scenarioData
+        ? {
+            ...state.scenarioData,
+            [scenarioId]: scenarioData,
+          }
+        : state.scenarioData,
+      isLoadingScenario:
+        state.isLoadingScenario === scenarioId
+          ? undefined
+          : state.isLoadingScenario,
+    }));
   }
 
   public componentDidMount() {
@@ -274,7 +279,7 @@ class FutureBody extends React.Component<Props, State> {
   // }
 
   private handleSetComparisonVariables = (
-    comparisonVariables: ComparisonVariables,
+    comparisonVariables: FutureDatasetVariables,
   ) => {
     this.setState({ comparisonVariables });
   };
@@ -326,7 +331,8 @@ class FutureBody extends React.Component<Props, State> {
     return (
       <div>
         <Title>Explore possible futures of water scarcity</Title>
-        {!waterRegions ? (
+        {!waterRegions ||
+        (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
           <StyledSpinner />
         ) : (
           <Container>

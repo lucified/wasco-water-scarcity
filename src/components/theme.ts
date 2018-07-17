@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 // FONT
 
-const bodyFontSize = 18;
+const bodyFontSize = 16;
 const bodyFontFamily =
   "'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif";
 const headingFontFamily =
@@ -23,7 +23,7 @@ const widescreenMonitorBreakpoint = 1920;
 // colors from design
 export const colors = {
   red: '#dd0035',
-  blue: '#23408f',
+  blue: '#2374C4',
   blueDarker: '#000d5c',
   blueLight: '#58addb',
   blueChill: 'rgb(10, 135, 165)',
@@ -50,7 +50,7 @@ export const colors = {
   border: 'rgba(60, 30, 0, 0.12)',
   text: '#373433', // grayDarker
   textHover: 'black',
-  textSelection: '#dd0035', // red
+  textSelection: '#2374C4', // blue
   textMenu: '#807775', // grayDark
 
   selection: 'white',
@@ -66,12 +66,10 @@ const defaultMargin = 20;
 
 // REPEATING ELEMENTS
 
-export const SectionHeader = styled.h1`
-  margin-top: ${defaultMargin * 2}px;
-`;
-
-export const SelectorHeader = styled.h2`
-  margin-top: ${defaultMargin}px;
+export const SectionHeader = styled.h2`
+  margin-bottom: ${defaultMargin / 2}px;
+  font-size: 24px;
+  font-weight: 400;
 `;
 
 export const BodyText = styled.div`
@@ -83,6 +81,15 @@ export const BodyText = styled.div`
   b {
     color: ${colors.grayDarkest};
   }
+`;
+
+export const SelectorHeader = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+`;
+
+export const SelectorDescription = BodyText.extend`
+  font-size: ${bodyFontSize - 2}px;
 `;
 
 export const SecondaryContent = BodyText.extend`

@@ -1,6 +1,5 @@
 import { ExtendedFeature, ExtendedFeatureCollection } from 'd3-geo';
 import * as GeoJSON from 'geojson';
-import { Omit } from 'recompose';
 import { FutureDataType, StressShortageDatum, TimeScale } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
@@ -29,7 +28,10 @@ export interface HistoricalDataset {
   url: string;
 }
 
-export interface FutureDataset {
+export type FutureDatasetVariables = {
+  [variable in FutureScenarioVariableName]: string[]
+};
+export type FutureDataset = FutureDatasetVariables & {
   /**
    * An "ensemble" is all the scenarios for one FPU/region. Used for the line chart.
    */
@@ -39,27 +41,13 @@ export interface FutureDataset {
    */
   urlTemplateScenario: string;
   variableName: FutureDataType;
-  impactModels: string[];
-  climateModels: string[];
-  populations: string[];
-  climateExperiments: string[];
-  yieldGaps: string[];
-  dietChanges: string[];
-  foodLossReds: string[];
-  trades: string[];
-  agriExps: string[];
-  reuses: string[];
-  allocs: string[];
-}
+};
 
-export type ComparisonVariables = Omit<
-  FutureDataset,
-  'urlTemplateEnsemble' | 'urlTemplateScenario' | 'variableName'
->;
+export type FutureScenario = {
+  [variable in FutureScenarioVariableName]: string
+};
 
-export type FutureScenario = { [variable in FutureScenarioVariable]: string };
-
-export type FutureScenarioVariable =
+export type FutureScenarioVariableName =
   | 'population'
   | 'impactModel'
   | 'climateModel'
@@ -72,7 +60,7 @@ export type FutureScenarioVariable =
   | 'reuse'
   | 'alloc';
 
-export const futureScenarioKeys: FutureScenarioVariable[] = [
+export const allFutureScenarioVariables: FutureScenarioVariableName[] = [
   'population',
   'impactModel',
   'climateModel',

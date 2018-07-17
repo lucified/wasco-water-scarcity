@@ -13,21 +13,34 @@ interface ButtonProps {
   disabled?: boolean;
 }
 
-const Button = styled.a`
+const Row = styled.div`
+  width: 100%;
+  border: ${theme.borderWidth}px solid ${theme.colors.border};
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 14px;
+
+  &:first-child {
+    border-radius: ${theme.borderRadius}px ${theme.borderRadius}px 0 0;
+  }
+
+  &:last-child {
+    border: ${theme.borderWidth}px solid ${theme.colors.border};
+    border-radius: 0 0 ${theme.borderRadius}px ${theme.borderRadius}px;
+  }
+`;
+
+const Button = styled.div`
   font-weight: 600;
   font-size: 0.85rem;
   font-family: ${theme.labelFontFamily};
-  text-transform: uppercase;
-  line-height: 46px;
   width: 100%;
 
   position: relative;
   text-decoration: none;
-  display: inline-block;
-  border: ${theme.borderWidth}px solid ${theme.colors.border};
-  border-right: 0;
   cursor: ${({ disabled }: ButtonProps) => (disabled ? 'default' : 'pointer')};
-  padding-left: 48px;
+  padding-left: 40px;
   padding-right: 10px;
   color: ${({ selected, disabled }: ButtonProps) =>
     disabled
@@ -35,9 +48,6 @@ const Button = styled.a`
       : selected
         ? theme.colors.textSelection
         : theme.colors.textMenu};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   background-color: ${({ selected }: ButtonProps) =>
     selected ? theme.colors.selection : 'white'};
 
@@ -48,8 +58,9 @@ const Button = styled.a`
   }
 
   &:before {
-    left: 15px;
-    top: 14px;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
     height: 20px;
     width: 20px;
     border-radius: 10px;
@@ -57,12 +68,15 @@ const Button = styled.a`
       selected && disabled ? theme.colors.gray : 'white'};
     border: ${theme.borderWidth}px solid ${theme.colors.border};
     ${({ selected }: ButtonProps) =>
-      selected ? `border-color: ${theme.colors.red}; opacity: 0.3;` : ''};
+      selected
+        ? `border-color: ${theme.colors.textSelection}; opacity: 0.3;`
+        : ''};
   }
 
   &:after {
-    left: 20px;
-    top: 19px;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     height: 10px;
     width: 10px;
     border-radius: 5px;
@@ -70,12 +84,13 @@ const Button = styled.a`
       selected
         ? disabled
           ? theme.colors.gray
-          : theme.colors.red
+          : theme.colors.textSelection
         : 'transparent'};
   }
 
   &:hover {
-    color: ${theme.colors.textHover};
+    color: ${({ selected }: ButtonProps) =>
+      selected ? theme.colors.textSelection : theme.colors.textHover};
     background-color: ${theme.colors.selectionActive};
     ${({ selected }: ButtonProps) =>
       selected ? `text-decoration: none; box-shadow: none;` : ''};
@@ -86,23 +101,29 @@ const Button = styled.a`
       disabled
         ? 'white'
         : selected
-          ? theme.colors.red
+          ? theme.colors.textSelection
           : theme.colors.grayLight};
-  }
-
-  &:first-child {
-    border-radius: ${theme.borderRadius}px 0 0 ${theme.borderRadius}px;
-  }
-
-  &:last-child {
-    border: ${theme.borderWidth}px solid ${theme.colors.border};
-    border-radius: 0 ${theme.borderRadius}px ${theme.borderRadius}px 0;
   }
 `;
 
+const Title = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  line-height: 22px;
+`;
+
+const Description = styled.div`
+  font-weight: 400;
+`;
+
+const Checkbox = styled.input.attrs({ type: 'checkbox' })``;
+
 export interface Option {
   value: string;
-  label: string;
+  title: string;
+  description: string;
   disabled?: boolean;
 }
 
@@ -138,28 +159,31 @@ export default class MultiSelector extends React.Component<PassedProps> {
     const {
       multiSelectedValues,
       options,
-      disabled,
+      disabled: groupDisabled,
       className,
       selectedValue,
     } = this.props;
 
     return (
       <ButtonGroup className={className}>
-        {options.map(option => (
-          <Button
-            key={`selector-${option.value}`}
-            onClick={this.generateClickCallback(option.value)}
-            disabled={disabled || option.disabled}
-            selected={option.value === selectedValue}
+        {options.map(({ value, disabled, description, title }) => (
+          <Row
+            key={`selector-${value}`}
           >
-            {option.label}
-            <input
-              type="checkbox"
-              value={option.value}
-              checked={multiSelectedValues.indexOf(option.value) > -1}
-              onChange={this.createCheckboxChangeHandler(option.value)}
+            <Button
+              onClick={this.generateClickCallback(value)}
+              disabled={groupDisabled || disabled}
+              selected={value === selectedValue}
+            >
+              <Title>{title}</Title>
+              <Description>{description}</Description>
+            </Button>
+            <Checkbox
+              value={value}
+              checked={multiSelectedValues.indexOf(value) > -1}
+              onChange={this.createCheckboxChangeHandler(value)}
             />
-          </Button>
+          </Row>
         ))}
       </ButtonGroup>
     );
