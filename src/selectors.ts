@@ -169,15 +169,15 @@ const getAggregateData = createSelector(
   },
 );
 
-export function getSelectedHistoricalTimeIndex(state: StateTree): number {
+export function getSelectedHistoricalTimeIndex(state: StateTree) {
   return state.selections.historicalTimeIndex;
 }
 
-export function getSelectedWaterRegionId(state: StateTree): number | undefined {
+export function getSelectedWaterRegionId(state: StateTree) {
   return state.selections.region;
 }
 
-export function getSelectedWorldRegionId(state: StateTree): number {
+export function getSelectedWorldRegionId(state: StateTree) {
   return state.selections.worldRegion;
 }
 

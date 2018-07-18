@@ -72,6 +72,10 @@ export const SectionHeader = styled.h2`
   font-weight: 400;
 `;
 
+export const SmallSectionHeader = styled.h3`
+  margin-top: 0;
+`;
+
 export const BodyText = styled.div`
   font-family: ${bodyFontFamily};
   font-size: ${bodyFontSize}px;

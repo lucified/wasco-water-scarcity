@@ -12,13 +12,15 @@ import {
 import { FutureDataType } from '../../../types';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
 import responsive from '../../generic/responsive';
-import { theme } from '../../theme';
+import { SmallSectionHeader, theme } from '../../theme';
 
 interface PassedProps {
   className?: string;
   selectedTimeIndex: number;
   selectedScenario: FutureScenario;
   selectedDataType: FutureDataType;
+  selectedWaterRegionId?: number;
+  selectedWorldRegionId: number;
   ensembleData: FutureEnsembleData;
   comparisonVariables: FutureDatasetVariables;
   hoveredValue?: string;
@@ -99,32 +101,67 @@ const getHoveredSeries = createSelector(
   },
 );
 
-function labelForDataType(dataType: FutureDataType) {
+function labelForAxis(dataType: FutureDataType) {
   switch (dataType) {
     case 'stress':
       return 'Water stress';
     case 'kcal':
-      return 'Food production (kcal)';
+      return 'Kcal per person';
+  }
+}
+
+function waterRegionTitle(dataType: FutureDataType) {
+  switch (dataType) {
+    case 'stress':
+      return 'Water stress for region';
+    case 'kcal':
+      return 'Region food supply per person';
+  }
+}
+
+function worldRegionTitle(dataType: FutureDataType) {
+  switch (dataType) {
+    case 'stress':
+      return 'Population living under water stress';
+    case 'kcal':
+      return 'Population with low food supply';
   }
 }
 
 function FutureLineChart(props: Props) {
-  const { width, height, className, selectedDataType } = props;
+  const {
+    width,
+    height,
+    className,
+    selectedDataType,
+    selectedWaterRegionId,
+  } = props;
 
   const comparisonSeries = getComparisonSeries(props);
   const selectedSeries = getSelectedSeries(props);
   const hoveredSeries = getHoveredSeries(props);
+  const yAxisLabel =
+    selectedWaterRegionId != null
+      ? labelForAxis(selectedDataType)
+      : '# of people';
+  const title =
+    selectedWaterRegionId != null
+      ? waterRegionTitle(selectedDataType)
+      : worldRegionTitle(selectedDataType);
 
   return (
-    <CanvasLineChart
-      className={className}
-      series={comparisonSeries}
-      selectedSeries={selectedSeries}
-      hoveredSeries={hoveredSeries}
-      width={width || 600}
-      height={height || 240}
-      yAxisLabel={labelForDataType(selectedDataType)}
-    />
+    <>
+      <SmallSectionHeader>{title}</SmallSectionHeader>
+      <CanvasLineChart
+        className={className}
+        series={comparisonSeries}
+        selectedSeries={selectedSeries}
+        hoveredSeries={hoveredSeries}
+        width={width || 600}
+        height={height || 240}
+        yAxisLabel={yAxisLabel}
+      />
+    </>
   );
 }
 

@@ -30,7 +30,7 @@ import {
 import { FutureDataType } from '../../../types';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
-import { theme } from '../../theme';
+import { SmallSectionHeader, theme } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
@@ -83,7 +83,7 @@ const Error = styled.div`
 
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
-  selectedWorldRegionId?: number;
+  selectedWorldRegionId: number;
   waterRegions?: WaterRegionGeoJSON;
 }
 
@@ -204,7 +204,7 @@ class FutureBody extends React.Component<Props, State> {
 
     this.fetchFutureEnsembleData(
       selectedDataset,
-      toEnsembleWorldId(selectedWorldRegionId!),
+      toEnsembleWorldId(selectedWorldRegionId),
       selectedDataType,
     );
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
@@ -218,7 +218,7 @@ class FutureBody extends React.Component<Props, State> {
       const { ensembleData, selectedDataset, selectedDataType } = this.state;
       const ensembleAreaId = nextProps.selectedWaterRegionId
         ? toEnsembleRegionId(nextProps.selectedWaterRegionId)
-        : toEnsembleWorldId(nextProps.selectedWorldRegionId!);
+        : toEnsembleWorldId(nextProps.selectedWorldRegionId);
       if (!ensembleData[selectedDataType][ensembleAreaId]) {
         this.fetchFutureEnsembleData(
           selectedDataset,
@@ -235,7 +235,7 @@ class FutureBody extends React.Component<Props, State> {
   //   if (dataType !== selectedDataType) {
   //     const areaId = selectedWaterRegionId
   //       ? toEnsembleRegionId(selectedWaterRegionId)
-  //       : toEnsembleWorldId(selectedWorldRegionId!);
+  //       : toEnsembleWorldId(selectedWorldRegionId);
   //     const dataset = getFutureDataset(dataType)!;
   //     this.setState({
   //       selectedDataType: dataType,
@@ -351,7 +351,7 @@ class FutureBody extends React.Component<Props, State> {
     const mapData = this.getMapData(this.state);
     const ensembleAreaId = selectedWaterRegionId
       ? toEnsembleRegionId(selectedWaterRegionId)
-      : toEnsembleWorldId(selectedWorldRegionId!);
+      : toEnsembleWorldId(selectedWorldRegionId);
 
     const yearString =
       mapData &&
@@ -371,7 +371,9 @@ class FutureBody extends React.Component<Props, State> {
                 <StyledSpinner />
               ) : (
                 <>
-                  <h2>Selected scenario{yearLabel}</h2>
+                  <SmallSectionHeader>
+                    Selected scenario{yearLabel}
+                  </SmallSectionHeader>
                   {!mapData ? (
                     isLoadingScenario === toScenarioId(selectedScenario) ? (
                       <MapPlaceholder />
@@ -401,6 +403,8 @@ class FutureBody extends React.Component<Props, State> {
                       ensembleData={
                         ensembleData[selectedDataType][ensembleAreaId]!
                       }
+                      selectedWorldRegionId={selectedWorldRegionId}
+                      selectedWaterRegionId={selectedWaterRegionId}
                       comparisonVariables={comparisonVariables}
                       selectedScenario={selectedScenario}
                       onTimeIndexChange={this.handleTimeIndexChange}
