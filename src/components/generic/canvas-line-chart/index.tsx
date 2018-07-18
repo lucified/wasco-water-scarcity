@@ -43,6 +43,7 @@ interface PassedProps {
   selectedSeries?: Series;
   hoveredSeries?: Series[];
   yAxisLabel?: string;
+  yAxisFormatter?: (d: number) => string;
 }
 
 interface DefaultProps {
@@ -199,7 +200,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const tickSize = 6;
     const tickPadding = 3;
     const ticks = y.ticks(tickCount);
-    const tickFormat = y.tickFormat(tickCount, 's');
+    const tickFormat =
+      this.props.yAxisFormatter || y.tickFormat(tickCount, 's');
 
     context.beginPath();
     ticks.forEach(d => {

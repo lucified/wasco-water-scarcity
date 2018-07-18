@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { createSelector } from '../../../../node_modules/reselect';
 import {
   FutureDatasetVariables,
@@ -9,7 +10,10 @@ import {
   isScenarioEqual,
   toScenarioId,
 } from '../../../data';
+import { StateTree } from '../../../reducers';
+import { getNameForWorldRegionId } from '../../../selectors';
 import { FutureDataType } from '../../../types';
+import { formatPopulation } from '../../../utils';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
 import responsive from '../../generic/responsive';
 import { SmallSectionHeader, theme } from '../../theme';
@@ -26,6 +30,7 @@ interface PassedProps {
   hoveredValue?: string;
   hoveredVariable?: FutureScenarioVariableName;
   onTimeIndexChange: (value: number) => void;
+  getWorldRegionName: (id: number) => string;
   width?: number;
   height?: number;
 }
@@ -119,12 +124,12 @@ function waterRegionTitle(dataType: FutureDataType) {
   }
 }
 
-function worldRegionTitle(dataType: FutureDataType) {
+function worldRegionTitle(dataType: FutureDataType, regionName: string) {
   switch (dataType) {
     case 'stress':
-      return 'Population living under water stress';
+      return `${regionName} population living under water stress`;
     case 'kcal':
-      return 'Population with low food supply';
+      return `${regionName} population with low food supply`;
   }
 }
 
@@ -135,19 +140,23 @@ function FutureLineChart(props: Props) {
     className,
     selectedDataType,
     selectedWaterRegionId,
+    selectedWorldRegionId,
+    getWorldRegionName,
   } = props;
 
   const comparisonSeries = getComparisonSeries(props);
   const selectedSeries = getSelectedSeries(props);
   const hoveredSeries = getHoveredSeries(props);
-  const yAxisLabel =
-    selectedWaterRegionId != null
-      ? labelForAxis(selectedDataType)
-      : '# of people';
-  const title =
-    selectedWaterRegionId != null
-      ? waterRegionTitle(selectedDataType)
-      : worldRegionTitle(selectedDataType);
+  const isWaterRegionSelected = selectedWaterRegionId != null;
+  const yAxisLabel = isWaterRegionSelected
+    ? labelForAxis(selectedDataType)
+    : '# of people';
+  const title = isWaterRegionSelected
+    ? waterRegionTitle(selectedDataType)
+    : worldRegionTitle(
+        selectedDataType,
+        getWorldRegionName(selectedWorldRegionId),
+      );
 
   return (
     <>
@@ -160,9 +169,12 @@ function FutureLineChart(props: Props) {
         width={width || 600}
         height={height || 240}
         yAxisLabel={yAxisLabel}
+        yAxisFormatter={isWaterRegionSelected ? undefined : formatPopulation}
       />
     </>
   );
 }
 
-export default responsive(FutureLineChart);
+export default connect((state: StateTree) => ({
+  getWorldRegionName: getNameForWorldRegionId(state),
+}))(responsive(FutureLineChart));

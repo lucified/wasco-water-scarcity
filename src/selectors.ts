@@ -253,6 +253,24 @@ export function getThresholdsForDataType(
   return getThresholds(state)[dataType];
 }
 
+export const getNameForWorldRegionId = createSelector(
+  getWorldRegionData,
+  worldRegions => {
+    if (!worldRegions) {
+      return (id: number) => (id === 0 ? 'Global' : '');
+    }
+
+    const hash = worldRegions.reduce<{ [id: number]: string }>(
+      (result, region) => {
+        result[region.id] = region.name;
+        return result;
+      },
+      {},
+    );
+    return (id: number) => (id === 0 ? 'Global' : hash[id] || '');
+  },
+);
+
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
 export const getDataByRegion = createSelector(
