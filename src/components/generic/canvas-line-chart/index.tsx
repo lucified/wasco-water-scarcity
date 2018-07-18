@@ -3,6 +3,7 @@ import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
 import * as React from 'react';
+import { theme } from '../../theme';
 
 // From: https://stackoverflow.com/a/15666143
 const PIXEL_RATIO = (() => {
@@ -31,13 +32,17 @@ export interface Series {
 }
 
 interface PassedProps {
+  className?: string;
   width: number;
   height: number;
   marginLeft?: number;
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  data: Series[];
+  series: Series[];
+  selectedSeries?: Series;
+  hoveredSeries?: Series[];
+  yAxisLabel?: string;
 }
 
 interface DefaultProps {
@@ -80,10 +85,17 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart() {
-    const { data, marginLeft, marginTop, width, height } = this
-      .props as PropsWithDefaults;
+    const {
+      series,
+      selectedSeries,
+      hoveredSeries,
+      marginLeft,
+      marginTop,
+      width,
+      height,
+    } = this.props as PropsWithDefaults;
 
-    if (data.length === 0) {
+    if (series.length === 0) {
       return;
     }
 
@@ -96,13 +108,13 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context.clearRect(0, 0, width, height);
 
     const x = scaleTime()
-      .domain(extent(flatMap(data, d => d.points.map(p => p.time))) as [
+      .domain(extent(flatMap(series, d => d.points.map(p => p.time))) as [
         Date,
         Date
       ])
       .range([0, chartWidth]);
     const y = scaleLinear()
-      .domain(extent(flatMap(data, d => d.points.map(p => p.value))) as [
+      .domain(extent(flatMap(series, d => d.points.map(p => p.value))) as [
         number,
         number
       ])
@@ -121,8 +133,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.globalAlpha = 0.2;
     context.lineWidth = 0.2;
-    context.strokeStyle = data[0].color;
-    data.forEach(d => {
+    series.forEach(d => {
       context.beginPath();
       lineGenerator(d.points);
       if (context.strokeStyle !== d.color) {
@@ -130,6 +141,29 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       }
       context.stroke();
     });
+
+    if (hoveredSeries) {
+      context.globalAlpha = 0.5;
+      hoveredSeries.forEach(d => {
+        context.beginPath();
+        lineGenerator(d.points);
+        if (context.strokeStyle !== d.color) {
+          context.strokeStyle = d.color;
+        }
+        context.stroke();
+      });
+    }
+
+    if (selectedSeries) {
+      context.globalAlpha = 1;
+      context.lineWidth = 1;
+      context.beginPath();
+      lineGenerator(selectedSeries.points);
+      if (context.strokeStyle !== selectedSeries.color) {
+        context.strokeStyle = selectedSeries.color;
+      }
+      context.stroke();
+    }
   }
 
   private drawXAxis(
@@ -161,12 +195,11 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context: CanvasRenderingContext2D,
     y: ScaleLinear<number, number>,
   ) {
-    const chartHeight = this.chartHeight();
     const tickCount = 10;
     const tickSize = 6;
     const tickPadding = 3;
     const ticks = y.ticks(tickCount);
-    const tickFormat = y.tickFormat(tickCount);
+    const tickFormat = y.tickFormat(tickCount, 's');
 
     context.beginPath();
     ticks.forEach(d => {
@@ -176,33 +209,29 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context.strokeStyle = 'black';
     context.stroke();
 
-    context.beginPath();
-    context.moveTo(-tickSize, 0);
-    context.lineTo(0.5, 0);
-    context.lineTo(0.5, chartHeight);
-    context.lineTo(-tickSize, chartHeight);
-    context.strokeStyle = 'black';
-    context.stroke();
-
     context.textAlign = 'right';
     context.textBaseline = 'middle';
     ticks.forEach(d => {
       context.fillText(tickFormat(d), -tickSize - tickPadding, y(d));
     });
 
-    // context.save();
-    // context.rotate(-Math.PI / 2);
-    // context.textAlign = 'right';
-    // context.textBaseline = 'top';
-    // context.font = 'bold 10px sans-serif';
-    // context.fillText('Price (US$)', -10, 10);
-    // context.restore();
+    if (this.props.yAxisLabel) {
+      context.save();
+      context.rotate(-Math.PI / 2);
+      context.textAlign = 'right';
+      context.textBaseline = 'top';
+      context.fillStyle = theme.colors.gray;
+      context.font = theme.bodyFontFamily;
+      context.fillText(this.props.yAxisLabel, 0, 5);
+      context.restore();
+    }
   }
 
   public render() {
-    const { width, height } = this.props;
+    const { width, height, className } = this.props;
     return (
       <canvas
+        className={className}
         width={width * PIXEL_RATIO}
         height={height * PIXEL_RATIO}
         style={{ width, height }}

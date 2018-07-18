@@ -1,4 +1,4 @@
-import { groupBy, keyBy, pick, uniq, values } from 'lodash';
+import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
 import {
   FutureDataType,
   HistoricalDataType,
@@ -9,11 +9,13 @@ import {
 } from '../types';
 import { futureDatasets, historicalDatasets } from './datasets';
 import {
+  allFutureScenarioVariables,
   FutureDataset,
+  FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
-  futureScenarioKeys,
+  FutureScenarioVariableName,
   FutureScenarioWithData,
   LocalData,
   RawRegionStressShortageDatum,
@@ -89,9 +91,17 @@ export async function fetchFutureEnsembleData(
   }
 }
 
+export function toEnsembleWorldId(worldRegionId: number) {
+  return `world-${worldRegionId}_0.2`;
+}
+
+export function toEnsembleRegionId(regionId: number) {
+  return regionId.toString();
+}
+
 export function toScenarioId(scenario: FutureScenario) {
   return Object.keys(scenario)
-    .filter(key => !!futureScenarioKeys.find(d => d === key))
+    .filter(key => !!allFutureScenarioVariables.find(d => d === key))
     .sort()
     .reduce(
       (result, key) => `${result}-${scenario[key as keyof FutureScenario]}`,
@@ -102,7 +112,7 @@ export function toScenarioId(scenario: FutureScenario) {
 export function removeDataFromScenario(
   scenarioWithData: FutureScenarioWithData,
 ): FutureScenario {
-  return pick(scenarioWithData, futureScenarioKeys);
+  return pick(scenarioWithData, allFutureScenarioVariables);
 }
 
 export async function fetchFutureScenarioData(
@@ -143,6 +153,24 @@ export function getDefaultHistoricalImpactModel() {
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
 }
 
+export function getDefaultFutureScenario(): FutureScenario {
+  return {
+    yieldGap: 'current',
+    dietChange: 'current',
+    foodLossRed: 'current',
+    trade: 'current volume',
+    agriExp: 'current',
+    reuse: 'minwater',
+    // Social uncertainties
+    population: 'SSP2',
+    climateExperiment: 'rcp4p5',
+    alloc: 'discharge',
+    // Scientific uncertainties
+    impactModel: 'watergap', // TODO: change to mean
+    climateModel: 'gfdl-esm2m', // TODO: change to mean
+  };
+}
+
 export async function getLocalRegionData(regionId: number) {
   try {
     const result = await fetch(
@@ -162,14 +190,6 @@ export async function getLocalRegionData(regionId: number) {
 }
 
 /* Future */
-export function getFutureDatasets() {
-  return futureDatasets;
-}
-
-export function getDefaultFutureDataset() {
-  return getFutureDatasets().find(d => !!d.default)!; // Note: we assume at least one dataset to be the default
-}
-
 function getFutureEnsembleURL(dataset: FutureDataset, featureId: string) {
   return dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
 }
@@ -182,7 +202,7 @@ function getFutureScenarioURL(
     (url: string, variable: string) =>
       url.replace(
         `{{${variable}}}`,
-        scenario[variable as keyof FutureScenario]!,
+        scenario[variable as keyof FutureScenario],
       ),
     dataset.urlTemplateScenario,
   );
@@ -194,6 +214,38 @@ function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
     name: region.properties.featureName,
     feature: region,
   }));
+}
+
+export function isFutureScenarioVariable(
+  type: string,
+): type is FutureScenarioVariableName {
+  return (
+    allFutureScenarioVariables.indexOf(type as FutureScenarioVariableName) > -1
+  );
+}
+
+export function isScenarioEqual(a: FutureScenario, b: FutureScenario) {
+  return allFutureScenarioVariables.every(key => a[key] === b[key]);
+}
+
+function toBooleanHash(arr: string[]) {
+  return arr.reduce<{ [d: string]: true }>((result, d) => {
+    result[d] = true;
+    return result;
+  }, {});
+}
+
+export function isFutureScenarioInComparisonVariables(
+  comparisonVariables: FutureDatasetVariables,
+) {
+  const variablesHash = mapValues(comparisonVariables, toBooleanHash);
+  return (scenario: FutureScenario) => {
+    // Note that scenario may be a FutureScenarioWithData, which means we can't
+    // just go over the keys
+    return Object.keys(scenario)
+      .filter(isFutureScenarioVariable)
+      .every(type => !!variablesHash[type][scenario[type]]);
+  };
 }
 
 export async function fetchWorldRegionsData(): Promise<
@@ -260,18 +312,40 @@ export async function fetchWaterRegionsData(): Promise<
 }
 
 export function getFutureDataset(dataType: FutureDataType) {
-  const dataset = getFutureDatasets().find(
-    d =>
-      dataType === 'shortage'
-        ? d.variableName === 'short'
-        : d.variableName === 'stress',
-  );
+  const dataset = futureDatasets.find(d => d.variableName === dataType);
 
   if (!dataset) {
     console.error('No future dataset found for dataType:', dataType);
   }
 
   return dataset;
+}
+
+export enum StartingPoint {
+  ANYTHING_POSSIBLE,
+  CHANGE_THE_WORLD,
+}
+
+export function getDefaultComparison(
+  startingPoint: StartingPoint,
+): FutureDatasetVariables {
+  const allOptions = omit<FutureDatasetVariables>(
+    getFutureDataset('stress')!,
+    'urlTemplateEnsemble',
+    'urlTemplateScenario',
+    'variableName',
+  );
+  switch (startingPoint) {
+    case StartingPoint.ANYTHING_POSSIBLE:
+      return allOptions;
+    case StartingPoint.CHANGE_THE_WORLD:
+      return {
+        ...allOptions,
+        // TODO: change these to mean
+        impactModel: ['watergap'],
+        climateModel: ['gfdl-esm2m'],
+      };
+  }
 }
 
 export function getDataTypeColors(dataType: HistoricalDataType) {

@@ -1,145 +1,130 @@
-// import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
-import styled from 'styled-components';
-import { setFutureTimeIndex, toggleFutureScenarioLock } from '../../../actions';
-import { FutureScenarioWithData /*, getDataTypeColors */ } from '../../../data';
-import { StateTree } from '../../../reducers';
+import { createSelector } from '../../../../node_modules/reselect';
 import {
-  getDataExtentForAllScenariosInSelectedFutureDataset,
-  getEnsembleDataForSelectedFutureScenario,
-  getFilteredScenariosInSelectedFutureDataset,
-  getSelectedFutureDataType,
-  getSelectedFutureTimeIndex,
-  getSelectedHistoricalDataType,
-  getSelectedWaterRegionId,
-  getThresholdsForDataType,
-  isFutureScenarioLocked,
-} from '../../../selectors';
+  FutureDatasetVariables,
+  FutureEnsembleData,
+  FutureScenario,
+  FutureScenarioVariableName,
+  isFutureScenarioInComparisonVariables,
+  isScenarioEqual,
+} from '../../../data';
 import { FutureDataType } from '../../../types';
-import { CanvasLineChart, Series } from '../../generic/canvas-line-chart';
+import { CanvasLineChart } from '../../generic/canvas-line-chart';
+import responsive from '../../generic/responsive';
 import { theme } from '../../theme';
 
-const Empty = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 243px;
-  font-weight: 200;
-  font-family: ${theme.labelFontFamily};
-  color: ${theme.colors.gray};
-`;
-
-interface GeneratedDispatchProps {
-  onTimeIndexChange: (value: number) => void;
-  onToggleLock: () => void;
-}
-
-interface GeneratedStateProps {
-  selectedTimeIndex: number;
-  selectedDataType: FutureDataType;
-  selectedWaterRegionId?: number;
-  dataValueExtent?: [number, number];
-  chartData?: Series[];
-  selectedFutureDataForScenario?: FutureScenarioWithData;
-  thresholds: number[];
-  futureScenarioLocked: boolean;
-}
-
 interface PassedProps {
-  onLineHover?: (scenarioId: string) => void;
+  className?: string;
+  selectedTimeIndex: number;
+  selectedScenario: FutureScenario;
+  selectedDataType: FutureDataType;
+  ensembleData: FutureEnsembleData;
+  comparisonVariables: FutureDatasetVariables;
+  hoveredValue?: string;
+  hoveredVariable?: FutureScenarioVariableName;
+  onTimeIndexChange: (value: number) => void;
   width?: number;
   height?: number;
 }
 
-type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
+type Props = PassedProps;
 
-const getChartData = createSelector(
-  getFilteredScenariosInSelectedFutureDataset,
-  filteredData =>
-    filteredData &&
-    filteredData.map(series => ({
-      id: series.scenarioId,
-      color: theme.colors.blueAalto,
-      points: series.data.map(d => ({
+// NOTE: We only have global memoized selectors which won't work if we ever
+// decide to add a second future line chart.
+
+/**
+ * Returns the comparison series.
+ */
+const getFilteredSeries = createSelector(
+  (props: Props) => props.ensembleData,
+  (props: Props) => props.comparisonVariables,
+  (data, comparisonVariables) => {
+    const scenarioFilter = isFutureScenarioInComparisonVariables(
+      comparisonVariables,
+    );
+    return data.filter(scenarioFilter);
+  },
+);
+
+const getComparisonSeries = createSelector(getFilteredSeries, filteredData =>
+  filteredData.map(series => ({
+    id: series.scenarioId,
+    color: theme.colors.grayLight,
+    points: series.data.map(d => ({
+      value: d.value,
+      time: new Date((d.y0 + d.y1) / 2, 0),
+    })),
+  })),
+);
+
+const getSelectedSeries = createSelector(
+  (props: Props) => props.ensembleData,
+  (props: Props) => props.selectedScenario,
+  (data, selectedScenario) => {
+    const datum = data.find(d => isScenarioEqual(selectedScenario, d));
+    if (!datum) {
+      console.error('Unable to find selected scenario from ensemble');
+      return undefined;
+    }
+    return {
+      id: datum.scenarioId,
+      color: theme.colors.textSelection,
+      points: datum.data.map(d => ({
         value: d.value,
         time: new Date((d.y0 + d.y1) / 2, 0),
       })),
-    })),
+    };
+  },
 );
 
-function FutureLineChart({
-  dataValueExtent,
-  chartData,
-  selectedDataType,
-  // thresholds,
-  selectedFutureDataForScenario,
-  // selectedTimeIndex,
-  selectedWaterRegionId,
-  // onTimeIndexChange,
-  // onLineHover,
-  // onToggleLock,
-  // futureScenarioLocked,
-  width,
-  height,
-}: Props) {
-  if (!selectedDataType || selectedWaterRegionId == null) {
-    return <Empty>Select an area on the map</Empty>;
+const getHoveredSeries = createSelector(
+  getFilteredSeries,
+  (props: Props) => props.hoveredValue,
+  (props: Props) => props.hoveredVariable,
+  (filteredData, hoveredValue, hoveredVariable) => {
+    if (!hoveredValue || !hoveredVariable) {
+      return undefined;
+    }
+    return filteredData
+      .filter(d => d[hoveredVariable] === hoveredValue)
+      .map(datum => ({
+        id: datum.scenarioId,
+        color: theme.colors.textHover,
+        points: datum.data.map(d => ({
+          value: d.value,
+          time: new Date((d.y0 + d.y1) / 2, 0),
+        })),
+      }));
+  },
+);
+
+function labelForDataType(dataType: FutureDataType) {
+  switch (dataType) {
+    case 'stress':
+      return 'Water stress';
+    case 'kcal':
+      return 'Food production (kcal)';
   }
+}
 
-  if (!dataValueExtent || !chartData || !selectedFutureDataForScenario) {
-    return null;
-  }
+function FutureLineChart(props: Props) {
+  const { width, height, className, selectedDataType } = props;
 
-  // const thresholdColors =
-  //   selectedDataType === 'shortage'
-  //     ? ['none', ...getDataTypeColors('shortage')].reverse()
-  //     : ['none', ...getDataTypeColors('stress')];
-
-  // const backgroundColorScale = scaleThreshold<number, string>()
-  //   .domain(thresholds)
-  //   .range(thresholdColors);
+  const comparisonSeries = getComparisonSeries(props);
+  const selectedSeries = getSelectedSeries(props);
+  const hoveredSeries = getHoveredSeries(props);
 
   return (
     <CanvasLineChart
-      data={chartData}
+      className={className}
+      series={comparisonSeries}
+      selectedSeries={selectedSeries}
+      hoveredSeries={hoveredSeries}
       width={width || 600}
       height={height || 240}
+      yAxisLabel={labelForDataType(selectedDataType)}
     />
   );
 }
 
-export default connect<
-  GeneratedStateProps,
-  GeneratedDispatchProps,
-  PassedProps,
-  StateTree
->(
-  state => {
-    const selectedDataType = getSelectedHistoricalDataType(state);
-
-    return {
-      selectedTimeIndex: getSelectedFutureTimeIndex(state),
-      selectedWaterRegionId: getSelectedWaterRegionId(state),
-      selectedDataType: getSelectedFutureDataType(state),
-      dataValueExtent: getDataExtentForAllScenariosInSelectedFutureDataset(
-        state,
-      ),
-      chartData: getChartData(state),
-      selectedFutureDataForScenario: getEnsembleDataForSelectedFutureScenario(
-        state,
-      ),
-      thresholds: getThresholdsForDataType(state, selectedDataType),
-      futureScenarioLocked: isFutureScenarioLocked(state),
-    };
-  },
-  dispatch => ({
-    onTimeIndexChange: (value: number) => {
-      dispatch(setFutureTimeIndex(value));
-    },
-    onToggleLock: () => {
-      dispatch(toggleFutureScenarioLock());
-    },
-  }),
-)(FutureLineChart);
+export default responsive(FutureLineChart);

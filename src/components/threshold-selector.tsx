@@ -10,7 +10,6 @@ import {
 } from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
-import { FutureDataType } from '../types';
 import { theme } from './theme';
 
 // Using esnext modules with TypeScript doesn't allow us to do
@@ -116,7 +115,7 @@ const ResetLink = styled.span`
 `;
 
 interface PassedProps {
-  dataType: FutureDataType;
+  dataType: 'stress' | 'shortage';
   className?: string;
 }
 
@@ -130,7 +129,14 @@ interface GeneratedDispatchProps {
 
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
-const configurations = {
+const configurations: {
+  [type in 'stress' | 'shortage']: {
+    min: number;
+    max: number;
+    step: number;
+    formatter: (n: number) => string;
+  }
+} = {
   stress: {
     min: 0,
     max: defaultDataTypeThresholdMaxValues.stress,
@@ -145,7 +151,7 @@ const configurations = {
   },
 };
 
-function getHeaderText(dataType: FutureDataType) {
+function getHeaderText(dataType: 'stress' | 'shortage') {
   const text =
     dataType === 'shortage'
       ? 'Available water per capita (m³)'

@@ -1,7 +1,6 @@
 import { ExtendedFeature, ExtendedFeatureCollection } from 'd3-geo';
 import * as GeoJSON from 'geojson';
-import { Omit } from 'recompose';
-import { StressShortageDatum, TimeScale } from '../types';
+import { FutureDataType, StressShortageDatum, TimeScale } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
   geometry: any;
@@ -29,27 +28,26 @@ export interface HistoricalDataset {
   url: string;
 }
 
-export interface FutureDataset {
-  default?: boolean;
+export type FutureDatasetVariables = {
+  [variable in FutureScenarioVariableName]: string[]
+};
+export type FutureDataset = FutureDatasetVariables & {
+  /**
+   * An "ensemble" is all the scenarios for one FPU/region. Used for the line chart.
+   */
   urlTemplateEnsemble: string;
+  /**
+   * A "scenario" is one scenario for all FPU/regions. Used for the map.
+   */
   urlTemplateScenario: string;
-  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
-  impactModels: string[];
-  climateModels: string[];
-  populations: string[];
-  climateExperiments: string[];
-  yieldGaps: string[];
-  dietChanges: string[];
-  foodLossReds: string[];
-  trades: string[];
-  agriExps: string[];
-  reuses: string[];
-  allocs: string[];
-}
+  variableName: FutureDataType;
+};
 
-export type FutureScenario = { [variable in FutureScenarioVariable]?: string };
+export type FutureScenario = {
+  [variable in FutureScenarioVariableName]: string
+};
 
-export type FutureScenarioVariable =
+export type FutureScenarioVariableName =
   | 'population'
   | 'impactModel'
   | 'climateModel'
@@ -62,7 +60,7 @@ export type FutureScenarioVariable =
   | 'reuse'
   | 'alloc';
 
-export const futureScenarioKeys: FutureScenarioVariable[] = [
+export const allFutureScenarioVariables: FutureScenarioVariableName[] = [
   'population',
   'impactModel',
   'climateModel',
@@ -79,7 +77,6 @@ export const futureScenarioKeys: FutureScenarioVariable[] = [
 export interface FutureScenarioWithData extends FutureScenario {
   scenarioId: string;
   default?: boolean;
-  variableName: 'avail' | 'consIrr' | 'pop' | 'stress' | 'short';
   spatialUnit: string;
   timeScale: TimeScale; // Should only be decadal
   socialForcing: string;
@@ -93,12 +90,26 @@ export interface FutureScenarioWithData extends FutureScenario {
   }>;
 }
 
+/**
+ * An "ensemble" is all the scenarios for one FPU/region. Used for the line chart.
+ */
 export type FutureEnsembleData = FutureScenarioWithData[];
+
+interface FutureScenarioRegionDatum {
+  pop: number;
+  avail: number;
+  consIrr: number;
+  stress: number;
+  kcal: number;
+}
+/**
+ * A "scenario" is one scenario for all FPU/regions. Used for the map.
+ */
 export type FutureScenarioData = Array<{
   y0: number; // start year
   y1: number; // end year
   data: {
-    [regionId: string]: Omit<RawRegionStressShortageDatum, 'y0' | 'y1' | 'id'>;
+    [regionId: string]: FutureScenarioRegionDatum;
   };
 }>;
 

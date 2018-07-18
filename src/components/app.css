@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&amp;subset=latin-ext,cyrillic,latin');
-@import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700,800&amp;subset=latin-ext,cyrillic,latin');
 
 *,
 *:before,
@@ -11,6 +10,7 @@ body {
   height: 100%;
   margin: 0;
   overflow-y: scroll;
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
 #content {

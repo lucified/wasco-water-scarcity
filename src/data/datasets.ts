@@ -3,7 +3,7 @@
 import { FutureDataset, HistoricalDataset } from './types';
 
 // prettier-ignore
-const historicalDatasets: HistoricalDataset[] = [
+export const historicalDatasets: HistoricalDataset[] = [
   {
     spatialUnit: 'FPU',
     timeScale: 'annual',
@@ -189,10 +189,9 @@ const historicalDatasets: HistoricalDataset[] = [
   },
 ];
 
-const futureDatasets: FutureDataset[] = [
+export const futureDatasets: FutureDataset[] = [
   // Note: there will be datasets for other variables
   {
-    default: true,
     urlTemplateEnsemble:
       'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/{{featureId}}/all.json',
     urlTemplateScenario:
@@ -200,18 +199,16 @@ const futureDatasets: FutureDataset[] = [
       'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc_2011_2090/' +
       '{{yieldGap}}_{{dietChange}}_{{foodLossRed}}_{{population}}_{{trade}}_{{agriExp}}_{{reuse}}_{{alloc}}.json',
     variableName: 'stress',
-    impactModels: ['h08', 'pcrglobwb', 'watergap'],
-    climateModels: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiments: ['rcp4p5', 'rcp8p5'],
-    yieldGaps: ['current', 'medium', 'high'],
-    dietChanges: ['current', 'medium', 'high'],
-    foodLossReds: ['current', 'medium', 'high'],
-    populations: ['SSP1', 'SSP2', 'SSP3'],
-    trades: ['none', 'current volume'],
-    agriExps: ['current', 'increase'],
-    reuses: ['maxfood', 'minwater', 'meetfood'],
-    allocs: ['runoff', 'discharge'],
+    impactModel: ['h08', 'pcrglobwb', 'watergap'],
+    climateModel: ['gfdl-esm2m', 'hadgem2-es'],
+    climateExperiment: ['rcp4p5', 'rcp8p5'],
+    yieldGap: ['current', 'medium', 'high'],
+    dietChange: ['current', 'medium', 'high'],
+    foodLossRed: ['current', 'medium', 'high'],
+    population: ['SSP1', 'SSP2', 'SSP3'],
+    trade: ['none', 'current volume'],
+    agriExp: ['current', 'increase'],
+    reuse: ['maxfood', 'minwater', 'meetfood'],
+    alloc: ['runoff', 'discharge'],
   },
 ];
-
-export { historicalDatasets, futureDatasets };
