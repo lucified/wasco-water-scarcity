@@ -125,6 +125,8 @@ function FutureLineChart(props: Props) {
     selectedDataType,
     selectedWaterRegionId,
     selectedWorldRegionId,
+    selectedTimeIndex,
+    onTimeIndexChange,
     getWorldRegionName,
   } = props;
 
@@ -150,6 +152,8 @@ function FutureLineChart(props: Props) {
         series={comparisonSeries}
         selectedSerie={selectedSerie}
         hoveredSeries={hoveredSeries}
+        selectedTimeIndex={selectedTimeIndex}
+        onSetSelectedTimeIndex={onTimeIndexChange}
         width={width || 600}
         height={height || 240}
         yAxisLabel={yAxisLabel}

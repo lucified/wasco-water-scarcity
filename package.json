@@ -60,6 +60,7 @@
     "lucify-deploy-config": "^0.1.8",
     "lucify-notifier": "^0.1.17",
     "normalize.css": "^8.0.0",
+    "pepjs": "^0.4.3",
     "postcss-flexbugs-fixes": "^3.3.1",
     "postcss-loader": "^2.1.6",
     "prettier": "^1.13.7",

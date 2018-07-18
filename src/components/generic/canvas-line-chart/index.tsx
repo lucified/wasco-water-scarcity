@@ -1,4 +1,5 @@
 import { extent } from 'd3-array';
+import { format } from 'd3-format';
 import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
@@ -6,10 +7,45 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 
+require('pepjs'); // Pointer Events polyfill. Needed for e.g. Safari
+
 const Canvas = styled.canvas`
   position: absolute;
   top: 0;
   left: 0;
+`;
+
+const SVG = styled.svg`
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: ew-resize;
+  touch-action: none; /* needed for Pointer Events */
+`;
+
+const SelectedLine = styled.line`
+  stroke: ${theme.colors.textSelection};
+  stroke-dasharray: 5 5;
+  stroke-width: 1px;
+
+  transition: transform 250ms;
+`;
+
+const SelectedPoint = styled.circle`
+  stroke: ${theme.colors.textSelection};
+  stroke-width: 2px;
+  fill: none;
+
+  transition: transform 250ms;
+`;
+
+const SelectedPointLabel = styled.text`
+  fill: ${theme.colors.textSelection};
+  font-family: ${theme.bodyFontFamily};
+  font-size: 12px;
+  user-select: none;
+
+  transition: transform 250ms;
 `;
 
 // From: https://stackoverflow.com/a/15666143
@@ -52,6 +88,8 @@ interface PassedProps {
    */
   series: Series[];
   selectedSerie?: Series;
+  selectedTimeIndex?: number;
+  onSetSelectedTimeIndex?: (index: number) => void;
   hoveredSeries?: Series[];
   yAxisLabel?: string;
   yAxisFormatter?: (d: number) => string;
@@ -71,6 +109,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
   private seriesAndAxisCanvasRef!: HTMLCanvasElement;
   private hoverCanvasRef!: HTMLCanvasElement;
   private selectedCanvasRef!: HTMLCanvasElement;
+  private svgRef!: SVGElement;
+  private isDragging = false;
 
   public static defaultProps: DefaultProps = {
     marginLeft: 40,
@@ -118,6 +158,81 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     }
   }
 
+  // Based on https://codesandbox.io/s/q83r7nrwv6
+  private onPointerDown = (event: React.PointerEvent) => {
+    this.isDragging = true;
+    this.moveSelectedPointTo(event);
+  };
+
+  private onPointerUp = () => {
+    this.isDragging = false;
+  };
+
+  private onPointerMove = (event: React.PointerEvent) => {
+    if (!this.isDragging) {
+      return;
+    }
+
+    this.moveSelectedPointTo(event);
+  };
+
+  private moveSelectedPointTo(event: React.PointerEvent) {
+    const {
+      onSetSelectedTimeIndex,
+      selectedSerie,
+      marginLeft,
+      selectedTimeIndex,
+    } = this.props;
+    if (!selectedSerie || !onSetSelectedTimeIndex) {
+      return;
+    }
+    const { left } = this.svgRef.getBoundingClientRect();
+    let x = event.pageX - left - marginLeft!;
+    const chartWidth = this.chartWidth();
+
+    if (x < 0) {
+      x = 0;
+    } else if (x > chartWidth) {
+      x = chartWidth;
+    }
+    const index = scaleLinear()
+      .domain([0, chartWidth])
+      .rangeRound([0, selectedSerie.points.length - 1])(x);
+
+    if (index !== selectedTimeIndex) {
+      onSetSelectedTimeIndex(index);
+    }
+  }
+
+  // Should this be memoized?
+  private getScales() {
+    const { series, selectedSerie, hoveredSeries } = this
+      .props as PropsWithDefaults;
+
+    const chartWidth = this.chartWidth();
+    const chartHeight = this.chartHeight();
+
+    const allData = series.concat(
+      hoveredSeries || [],
+      selectedSerie ? [selectedSerie] : [],
+    );
+
+    const x = scaleTime()
+      .domain(extent(flatMap(allData, d => d.points.map(p => p.time))) as [
+        Date,
+        Date
+      ])
+      .range([0, chartWidth]);
+    const y = scaleLinear()
+      .domain(extent(flatMap(allData, d => d.points.map(p => p.value))) as [
+        number,
+        number
+      ])
+      .range([chartHeight, 0]);
+
+    return { x, y };
+  }
+
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart(
     redrawSeries = true,
@@ -134,21 +249,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       height,
     } = this.props as PropsWithDefaults;
 
-    const chartWidth = this.chartWidth();
-    const chartHeight = this.chartHeight();
-
-    const x = scaleTime()
-      .domain(extent(flatMap(series, d => d.points.map(p => p.time))) as [
-        Date,
-        Date
-      ])
-      .range([0, chartWidth]);
-    const y = scaleLinear()
-      .domain(extent(flatMap(series, d => d.points.map(p => p.value))) as [
-        number,
-        number
-      ])
-      .range([chartHeight, 0]);
+    const { x, y } = this.getScales();
 
     const lineGenerator = line<Point>()
       .x(d => x(d.time))
@@ -289,6 +390,23 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const hiDPIWidth = width * PIXEL_RATIO;
     const hiDIPHeight = height * PIXEL_RATIO;
 
+    const { x, y } = this.getScales();
+    const {
+      marginLeft,
+      marginTop,
+      selectedTimeIndex,
+      selectedSerie,
+    } = this.props;
+    const selectedPoint =
+      selectedTimeIndex != null &&
+      selectedSerie &&
+      selectedSerie.points[selectedTimeIndex];
+    const selectedPointX = selectedPoint && Math.round(x(selectedPoint.time));
+    const selectedPointY = selectedPoint && Math.round(y(selectedPoint.value));
+    const positionLabelLeft =
+      selectedPoint && selectedTimeIndex! > selectedSerie!.points.length / 2;
+    const chartHeight = this.chartHeight();
+
     return (
       <div
         style={{ width, height, position: 'relative' }}
@@ -312,6 +430,55 @@ export class CanvasLineChart extends React.PureComponent<Props> {
           style={{ width, height, zIndex: 2 }}
           innerRef={ref => (this.selectedCanvasRef = ref!)}
         />
+        {selectedPoint && (
+          <SVG
+            style={{ width, height, zIndex: 3 }}
+            innerRef={ref => (this.svgRef = ref)}
+            onPointerDown={this.onPointerDown}
+            onPointerUp={this.onPointerUp}
+            onPointerCancel={this.onPointerUp}
+            onPointerMove={this.onPointerMove}
+            {...{ touchAction: 'none' }}
+          >
+            <g
+              transform={`translate(${marginLeft}, ${marginTop})`}
+              style={{
+                transform: `translate(${marginLeft}px, ${marginTop}px)`,
+              }}
+            >
+              <SelectedLine
+                x1={0}
+                y1={0}
+                x2={0}
+                y2={chartHeight}
+                transform={`translate(${selectedPointX}, 0)`}
+                style={{ transform: `translate(${selectedPointX}px, 0)` }}
+              />
+              <SelectedPoint
+                x={0}
+                y={0}
+                r={5}
+                transform={`translate(${selectedPointX}, ${selectedPointY})`}
+                style={{
+                  transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
+                }}
+              />
+              <SelectedPointLabel
+                x={0}
+                y={0}
+                dy="-0.65em"
+                dx={positionLabelLeft ? -5 : 5}
+                textAnchor={positionLabelLeft ? 'end' : 'start'}
+                transform={`translate(${selectedPointX}, ${selectedPointY})`}
+                style={{
+                  transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
+                }}
+              >
+                {format('.3g')(selectedPoint.value)}
+              </SelectedPointLabel>
+            </g>
+          </SVG>
+        )}
       </div>
     );
   }
