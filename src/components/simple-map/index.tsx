@@ -32,13 +32,13 @@ import { theme } from '../theme';
 const worldData = require('world-atlas/world/110m.json');
 
 const Land = styled.path`
-  fill: ${theme.colors.grayLighter};
+  fill: #d2e2e6;
 `;
 
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
-    stroke: #ccc;
+    stroke: #deeeee;
     transition: opacity 0.2s ease-in;
   }
 `;
