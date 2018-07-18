@@ -13,8 +13,8 @@ import {
   FutureScenarioData,
   FutureScenarioVariableName,
   getDefaultComparison,
+  getDefaultFutureDataset,
   getDefaultFutureScenario,
-  getFutureDataset,
   StartingPoint,
   toEnsembleRegionId,
   toEnsembleWorldId,
@@ -113,7 +113,7 @@ class FutureBody extends React.Component<Props, State> {
   public state: State = {
     selectedDataType: 'stress',
     selectedScenario: getDefaultFutureScenario(),
-    selectedDataset: getFutureDataset('stress')!,
+    selectedDataset: getDefaultFutureDataset(),
     selectedTimeIndex: 0,
     comparisonVariables: getDefaultComparison(StartingPoint.CHANGE_THE_WORLD),
     ensembleData: { stress: {}, kcal: {} },
@@ -143,14 +143,18 @@ class FutureBody extends React.Component<Props, State> {
   private async fetchFutureEnsembleData(
     dataset: FutureDataset,
     featureId: string,
+    dataType: FutureDataType,
   ) {
     if (this.state.isLoadingEnsemble != null) {
       console.error('Already loading ensemble', this.state.isLoadingEnsemble);
       return;
     }
     this.setState({ isLoadingEnsemble: featureId });
-    const ensembleData = await fetchFutureEnsembleData(dataset, featureId);
-    const dataType = dataset.variableName;
+    const ensembleData = await fetchFutureEnsembleData(
+      dataset,
+      featureId,
+      dataType,
+    );
     // TODO: check that memory usage doesn't explode if we store all responses
     this.setState(state => ({
       ensembleData: ensembleData
@@ -195,12 +199,13 @@ class FutureBody extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { selectedDataset, selectedScenario } = this.state;
+    const { selectedDataset, selectedScenario, selectedDataType } = this.state;
     const { selectedWorldRegionId } = this.props;
 
     this.fetchFutureEnsembleData(
       selectedDataset,
       toEnsembleWorldId(selectedWorldRegionId!),
+      selectedDataType,
     );
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
   }
@@ -210,15 +215,15 @@ class FutureBody extends React.Component<Props, State> {
       nextProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
       nextProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
     ) {
+      const { ensembleData, selectedDataset, selectedDataType } = this.state;
       const ensembleAreaId = nextProps.selectedWaterRegionId
         ? toEnsembleRegionId(nextProps.selectedWaterRegionId)
         : toEnsembleWorldId(nextProps.selectedWorldRegionId!);
-      if (
-        !this.state.ensembleData[this.state.selectedDataType][ensembleAreaId]
-      ) {
+      if (!ensembleData[selectedDataType][ensembleAreaId]) {
         this.fetchFutureEnsembleData(
-          this.state.selectedDataset,
+          selectedDataset,
           ensembleAreaId,
+          selectedDataType,
         );
       }
     }

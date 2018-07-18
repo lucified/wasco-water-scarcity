@@ -33,14 +33,21 @@ export type FutureDatasetVariables = {
 };
 export type FutureDataset = FutureDatasetVariables & {
   /**
-   * An "ensemble" is all the scenarios for one FPU/region. Used for the line chart.
+   * An "ensemble" contains all the scenarios for one FPU/region. The value of the
+   * data depends on the area type: for world regions, it's population and for FPUs
+   * it's `variableName` data.
+   *
+   * Used for the line chart.
    */
   urlTemplateEnsemble: string;
   /**
-   * A "scenario" is one scenario for all FPU/regions. Used for the map.
+   * A "scenario" is one scenario for all FPU/regions. It includes data for all
+   * the `variableName`s.
+   *
+   * Used for the map.
    */
   urlTemplateScenario: string;
-  variableName: FutureDataType;
+  variableName: FutureDataType[];
 };
 
 export type FutureScenario = {

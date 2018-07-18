@@ -79,8 +79,9 @@ export async function fetchHistoricalStressShortageData(
 export async function fetchFutureEnsembleData(
   dataset: FutureDataset,
   featureId: string,
+  dataType: FutureDataType,
 ): Promise<FutureEnsembleData | undefined> {
-  const url = getFutureEnsembleURL(dataset, featureId);
+  const url = getFutureEnsembleURL(dataset, featureId, dataType);
   try {
     const response = await fetch(url, { credentials: 'same-origin' });
     const parsedResult: FutureEnsembleData = await response.json();
@@ -190,8 +191,14 @@ export async function getLocalRegionData(regionId: number) {
 }
 
 /* Future */
-function getFutureEnsembleURL(dataset: FutureDataset, featureId: string) {
-  return dataset.urlTemplateEnsemble.replace('{{featureId}}', featureId);
+function getFutureEnsembleURL(
+  dataset: FutureDataset,
+  featureId: string,
+  dataType: FutureDataType,
+) {
+  return dataset.urlTemplateEnsemble
+    .replace('{{featureId}}', featureId)
+    .replace('{{variableName}}', dataType);
 }
 
 function getFutureScenarioURL(
@@ -311,11 +318,13 @@ export async function fetchWaterRegionsData(): Promise<
   }
 }
 
-export function getFutureDataset(dataType: FutureDataType) {
-  const dataset = futureDatasets.find(d => d.variableName === dataType);
+// Note: we currently don't have ways to get other datasets since we only have one
+// at the moment.
+export function getDefaultFutureDataset() {
+  const dataset = futureDatasets[0];
 
   if (!dataset) {
-    console.error('No future dataset found for dataType:', dataType);
+    console.error('No future dataset found!');
   }
 
   return dataset;
@@ -330,7 +339,7 @@ export function getDefaultComparison(
   startingPoint: StartingPoint,
 ): FutureDatasetVariables {
   const allOptions = omit<FutureDatasetVariables>(
-    getFutureDataset('stress')!,
+    getDefaultFutureDataset(),
     'urlTemplateEnsemble',
     'urlTemplateScenario',
     'variableName',

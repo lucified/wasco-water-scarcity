@@ -193,12 +193,12 @@ export const futureDatasets: FutureDataset[] = [
   // Note: there will be datasets for other variables
   {
     urlTemplateEnsemble:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/stress/{{featureId}}/all.json',
+      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/{{variableName}}/{{featureId}}/all.json',
     urlTemplateScenario:
       'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/scenario_fpu_decadal/' +
       'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc_2011_2090/' +
       '{{yieldGap}}_{{dietChange}}_{{foodLossRed}}_{{population}}_{{trade}}_{{agriExp}}_{{reuse}}_{{alloc}}.json',
-    variableName: 'stress',
+    variableName: ['stress', 'kcal'],
     impactModel: ['h08', 'pcrglobwb', 'watergap'],
     climateModel: ['gfdl-esm2m', 'hadgem2-es'],
     climateExperiment: ['rcp4p5', 'rcp8p5'],
