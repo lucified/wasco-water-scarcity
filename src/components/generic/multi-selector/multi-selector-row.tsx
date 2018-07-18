@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Option } from '.';
 import { theme } from '../../theme';
+import { CompareIcon } from './compare-icon';
 
 interface ButtonProps {
   selected: boolean;
@@ -15,6 +16,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   padding: 14px;
+  position: relative;
 
   &:first-child {
     border-radius: ${theme.borderRadius}px ${theme.borderRadius}px 0 0;
@@ -119,6 +121,12 @@ const Checkbox = styled.input.attrs({ type: 'checkbox', readOnly: true })`
   left: 24px;
 `;
 
+const StyledIcon = styled(CompareIcon)`
+  position: absolute;
+  top: 0px;
+  right: 0px;
+`;
+
 interface Props {
   onMultiSelectToggle: (values: string) => void;
   onChangeSelect: (value: string) => void;
@@ -175,6 +183,14 @@ export class MultiSelectorRow extends React.Component<Props> {
           <Title>{title}</Title>
           <Description>{description}</Description>
         </Button>
+        {multiselectChecked && (
+          <StyledIcon
+            width={20}
+            height={20}
+            fill="white"
+            backgroundColor={theme.colors.grayLight}
+          />
+        )}
       </Row>
     );
   }

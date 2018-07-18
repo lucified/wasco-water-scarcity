@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { MultiSelectorRow } from './row';
+import { MultiSelectorRow } from './multi-selector-row';
 
 const ButtonGroup = styled.div`
   width: 100%;
