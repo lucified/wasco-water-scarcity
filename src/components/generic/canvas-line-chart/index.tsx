@@ -39,13 +39,15 @@ const SelectedPoint = styled.circle`
   transition: transform 250ms;
 `;
 
+const SelectedPointLabelContainer = styled.g`
+  transition: transform 250ms;
+`;
+
 const SelectedPointLabel = styled.text`
   fill: ${theme.colors.textSelection};
   font-family: ${theme.bodyFontFamily};
   font-size: 12px;
   user-select: none;
-
-  transition: transform 250ms;
 `;
 
 // From: https://stackoverflow.com/a/15666143
@@ -441,7 +443,6 @@ export class CanvasLineChart extends React.PureComponent<Props> {
             {...{ touchAction: 'none' }}
           >
             <g
-              transform={`translate(${marginLeft}, ${marginTop})`}
               style={{
                 transform: `translate(${marginLeft}px, ${marginTop}px)`,
               }}
@@ -451,31 +452,33 @@ export class CanvasLineChart extends React.PureComponent<Props> {
                 y1={0}
                 x2={0}
                 y2={chartHeight}
-                transform={`translate(${selectedPointX}, 0)`}
                 style={{ transform: `translate(${selectedPointX}px, 0)` }}
               />
               <SelectedPoint
                 x={0}
                 y={0}
                 r={5}
-                transform={`translate(${selectedPointX}, ${selectedPointY})`}
                 style={{
                   transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
                 }}
               />
-              <SelectedPointLabel
-                x={0}
-                y={0}
-                dy="-0.65em"
-                dx={positionLabelLeft ? -5 : 5}
-                textAnchor={positionLabelLeft ? 'end' : 'start'}
-                transform={`translate(${selectedPointX}, ${selectedPointY})`}
+              {/* Safari doesn't support CSS transitions on <text> elements (!!).
+                Need to wrap it in a <g>. */}
+              <SelectedPointLabelContainer
                 style={{
                   transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
                 }}
               >
-                {format('.3g')(selectedPoint.value)}
-              </SelectedPointLabel>
+                <SelectedPointLabel
+                  x={0}
+                  y={0}
+                  dy="-0.65em"
+                  dx={positionLabelLeft ? -5 : 5}
+                  textAnchor={positionLabelLeft ? 'end' : 'start'}
+                >
+                  {format('.3g')(selectedPoint.value)}
+                </SelectedPointLabel>
+              </SelectedPointLabelContainer>
             </g>
           </SVG>
         )}
