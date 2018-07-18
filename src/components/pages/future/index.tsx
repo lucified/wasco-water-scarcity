@@ -358,69 +358,71 @@ class FutureBody extends React.Component<Props, State> {
     return (
       <div>
         <Title>Explore possible futures of water scarcity</Title>
-        {!waterRegions ||
-        (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
-          <StyledSpinner />
-        ) : (
-          <Container>
-            <Scroll>
-              <StickyGraphics>
-                <h2>Selected scenario{yearLabel}</h2>
-                {!mapData ? (
-                  isLoadingScenario === toScenarioId(selectedScenario) ? (
-                    <MapPlaceholder />
+        <Container>
+          <Scroll>
+            <StickyGraphics>
+              {!waterRegions ||
+              (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
+                <StyledSpinner />
+              ) : (
+                <>
+                  <h2>Selected scenario{yearLabel}</h2>
+                  {!mapData ? (
+                    isLoadingScenario === toScenarioId(selectedScenario) ? (
+                      <MapPlaceholder />
+                    ) : (
+                      <Error>No data found for selected scenario.</Error>
+                    )
                   ) : (
-                    <Error>No data found for selected scenario.</Error>
-                  )
-                ) : (
-                  <div>
-                    <ResponsiveMap
-                      selectedData={mapData}
-                      waterRegions={waterRegions}
+                    <div>
+                      <ResponsiveMap
+                        selectedData={mapData}
+                        waterRegions={waterRegions}
+                      />
+                      <WorldRegionSelector />
+                    </div>
+                  )}
+                  {!ensembleData[selectedDataType][ensembleAreaId] ? (
+                    isLoadingEnsemble === ensembleAreaId ? (
+                      <StyledSpinner />
+                    ) : (
+                      <Error>No data found for selected area.</Error>
+                    )
+                  ) : (
+                    <FutureLineChart
+                      height={220}
+                      selectedTimeIndex={selectedTimeIndex}
+                      selectedDataType={selectedDataType}
+                      ensembleData={
+                        ensembleData[selectedDataType][ensembleAreaId]!
+                      }
+                      comparisonVariables={comparisonVariables}
+                      selectedScenario={selectedScenario}
+                      onTimeIndexChange={this.handleTimeIndexChange}
+                      hoveredValue={hoveredValue}
+                      hoveredVariable={hoveredVariable}
                     />
-                    <WorldRegionSelector />
-                  </div>
-                )}
-                {!ensembleData[selectedDataType][ensembleAreaId] ? (
-                  isLoadingEnsemble === ensembleAreaId ? (
-                    <StyledSpinner />
-                  ) : (
-                    <Error>No data found for selected area.</Error>
-                  )
-                ) : (
-                  <FutureLineChart
-                    height={220}
-                    selectedTimeIndex={selectedTimeIndex}
-                    selectedDataType={selectedDataType}
-                    ensembleData={
-                      ensembleData[selectedDataType][ensembleAreaId]!
-                    }
-                    comparisonVariables={comparisonVariables}
-                    selectedScenario={selectedScenario}
-                    onTimeIndexChange={this.handleTimeIndexChange}
-                    hoveredValue={hoveredValue}
-                    hoveredVariable={hoveredVariable}
-                  />
-                )}
-              </StickyGraphics>
-              <SelectorsContent>
-                <FutureScenarioFilter
-                  setScenario={this.handleSetSelectedScenario}
-                  selectedFutureDataset={selectedDataset}
-                  selectedScenario={selectedScenario}
-                  comparisonVariables={comparisonVariables}
-                  setComparisonVariables={this.handleSetComparisonVariables}
-                  onEnterHoverScenarioVariable={
-                    this.handleHoverEnterScenarioVariable
-                  }
-                  onLeaveHoverScenarioVariable={
-                    this.handleHoverLeaveScenarioVariable
-                  }
-                />
-              </SelectorsContent>
-            </Scroll>
-          </Container>
-        )}
+                  )}
+                </>
+              )}
+            </StickyGraphics>
+            <SelectorsContent>
+              <FutureScenarioFilter
+                setScenario={this.handleSetSelectedScenario}
+                selectedFutureDataset={selectedDataset}
+                selectedScenario={selectedScenario}
+                comparisonVariables={comparisonVariables}
+                setComparisonVariables={this.handleSetComparisonVariables}
+                onEnterHoverScenarioVariable={
+                  this.handleHoverEnterScenarioVariable
+                }
+                onLeaveHoverScenarioVariable={
+                  this.handleHoverLeaveScenarioVariable
+                }
+              />
+            </SelectorsContent>
+          </Scroll>
+        </Container>
       </div>
     );
   }
