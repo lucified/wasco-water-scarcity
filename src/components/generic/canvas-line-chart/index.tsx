@@ -40,7 +40,7 @@ interface PassedProps {
   marginTop?: number;
   marginBottom?: number;
   series: Series[];
-  selectedSeries?: Series[];
+  selectedSeries?: Series;
   hoveredSeries?: Series[];
   yAxisLabel?: string;
 }
@@ -157,14 +157,12 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     if (selectedSeries) {
       context.globalAlpha = 1;
       context.lineWidth = 1;
-      selectedSeries.forEach(d => {
-        context.beginPath();
-        lineGenerator(d.points);
-        if (context.strokeStyle !== d.color) {
-          context.strokeStyle = d.color;
-        }
-        context.stroke();
-      });
+      context.beginPath();
+      lineGenerator(selectedSeries.points);
+      if (context.strokeStyle !== selectedSeries.color) {
+        context.strokeStyle = selectedSeries.color;
+      }
+      context.stroke();
     }
   }
 

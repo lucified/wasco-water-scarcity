@@ -118,7 +118,7 @@ function FutureLineChart(props: Props) {
     <CanvasLineChart
       className={className}
       series={comparisonSeries}
-      selectedSeries={selectedSeries && [selectedSeries]}
+      selectedSeries={selectedSeries}
       hoveredSeries={hoveredSeries}
       width={width || 600}
       height={height || 240}
