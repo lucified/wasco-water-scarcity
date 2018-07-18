@@ -390,6 +390,7 @@ class FutureBody extends React.Component<Props, State> {
                   <FutureLineChart
                     height={220}
                     selectedTimeIndex={selectedTimeIndex}
+                    selectedDataType={selectedDataType}
                     ensembleData={
                       ensembleData[selectedDataType][ensembleAreaId]!
                     }

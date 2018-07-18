@@ -8,6 +8,7 @@ import {
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
 } from '../../../data';
+import { FutureDataType } from '../../../types';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
 import responsive from '../../generic/responsive';
 import { theme } from '../../theme';
@@ -16,6 +17,7 @@ interface PassedProps {
   className?: string;
   selectedTimeIndex: number;
   selectedScenario: FutureScenario;
+  selectedDataType: FutureDataType;
   ensembleData: FutureEnsembleData;
   comparisonVariables: FutureDatasetVariables;
   hoveredValue?: string;
@@ -96,8 +98,17 @@ const getHoveredSeries = createSelector(
   },
 );
 
+function labelForDataType(dataType: FutureDataType) {
+  switch (dataType) {
+    case 'stress':
+      return 'Water stress';
+    case 'kcal':
+      return 'Food production (kcal)';
+  }
+}
+
 function FutureLineChart(props: Props) {
-  const { width, height, className } = props;
+  const { width, height, className, selectedDataType } = props;
 
   const comparisonSeries = getComparisonSeries(props);
   const selectedSeries = getSelectedSeries(props);
@@ -107,10 +118,11 @@ function FutureLineChart(props: Props) {
     <CanvasLineChart
       className={className}
       series={comparisonSeries}
-      selectedSeries={selectedSeries}
+      selectedSeries={selectedSeries && [selectedSeries]}
       hoveredSeries={hoveredSeries}
       width={width || 600}
       height={height || 240}
+      yAxisLabel={labelForDataType(selectedDataType)}
     />
   );
 }

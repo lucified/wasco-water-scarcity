@@ -3,6 +3,7 @@ import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
 import * as React from 'react';
+import { theme } from '../../theme';
 
 // From: https://stackoverflow.com/a/15666143
 const PIXEL_RATIO = (() => {
@@ -39,8 +40,9 @@ interface PassedProps {
   marginTop?: number;
   marginBottom?: number;
   series: Series[];
-  selectedSeries?: Series;
+  selectedSeries?: Series[];
   hoveredSeries?: Series[];
+  yAxisLabel?: string;
 }
 
 interface DefaultProps {
@@ -131,7 +133,6 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.globalAlpha = 0.2;
     context.lineWidth = 0.2;
-    context.strokeStyle = series[0].color;
     series.forEach(d => {
       context.beginPath();
       lineGenerator(d.points);
@@ -155,13 +156,15 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     if (selectedSeries) {
       context.globalAlpha = 1;
-      context.lineWidth = 0.5;
-      context.beginPath();
-      lineGenerator(selectedSeries.points);
-      if (context.strokeStyle !== selectedSeries.color) {
-        context.strokeStyle = selectedSeries.color;
-      }
-      context.stroke();
+      context.lineWidth = 1;
+      selectedSeries.forEach(d => {
+        context.beginPath();
+        lineGenerator(d.points);
+        if (context.strokeStyle !== d.color) {
+          context.strokeStyle = d.color;
+        }
+        context.stroke();
+      });
     }
   }
 
@@ -194,12 +197,11 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context: CanvasRenderingContext2D,
     y: ScaleLinear<number, number>,
   ) {
-    const chartHeight = this.chartHeight();
     const tickCount = 10;
     const tickSize = 6;
     const tickPadding = 3;
     const ticks = y.ticks(tickCount);
-    const tickFormat = y.tickFormat(tickCount);
+    const tickFormat = y.tickFormat(tickCount, 's');
 
     context.beginPath();
     ticks.forEach(d => {
@@ -209,27 +211,22 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context.strokeStyle = 'black';
     context.stroke();
 
-    context.beginPath();
-    context.moveTo(-tickSize, 0);
-    context.lineTo(0.5, 0);
-    context.lineTo(0.5, chartHeight);
-    context.lineTo(-tickSize, chartHeight);
-    context.strokeStyle = 'black';
-    context.stroke();
-
     context.textAlign = 'right';
     context.textBaseline = 'middle';
     ticks.forEach(d => {
       context.fillText(tickFormat(d), -tickSize - tickPadding, y(d));
     });
 
-    // context.save();
-    // context.rotate(-Math.PI / 2);
-    // context.textAlign = 'right';
-    // context.textBaseline = 'top';
-    // context.font = 'bold 10px sans-serif';
-    // context.fillText('Price (US$)', -10, 10);
-    // context.restore();
+    if (this.props.yAxisLabel) {
+      context.save();
+      context.rotate(-Math.PI / 2);
+      context.textAlign = 'right';
+      context.textBaseline = 'top';
+      context.fillStyle = theme.colors.gray;
+      context.font = theme.bodyFontFamily;
+      context.fillText(this.props.yAxisLabel, 0, 5);
+      context.restore();
+    }
   }
 
   public render() {
