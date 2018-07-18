@@ -1,8 +1,8 @@
 import { isEqual, mapValues } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
-import { createSelector } from '../../../../node_modules/reselect';
 import {
   fetchFutureEnsembleData,
   fetchFutureScenarioData,
@@ -11,7 +11,6 @@ import {
   FutureEnsembleData,
   FutureScenario,
   FutureScenarioData,
-  FutureScenarioVariableName,
   getDefaultComparison,
   getDefaultFutureDataset,
   getDefaultFutureScenario,
@@ -93,8 +92,7 @@ interface State {
   selectedDataset: FutureDataset;
   selectedTimeIndex: number;
   comparisonVariables: FutureDatasetVariables;
-  hoveredVariable?: FutureScenarioVariableName;
-  hoveredValue?: string;
+  hoveredScenarios?: FutureEnsembleData;
   isLoadingEnsemble?: string;
   isLoadingScenario?: string;
   ensembleData: {
@@ -290,30 +288,6 @@ class FutureBody extends React.Component<Props, State> {
     this.setState({ comparisonVariables });
   };
 
-  private handleHoverEnterScenarioVariable = (
-    hoveredVariable: FutureScenarioVariableName,
-    hoveredValue: string,
-  ) => {
-    if (
-      this.state.hoveredValue !== hoveredValue ||
-      this.state.hoveredVariable !== hoveredVariable
-    ) {
-      this.setState({ hoveredValue, hoveredVariable });
-    }
-  };
-
-  private handleHoverLeaveScenarioVariable = (
-    hoveredVariable: FutureScenarioVariableName,
-    hoveredValue: string,
-  ) => {
-    if (
-      this.state.hoveredValue === hoveredValue ||
-      this.state.hoveredVariable === hoveredVariable
-    ) {
-      this.setState({ hoveredValue: undefined, hoveredVariable: undefined });
-    }
-  };
-
   private handleSetSelectedScenario = (scenario: FutureScenario) => {
     const { selectedScenario, scenarioData, selectedDataset } = this.state;
     if (!isEqual(selectedScenario, scenario)) {
@@ -322,6 +296,12 @@ class FutureBody extends React.Component<Props, State> {
       }
       this.setState({ selectedScenario: scenario });
     }
+  };
+
+  private handleSetHoveredScenarios = (
+    hoveredScenarios?: FutureEnsembleData,
+  ) => {
+    this.setState({ hoveredScenarios });
   };
 
   private handleTimeIndexChange = (newIndex: number) => {
@@ -345,8 +325,7 @@ class FutureBody extends React.Component<Props, State> {
       isLoadingScenario,
       isLoadingEnsemble,
       ensembleData,
-      hoveredValue,
-      hoveredVariable,
+      hoveredScenarios,
     } = this.state;
     const mapData = this.getMapData(this.state);
     const ensembleAreaId = selectedWaterRegionId
@@ -408,8 +387,7 @@ class FutureBody extends React.Component<Props, State> {
                       comparisonVariables={comparisonVariables}
                       selectedScenario={selectedScenario}
                       onTimeIndexChange={this.handleTimeIndexChange}
-                      hoveredValue={hoveredValue}
-                      hoveredVariable={hoveredVariable}
+                      hoveredScenarios={hoveredScenarios}
                     />
                   )}
                 </>
@@ -421,13 +399,9 @@ class FutureBody extends React.Component<Props, State> {
                 selectedFutureDataset={selectedDataset}
                 selectedScenario={selectedScenario}
                 comparisonVariables={comparisonVariables}
+                ensembleData={ensembleData[selectedDataType][ensembleAreaId]!}
                 setComparisonVariables={this.handleSetComparisonVariables}
-                onEnterHoverScenarioVariable={
-                  this.handleHoverEnterScenarioVariable
-                }
-                onLeaveHoverScenarioVariable={
-                  this.handleHoverLeaveScenarioVariable
-                }
+                setHoveredScenarios={this.handleSetHoveredScenarios}
               />
             </SelectorsContent>
           </Scroll>

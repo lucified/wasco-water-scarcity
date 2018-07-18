@@ -3,7 +3,14 @@ import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
 import { flatMap } from 'lodash';
 import * as React from 'react';
+import styled from 'styled-components';
 import { theme } from '../../theme';
+
+const Canvas = styled.canvas`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
 
 // From: https://stackoverflow.com/a/15666143
 const PIXEL_RATIO = (() => {
@@ -39,8 +46,12 @@ interface PassedProps {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
+  /**
+   * Draws different series onto different canvases and only redraws them if
+   * the series objects change. Memoize them to improve performance.
+   */
   series: Series[];
-  selectedSeries?: Series;
+  selectedSerie?: Series;
   hoveredSeries?: Series[];
   yAxisLabel?: string;
   yAxisFormatter?: (d: number) => string;
@@ -57,7 +68,9 @@ type Props = PassedProps;
 type PropsWithDefaults = Props & DefaultProps;
 
 export class CanvasLineChart extends React.PureComponent<Props> {
-  private canvasRef!: HTMLCanvasElement;
+  private seriesAndAxisCanvasRef!: HTMLCanvasElement;
+  private hoverCanvasRef!: HTMLCanvasElement;
+  private selectedCanvasRef!: HTMLCanvasElement;
 
   public static defaultProps: DefaultProps = {
     marginLeft: 40,
@@ -80,15 +93,40 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     this.drawChart();
   }
 
-  public componentDidUpdate() {
-    this.drawChart();
+  public componentDidUpdate(prevProps: Props) {
+    const shouldRedrawSeries = prevProps.series !== this.props.series;
+    const shouldRedrawHoveredSeries =
+      prevProps.hoveredSeries !== this.props.hoveredSeries;
+    const shouldRedrawSelectedSeries =
+      prevProps.selectedSerie !== this.props.selectedSerie;
+
+    if (
+      prevProps.width !== this.props.width ||
+      prevProps.height !== this.props.height
+    ) {
+      this.drawChart();
+    } else if (
+      shouldRedrawSeries ||
+      shouldRedrawHoveredSeries ||
+      shouldRedrawSelectedSeries
+    ) {
+      this.drawChart(
+        shouldRedrawSeries,
+        shouldRedrawHoveredSeries,
+        shouldRedrawSelectedSeries,
+      );
+    }
   }
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
-  private drawChart() {
+  private drawChart(
+    redrawSeries = true,
+    redrawHovered = true,
+    redrawSelected = true,
+  ) {
     const {
       series,
-      selectedSeries,
+      selectedSerie,
       hoveredSeries,
       marginLeft,
       marginTop,
@@ -96,17 +134,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       height,
     } = this.props as PropsWithDefaults;
 
-    if (series.length === 0) {
-      return;
-    }
-
     const chartWidth = this.chartWidth();
     const chartHeight = this.chartHeight();
-    const context = this.canvasRef.getContext('2d')!;
-
-    context.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
-    context.globalAlpha = 1.0;
-    context.clearRect(0, 0, width, height);
 
     const x = scaleTime()
       .domain(extent(flatMap(series, d => d.points.map(p => p.time))) as [
@@ -124,28 +153,23 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const lineGenerator = line<Point>()
       .x(d => x(d.time))
       .y(d => y(d.value))
-      .curve(curveMonotoneX)
-      .context(context);
+      .curve(curveMonotoneX);
 
-    context.translate(marginLeft, marginTop);
+    if (redrawSeries) {
+      const context = this.seriesAndAxisCanvasRef.getContext('2d')!;
+      lineGenerator.context(context);
 
-    this.drawXAxis(context, x);
-    this.drawYAxis(context, y);
+      context.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
+      context.globalAlpha = 1.0;
+      context.clearRect(0, 0, width, height);
+      context.translate(marginLeft, marginTop);
 
-    context.globalAlpha = 0.2;
-    context.lineWidth = 0.2;
-    series.forEach(d => {
-      context.beginPath();
-      lineGenerator(d.points);
-      if (context.strokeStyle !== d.color) {
-        context.strokeStyle = d.color;
-      }
-      context.stroke();
-    });
+      this.drawXAxis(context, x);
+      this.drawYAxis(context, y);
 
-    if (hoveredSeries) {
-      context.globalAlpha = 0.5;
-      hoveredSeries.forEach(d => {
+      context.globalAlpha = 0.2;
+      context.lineWidth = 0.2;
+      series.forEach(d => {
         context.beginPath();
         lineGenerator(d.points);
         if (context.strokeStyle !== d.color) {
@@ -155,15 +179,46 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       });
     }
 
-    if (selectedSeries) {
-      context.globalAlpha = 1;
-      context.lineWidth = 1;
-      context.beginPath();
-      lineGenerator(selectedSeries.points);
-      if (context.strokeStyle !== selectedSeries.color) {
-        context.strokeStyle = selectedSeries.color;
+    if (redrawHovered) {
+      const context = this.hoverCanvasRef.getContext('2d')!;
+      lineGenerator.context(context);
+
+      context.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
+      context.clearRect(0, 0, width, height);
+      context.translate(marginLeft, marginTop);
+
+      if (hoveredSeries) {
+        context.globalAlpha = 0.5;
+        context.lineWidth = hoveredSeries.length > 5 ? 0.2 : 1;
+        hoveredSeries.forEach(d => {
+          context.beginPath();
+          lineGenerator(d.points);
+          if (context.strokeStyle !== d.color) {
+            context.strokeStyle = d.color;
+          }
+          context.stroke();
+        });
       }
-      context.stroke();
+    }
+
+    if (redrawSelected) {
+      const context = this.selectedCanvasRef.getContext('2d')!;
+      lineGenerator.context(context);
+
+      context.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
+      context.clearRect(0, 0, width, height);
+      context.translate(marginLeft, marginTop);
+
+      if (selectedSerie) {
+        context.globalAlpha = 1;
+        context.lineWidth = 1;
+        context.beginPath();
+        lineGenerator(selectedSerie.points);
+        if (context.strokeStyle !== selectedSerie.color) {
+          context.strokeStyle = selectedSerie.color;
+        }
+        context.stroke();
+      }
     }
   }
 
@@ -231,14 +286,33 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
   public render() {
     const { width, height, className } = this.props;
+    const hiDPIWidth = width * PIXEL_RATIO;
+    const hiDIPHeight = height * PIXEL_RATIO;
+
     return (
-      <canvas
+      <div
+        style={{ width, height, position: 'relative' }}
         className={className}
-        width={width * PIXEL_RATIO}
-        height={height * PIXEL_RATIO}
-        style={{ width, height }}
-        ref={ref => (this.canvasRef = ref!)}
-      />
+      >
+        <Canvas
+          width={hiDPIWidth}
+          height={hiDIPHeight}
+          style={{ width, height, zIndex: 0 }}
+          innerRef={ref => (this.seriesAndAxisCanvasRef = ref!)}
+        />
+        <Canvas
+          width={hiDPIWidth}
+          height={hiDIPHeight}
+          style={{ width, height, zIndex: 1 }}
+          innerRef={ref => (this.hoverCanvasRef = ref!)}
+        />
+        <Canvas
+          width={hiDPIWidth}
+          height={hiDIPHeight}
+          style={{ width, height, zIndex: 2 }}
+          innerRef={ref => (this.selectedCanvasRef = ref!)}
+        />
+      </div>
     );
   }
 }

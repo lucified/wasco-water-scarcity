@@ -101,13 +101,9 @@ export function toEnsembleRegionId(regionId: number) {
 }
 
 export function toScenarioId(scenario: FutureScenario) {
-  return Object.keys(scenario)
-    .filter(key => !!allFutureScenarioVariables.find(d => d === key))
-    .sort()
-    .reduce(
-      (result, key) => `${result}-${scenario[key as keyof FutureScenario]}`,
-      '',
-    );
+  return allFutureScenarioVariables
+    .map(variable => scenario[variable])
+    .join('-');
 }
 
 export function removeDataFromScenario(

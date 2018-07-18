@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { createSelector } from '../../../../node_modules/reselect';
+import { createSelector } from 'reselect';
 import {
   FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
-  FutureScenarioVariableName,
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
   toScenarioId,
@@ -27,8 +26,7 @@ interface PassedProps {
   selectedWorldRegionId: number;
   ensembleData: FutureEnsembleData;
   comparisonVariables: FutureDatasetVariables;
-  hoveredValue?: string;
-  hoveredVariable?: FutureScenarioVariableName;
+  hoveredScenarios?: FutureEnsembleData;
   onTimeIndexChange: (value: number) => void;
   getWorldRegionName: (id: number) => string;
   width?: number;
@@ -40,32 +38,25 @@ type Props = PassedProps;
 // NOTE: We only have global memoized selectors which won't work if we ever
 // decide to add a second future line chart.
 
-/**
- * Returns the comparison series.
- */
-const getFilteredSeries = createSelector(
+const getComparisonSeries = createSelector(
   (props: Props) => props.ensembleData,
   (props: Props) => props.comparisonVariables,
   (data, comparisonVariables) => {
     const scenarioFilter = isFutureScenarioInComparisonVariables(
       comparisonVariables,
     );
-    return data.filter(scenarioFilter);
+    return data.filter(scenarioFilter).map(series => ({
+      id: toScenarioId(series),
+      color: theme.colors.grayLight,
+      points: series.data.map(d => ({
+        value: d.value,
+        time: new Date((d.y0 + d.y1) / 2, 0),
+      })),
+    }));
   },
 );
 
-const getComparisonSeries = createSelector(getFilteredSeries, filteredData =>
-  filteredData.map(series => ({
-    id: toScenarioId(series),
-    color: theme.colors.grayLight,
-    points: series.data.map(d => ({
-      value: d.value,
-      time: new Date((d.y0 + d.y1) / 2, 0),
-    })),
-  })),
-);
-
-const getSelectedSeries = createSelector(
+const getSelectedSerie = createSelector(
   (props: Props) => props.ensembleData,
   (props: Props) => props.selectedScenario,
   (data, selectedScenario) => {
@@ -86,24 +77,17 @@ const getSelectedSeries = createSelector(
 );
 
 const getHoveredSeries = createSelector(
-  getFilteredSeries,
-  (props: Props) => props.hoveredValue,
-  (props: Props) => props.hoveredVariable,
-  (filteredData, hoveredValue, hoveredVariable) => {
-    if (!hoveredValue || !hoveredVariable) {
-      return undefined;
-    }
-    return filteredData
-      .filter(d => d[hoveredVariable] === hoveredValue)
-      .map(datum => ({
-        id: toScenarioId(datum),
-        color: theme.colors.textHover,
-        points: datum.data.map(d => ({
-          value: d.value,
-          time: new Date((d.y0 + d.y1) / 2, 0),
-        })),
-      }));
-  },
+  (props: Props) => props.hoveredScenarios,
+  data =>
+    data &&
+    data.map(datum => ({
+      id: toScenarioId(datum),
+      color: theme.colors.textHover,
+      points: datum.data.map(d => ({
+        value: d.value,
+        time: new Date((d.y0 + d.y1) / 2, 0),
+      })),
+    })),
 );
 
 function labelForAxis(dataType: FutureDataType) {
@@ -145,7 +129,7 @@ function FutureLineChart(props: Props) {
   } = props;
 
   const comparisonSeries = getComparisonSeries(props);
-  const selectedSeries = getSelectedSeries(props);
+  const selectedSerie = getSelectedSerie(props);
   const hoveredSeries = getHoveredSeries(props);
   const isWaterRegionSelected = selectedWaterRegionId != null;
   const yAxisLabel = isWaterRegionSelected
@@ -164,7 +148,7 @@ function FutureLineChart(props: Props) {
       <CanvasLineChart
         className={className}
         series={comparisonSeries}
-        selectedSeries={selectedSeries}
+        selectedSerie={selectedSerie}
         hoveredSeries={hoveredSeries}
         width={width || 600}
         height={height || 240}

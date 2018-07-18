@@ -3,19 +3,16 @@ import styled from 'styled-components';
 import {
   FutureDataset,
   FutureDatasetVariables,
+  FutureEnsembleData,
   FutureScenario,
   FutureScenarioVariableName,
   getDefaultComparison,
+  isScenarioEqual,
   StartingPoint,
 } from '../../../data';
-import MultiSelector, { Option } from '../../generic/multi-selector';
-import {
-  BodyText,
-  SectionHeader,
-  SelectorDescription,
-  SelectorHeader,
-  theme,
-} from '../../theme';
+import { Option } from '../../generic/multi-selector';
+import { BodyText, SectionHeader, theme } from '../../theme';
+import { FutureScenarioFilterVariable } from './future-scenario-filter-variable';
 
 const Main = styled.div`
   display: flex;
@@ -26,21 +23,6 @@ const Main = styled.div`
 const Section = styled.div`
   margin-bottom: ${theme.defaultMargin * 2}px;
   width: 100%;
-`;
-
-const Variable = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-bottom: ${theme.defaultMargin}px;
-
-  font-size: 14px;
-  font-family: ${theme.labelFontFamily};
-`;
-
-const StyledMultiSelector = styled(MultiSelector)`
-  margin-top: ${theme.defaultMargin / 2}px;
 `;
 
 const StartingPointSelector = styled.div`
@@ -331,60 +313,101 @@ interface PassedProps {
   className?: string;
   selectedScenario: FutureScenario;
   selectedFutureDataset: FutureDataset;
-  setScenario: (scenario: FutureScenario) => void;
   comparisonVariables: FutureDatasetVariables;
+  ensembleData: FutureEnsembleData;
+  setScenario: (scenario: FutureScenario) => void;
   setComparisonVariables: (variables: FutureDatasetVariables) => void;
-  onEnterHoverScenarioVariable: (
-    hoveredVariable: FutureScenarioVariableName,
-    hoveredValue: string,
-  ) => void;
-  onLeaveHoverScenarioVariable: (
-    hoveredVariable: FutureScenarioVariableName,
-    hoveredValue: string,
-  ) => void;
+  setHoveredScenarios: (scenarios?: FutureEnsembleData) => void;
 }
 
 type Props = PassedProps;
 
 interface State {
   selectedStartingPoint: StartingPoint;
+  selectionMode: 'scenario' | 'comparisons';
+  hoveredVariable?: FutureScenarioVariableName;
+  hoveredValue?: string;
 }
 
 class FutureScenarioFilter extends React.Component<Props, State> {
   public state: State = {
     selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
+    selectionMode: 'scenario',
   };
 
-  private createChangeComparisonHandler = (
+  private handleChangeComparison = (
     field: FutureScenarioVariableName,
+    values: string[],
   ) => {
-    return (values: string[]) => {
-      this.props.setComparisonVariables({
-        ...this.props.comparisonVariables,
-        [field]: values,
-      });
-    };
+    this.props.setComparisonVariables({
+      ...this.props.comparisonVariables,
+      [field]: values,
+    });
   };
 
-  private createChangeScenarioHandler = (field: FutureScenarioVariableName) => {
-    return (value: string) => {
-      this.props.setScenario({
-        ...this.props.selectedScenario,
-        [field]: value,
-      });
-    };
+  private handleChangeScenario = (
+    field: FutureScenarioVariableName,
+    value: string,
+  ) => {
+    this.props.setScenario({
+      ...this.props.selectedScenario,
+      [field]: value,
+    });
   };
 
-  private createHoverEnterHandler = (variable: FutureScenarioVariableName) => {
-    return (value: string) => {
-      this.props.onEnterHoverScenarioVariable(variable, value);
-    };
+  private handleHoverEnter = (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => {
+    if (
+      this.state.hoveredValue !== hoveredValue ||
+      this.state.hoveredVariable !== hoveredVariable
+    ) {
+      const { selectionMode } = this.state;
+      const {
+        selectedScenario,
+        ensembleData,
+        setHoveredScenarios,
+      } = this.props;
+
+      if (
+        selectionMode === 'scenario' &&
+        // Don't create hover effects for selected scenario
+        selectedScenario[hoveredVariable] !== hoveredValue
+      ) {
+        const hoveredScenario = {
+          ...selectedScenario,
+          [hoveredVariable]: hoveredValue,
+        };
+        const hoveredScenarioWithData = ensembleData.find(d =>
+          isScenarioEqual(d, hoveredScenario),
+        );
+        if (!hoveredScenarioWithData) {
+          console.error('Unable to find data for hovered scenario');
+        } else {
+          setHoveredScenarios([hoveredScenarioWithData]);
+        }
+        this.setState({ hoveredValue, hoveredVariable });
+      } else if (selectionMode === 'comparisons') {
+        setHoveredScenarios(
+          ensembleData.filter(d => d[hoveredVariable] === hoveredValue),
+        );
+        this.setState({ hoveredValue, hoveredVariable });
+      }
+    }
   };
 
-  private createHoverLeaveHandler = (variable: FutureScenarioVariableName) => {
-    return (value: string) => {
-      this.props.onLeaveHoverScenarioVariable(variable, value);
-    };
+  private handleHoverLeave = (
+    hoveredVariable: FutureScenarioVariableName,
+    hoveredValue: string,
+  ) => {
+    if (
+      this.state.hoveredValue === hoveredValue ||
+      this.state.hoveredVariable === hoveredVariable
+    ) {
+      this.setState({ hoveredValue: undefined, hoveredVariable: undefined });
+      this.props.setHoveredScenarios(undefined);
+    }
   };
 
   public render() {
@@ -394,6 +417,8 @@ class FutureScenarioFilter extends React.Component<Props, State> {
       comparisonVariables,
       className,
     } = this.props;
+    const { selectedStartingPoint, selectionMode } = this.state;
+    const isMultiselect = selectionMode === 'comparisons';
 
     return (
       <Main className={className}>
@@ -404,10 +429,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         </BodyText>
         <StartingPointSelector>
           <StartingPointValue
-            selected={
-              this.state.selectedStartingPoint ===
-              StartingPoint.CHANGE_THE_WORLD
-            }
+            selected={selectedStartingPoint === StartingPoint.CHANGE_THE_WORLD}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
@@ -420,10 +442,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             Let's change the world
           </StartingPointValue>
           <StartingPointValue
-            selected={
-              this.state.selectedStartingPoint ===
-              StartingPoint.ANYTHING_POSSIBLE
-            }
+            selected={selectedStartingPoint === StartingPoint.ANYTHING_POSSIBLE}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.ANYTHING_POSSIBLE,
@@ -436,32 +455,46 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             Anything is possible
           </StartingPointValue>
         </StartingPointSelector>
+        {/* TODO: new styling for selection mode selector */}
+        <StartingPointSelector>
+          <StartingPointValue
+            selected={selectionMode === 'scenario'}
+            onClick={() => {
+              this.setState({
+                selectionMode: 'scenario',
+              });
+            }}
+          >
+            Select scenario
+          </StartingPointValue>
+          <StartingPointValue
+            selected={selectionMode === 'comparisons'}
+            onClick={() => {
+              this.setState({
+                selectionMode: 'comparisons',
+              });
+            }}
+          >
+            Comparison scenarios
+          </StartingPointValue>
+        </StartingPointSelector>
         {Object.keys(sections).map(sectionTitle => (
           <Section key={sectionTitle}>
             <SectionHeader>{sectionTitle}</SectionHeader>
-            {sections[sectionTitle].map(
-              ({ title, description, variable, options }) => (
-                <Variable key={variable}>
-                  <SelectorHeader>{title}</SelectorHeader>
-                  <SelectorDescription>{description}</SelectorDescription>
-                  <StyledMultiSelector
-                    multiSelectedValues={comparisonVariables[variable]}
-                    options={options.filter(
-                      option =>
-                        selectedFutureDataset[variable].indexOf(option.value) >
-                        -1,
-                    )}
-                    selectedValue={selectedScenario[variable]}
-                    onChangeMultiSelect={this.createChangeComparisonHandler(
-                      variable,
-                    )}
-                    onChangeSelect={this.createChangeScenarioHandler(variable)}
-                    onEnterHoverRow={this.createHoverEnterHandler(variable)}
-                    onLeaveHoverRow={this.createHoverLeaveHandler(variable)}
-                  />
-                </Variable>
-              ),
-            )}
+            {sections[sectionTitle].map(contents => (
+              <FutureScenarioFilterVariable
+                key={contents.variable}
+                {...contents}
+                multiselect={isMultiselect}
+                selectedFutureDataset={selectedFutureDataset}
+                comparisonVariables={comparisonVariables}
+                selectedScenario={selectedScenario}
+                onLeaveHoverVariable={this.handleHoverLeave}
+                onEnterHoverVariable={this.handleHoverEnter}
+                setComparisonVariables={this.handleChangeComparison}
+                setSelectedScenario={this.handleChangeScenario}
+              />
+            ))}
           </Section>
         ))}
       </Main>
