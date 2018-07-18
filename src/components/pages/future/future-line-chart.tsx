@@ -7,6 +7,7 @@ import {
   FutureScenarioVariableName,
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
+  toScenarioId,
 } from '../../../data';
 import { FutureDataType } from '../../../types';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
@@ -48,7 +49,7 @@ const getFilteredSeries = createSelector(
 
 const getComparisonSeries = createSelector(getFilteredSeries, filteredData =>
   filteredData.map(series => ({
-    id: series.scenarioId,
+    id: toScenarioId(series),
     color: theme.colors.grayLight,
     points: series.data.map(d => ({
       value: d.value,
@@ -67,7 +68,7 @@ const getSelectedSeries = createSelector(
       return undefined;
     }
     return {
-      id: datum.scenarioId,
+      id: toScenarioId(datum),
       color: theme.colors.textSelection,
       points: datum.data.map(d => ({
         value: d.value,
@@ -88,7 +89,7 @@ const getHoveredSeries = createSelector(
     return filteredData
       .filter(d => d[hoveredVariable] === hoveredValue)
       .map(datum => ({
-        id: datum.scenarioId,
+        id: toScenarioId(datum),
         color: theme.colors.textHover,
         points: datum.data.map(d => ({
           value: d.value,

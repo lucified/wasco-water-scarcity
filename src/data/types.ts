@@ -82,14 +82,6 @@ export const allFutureScenarioVariables: FutureScenarioVariableName[] = [
 ];
 
 export interface FutureScenarioWithData extends FutureScenario {
-  scenarioId: string;
-  default?: boolean;
-  spatialUnit: string;
-  timeScale: TimeScale; // Should only be decadal
-  socialForcing: string;
-  co2Forcing: string;
-  startYear: string;
-  endYear: string;
   data: Array<{
     y0: number; // start year
     y1: number; // end year
