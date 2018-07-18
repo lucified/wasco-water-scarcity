@@ -34,6 +34,7 @@ import { theme } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
+import MapPlaceholder from './map-placeholder';
 const Sticky = require('react-stickynode');
 
 const Title = styled.h1`
@@ -367,7 +368,7 @@ class FutureBody extends React.Component<Props, State> {
                 <h2>Selected scenario{yearLabel}</h2>
                 {!mapData ? (
                   isLoadingScenario === toScenarioId(selectedScenario) ? (
-                    <StyledSpinner />
+                    <MapPlaceholder />
                   ) : (
                     <Error>No data found for selected scenario.</Error>
                   )
