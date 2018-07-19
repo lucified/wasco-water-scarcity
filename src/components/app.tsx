@@ -17,6 +17,8 @@ import Scarcity from './pages/scarcity';
 import Shortage from './pages/shortage';
 import Stress from './pages/stress';
 
+require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
+
 import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
