@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { ExtendedFeature, geoNaturalEarth1, geoPath } from 'd3-geo';
+import { ExtendedFeature, geoNaturalEarth1, geoPath, GeoSphere } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -16,23 +16,24 @@ import styled from 'styled-components';
 import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
+  belowThresholdColor,
   defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
   getLocalRegionData,
   GridData,
   GridVariable,
   LocalData,
+  missingDataColor,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
 } from '../../data';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedHistoricalDataType,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
 } from '../../selectors';
-import { HistoricalDataType, TimeAggregate, WorldRegion } from '../../types';
+import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
 
 const worldData = require('world-atlas/world/110m.json');
@@ -44,7 +45,7 @@ const Land = styled.path`
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
-    stroke: #deeeee;
+    stroke: #ecf4f8;
     transition: opacity 0.2s ease-in;
 
     &.selected {
@@ -112,12 +113,12 @@ interface PassedProps {
   width: number;
   selectedData: TimeAggregate<number>;
   waterRegions: WaterRegionGeoJSON;
+  selectedDataType: AnyDataType;
 }
 
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegion?: WorldRegion;
-  selectedDataType: HistoricalDataType;
   colorScale: ScaleThreshold<number, string>;
   thresholds: number[];
   stressThresholds: number[];
@@ -138,20 +139,19 @@ interface State {
   };
 }
 
-function getColorScale(dataType: HistoricalDataType, thresholds: number[]) {
-  const emptyColor = '#D2E3E5';
-
+function getColorScale(dataType: AnyDataType, thresholds: number[]) {
   const colors =
-    dataType === 'shortage'
-      ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
-      : [emptyColor, ...getDataTypeColors(dataType)];
+    // These data types have a larger = better scale
+    dataType === 'shortage' || dataType === 'kcal'
+      ? [belowThresholdColor, ...getDataTypeColors(dataType)].reverse()
+      : [belowThresholdColor, ...getDataTypeColors(dataType)];
 
   return scaleThreshold<number, string>()
     .domain(thresholds)
     .range(colors);
 }
 
-function getLabel(dataType: HistoricalDataType) {
+function getLabel(dataType: AnyDataType) {
   switch (dataType) {
     case 'stress':
       return 'Water stress';
@@ -159,6 +159,8 @@ function getLabel(dataType: HistoricalDataType) {
       return 'Water shortage';
     case 'scarcity':
       return 'Water scarcity';
+    case 'kcal':
+      return 'Food supply';
   }
 }
 
@@ -316,8 +318,8 @@ class Map extends React.Component<Props, State> {
     const svg = select<SVGElement, undefined>(this.svgRef);
     svg
       .select<SVGPathElement>('#sphere')
-      .datum({ type: 'Sphere' })
-      .attr('d', path as any); // TODO: fix typing
+      .datum<GeoSphere>({ type: 'Sphere' })
+      .attr('d', path);
 
     svg.select('use#globe-fill').on('click', clearSelectedRegion);
 
@@ -325,7 +327,7 @@ class Map extends React.Component<Props, State> {
     svg
       .select<SVGPathElement>('path#land')
       .datum(feature(worldData, worldData.objects.land))
-      .attr('d', path as any);
+      .attr('d', path);
 
     // Water regions
     // prettier-ignore
@@ -396,14 +398,14 @@ class Map extends React.Component<Props, State> {
       g.call(
         axisBottom(this.legendXScale!)
           .tickSize(10)
-          .tickValues([0.25, 0.75, 1.5])
+          .tickValues([0.12, 0.75, 1.32])
           .tickFormat(
             d =>
-              d === 0.25
+              d === 0.12
                 ? 'Stress'
                 : d === 0.75
-                  ? 'Shortage'
-                  : 'Stress + Shortage',
+                  ? 'Stress + Shortage'
+                  : 'Shortage',
           ),
       )
         .select('.domain')
@@ -417,9 +419,7 @@ class Map extends React.Component<Props, State> {
           .tickSize(13)
           .tickValues(this.colorScale!.domain())
           .tickFormat(
-            selectedDataType === 'stress'
-              ? format('.2f')
-              : (format('d') as any), // TODO: fix typing
+            selectedDataType === 'stress' ? format('.2f') : format('d'),
           ),
       )
         .select('.domain')
@@ -527,7 +527,7 @@ class Map extends React.Component<Props, State> {
       selectedData: { data },
     } = this.props;
     const value = data[featureId];
-    return value != null ? colorScale(value) : '#807775';
+    return value != null ? colorScale(value) : missingDataColor;
   }
 
   private redrawFillsAndBorders() {
@@ -931,13 +931,12 @@ export default connect<
   PassedProps,
   StateTree
 >(
-  state => {
-    const selectedDataType = getSelectedHistoricalDataType(state);
+  (state, passedProps) => {
+    const { selectedDataType } = passedProps;
     const thresholds = getThresholdsForDataType(state, selectedDataType);
 
     return {
       selectedWaterRegionId: getSelectedWaterRegionId(state),
-      selectedDataType,
       selectedWorldRegion: getSelectedWorldRegion(state),
       thresholds,
       colorScale: getColorScale(selectedDataType, thresholds),

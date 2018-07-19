@@ -1,7 +1,7 @@
 import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
 import {
+  AnyDataType,
   FutureDataType,
-  HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
   TimeScale,
@@ -211,6 +211,11 @@ function getFutureScenarioURL(
   );
 }
 
+export function isFutureDataType(value: string): value is FutureDataType {
+  const options: FutureDataType[] = ['stress', 'kcal'];
+  return options.indexOf(value as FutureDataType) > -1;
+}
+
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   return geoJSON.features.map(region => ({
     id: region.properties.featureId,
@@ -270,7 +275,9 @@ export async function fetchWorldRegionsData(): Promise<
   }
 }
 
-export const defaultDataTypeThresholds = {
+export const defaultDataTypeThresholds: {
+  [dataType in AnyDataType]: number[]
+} = {
   stress: [0.2, 0.4, 1],
   /**
    * Note: higher is better.
@@ -284,12 +291,19 @@ export const defaultDataTypeThresholds = {
    * x >= 1.0 = shortage and stress
    */
   scarcity: [0, 0.5, 1],
+  /**
+   * Higher is bettter.
+   */
+  kcal: [1845, 2355, 2894],
 };
 
-export const defaultDataTypeThresholdMaxValues = {
+export const defaultDataTypeThresholdMaxValues: {
+  [dataType in AnyDataType]: number
+} = {
   stress: 2,
   shortage: 4000,
-  scarcity: 2,
+  scarcity: 1.5,
+  kcal: 4000,
 };
 
 export function generateWaterToWorldRegionsMap(
@@ -353,15 +367,20 @@ export function getDefaultComparison(
   }
 }
 
-export function getDataTypeColors(dataType: HistoricalDataType) {
+export const belowThresholdColor = '#DBE4E8';
+export const missingDataColor = '#807775';
+
+export function getDataTypeColors(dataType: AnyDataType) {
   switch (dataType) {
     case 'stress':
-      // From d3-scale-chromatic's schemePurple
-      return ['#cbc9e2', '#9e9ac8', '#6a51a3'];
+      return ['#F59696', '#CE4B4B', '#A81818'];
     case 'shortage':
-      return ['#f5f07f', '#e6dc4c', '#d7c919'];
+      return ['#C29FED', '#9A65DA', '#7839C5'];
     case 'scarcity':
-      return ['#6a51a3', '#d7c919', 'rgb(203, 24, 29)'];
+      // [stress, stress + shortage, shortage]
+      return ['#F59696', '#BB5C8B', '#C29FED'];
+    case 'kcal':
+      return ['#A7E595', '#48C423', '#2EA50A'];
   }
 
   console.warn('Unknown data type', dataType);
@@ -377,11 +396,11 @@ export function scarcitySelector(
     const hasStress = d.stress >= stressThresholds[0];
     const hasShortage = d.shortage <= shortageThresholds[2];
     if (hasStress && hasShortage) {
-      return scarcityThresholds[2] + 0.1;
+      return scarcityThresholds[1] + 0.1;
     }
 
     if (hasShortage) {
-      return scarcityThresholds[1] + 0.1;
+      return scarcityThresholds[2] + 0.1;
     }
 
     if (hasStress) {

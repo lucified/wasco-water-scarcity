@@ -15,14 +15,15 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
 import {
+  belowThresholdColor,
   defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
+  missingDataColor,
   WaterRegionGeoJSON,
   WaterRegionGeoJSONFeature,
 } from '../../data';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedHistoricalDataType,
   getSelectedWorldRegion,
   getThresholdsForDataType,
 } from '../../selectors';
@@ -38,7 +39,7 @@ const Land = styled.path`
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
-    stroke: #deeeee;
+    stroke: #ecf4f8;
     transition: opacity 0.2s ease-in;
   }
 `;
@@ -72,11 +73,11 @@ interface PassedProps {
   width: number;
   selectedData: TimeAggregate<number>;
   waterRegions: WaterRegionGeoJSON;
+  selectedDataType: HistoricalDataType;
 }
 
 interface GeneratedStateProps {
   selectedWorldRegion?: WorldRegion;
-  selectedDataType: HistoricalDataType;
   colorScale: ScaleThreshold<number, string>;
   thresholds: number[];
   stressThresholds: number[];
@@ -86,12 +87,10 @@ interface GeneratedStateProps {
 type Props = GeneratedStateProps & PassedProps;
 
 function getColorScale(dataType: HistoricalDataType, thresholds: number[]) {
-  const emptyColor = '#D2E3E5';
-
   const colors =
     dataType === 'shortage'
-      ? [emptyColor, ...getDataTypeColors(dataType)].reverse()
-      : [emptyColor, ...getDataTypeColors(dataType)];
+      ? [belowThresholdColor, ...getDataTypeColors(dataType)].reverse()
+      : [belowThresholdColor, ...getDataTypeColors(dataType)];
 
   return scaleThreshold<number, string>()
     .domain(thresholds)
@@ -282,14 +281,14 @@ class SimpleMap extends React.Component<Props> {
       g.call(
         axisBottom(this.legendXScale!)
           .tickSize(10)
-          .tickValues([0.25, 0.75, 1.5])
+          .tickValues([0.12, 0.75, 1.32])
           .tickFormat(
             d =>
-              d === 0.25
+              d === 0.12
                 ? 'Stress'
                 : d === 0.75
-                  ? 'Shortage'
-                  : 'Stress + Shortage',
+                  ? 'Stress + Shortage'
+                  : 'Shortage',
           ),
       )
         .select('.domain')
@@ -397,7 +396,7 @@ class SimpleMap extends React.Component<Props> {
       selectedData: { data },
     } = this.props;
     const value = data[featureId];
-    return value != null ? colorScale(value) : '#807775';
+    return value != null ? colorScale(value) : missingDataColor;
   }
 
   private redrawFillsAndBorders() {
@@ -454,12 +453,11 @@ class SimpleMap extends React.Component<Props> {
 }
 
 export default connect<GeneratedStateProps, {}, PassedProps, StateTree>(
-  state => {
-    const selectedDataType = getSelectedHistoricalDataType(state);
+  (state, passedProps) => {
+    const { selectedDataType } = passedProps;
     const thresholds = getThresholdsForDataType(state, selectedDataType);
 
     return {
-      selectedDataType,
       selectedWorldRegion: getSelectedWorldRegion(state),
       thresholds,
       colorScale: getColorScale(selectedDataType, thresholds),

@@ -14,6 +14,7 @@ import {
   getDefaultComparison,
   getDefaultFutureDataset,
   getDefaultFutureScenario,
+  isFutureDataType,
   StartingPoint,
   toEnsembleRegionId,
   toEnsembleWorldId,
@@ -27,6 +28,7 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
+import RadioSelector, { Option } from '../../generic/radio-selector';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
 import { SmallSectionHeader, theme } from '../../theme';
@@ -36,6 +38,17 @@ import FutureScenarioFilter from './future-scenario-filter';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const DataTypeSelectorContainer = styled.div`
+  margin-top: ${theme.defaultMargin}px;
+  width: 100%;
+  max-width: 400px;
+`;
 
 const Title = styled.h1`
   font-weight: 800;
@@ -94,6 +107,11 @@ const TimeSelectorContainer = styled.div`
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {
   return `${dataType}-${areaId}`;
 }
+
+const DATA_TYPE_OPTIONS: Array<{ label: string; value: FutureDataType }> = [
+  { label: 'Water stress', value: 'stress' },
+  { label: 'Food production', value: 'kcal' },
+];
 
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
@@ -266,18 +284,23 @@ class FutureBody extends React.Component<Props, State> {
     }
   }
 
-  // private setDataType(dataType: FutureDataType) {
-  //   const { selectedDataType, ensembleData, selectedDataset } = this.state;
-  //   const { selectedWaterRegionId, selectedWorldRegionId } = this.props;
-  //   if (dataType !== selectedDataType) {
-  //     const areaId = selectedWaterRegionId
-  //       ? toEnsembleRegionId(selectedWaterRegionId)
-  //       : toEnsembleWorldId(selectedWorldRegionId);
-  //     if (!ensembleData[dataType][areaId]) {
-  //       this.fetchFutureEnsembleData(selectedDataset, areaId, dataType);
-  //     }
-  //   }
-  // }
+  private setDataType = ({ value: dataType }: Option) => {
+    if (!isFutureDataType(dataType)) {
+      console.error('Not a valid dataType', dataType);
+      return;
+    }
+    const { selectedDataType, ensembleData, selectedDataset } = this.state;
+    const { selectedWaterRegionId, selectedWorldRegionId } = this.props;
+    if (dataType !== selectedDataType) {
+      const areaId = selectedWaterRegionId
+        ? toEnsembleRegionId(selectedWaterRegionId)
+        : toEnsembleWorldId(selectedWorldRegionId);
+      if (!ensembleData[dataType][areaId]) {
+        this.fetchFutureEnsembleData(selectedDataset, areaId, dataType);
+      }
+      this.setState({ selectedDataType: dataType });
+    }
+  };
 
   private handleSetComparisonVariables = (
     comparisonVariables: FutureDatasetVariables,
@@ -333,7 +356,16 @@ class FutureBody extends React.Component<Props, State> {
 
     return (
       <div>
-        <Title>Explore possible futures of water scarcity</Title>
+        <TitleContainer>
+          <Title>Explore possible futures of water scarcity</Title>
+          <DataTypeSelectorContainer>
+            <RadioSelector
+              values={DATA_TYPE_OPTIONS}
+              selectedValue={selectedDataType}
+              onChange={this.setDataType}
+            />
+          </DataTypeSelectorContainer>
+        </TitleContainer>
         <Container>
           <Scroll>
             <StickyGraphics>
@@ -372,6 +404,7 @@ class FutureBody extends React.Component<Props, State> {
                       <ResponsiveMap
                         selectedData={mapData}
                         waterRegions={waterRegions}
+                        selectedDataType={selectedDataType}
                       />
                       <WorldRegionSelector />
                     </>

@@ -1,5 +1,6 @@
 import { WaterRegionGeoJSON } from '../data';
 import {
+  AnyDataType,
   HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
@@ -18,11 +19,7 @@ export interface SelectionsTree {
   region?: number;
 }
 
-export interface ThresholdsTree {
-  stress: number[];
-  shortage: number[];
-  scarcity: number[];
-}
+export type ThresholdsTree = { [dataType in AnyDataType]: number[] };
 
 export interface DataTree {
   stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
