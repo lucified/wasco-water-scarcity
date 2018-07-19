@@ -314,7 +314,7 @@ interface PassedProps {
   selectedScenario: FutureScenario;
   selectedFutureDataset: FutureDataset;
   comparisonVariables: FutureDatasetVariables;
-  ensembleData: FutureEnsembleData;
+  ensembleData?: FutureEnsembleData;
   setScenario: (scenario: FutureScenario) => void;
   setComparisonVariables: (variables: FutureDatasetVariables) => void;
   setHoveredScenarios: (scenarios?: FutureEnsembleData) => void;
@@ -359,16 +359,13 @@ class FutureScenarioFilter extends React.Component<Props, State> {
     hoveredVariable: FutureScenarioVariableName,
     hoveredValue: string,
   ) => {
+    const { selectedScenario, ensembleData, setHoveredScenarios } = this.props;
     if (
-      this.state.hoveredValue !== hoveredValue ||
-      this.state.hoveredVariable !== hoveredVariable
+      ensembleData &&
+      (this.state.hoveredValue !== hoveredValue ||
+        this.state.hoveredVariable !== hoveredVariable)
     ) {
       const { selectionMode } = this.state;
-      const {
-        selectedScenario,
-        ensembleData,
-        setHoveredScenarios,
-      } = this.props;
 
       if (
         selectionMode === 'scenario' &&

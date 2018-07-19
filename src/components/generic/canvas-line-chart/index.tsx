@@ -2,7 +2,7 @@ import { extent } from 'd3-array';
 import { format } from 'd3-format';
 import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
-import { flatMap } from 'lodash';
+import { flatMap, isEqual } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
@@ -113,6 +113,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
   private selectedCanvasRef!: HTMLCanvasElement;
   private svgRef!: SVGElement;
   private isDragging = false;
+  private previousYDomain: number[] = [0, 0];
 
   public static defaultProps: DefaultProps = {
     marginLeft: 40,
@@ -237,9 +238,9 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart(
-    redrawSeries = true,
-    redrawHovered = true,
-    redrawSelected = true,
+    forceRedrawSeries = true,
+    forceRedrawHovered = true,
+    forceRedrawSelected = true,
   ) {
     const {
       series,
@@ -253,12 +254,19 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     const { x, y } = this.getScales();
 
+    let redrawEverything = false;
+    const currentYDomain = y.domain();
+    if (!isEqual(currentYDomain, this.previousYDomain)) {
+      redrawEverything = true;
+      this.previousYDomain = currentYDomain;
+    }
+
     const lineGenerator = line<Point>()
       .x(d => x(d.time))
       .y(d => y(d.value))
       .curve(curveMonotoneX);
 
-    if (redrawSeries) {
+    if (redrawEverything || forceRedrawSeries) {
       const context = this.seriesAndAxisCanvasRef.getContext('2d')!;
       lineGenerator.context(context);
 
@@ -282,7 +290,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       });
     }
 
-    if (redrawHovered) {
+    if (redrawEverything || forceRedrawHovered) {
       const context = this.hoverCanvasRef.getContext('2d')!;
       lineGenerator.context(context);
 
@@ -304,7 +312,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       }
     }
 
-    if (redrawSelected) {
+    if (redrawEverything || forceRedrawSelected) {
       const context = this.selectedCanvasRef.getContext('2d')!;
       lineGenerator.context(context);
 

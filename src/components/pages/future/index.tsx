@@ -439,7 +439,7 @@ class FutureBody extends React.Component<Props, State> {
                 selectedFutureDataset={selectedDataset}
                 selectedScenario={selectedScenario}
                 comparisonVariables={comparisonVariables}
-                ensembleData={ensembleData[selectedDataType][ensembleAreaId]!}
+                ensembleData={ensembleData[selectedDataType][ensembleAreaId]}
                 setComparisonVariables={this.handleSetComparisonVariables}
                 setHoveredScenarios={this.handleSetHoveredScenarios}
               />
