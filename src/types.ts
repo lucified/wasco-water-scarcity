@@ -65,3 +65,5 @@ export type HistoricalDataType = 'stress' | 'shortage' | 'scarcity';
 export type FutureDataType = 'stress' | 'kcal';
 export type AnyDataType = HistoricalDataType | FutureDataType;
 export type TimeScale = 'decadal' | 'annual';
+
+export type Diff<T, U> = T extends U ? never : T;

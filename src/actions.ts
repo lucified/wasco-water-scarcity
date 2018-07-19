@@ -7,6 +7,7 @@ import {
   WaterRegionGeoJSON,
 } from './data';
 import {
+  AnyDataType,
   HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
@@ -114,11 +115,11 @@ export function setSelectedTimeScale(
 
 export interface SetThresholdsForDataTypeAction {
   type: 'SET_THRESHOLDS_FOR_DATA_TYPE';
-  dataType: HistoricalDataType;
+  dataType: AnyDataType;
   thresholds: number[];
 }
 export function setThresholdsForDataType(
-  dataType: HistoricalDataType,
+  dataType: AnyDataType,
   thresholds: number[],
 ): SetThresholdsForDataTypeAction {
   return {

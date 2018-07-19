@@ -1,13 +1,6 @@
-import { axisBottom } from 'd3-axis';
-import { format } from 'd3-format';
 import { ExtendedFeature, geoNaturalEarth1, geoPath, GeoSphere } from 'd3-geo';
-import {
-  scaleLinear,
-  ScaleLinear,
-  scaleThreshold,
-  ScaleThreshold,
-} from 'd3-scale';
-import { event, select, Selection } from 'd3-selection';
+import { scaleThreshold, ScaleThreshold } from 'd3-scale';
+import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
@@ -17,7 +10,6 @@ import { feature } from 'topojson';
 import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
 import {
   belowThresholdColor,
-  defaultDataTypeThresholdMaxValues,
   getDataTypeColors,
   getLocalRegionData,
   GridData,
@@ -35,8 +27,17 @@ import {
 } from '../../selectors';
 import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
+import ThresholdSelector from '../threshold-selector';
 
 const worldData = require('world-atlas/world/110m.json');
+
+const Container = styled.div`
+  position: relative;
+`;
+
+const StyledThresholdSelector = styled(ThresholdSelector)`
+  position: absolute;
+`;
 
 const Land = styled.path`
   fill: #d2e2e6;
@@ -72,16 +73,6 @@ const SelectedRegion = styled.g`
     opacity: 0.8;
     fill: none;
   }
-`;
-
-const Legend = styled.g`
-  user-select: none;
-`;
-
-const LegendCaption = styled.text`
-  fill: #000;
-  text-anchor: start;
-  font-weight: bold;
 `;
 
 const CountryBorders = styled.g`
@@ -151,19 +142,6 @@ function getColorScale(dataType: AnyDataType, thresholds: number[]) {
     .range(colors);
 }
 
-function getLabel(dataType: AnyDataType) {
-  switch (dataType) {
-    case 'stress':
-      return 'Water stress';
-    case 'shortage':
-      return 'Water shortage';
-    case 'scarcity':
-      return 'Water scarcity';
-    case 'kcal':
-      return 'Food supply';
-  }
-}
-
 class Map extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -175,15 +153,9 @@ class Map extends React.Component<Props, State> {
   }
 
   private svgRef!: SVGElement;
-  private legendWidth = 200;
-  private colorScale?: ScaleThreshold<number, string>;
-  private legendXScale?: ScaleLinear<number, number>;
-  private legendExtentPairs?: Array<[number, number]>;
 
   public componentDidMount() {
-    this.generateScales();
     this.drawMap();
-    this.drawLegend();
     this.zoomToGlobalArea(false);
   }
 
@@ -201,21 +173,14 @@ class Map extends React.Component<Props, State> {
     const { zoomInToRegion } = this.state;
 
     if (prevProps.width !== width) {
-      this.generateScales();
-      this.clearMapAndLegend();
+      this.clearMap();
       this.drawMap();
-      this.drawLegend();
     } else if (
       prevProps.selectedDataType !== selectedDataType ||
       prevProps.thresholds !== thresholds ||
       (selectedDataType === 'scarcity' &&
         (prevProps.stressThresholds !== stressThresholds ||
-          prevProps.shortageThresholds !== shortageThresholds))
-    ) {
-      this.generateScales();
-      this.redrawFillsAndBorders();
-      this.redrawLegend();
-    } else if (
+          prevProps.shortageThresholds !== shortageThresholds)) ||
       prevProps.selectedData !== selectedData ||
       prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
       (prevState.zoomInToRegion && !zoomInToRegion)
@@ -249,40 +214,11 @@ class Map extends React.Component<Props, State> {
     }
   }
 
-  private generateScales() {
-    const { colorScale, thresholds, selectedDataType } = this.props;
-    // Based on https://bl.ocks.org/mbostock/4060606
-    const maxThreshold = thresholds[thresholds.length - 1];
-    const xScale = scaleLinear()
-      .domain([
-        0,
-        Math.max(
-          maxThreshold * 1.1,
-          defaultDataTypeThresholdMaxValues[selectedDataType],
-        ),
-      ])
-      .rangeRound([0, this.legendWidth]);
-
-    this.legendExtentPairs = colorScale.range().map(d => {
-      const colorExtent = colorScale.invertExtent(d);
-      if (colorExtent[0] == null) {
-        colorExtent[0] = xScale.domain()[0];
-      }
-      if (colorExtent[1] == null) {
-        colorExtent[1] = xScale.domain()[1];
-      }
-
-      return colorExtent as [number, number];
-    });
-    this.colorScale = colorScale;
-    this.legendXScale = xScale;
-  }
-
   private getHeight() {
     return this.props.width / 1.9;
   }
 
-  private clearMapAndLegend() {
+  private clearMap() {
     const svg = select<SVGElement, undefined>(this.svgRef);
     svg.select('use#globe-fill').on('click', null);
     svg
@@ -292,10 +228,6 @@ class Map extends React.Component<Props, State> {
     svg
       .select<SVGGElement>('g#clickable-water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-      .remove();
-    svg
-      .select<SVGGElement>('g#legend')
-      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
       .remove();
   }
 
@@ -360,85 +292,6 @@ class Map extends React.Component<Props, State> {
       .attr('class', 'clickable-water-region')
       .attr('d', path)
       .on('click', this.handleRegionClick);
-  }
-
-  private drawLegend() {
-    const g = select<SVGElement, undefined>(this.svgRef).select<SVGGElement>(
-      'g#legend',
-    );
-
-    // prettier-ignore
-    g
-      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
-      .data(this.legendExtentPairs!)
-      .enter()
-        .append<SVGRectElement>('rect')
-        .attr('height', 8)
-        .call(this.drawLegendRectangle);
-
-    g.call(this.addLegendLabels);
-  }
-
-  private drawLegendRectangle = (
-    rect: Selection<SVGRectElement, [number, number], any, any>,
-  ) => {
-    const { legendXScale, colorScale } = this;
-    rect
-      .attr('x', d => legendXScale!(d[0]))
-      .attr('width', d => legendXScale!(d[1]) - legendXScale!(d[0]))
-      .attr('fill', d => colorScale!(d[0]));
-  };
-
-  private addLegendLabels = (
-    g: Selection<SVGGElement, undefined, any, any>,
-  ) => {
-    const { selectedDataType } = this.props;
-    if (selectedDataType === 'scarcity') {
-      // TODO: fix this ugly hack
-      g.call(
-        axisBottom(this.legendXScale!)
-          .tickSize(10)
-          .tickValues([0.12, 0.75, 1.32])
-          .tickFormat(
-            d =>
-              d === 0.12
-                ? 'Stress'
-                : d === 0.75
-                  ? 'Stress + Shortage'
-                  : 'Shortage',
-          ),
-      )
-        .select('.domain')
-        .remove();
-      g.selectAll('.tick')
-        .select('line')
-        .remove();
-    } else {
-      g.call(
-        axisBottom(this.legendXScale!)
-          .tickSize(13)
-          .tickValues(this.colorScale!.domain())
-          .tickFormat(
-            selectedDataType === 'stress' ? format('.2f') : format('d'),
-          ),
-      )
-        .select('.domain')
-        .remove();
-    }
-  };
-
-  private redrawLegend() {
-    const g = select<SVGElement, undefined>(this.svgRef).select<SVGGElement>(
-      'g#legend',
-    );
-
-    // prettier-ignore
-    g
-      .selectAll<SVGRectElement, Array<[number, number]>>('rect')
-      .data(this.legendExtentPairs!)
-      .call(this.drawLegendRectangle);
-
-    g.call(this.addLegendLabels);
   }
 
   private zoomToGlobalArea(useTransition = true) {
@@ -881,36 +734,38 @@ class Map extends React.Component<Props, State> {
     const height = this.getHeight();
 
     return (
-      <SVG
-        width={width}
-        height={height}
-        innerRef={ref => {
-          this.svgRef = ref;
-        }}
-      >
-        <defs>
-          <clipPath id="clip">
-            <use xlinkHref="#sphere" />
-          </clipPath>
-          <path id="sphere" />
-        </defs>
-        <use id="globe-fill" xlinkHref="#sphere" style={{ fill: 'white' }} />
-        <g id="countries">
-          <Land id="land" clipPath="url(#clip)" />
-        </g>
-        <g id="water-regions" clipPath="url(#clip)" />
-        <g id="grid-data" clipPath="url(#clip)" />
-        <SelectedRegion id="selected-region" clipPath="url(#clip)" />
-        <CountryBorders id="country-borders" clipPath="url(#clip)" />
-        <Basins id="basins" clipPath="url(#clip)" />
-        <g id="basin-labels" clipPath="url(#clip)" />
-        <g id="country-labels" clipPath="url(#clip)" />
-        <DDM id="ddm" clipPath="url(#clip)" />
-        <Rivers id="rivers" clipPath="url(#clip)" />
-        <g id="places" clipPath="url(#clip)" />
-        <g id="places-labels" clipPath="url(#clip)" />
-        <g id="clickable-water-regions" clipPath="url(#clip)" />
-        <Legend
+      <Container>
+        <SVG
+          width={width}
+          height={height}
+          innerRef={ref => {
+            this.svgRef = ref;
+          }}
+        >
+          <defs>
+            <clipPath id="clip">
+              <use xlinkHref="#sphere" />
+            </clipPath>
+            <path id="sphere" />
+          </defs>
+          <use id="globe-fill" xlinkHref="#sphere" style={{ fill: 'white' }} />
+          <g id="countries">
+            <Land id="land" clipPath="url(#clip)" />
+          </g>
+          <g id="water-regions" clipPath="url(#clip)" />
+          <g id="grid-data" clipPath="url(#clip)" />
+          <SelectedRegion id="selected-region" clipPath="url(#clip)" />
+          <CountryBorders id="country-borders" clipPath="url(#clip)" />
+          <Basins id="basins" clipPath="url(#clip)" />
+          <g id="basin-labels" clipPath="url(#clip)" />
+          <g id="country-labels" clipPath="url(#clip)" />
+          <DDM id="ddm" clipPath="url(#clip)" />
+          <Rivers id="rivers" clipPath="url(#clip)" />
+          <g id="places" clipPath="url(#clip)" />
+          <g id="places-labels" clipPath="url(#clip)" />
+          <g id="clickable-water-regions" clipPath="url(#clip)" />
+          {/* TODO: add legend for scarcity dataType */}
+          {/*<Legend
           id="legend"
           transform={`translate(${Math.round(width * 0.6)}, ${Math.round(
             height - 26,
@@ -919,8 +774,15 @@ class Map extends React.Component<Props, State> {
           <LegendCaption x="0" y="-6">
             {getLabel(selectedDataType)}
           </LegendCaption>
-        </Legend>
-      </SVG>
+        </Legend>*/}
+        </SVG>
+        {selectedDataType !== 'scarcity' && (
+          <StyledThresholdSelector
+            style={{ left: width * 0.5, top: height - 40 }}
+            dataType={selectedDataType}
+          />
+        )}
+      </Container>
     );
   }
 }
@@ -931,8 +793,7 @@ export default connect<
   PassedProps,
   StateTree
 >(
-  (state, passedProps) => {
-    const { selectedDataType } = passedProps;
+  (state, { selectedDataType }) => {
     const thresholds = getThresholdsForDataType(state, selectedDataType);
 
     return {
