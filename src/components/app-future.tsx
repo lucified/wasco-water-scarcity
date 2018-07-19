@@ -7,6 +7,8 @@ import { loadMapData } from '../actions';
 import { StateTree } from '../reducers';
 import Future from './pages/future';
 
+require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
+
 import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
