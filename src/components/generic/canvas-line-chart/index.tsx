@@ -90,11 +90,12 @@ interface PassedProps {
    */
   series: Series[];
   selectedSerie?: Series;
+  hoveredSeries?: Series[];
   selectedTimeIndex?: number;
   onSetSelectedTimeIndex?: (index: number) => void;
-  hoveredSeries?: Series[];
   yAxisLabel?: string;
   yAxisFormatter?: (d: number) => string;
+  yAxisColor?: (d: number) => string;
 }
 
 interface DefaultProps {
@@ -362,12 +363,12 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context: CanvasRenderingContext2D,
     y: ScaleLinear<number, number>,
   ) {
+    const { yAxisFormatter, yAxisColor, yAxisLabel } = this.props;
     const tickCount = 10;
     const tickSize = 6;
     const tickPadding = 3;
     const ticks = y.ticks(tickCount);
-    const tickFormat =
-      this.props.yAxisFormatter || y.tickFormat(tickCount, 's');
+    const tickFormat = yAxisFormatter || y.tickFormat(tickCount, 's');
 
     context.beginPath();
     ticks.forEach(d => {
@@ -380,17 +381,20 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context.textAlign = 'right';
     context.textBaseline = 'middle';
     ticks.forEach(d => {
+      if (yAxisColor) {
+        context.fillStyle = yAxisColor(d);
+      }
       context.fillText(tickFormat(d), -tickSize - tickPadding, y(d));
     });
 
-    if (this.props.yAxisLabel) {
+    if (yAxisLabel) {
       context.save();
       context.rotate(-Math.PI / 2);
       context.textAlign = 'right';
       context.textBaseline = 'top';
       context.fillStyle = theme.colors.gray;
       context.font = theme.bodyFontFamily;
-      context.fillText(this.props.yAxisLabel, 0, 5);
+      context.fillText(yAxisLabel, 0, 5);
       context.restore();
     }
   }

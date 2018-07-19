@@ -5,35 +5,21 @@ import {
   FutureDatasetVariables,
   FutureEnsembleData,
   FutureScenario,
+  getDataTypeColors,
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
   toScenarioId,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
-import { getNameForWorldRegionId } from '../../../selectors';
+import {
+  getNameForWorldRegionId,
+  getThresholdsForDataType,
+} from '../../../selectors';
 import { FutureDataType } from '../../../types';
 import { formatPopulation } from '../../../utils';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
 import responsive from '../../generic/responsive';
 import { SmallSectionHeader, theme } from '../../theme';
-
-interface PassedProps {
-  className?: string;
-  selectedTimeIndex: number;
-  selectedScenario: FutureScenario;
-  selectedDataType: FutureDataType;
-  selectedWaterRegionId?: number;
-  selectedWorldRegionId: number;
-  ensembleData: FutureEnsembleData;
-  comparisonVariables: FutureDatasetVariables;
-  hoveredScenarios?: FutureEnsembleData;
-  onTimeIndexChange: (value: number) => void;
-  getWorldRegionName: (id: number) => string;
-  width?: number;
-  height?: number;
-}
-
-type Props = PassedProps;
 
 // NOTE: We only have global memoized selectors which won't work if we ever
 // decide to add a second future line chart.
@@ -117,6 +103,28 @@ function worldRegionTitle(dataType: FutureDataType, regionName: string) {
   }
 }
 
+interface GeneratedStateProps {
+  getWorldRegionName: (id: number) => string;
+  thresholds: number[];
+}
+
+interface PassedProps {
+  className?: string;
+  selectedTimeIndex: number;
+  selectedScenario: FutureScenario;
+  selectedDataType: FutureDataType;
+  selectedWaterRegionId?: number;
+  selectedWorldRegionId: number;
+  ensembleData: FutureEnsembleData;
+  comparisonVariables: FutureDatasetVariables;
+  hoveredScenarios?: FutureEnsembleData;
+  onTimeIndexChange: (value: number) => void;
+  width?: number;
+  height?: number;
+}
+
+type Props = PassedProps & GeneratedStateProps;
+
 function FutureLineChart(props: Props) {
   const {
     width,
@@ -128,6 +136,7 @@ function FutureLineChart(props: Props) {
     selectedTimeIndex,
     onTimeIndexChange,
     getWorldRegionName,
+    thresholds,
   } = props;
 
   const comparisonSeries = getComparisonSeries(props);
@@ -144,6 +153,20 @@ function FutureLineChart(props: Props) {
         getWorldRegionName(selectedWorldRegionId),
       );
 
+  const colors = getDataTypeColors(selectedDataType);
+  const yAxisLabelColor = (d: number) => {
+    if (d > thresholds[2]) {
+      return colors[2];
+    } else if (d > thresholds[1]) {
+      return colors[1];
+    } else if (d > thresholds[0]) {
+      return colors[0];
+    }
+
+    // belowThresholdColor is a bit too light
+    return theme.colors.gray;
+  };
+
   return (
     <>
       <SmallSectionHeader>{title}</SmallSectionHeader>
@@ -158,11 +181,13 @@ function FutureLineChart(props: Props) {
         height={height || 240}
         yAxisLabel={yAxisLabel}
         yAxisFormatter={isWaterRegionSelected ? undefined : formatPopulation}
+        yAxisColor={isWaterRegionSelected ? yAxisLabelColor : undefined}
       />
     </>
   );
 }
 
-export default connect((state: StateTree) => ({
+export default connect((state: StateTree, passedProps: PassedProps) => ({
   getWorldRegionName: getNameForWorldRegionId(state),
+  thresholds: getThresholdsForDataType(state, passedProps.selectedDataType),
 }))(responsive(FutureLineChart));
