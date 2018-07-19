@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import styled from 'styled-components';
 import {
   FutureDatasetVariables,
   FutureEnsembleData,
@@ -18,8 +19,31 @@ import {
 import { FutureDataType } from '../../../types';
 import { formatPopulation } from '../../../utils';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
+import { CompareIcon } from '../../generic/compare-icon';
 import responsive from '../../generic/responsive';
 import { SmallSectionHeader, theme } from '../../theme';
+
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+const LegendContainer = styled.div`
+  display: flex;
+  padding-right: ${theme.defaultMargin}px;
+`;
+
+const LegendItem = styled.div`
+  margin-left: ${theme.defaultMargin}px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+`;
+
+const StyledIcon = styled(CompareIcon)`
+  margin-right: 6px;
+`;
 
 // NOTE: We only have global memoized selectors which won't work if we ever
 // decide to add a second future line chart.
@@ -169,7 +193,44 @@ function FutureLineChart(props: Props) {
 
   return (
     <>
-      <SmallSectionHeader>{title}</SmallSectionHeader>
+      <HeaderRow>
+        <SmallSectionHeader>{title}</SmallSectionHeader>
+        <LegendContainer>
+          <LegendItem style={{ color: theme.colors.textSelection }}>
+            <svg style={{ width: 22, height: 22, marginRight: 6 }}>
+              <circle
+                cx={11}
+                cy={11}
+                r={10}
+                style={{
+                  fill: 'none',
+                  stroke: theme.colors.textSelection,
+                  strokeWidth: 1,
+                  strokeOpacity: 0.3,
+                }}
+              />
+              <circle
+                cx={11}
+                cy={11}
+                r={5}
+                style={{
+                  fill: theme.colors.textSelection,
+                }}
+              />
+            </svg>
+            Selected scenario
+          </LegendItem>
+          <LegendItem style={{ color: theme.colors.gray }}>
+            <StyledIcon
+              width={20}
+              height={20}
+              fill="white"
+              backgroundColor={theme.colors.gray}
+            />
+            Comparison scenarios
+          </LegendItem>
+        </LegendContainer>
+      </HeaderRow>
       <CanvasLineChart
         className={className}
         series={comparisonSeries}

@@ -47,7 +47,8 @@ const TitleContainer = styled.div`
 const DataTypeSelectorContainer = styled.div`
   margin-top: ${theme.defaultMargin}px;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  padding-right: ${theme.defaultMargin}px;
 `;
 
 const Title = styled.h1`
@@ -102,6 +103,7 @@ const MapHeaderRow = styled.div`
 const TimeSelectorContainer = styled.div`
   max-width: 300px;
   width: 100%;
+  padding-right: ${theme.defaultMargin}px;
 `;
 
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {

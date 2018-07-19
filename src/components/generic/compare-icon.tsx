@@ -8,6 +8,7 @@ interface Props {
   height: number;
   className?: string;
 }
+
 export function CompareIcon({
   backgroundColor,
   fill,

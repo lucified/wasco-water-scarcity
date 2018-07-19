@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Option } from '.';
 import { theme } from '../../theme';
-import { CompareIcon } from './compare-icon';
+import { CompareIcon } from '../compare-icon';
 
 interface ButtonProps {
   selected: boolean;
