@@ -58,7 +58,9 @@ const Button = styled.a`
       selected && disabled ? theme.colors.gray : 'white'};
     border: ${theme.borderWidth}px solid ${theme.colors.border};
     ${({ selected }: ButtonProps) =>
-      selected ? `border-color: ${theme.colors.red}; opacity: 0.3;` : ''};
+      selected
+        ? `border-color: ${theme.colors.textSelection}; opacity: 0.3;`
+        : ''};
   }
 
   &:after {
@@ -71,7 +73,7 @@ const Button = styled.a`
       selected
         ? disabled
           ? theme.colors.gray
-          : theme.colors.red
+          : theme.colors.textSelection
         : 'transparent'};
   }
 
@@ -87,7 +89,7 @@ const Button = styled.a`
       disabled
         ? 'white'
         : selected
-          ? theme.colors.red
+          ? theme.colors.textSelection
           : theme.colors.grayLight};
   }
 
