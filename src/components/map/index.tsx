@@ -100,6 +100,25 @@ const Basins = styled.g`
   fill: none;
 `;
 
+const scarcityColors = getDataTypeColors('scarcity');
+
+const ScarcityLegend = styled.g`
+  user-select: none;
+`;
+
+const LegendCaption = styled.text`
+  fill: #000;
+  font-size: 14px;
+  text-anchor: start;
+  font-weight: bold;
+`;
+
+const LegendLabel = styled.text`
+  fill: #000;
+  font-size: 12px;
+  text-anchor: middle;
+`;
+
 interface PassedProps {
   width: number;
   selectedData: TimeAggregate<number>;
@@ -729,6 +748,56 @@ class Map extends React.Component<Props, State> {
     }
   }
 
+  private getScarcityLegend() {
+    const { width } = this.props;
+    const height = this.getHeight();
+
+    return (
+      <ScarcityLegend
+        transform={`translate(${Math.round(width * 0.5)}, ${Math.round(
+          height - 26,
+        )})`}
+      >
+        <LegendCaption x="0" y="-6">
+          Water scarcity
+        </LegendCaption>
+        <rect
+          x="0"
+          y="0"
+          width="50"
+          height="10"
+          fill={scarcityColors[0]}
+          stroke-width="0"
+        />
+        <LegendLabel x="25" y="22" dx="2">
+          Stress
+        </LegendLabel>
+        <rect
+          x="50"
+          y="0"
+          width="115"
+          height="10"
+          fill={scarcityColors[1]}
+          stroke-width="0"
+        />
+        <LegendLabel x="108" y="22" dx="2">
+          Stress + Shortage
+        </LegendLabel>
+        <rect
+          x="165"
+          y="0"
+          width="65"
+          height="10"
+          fill={scarcityColors[2]}
+          stroke-width="0"
+        />
+        <LegendLabel x="197" y="22" dx="2">
+          Shortage
+        </LegendLabel>
+      </ScarcityLegend>
+    );
+  }
+
   public render() {
     const { selectedDataType, width } = this.props;
     const height = this.getHeight();
@@ -764,17 +833,7 @@ class Map extends React.Component<Props, State> {
           <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
           <g id="clickable-water-regions" clipPath="url(#clip)" />
-          {/* TODO: add legend for scarcity dataType */}
-          {/*<Legend
-          id="legend"
-          transform={`translate(${Math.round(width * 0.6)}, ${Math.round(
-            height - 26,
-          )})`}
-        >
-          <LegendCaption x="0" y="-6">
-            {getLabel(selectedDataType)}
-          </LegendCaption>
-        </Legend>*/}
+          {selectedDataType === 'scarcity' && this.getScarcityLegend()}
         </SVG>
         {selectedDataType !== 'scarcity' && (
           <StyledThresholdSelector
