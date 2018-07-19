@@ -21,7 +21,7 @@ const Main = styled.div`
 `;
 
 const Section = styled.div`
-  margin-bottom: ${theme.defaultMargin * 2}px;
+  margin-bottom: ${theme.defaultMargin}px;
   width: 100%;
 `;
 
@@ -62,6 +62,7 @@ const sections: {
         'Eating only what we need means less food needs to be produced. ' +
         'Water needed to feed animals means that eating less animal products generally requires less water.',
       variable: 'dietChange',
+      furtherInformation: <div>Jalava et al.</div>,
       options: [
         {
           title: 'Current',
@@ -110,6 +111,14 @@ const sections: {
       description:
         'There is potential to produce more crops with limited changes to water use',
       variable: 'yieldGap',
+      furtherInformation: (
+        <ul style={{ margin: 0 }}>
+          <li>Kummu et al. 2017</li>
+          <li>Mueller et al. 2012</li>
+          <li>Fader et al. 2013</li>
+          <li>Jägermeyr et al. 2016</li>
+        </ul>
+      ),
       options: [
         {
           title: 'Current',
@@ -193,6 +202,21 @@ const sections: {
       description:
         'Water use may be influenced by population, GDP, and changes in water use efficiency.',
       variable: 'population',
+      furtherInformation: (
+        <div>
+          <p>
+            SSP stands for Shared Socio-economic Pathway, which are scenarios
+            developed by the Intergovernmental Panel on Climate Change (IPCC).
+            Each scenario is associated with a narrative describing how the
+            future could unfold. The scenarios have then been quantified …
+          </p>
+          <p>
+            Water for food is driven only by population when examining potential
+            for change, but also by GDP when using pre-designed scenarios.
+            Domestic and industrial water use are driven by all three factors.
+          </p>
+        </div>
+      ),
       options: [
         {
           title: 'SSP1',
@@ -217,6 +241,17 @@ const sections: {
         'Estimated temperature and rainfall for different greenhouse gas concentrations, ' +
         'defined as increases in energy input in 2100 relative to pre-industrial times',
       variable: 'climateExperiment',
+      furtherInformation: (
+        <div>
+          RCP stands for Representative Concentration Pathways, which are
+          defined by the Intergovernmental Panel on Climate Change (IPCC). The
+          pathways have different shapes over time, with values in 2100
+          representing a range of energy inputs to the Earth’s climate system.
+          These energy inputs are usually referred to as radiative forcing - how
+          much sunlight is absorbed by the Earth minus the energy it radiates
+          into space.
+        </div>
+      ),
       options: [
         {
           title: 'RCP 4.5',
