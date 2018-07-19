@@ -24,11 +24,25 @@ const StyledMultiSelector = styled(MultiSelector)`
   margin-top: ${theme.defaultMargin / 2}px;
 `;
 
+const MoreInformationContainer = styled.div`
+  margin-top: ${theme.defaultMargin / 2}px;
+`;
+
+const MoreInformationContent = styled.div`
+  margin-bottom: ${theme.defaultMargin / 2}px;
+`;
+
+const MoreInformationLink = styled.a`
+  display: block;
+  cursor: pointer;
+`;
+
 interface Props {
   variable: FutureScenarioVariableName;
   title: string;
   description: string;
   multiselect: boolean;
+  furtherInformation?: JSX.Element;
   options: Option[];
   selectedFutureDataset: FutureDataset;
   comparisonVariables: FutureDatasetVariables;
@@ -51,7 +65,18 @@ interface Props {
   ) => void;
 }
 
-export class FutureScenarioFilterVariable extends React.Component<Props> {
+interface State {
+  furtherInformationOpen: boolean;
+}
+
+export class FutureScenarioFilterVariable extends React.Component<
+  Props,
+  State
+> {
+  public state: State = {
+    furtherInformationOpen: false,
+  };
+
   private handleChangeComparison = (values: string[]) => {
     this.props.setComparisonVariables(this.props.variable, values);
   };
@@ -68,6 +93,12 @@ export class FutureScenarioFilterVariable extends React.Component<Props> {
     this.props.onLeaveHoverVariable(this.props.variable, value);
   };
 
+  private toggleFurtherInformation = () => {
+    this.setState(state => ({
+      furtherInformationOpen: !state.furtherInformationOpen,
+    }));
+  };
+
   public render() {
     const {
       variable,
@@ -78,7 +109,10 @@ export class FutureScenarioFilterVariable extends React.Component<Props> {
       selectedFutureDataset,
       selectedScenario,
       comparisonVariables,
+      furtherInformation,
     } = this.props;
+    const { furtherInformationOpen } = this.state;
+
     return (
       <Variable key={variable}>
         <SelectorHeader>{title}</SelectorHeader>
@@ -96,6 +130,18 @@ export class FutureScenarioFilterVariable extends React.Component<Props> {
           onEnterHoverRow={this.handleHoverEnter}
           onLeaveHoverRow={this.handleHoverLeave}
         />
+        {furtherInformation && (
+          <MoreInformationContainer>
+            {furtherInformationOpen && (
+              <MoreInformationContent>
+                {furtherInformation}
+              </MoreInformationContent>
+            )}
+            <MoreInformationLink onClick={this.toggleFurtherInformation}>
+              {furtherInformationOpen ? 'Hide' : 'Show more information'}
+            </MoreInformationLink>
+          </MoreInformationContainer>
+        )}
       </Variable>
     );
   }
