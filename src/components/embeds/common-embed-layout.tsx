@@ -31,7 +31,13 @@ class CommonEmbedLayout extends React.Component<Props> {
   }
 
   public render() {
-    const { selectedWaterData, waterRegions, width, autoplay } = this.props;
+    const {
+      selectedWaterData,
+      waterRegions,
+      width,
+      selectedDataType,
+      autoplay,
+    } = this.props;
 
     return (
       <div>
@@ -56,6 +62,7 @@ class CommonEmbedLayout extends React.Component<Props> {
                 />
                 <SimpleMap
                   width={width}
+                  selectedDataType={selectedDataType}
                   selectedData={selectedWaterData}
                   waterRegions={waterRegions}
                 />
