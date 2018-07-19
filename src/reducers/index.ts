@@ -15,6 +15,7 @@ const defaultState: StateTree = {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
     scarcity: [...defaultDataTypeThresholds.scarcity],
+    kcal: [...defaultDataTypeThresholds.kcal],
   },
   selections: {
     historicalTimeIndex: 0,

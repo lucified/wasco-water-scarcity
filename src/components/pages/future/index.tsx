@@ -404,6 +404,7 @@ class FutureBody extends React.Component<Props, State> {
                       <ResponsiveMap
                         selectedData={mapData}
                         waterRegions={waterRegions}
+                        selectedDataType={selectedDataType}
                       />
                       <WorldRegionSelector />
                     </>

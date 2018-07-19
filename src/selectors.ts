@@ -4,7 +4,7 @@ import { Data as GapminderData } from './components/generic/gapminder';
 import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
-  HistoricalDataType,
+  AnyDataType,
   StressShortageDatum,
   TimeAggregate,
   WorldRegion,
@@ -248,7 +248,7 @@ function getThresholds(state: StateTree) {
 
 export function getThresholdsForDataType(
   state: StateTree,
-  dataType: HistoricalDataType,
+  dataType: AnyDataType,
 ) {
   return getThresholds(state)[dataType];
 }

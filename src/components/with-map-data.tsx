@@ -22,6 +22,7 @@ interface GeneratedDispatchProps {
 
 interface GeneratedStateProps {
   selectedWaterData?: TimeAggregate<number>;
+  selectedDataType: HistoricalDataType;
   waterRegions?: WaterRegionGeoJSON;
 }
 
@@ -55,6 +56,7 @@ export default function withMapData<T extends MapProps>(
         data: mapValues(selectedData.data, d => selector(d)),
       };
       return {
+        selectedDataType: dataType,
         selectedWaterData: dataForComponent,
         waterRegions: getWaterRegionData(state),
       };

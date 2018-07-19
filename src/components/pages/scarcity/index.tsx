@@ -55,7 +55,7 @@ class ScarcityBody extends React.Component<MapProps> {
   }
 
   public render() {
-    const { selectedWaterData, waterRegions } = this.props;
+    const { selectedWaterData, waterRegions, selectedDataType } = this.props;
 
     return (
       <div>
@@ -99,6 +99,7 @@ class ScarcityBody extends React.Component<MapProps> {
                 />
                 <ResponsiveMap
                   selectedData={selectedWaterData}
+                  selectedDataType={selectedDataType}
                   waterRegions={waterRegions}
                 />
               </MapContainer>
