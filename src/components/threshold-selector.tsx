@@ -10,6 +10,7 @@ import {
 } from '../data';
 import { StateTree } from '../reducers';
 import { getThresholdsForDataType } from '../selectors';
+import { AnyDataType, Diff } from '../types';
 import { theme } from './theme';
 
 // Using esnext modules with TypeScript doesn't allow us to do
@@ -23,23 +24,26 @@ const Root = styled.div`
 const Header = styled.div`
   margin-bottom: 4px;
   font-family: ${theme.labelFontFamily};
+  font-size: 14px;
 `;
 
 const stressColors = getDataTypeColors('stress');
 const shortageColors = getDataTypeColors('shortage');
+const kcalColors = getDataTypeColors('kcal');
 
 const StyledReactSlider = styled(ReactSlider)`
   width: 100%;
-  height: 26px;
+  height: 18px;
 
   & .bar-stress,
-  & .bar-shortage {
+  & .bar-shortage,
+  & .bar-kcal {
     position: relative;
     top: 2px;
     background: #d2e3e5;
-    height: 16px;
-    border-radius: 8px;
-    margin: 0 6px;
+    height: 10px;
+    border-radius: 5px;
+    margin: 0 1px;
 
     &.bar-stress-1 {
       background: ${stressColors[0]};
@@ -64,25 +68,37 @@ const StyledReactSlider = styled(ReactSlider)`
     &.bar-shortage-2 {
       background: ${shortageColors[0]};
     }
+
+    &.bar-kcal-0 {
+      background: ${kcalColors[2]};
+    }
+
+    &.bar-kcal-1 {
+      background: ${kcalColors[1]};
+    }
+
+    &.bar-kcal-2 {
+      background: ${kcalColors[0]};
+    }
   }
 
   & .threshold-selector-handle {
     background-color: #aaa;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
     border: 2px solid white;
   }
 
   & .threshold-selector-active {
-    border: 4px solid white !important;
+    border: 3px solid white !important;
   }
 `;
 
 const Labels = styled.div`
   position: relative;
-  font-size: 14px;
+  font-size: 12px;
   font-family: ${theme.labelFontFamily};
   color: ${theme.colors.grayDarker};
   margin: 0 10px;
@@ -105,7 +121,7 @@ const ResetLink = styled.span`
   top: -5px;
   cursor: pointer;
   color: ${theme.colors.grayDark};
-  font-size: 14px;
+  font-size: 12px;
   font-weight: lighter;
   font-family: ${theme.labelFontFamily};
 
@@ -114,8 +130,11 @@ const ResetLink = styled.span`
   }
 `;
 
+type SupportedDataTypes = Diff<AnyDataType, 'scarcity'>;
+
 interface PassedProps {
-  dataType: 'stress' | 'shortage';
+  dataType: SupportedDataTypes;
+  style?: React.CSSProperties;
   className?: string;
 }
 
@@ -130,7 +149,7 @@ interface GeneratedDispatchProps {
 type Props = GeneratedDispatchProps & GeneratedStateProps & PassedProps;
 
 const configurations: {
-  [type in 'stress' | 'shortage']: {
+  [type in SupportedDataTypes]: {
     min: number;
     max: number;
     step: number;
@@ -149,19 +168,48 @@ const configurations: {
     step: 10,
     formatter: format('d'),
   },
+  kcal: {
+    min: 0,
+    max: defaultDataTypeThresholdMaxValues.kcal,
+    step: 1,
+    formatter: format('d'),
+  },
 };
 
-function getHeaderText(dataType: 'stress' | 'shortage') {
-  const text =
-    dataType === 'shortage'
-      ? 'Available water per capita (m³)'
-      : 'Consumption relative to availability';
+function getHeaderText(dataType: SupportedDataTypes) {
+  let body;
+  let header;
+  switch (dataType) {
+    case 'stress':
+      header = 'Stress';
+      body = 'Consumption relative to availability';
+      break;
+    case 'shortage':
+      header = 'Shortage';
+      body = 'Available water per capita (m³)';
+      break;
+    case 'kcal':
+      header = 'Food production';
+      body = 'Kcal per person per day';
+      break;
+  }
+
   return (
     <span>
-      <strong>{dataType.charAt(0).toUpperCase() + dataType.slice(1)}:</strong>{' '}
-      {text}
+      <strong>{header}:</strong> {body}
     </span>
   );
+}
+
+function getBarClassName(dataType: SupportedDataTypes) {
+  switch (dataType) {
+    case 'stress':
+      return 'bar-stress';
+    case 'shortage':
+      return 'bar-shortage';
+    case 'kcal':
+      return 'bar-kcal';
+  }
 }
 
 // TODO: Replace react-slider with https://github.com/airbnb/rheostat ?
@@ -171,13 +219,14 @@ function ThresholdSelector({
   thresholds,
   dataType,
   setThresholds,
+  style,
 }: Props) {
   const { step, min, max, formatter } = configurations[dataType];
   const slidingMax = Math.max(thresholds[thresholds.length - 1] * 1.1, max);
 
   // ReactSlider modifies the contents of the values array. We need to clone it
   return (
-    <Root className={className}>
+    <Root style={style} className={className}>
       <Header>{getHeaderText(dataType)}</Header>
       <StyledReactSlider
         min={min}
@@ -190,7 +239,7 @@ function ThresholdSelector({
         snapDragDisabled
         handleClassName="threshold-selector-handle"
         handleActiveClassName="threshold-selector-active"
-        barClassName={dataType === 'stress' ? 'bar-stress' : 'bar-shortage'}
+        barClassName={getBarClassName(dataType)}
         onChange={setThresholds}
       />
       <Labels>
@@ -227,7 +276,7 @@ export default connect<
   }),
   (dispatch, ownProps) => ({
     setThresholds: (values: number[] | number) => {
-      // ReactSlider modifies the contents of the values array
+      // NOTE! ReactSlider modifies the contents of the values array
       const thresholds = Array.isArray(values) ? values.slice() : [values];
       dispatch(setThresholdsForDataType(ownProps.dataType, thresholds));
     },
