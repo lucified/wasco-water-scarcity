@@ -34,6 +34,7 @@ import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
 import MapPlaceholder from './map-placeholder';
+import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
 
 const Title = styled.h1`
@@ -78,6 +79,16 @@ const StyledSpinner = styled(Spinner)`
 const Error = styled.div`
   margin-top: 40px;
   text-align: center;
+`;
+
+const MapHeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const TimeSelectorContainer = styled.div`
+  max-width: 300px;
+  width: 100%;
 `;
 
 interface GeneratedStateProps {
@@ -135,6 +146,25 @@ class FutureBody extends React.Component<Props, State> {
         endYear,
         data: mapValues(timeData, d => d[dataType]),
       };
+    },
+  );
+
+  private getTimeLabels = createSelector(
+    // Note: the time labels should be the same for all scenarios
+    (state: State) => state.scenarioData[toScenarioId(state.selectedScenario)],
+    scenarioData => {
+      if (!scenarioData) {
+        return undefined;
+      }
+
+      return scenarioData.reduce<{ [index: number]: string }>(
+        (result, datum, index) => {
+          const { y0, y1 } = datum;
+          result[index] = y0 !== y1 ? `${y0}-${y1}` : `${y0}`;
+          return result;
+        },
+        {},
+      );
     },
   );
 
@@ -332,12 +362,7 @@ class FutureBody extends React.Component<Props, State> {
       ? toEnsembleRegionId(selectedWaterRegionId)
       : toEnsembleWorldId(selectedWorldRegionId);
 
-    const yearString =
-      mapData &&
-      (mapData.startYear !== mapData.endYear
-        ? `${mapData.startYear}-${mapData.endYear}`
-        : mapData.startYear);
-    const yearLabel = mapData && ` for ${yearString}`;
+    const timeLabels = this.getTimeLabels(this.state);
 
     return (
       <div>
@@ -350,9 +375,20 @@ class FutureBody extends React.Component<Props, State> {
                 <StyledSpinner />
               ) : (
                 <>
-                  <SmallSectionHeader>
-                    Selected scenario{yearLabel}
-                  </SmallSectionHeader>
+                  <MapHeaderRow>
+                    <SmallSectionHeader>Selected scenario</SmallSectionHeader>
+                    <TimeSelectorContainer>
+                      {timeLabels && (
+                        <TimeSelector
+                          min={0}
+                          max={Object.keys(timeLabels).length - 1}
+                          value={selectedTimeIndex}
+                          onChange={this.handleTimeIndexChange}
+                          labels={timeLabels}
+                        />
+                      )}
+                    </TimeSelectorContainer>
+                  </MapHeaderRow>
                   {!mapData ? (
                     isLoadingScenario === toScenarioId(selectedScenario) ? (
                       <MapPlaceholder />
@@ -360,13 +396,13 @@ class FutureBody extends React.Component<Props, State> {
                       <Error>No data found for selected scenario.</Error>
                     )
                   ) : (
-                    <div>
+                    <>
                       <ResponsiveMap
                         selectedData={mapData}
                         waterRegions={waterRegions}
                       />
                       <WorldRegionSelector />
-                    </div>
+                    </>
                   )}
                   {!ensembleData[selectedDataType][ensembleAreaId] ? (
                     isLoadingEnsemble === ensembleAreaId ? (

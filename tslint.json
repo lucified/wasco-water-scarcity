@@ -12,7 +12,16 @@
     "jsx-boolean-value": false,
     "jsx-wrap-multiline": false,
     "object-literal-sort-keys": false,
-    "no-console": [true, "log", "assert", "debug", "info", "profile", "time", "trace"],
+    "no-console": [
+      true,
+      "log",
+      "assert",
+      "debug",
+      "info",
+      "profile",
+      "time",
+      "trace"
+    ],
     "no-object-literal-type-assertion": false,
     "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
     "member-ordering": [false],
@@ -20,8 +29,15 @@
     "arrow-parens": false,
     "no-empty-interface": false,
     "semicolon": [true, "always", "ignore-bound-class-methods"],
-    "no-this-assignment": [true, {"allow-destructuring": true}],
-    "no-submodule-imports": false
+    "no-this-assignment": [true, { "allow-destructuring": true }],
+    "no-submodule-imports": false,
+    "trailing-comma": {
+      "options": {
+        "multiline": "always",
+        "singleline": "never",
+        "esSpecCompliant": true
+      }
+    }
   },
   "jsRules": {
     "arrow-parens": false,
@@ -35,7 +51,13 @@
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
     "quotemark": [true, "single", "avoid-escape", "jsx-double"],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ],
     "no-submodule-imports": false
   },
   "rulesDirectory": []
