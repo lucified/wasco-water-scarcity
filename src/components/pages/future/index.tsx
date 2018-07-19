@@ -91,6 +91,10 @@ const TimeSelectorContainer = styled.div`
   width: 100%;
 `;
 
+function ensembleRequestId(areaId: string, dataType: FutureDataType) {
+  return `${dataType}-${areaId}`;
+}
+
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegionId: number;
@@ -104,8 +108,8 @@ interface State {
   selectedTimeIndex: number;
   comparisonVariables: FutureDatasetVariables;
   hoveredScenarios?: FutureEnsembleData;
-  isLoadingEnsemble?: string;
-  isLoadingScenario?: string;
+  ensemblesRequested: string[];
+  scenariosRequested: string[];
   ensembleData: {
     [dataType in FutureDataType]: {
       [regionId: string]: FutureEnsembleData | undefined;
@@ -127,6 +131,8 @@ class FutureBody extends React.Component<Props, State> {
     comparisonVariables: getDefaultComparison(StartingPoint.CHANGE_THE_WORLD),
     ensembleData: { stress: {}, kcal: {} },
     scenarioData: {},
+    ensemblesRequested: [],
+    scenariosRequested: [],
   };
 
   private getMapData = createSelector(
@@ -173,11 +179,14 @@ class FutureBody extends React.Component<Props, State> {
     featureId: string,
     dataType: FutureDataType,
   ) {
-    if (this.state.isLoadingEnsemble != null) {
-      console.error('Already loading ensemble', this.state.isLoadingEnsemble);
+    const requestId = ensembleRequestId(featureId, dataType);
+    if (this.state.ensemblesRequested.indexOf(requestId) > -1) {
+      console.error('Already loading ensemble', requestId);
       return;
     }
-    this.setState({ isLoadingEnsemble: featureId });
+    this.setState(state => ({
+      ensemblesRequested: state.ensemblesRequested.concat(requestId),
+    }));
     const ensembleData = await fetchFutureEnsembleData(
       dataset,
       featureId,
@@ -194,10 +203,9 @@ class FutureBody extends React.Component<Props, State> {
             },
           }
         : state.ensembleData,
-      isLoadingEnsemble:
-        state.isLoadingEnsemble === featureId
-          ? undefined
-          : state.isLoadingEnsemble,
+      ensemblesRequested: state.ensemblesRequested.filter(
+        id => id !== requestId,
+      ),
     }));
   }
 
@@ -206,11 +214,13 @@ class FutureBody extends React.Component<Props, State> {
     scenario: FutureScenario,
   ) {
     const scenarioId = toScenarioId(scenario);
-    if (this.state.isLoadingScenario != null) {
-      console.error('Already loading scenario', this.state.isLoadingScenario);
+    if (this.state.scenariosRequested.indexOf(scenarioId) > -1) {
+      console.error('Already loading scenario', scenarioId);
       return;
     }
-    this.setState({ isLoadingScenario: scenarioId });
+    this.setState(state => ({
+      scenariosRequested: state.scenariosRequested.concat(scenarioId),
+    }));
     const scenarioData = await fetchFutureScenarioData(dataset, scenario);
     this.setState(state => ({
       scenarioData: scenarioData
@@ -219,10 +229,9 @@ class FutureBody extends React.Component<Props, State> {
             [scenarioId]: scenarioData,
           }
         : state.scenarioData,
-      isLoadingScenario:
-        state.isLoadingScenario === scenarioId
-          ? undefined
-          : state.isLoadingScenario,
+      scenariosRequested: state.scenariosRequested.filter(
+        id => id !== scenarioId,
+      ),
     }));
   }
 
@@ -258,56 +267,14 @@ class FutureBody extends React.Component<Props, State> {
   }
 
   // private setDataType(dataType: FutureDataType) {
-  //   const { selectedDataType, ensembleData } = this.state;
+  //   const { selectedDataType, ensembleData, selectedDataset } = this.state;
   //   const { selectedWaterRegionId, selectedWorldRegionId } = this.props;
   //   if (dataType !== selectedDataType) {
   //     const areaId = selectedWaterRegionId
   //       ? toEnsembleRegionId(selectedWaterRegionId)
   //       : toEnsembleWorldId(selectedWorldRegionId);
-  //     const dataset = getFutureDataset(dataType)!;
-  //     this.setState({
-  //       selectedDataType: dataType,
-  //       selectedDataset: dataset,
-  //     });
-  //     // TODO: Check that we don't need to do this for the future scenario as well –
-  //     // AFAIK the data for different data types is already included in the fetched
-  //     // data and it only needs to be fetched if we change scenario.
   //     if (!ensembleData[dataType][areaId]) {
-  //       this.fetchFutureEnsembleData(dataset, areaId);
-  //     }
-  //   }
-  // }
-
-  // private verifyDataExistsForSelectedScenario() {
-  //   const {
-  //     futureEnsembleData,
-  //     allEnsemblesInSelectedDataset,
-  //     mapData,
-  //     selectedScenario,
-  //     selectedFutureDataset,
-  //   } = this.props;
-
-  //   if (allEnsemblesInSelectedDataset) {
-  //     if (!futureEnsembleData) {
-  //       // This means we have fetched the data but have currently selected a
-  //       // scenario for which data does not exist. Switch to the default one.
-  //       let defaultScenario = allEnsemblesInSelectedDataset.find(
-  //         d => !!d.default,
-  //       );
-  //       if (!defaultScenario) {
-  //         console.warn('Missing default scenario for dataset');
-  //         defaultScenario = allEnsemblesInSelectedDataset[0];
-  //       }
-  //       if (!defaultScenario) {
-  //         console.error('No scenarios for dataset!');
-  //       } else {
-  //         this.setSelectedScenario(removeDataFromScenario(defaultScenario));
-  //       }
-  //     } else if (!mapData && selectedScenario) {
-  //       this.props.loadFutureScenarioData(
-  //         selectedFutureDataset,
-  //         selectedScenario,
-  //       );
+  //       this.fetchFutureEnsembleData(selectedDataset, areaId, dataType);
   //     }
   //   }
   // }
@@ -352,8 +319,8 @@ class FutureBody extends React.Component<Props, State> {
       selectedScenario,
       selectedDataset,
       comparisonVariables,
-      isLoadingScenario,
-      isLoadingEnsemble,
+      scenariosRequested,
+      ensemblesRequested,
       ensembleData,
       hoveredScenarios,
     } = this.state;
@@ -394,7 +361,8 @@ class FutureBody extends React.Component<Props, State> {
                     </TimeSelectorContainer>
                   </MapHeaderRow>
                   {!mapData ? (
-                    isLoadingScenario === toScenarioId(selectedScenario) ? (
+                    scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
+                    -1 ? (
                       <MapPlaceholder />
                     ) : (
                       <Error>No data found for selected scenario.</Error>
@@ -409,7 +377,9 @@ class FutureBody extends React.Component<Props, State> {
                     </>
                   )}
                   {!ensembleData[selectedDataType][ensembleAreaId] ? (
-                    isLoadingEnsemble === ensembleAreaId ? (
+                    ensemblesRequested.indexOf(
+                      ensembleRequestId(ensembleAreaId, selectedDataType),
+                    ) > -1 ? (
                       <StyledSpinner />
                     ) : (
                       <Error>No data found for selected area.</Error>
