@@ -211,6 +211,11 @@ function getFutureScenarioURL(
   );
 }
 
+export function isFutureDataType(value: string): value is FutureDataType {
+  const options: FutureDataType[] = ['stress', 'kcal'];
+  return options.indexOf(value as FutureDataType) > -1;
+}
+
 function generateWorldRegionsData(geoJSON: WorldRegionGeoJSON): WorldRegion[] {
   return geoJSON.features.map(region => ({
     id: region.properties.featureId,
