@@ -385,6 +385,10 @@ class FutureBody extends React.Component<Props, State> {
                           value={selectedTimeIndex}
                           onChange={this.handleTimeIndexChange}
                           labels={timeLabels}
+                          labelStyle={{
+                            fontFamily: theme.bodyFontFamily,
+                            fontSize: 14,
+                          }}
                         />
                       )}
                     </TimeSelectorContainer>
