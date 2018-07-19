@@ -1,6 +1,6 @@
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
-import { ExtendedFeature, geoNaturalEarth1, geoPath } from 'd3-geo';
+import { ExtendedFeature, geoNaturalEarth1, geoPath, GeoSphere } from 'd3-geo';
 import {
   scaleLinear,
   ScaleLinear,
@@ -318,8 +318,8 @@ class Map extends React.Component<Props, State> {
     const svg = select<SVGElement, undefined>(this.svgRef);
     svg
       .select<SVGPathElement>('#sphere')
-      .datum({ type: 'Sphere' })
-      .attr('d', path as any); // TODO: fix typing
+      .datum<GeoSphere>({ type: 'Sphere' })
+      .attr('d', path);
 
     svg.select('use#globe-fill').on('click', clearSelectedRegion);
 
@@ -327,7 +327,7 @@ class Map extends React.Component<Props, State> {
     svg
       .select<SVGPathElement>('path#land')
       .datum(feature(worldData, worldData.objects.land))
-      .attr('d', path as any);
+      .attr('d', path);
 
     // Water regions
     // prettier-ignore
@@ -419,9 +419,7 @@ class Map extends React.Component<Props, State> {
           .tickSize(13)
           .tickValues(this.colorScale!.domain())
           .tickFormat(
-            selectedDataType === 'stress'
-              ? format('.2f')
-              : (format('d') as any), // TODO: fix typing
+            selectedDataType === 'stress' ? format('.2f') : format('d'),
           ),
       )
         .select('.domain')
