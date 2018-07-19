@@ -82,87 +82,86 @@ const getAggregateData = createSelector(
         endYear,
       ));
 
-      Object.keys(timeUnit.data)
-        .map(Number)
-        .forEach(id => {
-          const region = timeUnit.data[id];
-          const worldRegionId = waterToWorldRegionMap[id];
-          if (worldRegionId == null) {
-            console.warn(`No world region ID available for region ${id}`);
-            return;
-          }
-          const { population } = region;
-          const worldRegion =
-            result.data[worldRegionId] ||
-            (result.data[worldRegionId] = createEmptyWorldRegionAggregate(
-              worldRegionId,
-              startYear,
-              endYear,
-            ));
+      Object.keys(timeUnit.data).forEach(idString => {
+        const id = Number(idString);
+        const region = timeUnit.data[id];
+        const worldRegionId = waterToWorldRegionMap[id];
+        if (worldRegionId == null) {
+          console.warn(`No world region ID available for region ${id}`);
+          return;
+        }
+        const { population } = region;
+        const worldRegion =
+          result.data[worldRegionId] ||
+          (result.data[worldRegionId] = createEmptyWorldRegionAggregate(
+            worldRegionId,
+            startYear,
+            endYear,
+          ));
 
-          const fieldsToAdd: Array<keyof AggregateStressShortageDatum> = [
-            'population',
-            'availability',
-            'consumptionTotal',
-            'consumptionIrrigation',
-            'consumptionDomestic',
-            'consumptionElectric',
-            'consumptionLivestock',
-            'consumptionManufacturing',
-          ];
+        const fieldsToAdd: Array<keyof AggregateStressShortageDatum> = [
+          'population',
+          'availability',
+          'consumptionTotal',
+          'consumptionIrrigation',
+          'consumptionDomestic',
+          'consumptionElectric',
+          'consumptionLivestock',
+          'consumptionManufacturing',
+        ];
 
-          fieldsToAdd.forEach(field => {
-            worldRegion[field] += (region as any)[field];
-            wholeGlobeRegion[field] += (region as any)[field];
-          });
-
-          // Stress
-          if (region.stress == null || region.stress >= thresholds.stress[2]) {
-            worldRegion.populationHighStress += population;
-            wholeGlobeRegion.populationHighStress += population;
-          } else if (region.stress >= thresholds.stress[1]) {
-            worldRegion.populationModerateStress += population;
-            wholeGlobeRegion.populationModerateStress += population;
-          } else if (region.stress >= thresholds.stress[0]) {
-            worldRegion.populationLowStress += population;
-            wholeGlobeRegion.populationLowStress += population;
-          } else {
-            worldRegion.populationNoStress += population;
-            wholeGlobeRegion.populationNoStress += population;
-          }
-
-          // Shortage
-          if (region.shortage <= thresholds.shortage[0]) {
-            worldRegion.populationHighShortage += population;
-            wholeGlobeRegion.populationHighShortage += population;
-          } else if (region.shortage <= thresholds.shortage[1]) {
-            worldRegion.populationModerateShortage += population;
-            wholeGlobeRegion.populationModerateShortage += population;
-          } else if (region.shortage <= thresholds.shortage[2]) {
-            worldRegion.populationLowShortage += population;
-            wholeGlobeRegion.populationLowShortage += population;
-          } else {
-            worldRegion.populationNoShortage += population;
-            wholeGlobeRegion.populationNoShortage += population;
-          }
-
-          // Scarcity
-          if (region.stress == null || region.stress >= thresholds.stress[0]) {
-            if (region.shortage <= thresholds.shortage[2]) {
-              worldRegion.populationShortageAndStress += population;
-              wholeGlobeRegion.populationShortageAndStress += population;
-            } else {
-              worldRegion.populationOnlyStress += population;
-              wholeGlobeRegion.populationOnlyStress += population;
-            }
-          } else if (region.shortage <= thresholds.shortage[2]) {
-            worldRegion.populationOnlyShortage += population;
-            wholeGlobeRegion.populationOnlyShortage += population;
-          } else {
-            worldRegion.populationNoShortageAndStress += population;
-            wholeGlobeRegion.populationNoShortageAndStress += population;
-          }
+        fieldsToAdd.forEach(field => {
+          worldRegion[field] += (region as any)[field];
+          wholeGlobeRegion[field] += (region as any)[field];
         });
+
+        // Stress
+        if (region.stress == null || region.stress >= thresholds.stress[2]) {
+          worldRegion.populationHighStress += population;
+          wholeGlobeRegion.populationHighStress += population;
+        } else if (region.stress >= thresholds.stress[1]) {
+          worldRegion.populationModerateStress += population;
+          wholeGlobeRegion.populationModerateStress += population;
+        } else if (region.stress >= thresholds.stress[0]) {
+          worldRegion.populationLowStress += population;
+          wholeGlobeRegion.populationLowStress += population;
+        } else {
+          worldRegion.populationNoStress += population;
+          wholeGlobeRegion.populationNoStress += population;
+        }
+
+        // Shortage
+        if (region.shortage <= thresholds.shortage[0]) {
+          worldRegion.populationHighShortage += population;
+          wholeGlobeRegion.populationHighShortage += population;
+        } else if (region.shortage <= thresholds.shortage[1]) {
+          worldRegion.populationModerateShortage += population;
+          wholeGlobeRegion.populationModerateShortage += population;
+        } else if (region.shortage <= thresholds.shortage[2]) {
+          worldRegion.populationLowShortage += population;
+          wholeGlobeRegion.populationLowShortage += population;
+        } else {
+          worldRegion.populationNoShortage += population;
+          wholeGlobeRegion.populationNoShortage += population;
+        }
+
+        // Scarcity
+        if (region.stress == null || region.stress >= thresholds.stress[0]) {
+          if (region.shortage <= thresholds.shortage[2]) {
+            worldRegion.populationShortageAndStress += population;
+            wholeGlobeRegion.populationShortageAndStress += population;
+          } else {
+            worldRegion.populationOnlyStress += population;
+            wholeGlobeRegion.populationOnlyStress += population;
+          }
+        } else if (region.shortage <= thresholds.shortage[2]) {
+          worldRegion.populationOnlyShortage += population;
+          wholeGlobeRegion.populationOnlyShortage += population;
+        } else {
+          worldRegion.populationNoShortageAndStress += population;
+          wholeGlobeRegion.populationNoShortageAndStress += population;
+        }
+      });
 
       return result;
     });

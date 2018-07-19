@@ -302,7 +302,7 @@ export const defaultDataTypeThresholdMaxValues: {
 } = {
   stress: 2,
   shortage: 4000,
-  scarcity: 2,
+  scarcity: 1.5,
   kcal: 4000,
 };
 
@@ -375,11 +375,12 @@ export function getDataTypeColors(dataType: AnyDataType) {
     case 'stress':
       return ['#F59696', '#CE4B4B', '#A81818'];
     case 'shortage':
-      return ['#f5f07f', '#e6dc4c', '#d7c919'];
+      return ['#C29FED', '#9A65DA', '#7839C5'];
     case 'scarcity':
-      return ['#6a51a3', '#d7c919', 'rgb(203, 24, 29)'];
+      // [stress, stress + shortage, shortage]
+      return ['#F59696', '#BB5C8B', '#C29FED'];
     case 'kcal':
-      return ['#f5f07f', '#e6dc4c', '#d7c919'];
+      return ['#A7E595', '#48C423', '#2EA50A'];
   }
 
   console.warn('Unknown data type', dataType);
@@ -395,11 +396,11 @@ export function scarcitySelector(
     const hasStress = d.stress >= stressThresholds[0];
     const hasShortage = d.shortage <= shortageThresholds[2];
     if (hasStress && hasShortage) {
-      return scarcityThresholds[2] + 0.1;
+      return scarcityThresholds[1] + 0.1;
     }
 
     if (hasShortage) {
-      return scarcityThresholds[1] + 0.1;
+      return scarcityThresholds[2] + 0.1;
     }
 
     if (hasStress) {

@@ -398,14 +398,14 @@ class Map extends React.Component<Props, State> {
       g.call(
         axisBottom(this.legendXScale!)
           .tickSize(10)
-          .tickValues([0.25, 0.75, 1.5])
+          .tickValues([0.12, 0.75, 1.32])
           .tickFormat(
             d =>
-              d === 0.25
+              d === 0.12
                 ? 'Stress'
                 : d === 0.75
-                  ? 'Shortage'
-                  : 'Stress + Shortage',
+                  ? 'Stress + Shortage'
+                  : 'Shortage',
           ),
       )
         .select('.domain')

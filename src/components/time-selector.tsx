@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
-import { getDataTypeColors } from '../data';
+import { belowThresholdColor, getDataTypeColors } from '../data';
 import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
@@ -30,8 +30,7 @@ function getValues(
   dataType: HistoricalDataType,
   datum: AggregateStressShortageDatum,
 ) {
-  const emptyColor = '#D2E3E5';
-  const colors = [emptyColor, ...getDataTypeColors(dataType)];
+  const colors = [belowThresholdColor, ...getDataTypeColors(dataType)];
 
   switch (dataType) {
     case 'stress':
@@ -83,13 +82,13 @@ function getValues(
     case 'scarcity':
       return [
         {
-          key: 'Stress and shortage',
-          total: datum.populationShortageAndStress,
+          key: 'Shortage only',
+          total: datum.populationOnlyShortage,
           color: colors[3],
         },
         {
-          key: 'Shortage only',
-          total: datum.populationOnlyShortage,
+          key: 'Stress and shortage',
+          total: datum.populationShortageAndStress,
           color: colors[2],
         },
         {
