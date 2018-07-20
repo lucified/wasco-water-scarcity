@@ -2,7 +2,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { WaterRegionGeoJSON } from '../../../data';
 import { HistoricalDataType, TimeAggregate } from '../../../types';
-import Gapminder from '../../gapminder';
 import Spinner from '../../generic/spinner';
 import Header from '../../header';
 import { ResponsiveMap } from '../../map/responsive';
@@ -101,13 +100,6 @@ export class PastBody extends React.Component<Props> {
                 <div className="row">
                   <WorldRegionSelector />
                 </div>
-                {selectedDataType === 'scarcity' && (
-                  <div className="row middle-xs">
-                    <div className="col-xs-12">
-                      <Gapminder />
-                    </div>
-                  </div>
-                )}
                 <div className="row">
                   <SelectedRegionInformation dataType={selectedDataType} />
                 </div>

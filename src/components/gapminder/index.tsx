@@ -19,6 +19,24 @@ import {
 import Gapminder, { Data } from '../generic/gapminder';
 import responsive from '../generic/responsive';
 
+function shortageSelector(data: { [dataType: string]: number[] }) {
+  return data.shortage;
+}
+
+function stressSelector(data: { [dataType: string]: number[] }) {
+  return data.stress;
+}
+
+function populationSelector(data: { [dataType: string]: number[] }) {
+  return data.population;
+}
+
+const ResponsiveGapminder = responsive(Gapminder);
+
+interface PassedProps {
+  height: number;
+}
+
 interface GeneratedStateProps {
   selectedTimeIndex: number;
   waterToWorldRegionMap?: { [waterRegionId: number]: number };
@@ -34,21 +52,7 @@ interface GeneratedDispatchProps {
   toggleSelectedRegion: (id: string) => void;
 }
 
-type Props = GeneratedStateProps & GeneratedDispatchProps;
-
-function shortageSelector(data: { [dataType: string]: number[] }) {
-  return data.shortage;
-}
-
-function stressSelector(data: { [dataType: string]: number[] }) {
-  return data.stress;
-}
-
-function populationSelector(data: { [dataType: string]: number[] }) {
-  return data.population;
-}
-
-const ResponsiveGapminder = responsive(Gapminder);
+type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 function GapminderWrapper({
   selectedTimeIndex,
@@ -60,6 +64,7 @@ function GapminderWrapper({
   toggleSelectedRegion,
   stressThresholds,
   shortageThresholds,
+  height,
 }: Props) {
   if (!waterToWorldRegionMap || !data) {
     return null;
@@ -85,7 +90,7 @@ function GapminderWrapper({
   return (
     <div>
       <ResponsiveGapminder
-        height={400}
+        height={height}
         data={data}
         selectedTimeIndex={selectedTimeIndex}
         selectedData={
@@ -112,10 +117,10 @@ function GapminderWrapper({
   );
 }
 
-export default connect<
+export const ConnectedGapminder = connect<
   GeneratedStateProps,
   GeneratedDispatchProps,
-  {},
+  PassedProps,
   StateTree
 >(
   state => ({

@@ -23,6 +23,7 @@ import {
   StressShortageDatum,
   WorldRegion,
 } from '../../types';
+import { ConnectedGapminder } from '../gapminder';
 import { SectionHeader, theme } from '../theme';
 import AvailabilityChart from './availability-chart';
 import ConsumptionChart from './consumption-chart';
@@ -107,7 +108,6 @@ class SelectedRegionInformation extends React.Component<Props> {
 
   private getStressChart() {
     const {
-      dataType,
       timeSeriesForSelectedWaterRegion,
       stressThresholds,
       selectedTimeIndex,
@@ -115,15 +115,9 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeIndexLocked,
     } = this.props;
 
-    if (['stress', 'scarcity'].indexOf(dataType) < 0) {
-      return null;
-    }
-
-    const title = this.getChartTitle('stress');
-
     return (
       <div className="col-xs-12 col-md-4">
-        <Heading>{title}</Heading>
+        <Heading>{this.getChartTitle('stress')}</Heading>
         <Description>Consumption / Availability</Description>
         {timeSeriesForSelectedWaterRegion ? (
           <DataLineChart
@@ -147,7 +141,6 @@ class SelectedRegionInformation extends React.Component<Props> {
 
   private getShortageChart() {
     const {
-      dataType,
       timeSeriesForSelectedWaterRegion,
       shortageThresholds,
       selectedTimeIndex,
@@ -155,15 +148,9 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeIndexLocked,
     } = this.props;
 
-    if (['shortage', 'scarcity'].indexOf(dataType) < 0) {
-      return null;
-    }
-
-    const title = this.getChartTitle('shortage');
-
     return (
       <div className="col-xs-12 col-md-4">
-        <Heading>{title}</Heading>
+        <Heading>{this.getChartTitle('shortage')}</Heading>
         <Description>Availability per person (m³)</Description>
         {timeSeriesForSelectedWaterRegion ? (
           <DataLineChart
@@ -190,17 +177,12 @@ class SelectedRegionInformation extends React.Component<Props> {
 
   private getAvailabilityChart(maxConsumptionOrAvailability: number) {
     const {
-      dataType,
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
     } = this.props;
-
-    if (['stress', 'shortage'].indexOf(dataType) < 0) {
-      return null;
-    }
 
     return (
       <div className="col-xs-12 col-md-4">
@@ -223,17 +205,12 @@ class SelectedRegionInformation extends React.Component<Props> {
 
   private getConsumptionChart(maxConsumptionOrAvailability: number) {
     const {
-      dataType,
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
     } = this.props;
-
-    if (['stress', 'shortage'].indexOf(dataType) < 0) {
-      return null;
-    }
 
     return (
       <div className="col-xs-12 col-md-4">
@@ -281,6 +258,55 @@ class SelectedRegionInformation extends React.Component<Props> {
     );
   }
 
+  private getGapminderChart() {
+    return (
+      <div className="col-xs-12 col-md-4">
+        <Heading>Stress vs. shortage</Heading>
+        <Description>Per region</Description>
+        <ConnectedGapminder height={260} />
+      </div>
+    );
+  }
+
+  private getChartsFor(dataType: HistoricalDataType) {
+    const {
+      timeSeriesForSelectedWaterRegion,
+      timeSeriesForSelectedWorldRegion,
+    } = this.props;
+
+    const maxConsumptionOrAvailability = max<Datum, number>(
+      timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion!,
+      d => Math.max(d.availability, d.consumptionTotal),
+    )!;
+
+    switch (dataType) {
+      case 'stress':
+        return (
+          <>
+            {this.getStressChart()}
+            {this.getAvailabilityChart(maxConsumptionOrAvailability)}
+            {this.getConsumptionChart(maxConsumptionOrAvailability)}
+          </>
+        );
+      case 'shortage':
+        return (
+          <>
+            {this.getShortageChart()}
+            {this.getAvailabilityChart(maxConsumptionOrAvailability)}
+            {this.getPopulationChart()}
+          </>
+        );
+      case 'scarcity':
+        return (
+          <>
+            {this.getStressChart()}
+            {this.getShortageChart()}
+            {this.getGapminderChart()}
+          </>
+        );
+    }
+  }
+
   private getTitle() {
     const { selectedWaterRegionId, selectedWorldRegion } = this.props;
 
@@ -296,32 +322,16 @@ class SelectedRegionInformation extends React.Component<Props> {
   }
 
   public render() {
-    const {
-      timeSeriesForSelectedWaterRegion,
-      timeSeriesForSelectedWorldRegion,
-      dataType,
-    } = this.props;
+    const { timeSeriesForSelectedWorldRegion, dataType } = this.props;
 
     if (!timeSeriesForSelectedWorldRegion) {
       return null;
     }
 
-    const maxConsumptionOrAvailability = max<Datum, number>(
-      timeSeriesForSelectedWaterRegion || timeSeriesForSelectedWorldRegion,
-      d => Math.max(d.availability, d.consumptionTotal),
-    )!;
-
     return (
       <div className="col-xs-12">
         <SectionHeader>{this.getTitle()}</SectionHeader>
-        <div className="row">
-          {this.getStressChart()}
-          {this.getShortageChart()}
-          {this.getAvailabilityChart(maxConsumptionOrAvailability)}
-          {dataType === 'shortage'
-            ? this.getPopulationChart()
-            : this.getConsumptionChart(maxConsumptionOrAvailability)}
-        </div>
+        <div className="row">{this.getChartsFor(dataType)}</div>
       </div>
     );
   }
