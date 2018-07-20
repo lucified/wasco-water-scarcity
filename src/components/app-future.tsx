@@ -1,3 +1,4 @@
+// react-hot-loader needs to be imported first
 import { hot } from 'react-hot-loader';
 // tslint:disable-next-line:ordered-imports
 import * as React from 'react';
@@ -7,6 +8,7 @@ import { loadMapData } from '../actions';
 import { StateTree } from '../reducers';
 import Future from './pages/future';
 
+// TODO: remove
 require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
 
 import 'normalize.css/normalize.css';

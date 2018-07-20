@@ -767,7 +767,7 @@ class Map extends React.Component<Props, State> {
           width="50"
           height="10"
           fill={scarcityColors[0]}
-          stroke-width="0"
+          strokeWidth="0"
         />
         <LegendLabel x="25" y="22" dx="2">
           Stress
@@ -778,7 +778,7 @@ class Map extends React.Component<Props, State> {
           width="115"
           height="10"
           fill={scarcityColors[1]}
-          stroke-width="0"
+          strokeWidth="0"
         />
         <LegendLabel x="108" y="22" dx="2">
           Stress + Shortage
@@ -789,7 +789,7 @@ class Map extends React.Component<Props, State> {
           width="65"
           height="10"
           fill={scarcityColors[2]}
-          stroke-width="0"
+          strokeWidth="0"
         />
         <LegendLabel x="197" y="22" dx="2">
           Shortage
