@@ -14,18 +14,16 @@ import {
 } from '../selectors';
 import Header from './header';
 import NotFound from './pages/not-found';
-import Scarcity from './pages/scarcity';
-import Shortage from './pages/shortage';
-import Stress from './pages/stress';
 
 // TODO: remove
 require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
 
-import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
+import 'normalize.css/normalize.css';
 import 'react-select/dist/react-select.css';
 import './app.css';
+import { Past } from './pages/past';
 import { theme } from './theme';
 
 // tslint:disable-next-line:no-unused-expression
@@ -113,9 +111,18 @@ class AppPlain extends React.Component<Props> {
         <div className="container">
           <Switch>
             {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={Stress} />
-            <Route path="/shortage" component={Shortage} />
-            <Route path="/scarcity" component={Scarcity} />
+            <Route
+              path="/stress"
+              render={() => <Past selectedDataType="stress" />}
+            />
+            <Route
+              path="/shortage"
+              render={() => <Past selectedDataType="shortage" />}
+            />
+            <Route
+              path="/scarcity"
+              render={() => <Past selectedDataType="scarcity" />}
+            />
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
             <Route component={NotFound} />
           </Switch>

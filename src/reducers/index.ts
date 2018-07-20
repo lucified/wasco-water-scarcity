@@ -23,7 +23,6 @@ const defaultState: StateTree = {
     impactModel: getDefaultHistoricalImpactModel(),
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
-    historicalDataType: 'stress',
     worldRegion: 0, // 0 means global
   },
 };
@@ -124,15 +123,6 @@ function selectionsReducer(
           // Clear selected region
           region: undefined,
           worldRegion: action.id,
-        };
-      }
-
-      return state;
-    case 'SET_SELECTED_HISTORICAL_DATA_TYPE':
-      if (action.dataType !== state.historicalDataType) {
-        return {
-          ...state,
-          historicalDataType: action.dataType,
         };
       }
 

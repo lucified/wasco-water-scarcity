@@ -191,10 +191,6 @@ export const getSelectedWorldRegion = createSelector<
   (id, regions) => regions && regions.find(r => r.id === id),
 );
 
-export function getSelectedHistoricalDataType(state: StateTree) {
-  return state.selections.historicalDataType;
-}
-
 export function getSelectedImpactModel(state: StateTree) {
   return state.selections.impactModel;
 }

@@ -8,7 +8,7 @@ interface Props {
 // Note: if we continue using one common embed layout for all embeds, this
 // component could be removed and just used directly inside index.tsx
 function StressEmbed({ autoplay }: Props) {
-  return <CommonEmbedLayout autoplay={autoplay} dataType="stress" />;
+  return <CommonEmbedLayout autoplay={autoplay} selectedDataType="stress" />;
 }
 
 export default StressEmbed;

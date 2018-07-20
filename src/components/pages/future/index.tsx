@@ -31,60 +31,22 @@ import { FutureDataType } from '../../../types';
 import RadioSelector, { Option } from '../../generic/radio-selector';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
-import { SmallSectionHeader, theme } from '../../theme';
+import {
+  BodyContainer,
+  DataTypeSelectorContainer,
+  Scroll,
+  SelectorsContent,
+  SmallSectionHeader,
+  StickyGraphics,
+  theme,
+  Title,
+  TitleContainer,
+} from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
-const Sticky = require('react-stickynode');
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const DataTypeSelectorContainer = styled.div`
-  margin-top: ${theme.defaultMargin}px;
-  width: 100%;
-  max-width: 420px;
-  padding-right: ${theme.defaultMargin}px;
-`;
-
-const Title = styled.h1`
-  font-weight: 800;
-  font-size: 28px;
-`;
-
-const Container = styled.div`
-  position: relative;
-  display: flex;
-  flex-flow: column;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  margin-top: ${theme.defaultMargin}px;
-`;
-
-const Scroll = styled.div`
-  position: relative;
-  display: block;
-`;
-
-const selectorsWidth = '400px';
-
-const SelectorsContent = styled.div`
-  position: relative;
-  width: ${selectorsWidth};
-  padding-right: ${theme.defaultMargin}px;
-`;
-
-const StickyGraphics = styled(Sticky)`
-  left: calc(100% - ${selectorsWidth});
-  width: calc(100% - ${selectorsWidth});
-  height: 100%;
-  float: right;
-`;
 
 const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
@@ -368,7 +330,7 @@ class FutureBody extends React.Component<Props, State> {
             />
           </DataTypeSelectorContainer>
         </TitleContainer>
-        <Container>
+        <BodyContainer>
           <Scroll>
             <StickyGraphics>
               {!waterRegions ||
@@ -450,7 +412,7 @@ class FutureBody extends React.Component<Props, State> {
               />
             </SelectorsContent>
           </Scroll>
-        </Container>
+        </BodyContainer>
       </div>
     );
   }

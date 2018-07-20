@@ -8,7 +8,6 @@ import {
 } from './data';
 import {
   AnyDataType,
-  HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
   TimeScale,
@@ -58,19 +57,6 @@ export function setSelectedWorldRegion(
   return {
     type: 'SET_SELECTED_WORLD_REGION',
     id,
-  };
-}
-
-export interface SetSelectedHistoricalDataTypeAction {
-  type: 'SET_SELECTED_HISTORICAL_DATA_TYPE';
-  dataType: HistoricalDataType;
-}
-export function setSelectedHistoricalDataType(
-  dataType: HistoricalDataType,
-): SetSelectedHistoricalDataTypeAction {
-  return {
-    type: 'SET_SELECTED_HISTORICAL_DATA_TYPE',
-    dataType,
   };
 }
 
@@ -232,7 +218,6 @@ export function loadMapData() {
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
-  | SetSelectedHistoricalDataTypeAction
   | SetSelectedWorldRegionAction
   | SetSelectedRegionAction
   | SetSelectedTimeScaleAction
