@@ -86,16 +86,8 @@ export const Title = styled.h1`
 export const BodyContainer = styled.div`
   position: relative;
   display: flex;
-  flex-flow: column;
-  margin-left: auto;
-  margin-right: auto;
   width: 100%;
   margin-top: ${defaultMargin}px;
-`;
-
-export const Scroll = styled.div`
-  position: relative;
-  display: block;
 `;
 
 const selectorsWidth = '400px';
@@ -107,10 +99,7 @@ export const SelectorsContent = styled.div`
 `;
 
 export const StickyGraphics = styled(Sticky)`
-  left: calc(100% - ${selectorsWidth});
   width: calc(100% - ${selectorsWidth});
-  height: 100%;
-  float: right;
 `;
 
 export const SectionHeader = styled.h2`

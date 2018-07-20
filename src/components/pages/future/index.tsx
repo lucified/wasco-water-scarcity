@@ -34,7 +34,6 @@ import { ResponsiveMap } from '../../map/responsive';
 import {
   BodyContainer,
   DataTypeSelectorContainer,
-  Scroll,
   SelectorsContent,
   SmallSectionHeader,
   StickyGraphics,
@@ -331,87 +330,85 @@ class FutureBody extends React.Component<Props, State> {
           </DataTypeSelectorContainer>
         </TitleContainer>
         <BodyContainer>
-          <Scroll>
-            <StickyGraphics>
-              {!waterRegions ||
-              (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
-                <StyledSpinner />
-              ) : (
-                <>
-                  <MapHeaderRow>
-                    <SmallSectionHeader>Selected scenario</SmallSectionHeader>
-                    <TimeSelectorContainer>
-                      {timeLabels && (
-                        <TimeSelector
-                          min={0}
-                          max={Object.keys(timeLabels).length - 1}
-                          value={selectedTimeIndex}
-                          onChange={this.handleTimeIndexChange}
-                          labels={timeLabels}
-                          labelStyle={{
-                            fontFamily: theme.bodyFontFamily,
-                            fontSize: 14,
-                          }}
-                        />
-                      )}
-                    </TimeSelectorContainer>
-                  </MapHeaderRow>
-                  {!mapData ? (
-                    scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
-                    -1 ? (
-                      <MapPlaceholder />
-                    ) : (
-                      <Error>No data found for selected scenario.</Error>
-                    )
-                  ) : (
-                    <>
-                      <ResponsiveMap
-                        selectedData={mapData}
-                        waterRegions={waterRegions}
-                        selectedDataType={selectedDataType}
+          <SelectorsContent>
+            <FutureScenarioFilter
+              setScenario={this.handleSetSelectedScenario}
+              selectedFutureDataset={selectedDataset}
+              selectedScenario={selectedScenario}
+              comparisonVariables={comparisonVariables}
+              ensembleData={ensembleData[selectedDataType][ensembleAreaId]}
+              setComparisonVariables={this.handleSetComparisonVariables}
+              setHoveredScenarios={this.handleSetHoveredScenarios}
+            />
+          </SelectorsContent>
+          <StickyGraphics>
+            {!waterRegions ||
+            (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
+              <StyledSpinner />
+            ) : (
+              <>
+                <MapHeaderRow>
+                  <SmallSectionHeader>Selected scenario</SmallSectionHeader>
+                  <TimeSelectorContainer>
+                    {timeLabels && (
+                      <TimeSelector
+                        min={0}
+                        max={Object.keys(timeLabels).length - 1}
+                        value={selectedTimeIndex}
+                        onChange={this.handleTimeIndexChange}
+                        labels={timeLabels}
+                        labelStyle={{
+                          fontFamily: theme.bodyFontFamily,
+                          fontSize: 14,
+                        }}
                       />
-                      <WorldRegionSelector />
-                    </>
-                  )}
-                  {!ensembleData[selectedDataType][ensembleAreaId] ? (
-                    ensemblesRequested.indexOf(
-                      ensembleRequestId(ensembleAreaId, selectedDataType),
-                    ) > -1 ? (
-                      <StyledSpinner />
-                    ) : (
-                      <Error>No data found for selected area.</Error>
-                    )
+                    )}
+                  </TimeSelectorContainer>
+                </MapHeaderRow>
+                {!mapData ? (
+                  scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
+                  -1 ? (
+                    <MapPlaceholder />
                   ) : (
-                    <FutureLineChart
-                      height={220}
-                      selectedTimeIndex={selectedTimeIndex}
+                    <Error>No data found for selected scenario.</Error>
+                  )
+                ) : (
+                  <>
+                    <ResponsiveMap
+                      selectedData={mapData}
+                      waterRegions={waterRegions}
                       selectedDataType={selectedDataType}
-                      ensembleData={
-                        ensembleData[selectedDataType][ensembleAreaId]!
-                      }
-                      selectedWorldRegionId={selectedWorldRegionId}
-                      selectedWaterRegionId={selectedWaterRegionId}
-                      comparisonVariables={comparisonVariables}
-                      selectedScenario={selectedScenario}
-                      onTimeIndexChange={this.handleTimeIndexChange}
-                      hoveredScenarios={hoveredScenarios}
                     />
-                  )}
-                </>
-              )}
-            </StickyGraphics>
-            <SelectorsContent>
-              <FutureScenarioFilter
-                setScenario={this.handleSetSelectedScenario}
-                selectedFutureDataset={selectedDataset}
-                selectedScenario={selectedScenario}
-                comparisonVariables={comparisonVariables}
-                ensembleData={ensembleData[selectedDataType][ensembleAreaId]}
-                setComparisonVariables={this.handleSetComparisonVariables}
-                setHoveredScenarios={this.handleSetHoveredScenarios}
-              />
-            </SelectorsContent>
-          </Scroll>
+                    <WorldRegionSelector />
+                  </>
+                )}
+                {!ensembleData[selectedDataType][ensembleAreaId] ? (
+                  ensemblesRequested.indexOf(
+                    ensembleRequestId(ensembleAreaId, selectedDataType),
+                  ) > -1 ? (
+                    <StyledSpinner />
+                  ) : (
+                    <Error>No data found for selected area.</Error>
+                  )
+                ) : (
+                  <FutureLineChart
+                    height={220}
+                    selectedTimeIndex={selectedTimeIndex}
+                    selectedDataType={selectedDataType}
+                    ensembleData={
+                      ensembleData[selectedDataType][ensembleAreaId]!
+                    }
+                    selectedWorldRegionId={selectedWorldRegionId}
+                    selectedWaterRegionId={selectedWaterRegionId}
+                    comparisonVariables={comparisonVariables}
+                    selectedScenario={selectedScenario}
+                    onTimeIndexChange={this.handleTimeIndexChange}
+                    hoveredScenarios={hoveredScenarios}
+                  />
+                )}
+              </>
+            )}
+          </StickyGraphics>
         </BodyContainer>
       </div>
     );

@@ -10,7 +10,6 @@ import SelectedRegionInformation from '../../selected-region-information';
 import {
   BodyContainer,
   DataTypeSelectorContainer,
-  Scroll,
   SelectorsContent,
   StickyGraphics,
   theme,
@@ -61,64 +60,62 @@ export class PastBody extends React.Component<Props> {
           <Title>Water scarcity exploration tool</Title>
         </TitleContainer>
         <BodyContainer>
-          <Scroll>
-            <StickyGraphics>
-              {!waterRegions || !selectedWaterData ? (
-                <StyledSpinner />
-              ) : (
-                <>
-                  <div className="row middle-xs">
-                    <div className="col-xs-12">
-                      <TimeSelector dataType={selectedDataType} />
+          <SelectorsContent>
+            <DataTypeSelectorContainer>
+              <NavLink to="/stress">Stress</NavLink>
+              <NavLink to="/shortage">Shortage</NavLink>
+              <NavLink to="/scarcity">Scarcity</NavLink>
+            </DataTypeSelectorContainer>
+            {selectedDataType === 'scarcity' && (
+              <>
+                <StyledThresholdSelector dataType="stress" />
+                <StyledThresholdSelector dataType="shortage" />
+              </>
+            )}
+          </SelectorsContent>
+          <StickyGraphics>
+            {!waterRegions || !selectedWaterData ? (
+              <StyledSpinner />
+            ) : (
+              <>
+                <div className="row middle-xs">
+                  <div className="col-xs-12">
+                    <TimeSelector dataType={selectedDataType} />
+                  </div>
+                </div>
+                <div className="row middle-xs">
+                  <MapContainer
+                    className={
+                      selectedDataType === 'scarcity'
+                        ? 'col-xs-12 col-md-6 col-lg-8'
+                        : 'col-xs-12'
+                    }
+                  >
+                    <StyledYearLabel
+                      startYear={selectedWaterData.startYear}
+                      endYear={selectedWaterData.endYear}
+                    />
+                    <ResponsiveMap
+                      selectedData={selectedWaterData}
+                      selectedDataType={selectedDataType}
+                      waterRegions={waterRegions}
+                    />
+                  </MapContainer>
+                  {selectedDataType === 'scarcity' && (
+                    <div className="col-xs-12 col-md-6 col-lg-4">
+                      <Gapminder />
                     </div>
-                  </div>
-                  <div className="row middle-xs">
-                    <MapContainer
-                      className={
-                        selectedDataType === 'scarcity'
-                          ? 'col-xs-12 col-md-6 col-lg-8'
-                          : 'col-xs-12'
-                      }
-                    >
-                      <StyledYearLabel
-                        startYear={selectedWaterData.startYear}
-                        endYear={selectedWaterData.endYear}
-                      />
-                      <ResponsiveMap
-                        selectedData={selectedWaterData}
-                        selectedDataType={selectedDataType}
-                        waterRegions={waterRegions}
-                      />
-                    </MapContainer>
-                    {selectedDataType === 'scarcity' && (
-                      <div className="col-xs-12 col-md-6 col-lg-4">
-                        <Gapminder />
-                      </div>
-                    )}
-                  </div>
-                  <div className="row">
-                    <WorldRegionSelector />
-                  </div>
-                  <div className="row">
-                    <SelectedRegionInformation dataType="shortage" />
-                  </div>
-                </>
-              )}
-            </StickyGraphics>
-            <SelectorsContent>
-              <DataTypeSelectorContainer>
-                <NavLink to="/stress">Stress</NavLink>
-                <NavLink to="/shortage">Shortage</NavLink>
-                <NavLink to="/scarcity">Scarcity</NavLink>
-              </DataTypeSelectorContainer>
-              {selectedDataType === 'scarcity' && (
-                <>
-                  <StyledThresholdSelector dataType="stress" />
-                  <StyledThresholdSelector dataType="shortage" />
-                </>
-              )}
-            </SelectorsContent>
-          </Scroll>
+                  )}
+                </div>
+                <div className="row">
+                  <WorldRegionSelector />
+                </div>
+                <div className="row">
+                  <SelectedRegionInformation dataType="shortage" />
+                </div>
+              </>
+            )}
+          </StickyGraphics>
         </BodyContainer>
       </div>
     );
