@@ -11,19 +11,14 @@ import {
   BodyContainer,
   SelectorsContent,
   StickyGraphics,
-  theme,
   Title,
   TitleContainer,
 } from '../../theme';
-import ThresholdSelector from '../../threshold-selector';
 import TimeSelector from '../../time-selector';
 import withMapData from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
-
-const StyledThresholdSelector = styled(ThresholdSelector)`
-  margin-bottom: ${theme.margin()};
-`;
+import { Choices } from './choices';
 
 const MapContainer = styled.div`
   position: relative;
@@ -61,12 +56,7 @@ export class PastBody extends React.Component<Props> {
         <Header />
         <BodyContainer className="container">
           <SelectorsContent>
-            {selectedDataType === 'scarcity' && (
-              <>
-                <StyledThresholdSelector dataType="stress" />
-                <StyledThresholdSelector dataType="shortage" />
-              </>
-            )}
+            <Choices dataType={selectedDataType} />
           </SelectorsContent>
           <StickyGraphics>
             {!waterRegions || !selectedWaterData ? (

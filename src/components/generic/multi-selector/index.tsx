@@ -11,16 +11,16 @@ const ButtonGroup = styled.div`
 export interface Option {
   value: string;
   title: string;
-  description: string;
+  description?: string | JSX.Element;
   disabled?: boolean;
 }
 
 interface PassedProps {
   options: Option[];
   className?: string;
-  onChangeMultiSelect: (values: string[]) => void;
-  onChangeSelect: (value: string) => void;
-  multiSelectedValues: string[];
+  onChangeMultiSelect?: (values: string[]) => void;
+  onChangeSelect?: (value: string) => void;
+  multiSelectedValues?: string[];
   multiselect?: boolean;
   selectedValue: string;
   onEnterHoverRow?: (value: string) => void;
@@ -30,10 +30,12 @@ interface PassedProps {
 export default class MultiSelector extends React.Component<PassedProps> {
   private handleToggleMultiselectValue = (value: string) => {
     const { multiSelectedValues, onChangeMultiSelect } = this.props;
-    if (multiSelectedValues.indexOf(value) > -1) {
-      onChangeMultiSelect(multiSelectedValues.filter(d => d !== value));
-    } else {
-      onChangeMultiSelect(multiSelectedValues.concat([value]));
+    if (multiSelectedValues && onChangeMultiSelect) {
+      if (multiSelectedValues.indexOf(value) > -1) {
+        onChangeMultiSelect(multiSelectedValues.filter(d => d !== value));
+      } else {
+        onChangeMultiSelect(multiSelectedValues.concat([value]));
+      }
     }
   };
 
@@ -60,7 +62,10 @@ export default class MultiSelector extends React.Component<PassedProps> {
             onMultiSelectToggle={this.handleToggleMultiselectValue}
             onEnterHoverRow={onEnterHoverRow}
             onLeaveHoverRow={onLeaveHoverRow}
-            multiselectChecked={multiSelectedValues.indexOf(option.value) > -1}
+            multiselectChecked={
+              !!multiSelectedValues &&
+              multiSelectedValues.indexOf(option.value) > -1
+            }
             selected={option.value === selectedValue}
           />
         ))}
