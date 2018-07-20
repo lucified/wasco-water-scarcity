@@ -11,7 +11,9 @@ import {
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
+  isRequestOngoing,
 } from '../selectors';
+import { historicalDataRequestId } from '../utils';
 import NotFound from './pages/not-found';
 import { Past } from './pages/past';
 import { theme } from './theme';
@@ -63,6 +65,7 @@ interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
   selectedTimeScale: string;
+  isLoading: boolean;
 }
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
@@ -104,21 +107,28 @@ class AppPlain extends React.Component<Props> {
   }
 
   public render() {
+    const { isLoading } = this.props;
     return (
       <Root>
         <Switch>
           {/* These routes also handle any data loading or other onLoad trigger */}
           <Route
             path="/stress"
-            render={() => <Past selectedDataType="stress" />}
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="stress" />
+            )}
           />
           <Route
             path="/shortage"
-            render={() => <Past selectedDataType="shortage" />}
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="shortage" />
+            )}
           />
           <Route
             path="/scarcity"
-            render={() => <Past selectedDataType="scarcity" />}
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="scarcity" />
+            )}
           />
           <Route path="/" exact render={() => <Redirect to="/stress" />} />
           <Route component={NotFound} />
@@ -130,15 +140,26 @@ class AppPlain extends React.Component<Props> {
 
 export const App = hot(module)(
   connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
-    state => ({
-      selectedClimateModel: getSelectedClimateModel(state),
-      selectedImpactModel: getSelectedImpactModel(state),
-      selectedTimeScale: getSelectedTimeScale(state),
-    }),
+    state => {
+      const selectedClimateModel = getSelectedClimateModel(state);
+      const selectedImpactModel = getSelectedImpactModel(state);
+      const selectedTimeScale = getSelectedTimeScale(state);
+      const requestId = historicalDataRequestId(
+        selectedClimateModel,
+        selectedImpactModel,
+        selectedTimeScale,
+      );
+      return {
+        selectedClimateModel,
+        selectedImpactModel,
+        selectedTimeScale,
+        isLoading: isRequestOngoing(state, requestId),
+      };
+    },
     dispatch => ({
       loadMapData: () => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadMapData() as any);
+        dispatch(loadMapData('mapdata') as any);
       },
       loadModelData: (
         climateModel: string,
@@ -146,7 +167,12 @@ export const App = hot(module)(
         timeScale: string,
       ) => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadModelData(climateModel, impactModel, timeScale) as any);
+        dispatch(loadModelData(
+          climateModel,
+          impactModel,
+          timeScale,
+          historicalDataRequestId(climateModel, impactModel, timeScale),
+        ) as any);
       },
     }),
   )(AppPlain),

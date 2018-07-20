@@ -69,7 +69,7 @@ export const AppFuture = hot(module)(
     dispatch => ({
       loadMapData: () => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadMapData() as any);
+        dispatch(loadMapData('mapdata') as any);
       },
     }),
   )(AppFuturePlain),

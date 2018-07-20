@@ -192,6 +192,14 @@ export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
 }
 
+function getRequestsTree(state: StateTree) {
+  return state.requests;
+}
+
+export function isRequestOngoing(state: StateTree, requestId: string) {
+  return getRequestsTree(state).indexOf(requestId) > -1;
+}
+
 export const getTimeSeriesForSelectedWaterRegion = createSelector(
   getSelectedWaterRegionId,
   getStressShortageData,

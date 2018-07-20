@@ -25,6 +25,7 @@ const defaultState: StateTree = {
     timeScale: 'decadal',
     worldRegion: 0, // 0 means global
   },
+  requests: [],
 };
 
 export const initialState = defaultState;
@@ -52,6 +53,22 @@ function dataReducer(state = initialState.data, action: Action): DataTree {
         waterToWorldRegionsMap: action.map,
       };
   }
+  return state;
+}
+
+function requestsReducer(
+  state = initialState.requests,
+  action: Action,
+): string[] {
+  switch (action.type) {
+    case 'REQUEST_STARTED':
+      return state.concat(action.id);
+    case 'REQUEST_COMPLETED':
+      if (state.indexOf(action.id) > -1) {
+        return state.filter(id => id !== action.id);
+      }
+  }
+
   return state;
 }
 
@@ -193,6 +210,7 @@ export default combineReducers<StateTree>({
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
   data: dataReducer,
+  requests: requestsReducer,
 });
 
 export * from './types';

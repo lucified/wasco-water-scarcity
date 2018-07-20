@@ -176,42 +176,68 @@ export function toggleHistoricalTimeIndexLock(): ToggleHistoricalTimeIndexLockAc
   };
 }
 
+export interface RequestStartedAction {
+  type: 'REQUEST_STARTED';
+  id: string;
+}
+export function requestStarted(id: string): RequestStartedAction {
+  return {
+    type: 'REQUEST_STARTED',
+    id,
+  };
+}
+
+export interface RequestCompletedAction {
+  type: 'REQUEST_COMPLETED';
+  id: string;
+}
+export function requestCompleted(id: string): RequestCompletedAction {
+  return {
+    type: 'REQUEST_COMPLETED',
+    id,
+  };
+}
+
 export function loadModelData(
   climateModel: string,
   impactModel: string,
   timeScale: string,
+  requestId: string,
 ) {
-  return (dispatch: Dispatch<Action>) => {
-    return fetchHistoricalStressShortageData(
+  return async (dispatch: Dispatch<Action>) => {
+    dispatch(requestStarted(requestId));
+    const waterData = await fetchHistoricalStressShortageData(
       climateModel,
       impactModel,
       timeScale,
-    ).then(waterData => {
-      if (waterData) {
-        dispatch(storeWaterData(waterData));
-      }
-    });
+    );
+    dispatch(requestCompleted(requestId));
+    if (waterData) {
+      dispatch(storeWaterData(waterData));
+    }
   };
 }
 
-export function loadMapData() {
-  return (dispatch: Dispatch<Action>) => {
-    return Promise.all([fetchWaterRegionsData(), fetchWorldRegionsData()]).then(
-      ([waterRegionData, worldRegionsData]) => {
-        if (waterRegionData) {
-          dispatch(storeWaterRegionData(waterRegionData));
-          dispatch(
-            storeWaterToWorldRegionMap(
-              generateWaterToWorldRegionsMap(waterRegionData),
-            ),
-          );
-        }
+export function loadMapData(requestId: string) {
+  return async (dispatch: Dispatch<Action>) => {
+    dispatch(requestStarted(requestId));
+    const [waterRegionData, worldRegionsData] = await Promise.all([
+      fetchWaterRegionsData(),
+      fetchWorldRegionsData(),
+    ]);
+    dispatch(requestCompleted(requestId));
+    if (waterRegionData) {
+      dispatch(storeWaterRegionData(waterRegionData));
+      dispatch(
+        storeWaterToWorldRegionMap(
+          generateWaterToWorldRegionsMap(waterRegionData),
+        ),
+      );
+    }
 
-        if (worldRegionsData) {
-          dispatch(storeWorldRegionData(worldRegionsData));
-        }
-      },
-    );
+    if (worldRegionsData) {
+      dispatch(storeWorldRegionData(worldRegionsData));
+    }
   };
 }
 
@@ -227,5 +253,7 @@ export type Action =
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction
   | StoreWaterToWorldRegionMapAction
+  | RequestStartedAction
+  | RequestCompletedAction
   | ToggleHistoricalTimeIndexLockAction
   | ToggleSelectedRegionAction;

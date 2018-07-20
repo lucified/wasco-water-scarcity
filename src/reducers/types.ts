@@ -30,4 +30,5 @@ export interface StateTree {
   data: DataTree;
   thresholds: ThresholdsTree;
   selections: SelectionsTree;
+  requests: string[];
 }

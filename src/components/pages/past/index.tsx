@@ -40,13 +40,19 @@ interface GeneratedStateProps {
 
 interface PassedProps {
   selectedDataType: HistoricalDataType;
+  isLoading: boolean;
 }
 
 type Props = GeneratedStateProps & PassedProps;
 
 export class PastBody extends React.Component<Props> {
   public render() {
-    const { waterRegions, selectedDataType, selectedWaterData } = this.props;
+    const {
+      waterRegions,
+      selectedDataType,
+      selectedWaterData,
+      isLoading,
+    } = this.props;
 
     return (
       <div>
@@ -59,7 +65,7 @@ export class PastBody extends React.Component<Props> {
             <Choices dataType={selectedDataType} />
           </SelectorsContent>
           <StickyGraphics>
-            {!waterRegions || !selectedWaterData ? (
+            {isLoading || !waterRegions || !selectedWaterData ? (
               <StyledSpinner />
             ) : (
               <>
