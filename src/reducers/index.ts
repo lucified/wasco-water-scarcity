@@ -23,9 +23,9 @@ const defaultState: StateTree = {
     impactModel: getDefaultHistoricalImpactModel(),
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
-    historicalDataType: 'stress',
     worldRegion: 0, // 0 means global
   },
+  requests: [],
 };
 
 export const initialState = defaultState;
@@ -53,6 +53,22 @@ function dataReducer(state = initialState.data, action: Action): DataTree {
         waterToWorldRegionsMap: action.map,
       };
   }
+  return state;
+}
+
+function requestsReducer(
+  state = initialState.requests,
+  action: Action,
+): string[] {
+  switch (action.type) {
+    case 'REQUEST_STARTED':
+      return state.concat(action.id);
+    case 'REQUEST_COMPLETED':
+      if (state.indexOf(action.id) > -1) {
+        return state.filter(id => id !== action.id);
+      }
+  }
+
   return state;
 }
 
@@ -128,15 +144,6 @@ function selectionsReducer(
       }
 
       return state;
-    case 'SET_SELECTED_HISTORICAL_DATA_TYPE':
-      if (action.dataType !== state.historicalDataType) {
-        return {
-          ...state,
-          historicalDataType: action.dataType,
-        };
-      }
-
-      return state;
     case 'SET_SELECTED_IMPACT_MODEL':
       if (action.impactModel !== state.impactModel) {
         let { climateModel } = state;
@@ -203,6 +210,7 @@ export default combineReducers<StateTree>({
   selections: selectionsReducer,
   thresholds: thresholdsReducer,
   data: dataReducer,
+  requests: requestsReducer,
 });
 
 export * from './types';

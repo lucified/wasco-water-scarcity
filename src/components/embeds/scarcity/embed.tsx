@@ -8,7 +8,7 @@ interface Props {
 // Note: if we continue using one common embed layout for all embeds, this
 // component could be removed and just used directly inside index.tsx
 function ScarcityEmbed({ autoplay }: Props) {
-  return <CommonEmbedLayout dataType="scarcity" autoplay={autoplay} />;
+  return <CommonEmbedLayout selectedDataType="scarcity" autoplay={autoplay} />;
 }
 
 export default ScarcityEmbed;

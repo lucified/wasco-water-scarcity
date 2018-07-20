@@ -5,20 +5,14 @@ import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
   AnyDataType,
-  StressShortageDatum,
   TimeAggregate,
-  WorldRegion,
 } from './types';
 
-function getStressShortageData(
-  state: StateTree,
-): Array<TimeAggregate<StressShortageDatum>> | undefined {
+function getStressShortageData(state: StateTree) {
   return state.data.stressShortageData;
 }
 
-export function getSelectedStressShortageData(
-  state: StateTree,
-): TimeAggregate<StressShortageDatum> | undefined {
+export function getSelectedStressShortageData(state: StateTree) {
   const data = getStressShortageData(state);
   return data && data[getSelectedHistoricalTimeIndex(state)];
 }
@@ -180,20 +174,11 @@ export function getSelectedWorldRegionId(state: StateTree) {
   return state.selections.worldRegion;
 }
 
-export const getSelectedWorldRegion = createSelector<
-  StateTree,
-  number,
-  WorldRegion[] | undefined,
-  WorldRegion | undefined
->(
+export const getSelectedWorldRegion = createSelector(
   getSelectedWorldRegionId,
   getWorldRegionData,
   (id, regions) => regions && regions.find(r => r.id === id),
 );
-
-export function getSelectedHistoricalDataType(state: StateTree) {
-  return state.selections.historicalDataType;
-}
 
 export function getSelectedImpactModel(state: StateTree) {
   return state.selections.impactModel;
@@ -205,6 +190,14 @@ export function getSelectedClimateModel(state: StateTree) {
 
 export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
+}
+
+function getRequestsTree(state: StateTree) {
+  return state.requests;
+}
+
+export function isRequestOngoing(state: StateTree, requestId: string) {
+  return getRequestsTree(state).indexOf(requestId) > -1;
 }
 
 export const getTimeSeriesForSelectedWaterRegion = createSelector(

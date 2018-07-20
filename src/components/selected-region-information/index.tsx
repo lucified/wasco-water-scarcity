@@ -52,7 +52,7 @@ const Empty = styled.div`
 `;
 
 interface PassedProps {
-  dataType?: HistoricalDataType;
+  dataType: HistoricalDataType;
 }
 
 interface GeneratedStateProps {
@@ -71,27 +71,12 @@ interface GeneratedDispatchProps {
   toggleTimeIndexLock: () => void;
 }
 
-interface DefaultProps {
-  dataType: HistoricalDataType;
-}
-
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
-type PropsWithDefaults = Props & DefaultProps;
 
 class SelectedRegionInformation extends React.Component<Props> {
-  public static defaultProps: DefaultProps = {
-    dataType: 'scarcity',
-  };
-
-  constructor(props: Props) {
-    super(props);
-
-    this.handleTimeIndexChange = this.handleTimeIndexChange.bind(this);
-  }
-
-  private handleTimeIndexChange(index: number) {
+  private handleTimeIndexChange = (index: number) => {
     this.props.setTimeIndex(index);
-  }
+  };
 
   private getChartTitle(type: string) {
     const { selectedWaterRegionId, selectedWorldRegion } = this.props;
@@ -128,7 +113,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     if (['stress', 'scarcity'].indexOf(dataType) < 0) {
       return null;
@@ -168,7 +153,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     if (['shortage', 'scarcity'].indexOf(dataType) < 0) {
       return null;
@@ -211,7 +196,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     if (['stress', 'shortage'].indexOf(dataType) < 0) {
       return null;
@@ -244,7 +229,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     if (['stress', 'shortage'].indexOf(dataType) < 0) {
       return null;
@@ -276,7 +261,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       selectedTimeIndex,
       toggleTimeIndexLock,
       timeIndexLocked,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     return (
       <div className="col-xs-12 col-md-4">
@@ -315,7 +300,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       timeSeriesForSelectedWaterRegion,
       timeSeriesForSelectedWorldRegion,
       dataType,
-    } = this.props as PropsWithDefaults;
+    } = this.props;
 
     if (!timeSeriesForSelectedWorldRegion) {
       return null;
@@ -327,7 +312,7 @@ class SelectedRegionInformation extends React.Component<Props> {
     )!;
 
     return (
-      <div className="col-xs-12 col-md-12 col-lg-12">
+      <div className="col-xs-12">
         <SectionHeader>{this.getTitle()}</SectionHeader>
         <div className="row">
           {this.getStressChart()}

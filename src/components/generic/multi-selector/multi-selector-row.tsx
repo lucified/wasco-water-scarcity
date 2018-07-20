@@ -128,8 +128,8 @@ const StyledIcon = styled(CompareIcon)`
 `;
 
 interface Props {
-  onMultiSelectToggle: (values: string) => void;
-  onChangeSelect: (value: string) => void;
+  onMultiSelectToggle?: (values: string) => void;
+  onChangeSelect?: (value: string) => void;
   onEnterHoverRow?: (value: string) => void;
   onLeaveHoverRow?: (value: string) => void;
   option: Option;
@@ -140,11 +140,15 @@ interface Props {
 
 export class MultiSelectorRow extends React.Component<Props> {
   private handleMultiselectChange = () => {
-    this.props.onMultiSelectToggle(this.props.option.value);
+    if (this.props.onMultiSelectToggle) {
+      this.props.onMultiSelectToggle(this.props.option.value);
+    }
   };
 
   private handleSelectToggle = () => {
-    this.props.onChangeSelect(this.props.option.value);
+    if (this.props.onChangeSelect) {
+      this.props.onChangeSelect(this.props.option.value);
+    }
   };
 
   private handleMouseEnter = () => {
@@ -181,7 +185,7 @@ export class MultiSelectorRow extends React.Component<Props> {
           selected={selected}
         >
           <Title>{title}</Title>
-          <Description>{description}</Description>
+          {description && <Description>{description}</Description>}
         </Button>
         {multiselectChecked && (
           <StyledIcon

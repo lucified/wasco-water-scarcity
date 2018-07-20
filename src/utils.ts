@@ -27,3 +27,11 @@ export function formatYearRange(d: Datum, longForm = false) {
         d.endYear % 100,
       )}`;
 }
+
+export function historicalDataRequestId(
+  climateModel: string,
+  impactModel: string,
+  timeScale: string,
+) {
+  return `${climateModel}-${impactModel}-${timeScale}`;
+}

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+const Sticky = require('react-stickynode');
 
 // FONT
 
@@ -65,6 +66,41 @@ const dividerWidth = 1;
 const defaultMargin = 20;
 
 // REPEATING ELEMENTS
+export const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const DataTypeSelectorContainer = styled.div`
+  margin-top: ${defaultMargin}px;
+  width: 100%;
+  max-width: 420px;
+  padding-right: ${defaultMargin}px;
+`;
+
+export const Title = styled.h1`
+  font-weight: 800;
+  font-size: 28px;
+`;
+
+export const BodyContainer = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-top: ${defaultMargin}px;
+`;
+
+const selectorsWidth = '400px';
+
+export const SelectorsContent = styled.div`
+  position: relative;
+  width: ${selectorsWidth};
+  padding-right: ${defaultMargin}px;
+`;
+
+export const StickyGraphics = styled(Sticky)`
+  width: calc(100% - ${selectorsWidth});
+`;
 
 export const SectionHeader = styled.h2`
   margin-bottom: ${defaultMargin / 2}px;

@@ -8,7 +8,7 @@ interface Props {
 // Note: if we continue using one common embed layout for all embeds, this
 // component could be removed and just used directly inside index.tsx
 function ShortageEmbed({ autoplay }: Props) {
-  return <CommonEmbedLayout dataType="shortage" autoplay={autoplay} />;
+  return <CommonEmbedLayout selectedDataType="shortage" autoplay={autoplay} />;
 }
 
 export default ShortageEmbed;

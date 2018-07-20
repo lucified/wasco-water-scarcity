@@ -17,6 +17,7 @@ import {
 } from '../../selectors';
 
 import Gapminder, { Data } from '../generic/gapminder';
+import responsive from '../generic/responsive';
 
 interface GeneratedStateProps {
   selectedTimeIndex: number;
@@ -46,6 +47,8 @@ function stressSelector(data: { [dataType: string]: number[] }) {
 function populationSelector(data: { [dataType: string]: number[] }) {
   return data.population;
 }
+
+const ResponsiveGapminder = responsive(Gapminder);
 
 function GapminderWrapper({
   selectedTimeIndex,
@@ -81,8 +84,7 @@ function GapminderWrapper({
 
   return (
     <div>
-      <Gapminder
-        width={400}
+      <ResponsiveGapminder
         height={400}
         data={data}
         selectedTimeIndex={selectedTimeIndex}

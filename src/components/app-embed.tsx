@@ -7,23 +7,24 @@ import { Route, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
-
-require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
-
-// tslint:disable-next-line:ordered-imports
-import 'flexboxgrid/dist/flexboxgrid.min.css';
-import 'normalize.css/normalize.css';
-import 'react-select/dist/react-select.css';
 import {
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
-import './app.css';
+import { historicalDataRequestId } from '../utils';
 import { ScarcityEmbed } from './embeds/scarcity';
 import { ShortageEmbed } from './embeds/shortage';
 import { StressEmbed } from './embeds/stress';
 import { theme } from './theme';
+
+require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
+
+import 'normalize.css/normalize.css';
+// tslint:disable-next-line:ordered-imports
+import 'flexboxgrid/dist/flexboxgrid.min.css';
+import 'react-select/dist/react-select.css';
+import './app.css';
 
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
@@ -112,7 +113,12 @@ export const AppEmbed = hot(module)(
         timeScale: string,
       ) => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadModelData(climateModel, impactModel, timeScale) as any);
+        dispatch(loadModelData(
+          climateModel,
+          impactModel,
+          timeScale,
+          historicalDataRequestId(climateModel, impactModel, timeScale),
+        ) as any);
       },
     }),
   )(AppEmbedPlain),

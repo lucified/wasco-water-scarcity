@@ -5,7 +5,7 @@ import responsive, { ResponsiveProps } from '../generic/responsive';
 import Spinner from '../generic/spinner';
 import SimpleMap from '../simple-map';
 import TimeSelector from '../time-selector';
-import withMapData, { MapProps } from '../with-map-data';
+import withMapData, { GeneratedMapProps } from '../with-map-data';
 import WorldRegionSelector from '../world-region-selector';
 import YearLabel from '../year-label';
 
@@ -19,17 +19,13 @@ const StyledYearLabel = styled(YearLabel)`
 `;
 
 interface PassedProps {
-  dataType: HistoricalDataType;
+  selectedDataType: HistoricalDataType;
   autoplay: boolean;
 }
 
-type Props = MapProps & ResponsiveProps & PassedProps;
+type Props = GeneratedMapProps & ResponsiveProps & PassedProps;
 
 class CommonEmbedLayout extends React.Component<Props> {
-  public componentDidMount() {
-    this.props.setSelectedDataType(this.props.dataType);
-  }
-
   public render() {
     const {
       selectedWaterData,
@@ -51,7 +47,11 @@ class CommonEmbedLayout extends React.Component<Props> {
           <div>
             <div className="row middle-xs">
               <div className="col-xs-12">
-                <TimeSelector showPlayButton autoplay={autoplay} />
+                <TimeSelector
+                  dataType={selectedDataType}
+                  showPlayButton
+                  autoplay={autoplay}
+                />
               </div>
             </div>
             <div className="row">

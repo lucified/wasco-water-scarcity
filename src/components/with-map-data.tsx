@@ -1,11 +1,9 @@
 import { mapValues } from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { setSelectedHistoricalDataType } from '../actions';
 import { scarcitySelector, WaterRegionGeoJSON } from '../data';
 import { StateTree } from '../reducers';
 import {
-  getSelectedHistoricalDataType,
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
@@ -16,55 +14,37 @@ import {
   TimeAggregate,
 } from '../types';
 
-interface GeneratedDispatchProps {
-  setSelectedDataType: (dataType: HistoricalDataType) => void;
-}
-
-interface GeneratedStateProps {
+export interface GeneratedMapProps {
   selectedWaterData?: TimeAggregate<number>;
-  selectedDataType: HistoricalDataType;
   waterRegions?: WaterRegionGeoJSON;
 }
 
-export type MapProps = GeneratedDispatchProps & GeneratedStateProps;
+interface PassedProps {
+  selectedDataType: HistoricalDataType;
+}
 
-export default function withMapData<T extends MapProps>(
+export default function withMapData<T extends PassedProps>(
   Component: React.ComponentType<T>,
-  // Force the dataType for certain pages, otherwise use the data type from the Redux state.
-  componentDataType?: HistoricalDataType,
 ) {
-  return connect<
-    GeneratedStateProps,
-    GeneratedDispatchProps,
-    Pick<T, Exclude<keyof T, keyof MapProps>>,
-    StateTree
-  >(
-    state => {
-      const dataType =
-        componentDataType || getSelectedHistoricalDataType(state);
+  return connect<GeneratedMapProps, {}, T, StateTree>(
+    (state, { selectedDataType }) => {
       const selectedData = getSelectedStressShortageData(state);
       const selector =
-        dataType === 'scarcity'
+        selectedDataType === 'scarcity'
           ? scarcitySelector(
               getThresholdsForDataType(state, 'scarcity'),
               getThresholdsForDataType(state, 'stress'),
               getThresholdsForDataType(state, 'shortage'),
             )
-          : (d: StressShortageDatum) => d[dataType];
+          : (d: StressShortageDatum) => d[selectedDataType];
       const dataForComponent = selectedData && {
         ...selectedData,
         data: mapValues(selectedData.data, d => selector(d)),
       };
       return {
-        selectedDataType: dataType,
         selectedWaterData: dataForComponent,
         waterRegions: getWaterRegionData(state),
       };
     },
-    dispatch => ({
-      setSelectedDataType: (newDataType: HistoricalDataType) => {
-        dispatch(setSelectedHistoricalDataType(newDataType));
-      },
-    }),
   )(Component as any); // TODO: Fix typings
 }

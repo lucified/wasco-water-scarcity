@@ -11,12 +11,12 @@ import {
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
+  isRequestOngoing,
 } from '../selectors';
-import Header from './header';
+import { historicalDataRequestId } from '../utils';
 import NotFound from './pages/not-found';
-import Scarcity from './pages/scarcity';
-import Shortage from './pages/shortage';
-import Stress from './pages/stress';
+import { Past } from './pages/past';
+import { theme } from './theme';
 
 // TODO: remove
 require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
@@ -26,7 +26,6 @@ import 'normalize.css/normalize.css';
 import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'react-select/dist/react-select.css';
 import './app.css';
-import { theme } from './theme';
 
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
@@ -66,6 +65,7 @@ interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
   selectedTimeScale: string;
+  isLoading: boolean;
 }
 
 type Props = PassedProps & GeneratedDispatchProps & GeneratedStateProps;
@@ -107,19 +107,32 @@ class AppPlain extends React.Component<Props> {
   }
 
   public render() {
+    const { isLoading } = this.props;
     return (
       <Root>
-        <Header />
-        <div className="container">
-          <Switch>
-            {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route path="/stress" component={Stress} />
-            <Route path="/shortage" component={Shortage} />
-            <Route path="/scarcity" component={Scarcity} />
-            <Route path="/" exact render={() => <Redirect to="/stress" />} />
-            <Route component={NotFound} />
-          </Switch>
-        </div>
+        <Switch>
+          {/* These routes also handle any data loading or other onLoad trigger */}
+          <Route
+            path="/stress"
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="stress" />
+            )}
+          />
+          <Route
+            path="/shortage"
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="shortage" />
+            )}
+          />
+          <Route
+            path="/scarcity"
+            render={() => (
+              <Past isLoading={isLoading} selectedDataType="scarcity" />
+            )}
+          />
+          <Route path="/" exact render={() => <Redirect to="/stress" />} />
+          <Route component={NotFound} />
+        </Switch>
       </Root>
     );
   }
@@ -127,11 +140,22 @@ class AppPlain extends React.Component<Props> {
 
 export const App = hot(module)(
   connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
-    state => ({
-      selectedClimateModel: getSelectedClimateModel(state),
-      selectedImpactModel: getSelectedImpactModel(state),
-      selectedTimeScale: getSelectedTimeScale(state),
-    }),
+    state => {
+      const selectedClimateModel = getSelectedClimateModel(state);
+      const selectedImpactModel = getSelectedImpactModel(state);
+      const selectedTimeScale = getSelectedTimeScale(state);
+      const requestId = historicalDataRequestId(
+        selectedClimateModel,
+        selectedImpactModel,
+        selectedTimeScale,
+      );
+      return {
+        selectedClimateModel,
+        selectedImpactModel,
+        selectedTimeScale,
+        isLoading: isRequestOngoing(state, requestId),
+      };
+    },
     dispatch => ({
       loadMapData: () => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
@@ -143,7 +167,12 @@ export const App = hot(module)(
         timeScale: string,
       ) => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadModelData(climateModel, impactModel, timeScale) as any);
+        dispatch(loadModelData(
+          climateModel,
+          impactModel,
+          timeScale,
+          historicalDataRequestId(climateModel, impactModel, timeScale),
+        ) as any);
       },
     }),
   )(AppPlain),

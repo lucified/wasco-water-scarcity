@@ -1,7 +1,6 @@
 import { WaterRegionGeoJSON } from '../data';
 import {
   AnyDataType,
-  HistoricalDataType,
   StressShortageDatum,
   TimeAggregate,
   TimeScale,
@@ -11,7 +10,6 @@ import {
 export interface SelectionsTree {
   historicalTimeIndex: number;
   lockHistoricalTimeIndex: boolean;
-  historicalDataType: HistoricalDataType;
   impactModel: string; // Only used in Past pages
   climateModel: string; // Only used in Past pages
   timeScale: TimeScale; // Only used in Past pages
@@ -32,4 +30,5 @@ export interface StateTree {
   data: DataTree;
   thresholds: ThresholdsTree;
   selections: SelectionsTree;
+  requests: string[];
 }

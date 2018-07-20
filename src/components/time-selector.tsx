@@ -6,7 +6,6 @@ import { belowThresholdColor, getDataTypeColors } from '../data';
 import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
-  getSelectedHistoricalDataType,
   getSelectedHistoricalTimeIndex,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
@@ -117,7 +116,6 @@ interface GeneratedStateProps {
   selectedIndex: number;
   currentIndexLabel: string;
   data?: AggregateStressShortageDatum[];
-  dataType: HistoricalDataType;
   selectedWorldRegion?: WorldRegion;
   timeIndexLocked: boolean;
 }
@@ -130,6 +128,7 @@ interface GeneratedDispatchProps {
 interface PassedProps {
   showPlayButton?: boolean;
   autoplay?: boolean;
+  dataType: HistoricalDataType;
 }
 
 type Props = GeneratedDispatchProps &
@@ -300,7 +299,6 @@ export default connect<
       selectedIndex,
       currentIndexLabel: label,
       data,
-      dataType: getSelectedHistoricalDataType(state),
       selectedWorldRegion: getSelectedWorldRegion(state),
       timeIndexLocked: isHistoricalTimeIndexLocked(state),
     };
