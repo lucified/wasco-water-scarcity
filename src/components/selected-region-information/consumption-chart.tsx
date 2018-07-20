@@ -73,11 +73,7 @@ const legendItems: Array<LegendItem & { field: keyof Datum }> = [
 ];
 
 class ConsumptionChart extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {};
-  }
+  public state: State = {};
 
   private generateBarChartData = memoize(
     (data: Datum[], hoveredType?: keyof Datum) =>

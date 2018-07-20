@@ -5,20 +5,14 @@ import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
   AnyDataType,
-  StressShortageDatum,
   TimeAggregate,
-  WorldRegion,
 } from './types';
 
-function getStressShortageData(
-  state: StateTree,
-): Array<TimeAggregate<StressShortageDatum>> | undefined {
+function getStressShortageData(state: StateTree) {
   return state.data.stressShortageData;
 }
 
-export function getSelectedStressShortageData(
-  state: StateTree,
-): TimeAggregate<StressShortageDatum> | undefined {
+export function getSelectedStressShortageData(state: StateTree) {
   const data = getStressShortageData(state);
   return data && data[getSelectedHistoricalTimeIndex(state)];
 }
@@ -180,12 +174,7 @@ export function getSelectedWorldRegionId(state: StateTree) {
   return state.selections.worldRegion;
 }
 
-export const getSelectedWorldRegion = createSelector<
-  StateTree,
-  number,
-  WorldRegion[] | undefined,
-  WorldRegion | undefined
->(
+export const getSelectedWorldRegion = createSelector(
   getSelectedWorldRegionId,
   getWorldRegionData,
   (id, regions) => regions && regions.find(r => r.id === id),
