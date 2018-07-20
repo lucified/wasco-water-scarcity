@@ -98,7 +98,7 @@ export class PastBody extends React.Component<Props> {
                   </div>
                 )}
                 <div className="row">
-                  <SelectedRegionInformation dataType="shortage" />
+                  <SelectedRegionInformation dataType={selectedDataType} />
                 </div>
               </>
             )}

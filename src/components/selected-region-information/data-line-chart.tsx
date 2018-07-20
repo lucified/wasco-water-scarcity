@@ -3,6 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { StressShortageDatum } from '../../types';
 import LineChart, { Data } from '../generic/line-chart';
+import responsive from '../generic/responsive';
 import { theme } from '../theme';
 
 const Chart = styled(LineChart)`
@@ -14,6 +15,7 @@ interface PassedProps {
   dataType: 'shortage' | 'stress';
   dataColor: string;
   thresholds: number[];
+  width: number;
   thresholdColors: string[];
   yAxisLabel?: string;
   id: string;
@@ -26,9 +28,10 @@ interface PassedProps {
 
 type Props = PassedProps;
 
-export default function DataLineChart({
+function DataLineChart({
   data,
   dataType,
+  width,
   dataColor,
   id,
   thresholds,
@@ -60,7 +63,7 @@ export default function DataLineChart({
   return (
     <Chart
       data={chartData}
-      width={400}
+      width={width}
       height={180}
       yAxisLabel={yAxisLabel}
       selectedDataSeries={id}
@@ -75,3 +78,5 @@ export default function DataLineChart({
     />
   );
 }
+
+export default responsive(DataLineChart);
