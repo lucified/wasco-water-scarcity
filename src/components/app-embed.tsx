@@ -105,7 +105,7 @@ export const AppEmbed = hot(module)(
     dispatch => ({
       loadMapData: () => {
         // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
-        dispatch(loadMapData('mapdata') as any);
+        dispatch(loadMapData() as any);
       },
       loadModelData: (
         climateModel: string,

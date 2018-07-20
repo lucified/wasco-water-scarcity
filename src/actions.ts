@@ -218,8 +218,9 @@ export function loadModelData(
   };
 }
 
-export function loadMapData(requestId: string) {
+export function loadMapData() {
   return async (dispatch: Dispatch<Action>) => {
+    const requestId = 'mapdata';
     dispatch(requestStarted(requestId));
     const [waterRegionData, worldRegionsData] = await Promise.all([
       fetchWaterRegionsData(),
