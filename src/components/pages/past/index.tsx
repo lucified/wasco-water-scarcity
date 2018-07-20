@@ -1,15 +1,14 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { WaterRegionGeoJSON } from '../../../data';
 import { HistoricalDataType, TimeAggregate } from '../../../types';
 import Gapminder from '../../gapminder';
 import Spinner from '../../generic/spinner';
+import Header from '../../header';
 import { ResponsiveMap } from '../../map/responsive';
 import SelectedRegionInformation from '../../selected-region-information';
 import {
   BodyContainer,
-  DataTypeSelectorContainer,
   SelectorsContent,
   StickyGraphics,
   theme,
@@ -56,16 +55,12 @@ export class PastBody extends React.Component<Props> {
 
     return (
       <div>
-        <TitleContainer>
+        <TitleContainer className="container">
           <Title>Water scarcity exploration tool</Title>
         </TitleContainer>
-        <BodyContainer>
+        <Header />
+        <BodyContainer className="container">
           <SelectorsContent>
-            <DataTypeSelectorContainer>
-              <NavLink to="/stress">Stress</NavLink>
-              <NavLink to="/shortage">Shortage</NavLink>
-              <NavLink to="/scarcity">Scarcity</NavLink>
-            </DataTypeSelectorContainer>
             {selectedDataType === 'scarcity' && (
               <>
                 <StyledThresholdSelector dataType="stress" />

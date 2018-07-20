@@ -12,7 +12,6 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
-import Header from './header';
 import NotFound from './pages/not-found';
 import { Past } from './pages/past';
 import { theme } from './theme';
@@ -107,26 +106,23 @@ class AppPlain extends React.Component<Props> {
   public render() {
     return (
       <Root>
-        <Header />
-        <div className="container">
-          <Switch>
-            {/* These routes also handle any data loading or other onLoad trigger */}
-            <Route
-              path="/stress"
-              render={() => <Past selectedDataType="stress" />}
-            />
-            <Route
-              path="/shortage"
-              render={() => <Past selectedDataType="shortage" />}
-            />
-            <Route
-              path="/scarcity"
-              render={() => <Past selectedDataType="scarcity" />}
-            />
-            <Route path="/" exact render={() => <Redirect to="/stress" />} />
-            <Route component={NotFound} />
-          </Switch>
-        </div>
+        <Switch>
+          {/* These routes also handle any data loading or other onLoad trigger */}
+          <Route
+            path="/stress"
+            render={() => <Past selectedDataType="stress" />}
+          />
+          <Route
+            path="/shortage"
+            render={() => <Past selectedDataType="shortage" />}
+          />
+          <Route
+            path="/scarcity"
+            render={() => <Past selectedDataType="scarcity" />}
+          />
+          <Route path="/" exact render={() => <Redirect to="/stress" />} />
+          <Route component={NotFound} />
+        </Switch>
       </Root>
     );
   }
