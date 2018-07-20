@@ -14,17 +14,17 @@ import {
 } from '../selectors';
 import Header from './header';
 import NotFound from './pages/not-found';
+import { Past } from './pages/past';
+import { theme } from './theme';
 
 // TODO: remove
 require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
 
+import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
-import 'normalize.css/normalize.css';
 import 'react-select/dist/react-select.css';
 import './app.css';
-import { Past } from './pages/past';
-import { theme } from './theme';
 
 // tslint:disable-next-line:no-unused-expression
 injectGlobal`
