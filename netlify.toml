@@ -11,3 +11,8 @@
 
 [context."netlify/embed".environment]
   APP = "embed"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
