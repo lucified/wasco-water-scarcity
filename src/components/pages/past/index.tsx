@@ -74,14 +74,8 @@ export class PastBody extends React.Component<Props> {
                     <TimeSelector dataType={selectedDataType} />
                   </div>
                 </div>
-                <div className="row middle-xs">
-                  <MapContainer
-                    className={
-                      selectedDataType === 'scarcity'
-                        ? 'col-xs-12 col-md-6 col-lg-8'
-                        : 'col-xs-12'
-                    }
-                  >
+                <div className="row ">
+                  <MapContainer className="col-xs-12">
                     <StyledYearLabel
                       startYear={selectedWaterData.startYear}
                       endYear={selectedWaterData.endYear}
@@ -92,15 +86,17 @@ export class PastBody extends React.Component<Props> {
                       waterRegions={waterRegions}
                     />
                   </MapContainer>
-                  {selectedDataType === 'scarcity' && (
-                    <div className="col-xs-12 col-md-6 col-lg-4">
-                      <Gapminder />
-                    </div>
-                  )}
                 </div>
                 <div className="row">
                   <WorldRegionSelector />
                 </div>
+                {selectedDataType === 'scarcity' && (
+                  <div className="row middle-xs">
+                    <div className="col-xs-12">
+                      <Gapminder />
+                    </div>
+                  </div>
+                )}
                 <div className="row">
                   <SelectedRegionInformation dataType="shortage" />
                 </div>
