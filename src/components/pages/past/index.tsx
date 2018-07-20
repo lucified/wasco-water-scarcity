@@ -7,18 +7,32 @@ import Spinner from '../../generic/spinner';
 import Header from '../../header';
 import { ResponsiveMap } from '../../map/responsive';
 import SelectedRegionInformation from '../../selected-region-information';
-import {
-  BodyContainer,
-  SelectorsContent,
-  StickyGraphics,
-  Title,
-  TitleContainer,
-} from '../../theme';
+import { theme, Title, TitleContainer } from '../../theme';
 import TimeSelector from '../../time-selector';
 import withMapData from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
+const Sticky = require('react-stickynode');
+
+export const BodyContainer = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-top: ${theme.margin()};
+`;
+
+const selectorsWidth = '320px';
+
+export const SelectorsContent = styled.div`
+  position: relative;
+  width: ${selectorsWidth};
+  padding-left: ${theme.margin()};
+`;
+
+export const StickyGraphics = styled(Sticky)`
+  width: calc(100% - ${selectorsWidth});
+`;
 
 const MapContainer = styled.div`
   position: relative;
@@ -61,9 +75,6 @@ export class PastBody extends React.Component<Props> {
         </TitleContainer>
         <Header />
         <BodyContainer className="container">
-          <SelectorsContent>
-            <Choices dataType={selectedDataType} />
-          </SelectorsContent>
           <StickyGraphics>
             {isLoading || !waterRegions || !selectedWaterData ? (
               <StyledSpinner />
@@ -103,6 +114,9 @@ export class PastBody extends React.Component<Props> {
               </>
             )}
           </StickyGraphics>
+          <SelectorsContent>
+            <Choices dataType={selectedDataType} />
+          </SelectorsContent>
         </BodyContainer>
       </div>
     );

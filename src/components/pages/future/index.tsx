@@ -32,11 +32,8 @@ import RadioSelector, { Option } from '../../generic/radio-selector';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
 import {
-  BodyContainer,
   DataTypeSelectorContainer,
-  SelectorsContent,
   SmallSectionHeader,
-  StickyGraphics,
   theme,
   Title,
   TitleContainer,
@@ -46,6 +43,26 @@ import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
+const Sticky = require('react-stickynode');
+
+export const BodyContainer = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-top: ${theme.margin()};
+`;
+
+const selectorsWidth = '400px';
+
+export const SelectorsContent = styled.div`
+  position: relative;
+  width: ${selectorsWidth};
+  padding-right: ${theme.margin()};
+`;
+
+export const StickyGraphics = styled(Sticky)`
+  width: calc(100% - ${selectorsWidth});
+`;
 
 const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
