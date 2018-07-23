@@ -1,8 +1,8 @@
 import { applyMiddleware, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import { createMiddleware as createHashMiddleware } from './hash-middleware';
 import rootReducer, { StateTree } from './reducers';
 import { AppType } from './types';
+import { createMiddleware as createHashMiddleware } from './url-state';
 
 declare var window: { __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any };
 

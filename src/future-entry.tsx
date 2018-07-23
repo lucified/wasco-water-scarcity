@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import { AppFuture } from './components/app-future';
 import configureStore from './configure-store';
 import { getInitialState } from './reducers';
@@ -10,7 +11,9 @@ const store = configureStore(getInitialState(), AppType.FUTURE);
 
 ReactDOM.render(
   <Provider store={store}>
-    <AppFuture />
+    <BrowserRouter>
+      <AppFuture />
+    </BrowserRouter>
   </Provider>,
   document.getElementById('content'),
 );

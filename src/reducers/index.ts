@@ -7,7 +7,7 @@ import {
   getDefaultHistoricalImpactModel,
   getHistoricalClimateModels,
 } from '../data';
-import { getURLHashContents } from '../hash-middleware';
+import { getGlobalStateFromURLHash } from '../url-state';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 
 const defaultState: StateTree = {
@@ -30,7 +30,7 @@ const defaultState: StateTree = {
 };
 
 export function getInitialState(): StateTree {
-  const hashContents = getURLHashContents();
+  const hashContents = getGlobalStateFromURLHash();
   return {
     ...defaultState,
     selections: {

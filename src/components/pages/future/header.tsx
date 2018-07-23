@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { Props as FuturePageProps } from '.';
 import { theme } from '../../theme';
-import { futurePageURL } from './future-url';
 
 const Root = styled.div`
   border-bottom: 1px solid #f2f2f2;
@@ -43,7 +41,7 @@ const NavigationTheme = styled.div`
   color: ${theme.colors.gray};
 `;
 
-export default function Header(props: FuturePageProps) {
+export default function Header() {
   return (
     <Root>
       <Navigation>
@@ -52,18 +50,18 @@ export default function Header(props: FuturePageProps) {
             <div className="col-xs-12">
               <NavigationTheme>Future:</NavigationTheme>
               <NavigationItem
-                to={futurePageURL({ ...props, selectedDataType: 'stress' })}
-                isActive={match =>
-                  !!match && !!match.url && match.url.indexOf('/stress') === 0
+                to={`/stress${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/stress') === 0
                 }
                 activeClassName="selected"
               >
                 Water stress
               </NavigationItem>
               <NavigationItem
-                to={futurePageURL({ ...props, selectedDataType: 'kcal' })}
-                isActive={match =>
-                  !!match && !!match.url && match.url.indexOf('/kcal') === 0
+                to={`/kcal${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/kcal') === 0
                 }
                 activeClassName="selected"
               >
