@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 const Root = styled.div`
   border-bottom: 1px solid #f2f2f2;
@@ -48,15 +48,24 @@ export default function Header() {
         <div className="container">
           <div className="row">
             <div className="col-xs-12">
-              <NavigationTheme>Water body:</NavigationTheme>
-              <NavigationItem to="/stress" activeClassName="selected">
-                Heavy water usage
+              <NavigationTheme>Future:</NavigationTheme>
+              <NavigationItem
+                to={`/stress${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/stress') === 0
+                }
+                activeClassName="selected"
+              >
+                Water stress
               </NavigationItem>
-              <NavigationItem to="/shortage" activeClassName="selected">
-                Meeting water needs
-              </NavigationItem>
-              <NavigationItem to="/scarcity" activeClassName="selected">
-                Water scarcity
+              <NavigationItem
+                to={`/kcal${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/kcal') === 0
+                }
+                activeClassName="selected"
+              >
+                Food production
               </NavigationItem>
             </div>
           </div>

@@ -7,6 +7,7 @@ import {
   getDefaultHistoricalImpactModel,
   getHistoricalClimateModels,
 } from '../data';
+import { getGlobalStateFromURLHash } from '../url-state';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 
 const defaultState: StateTree = {
@@ -28,9 +29,22 @@ const defaultState: StateTree = {
   requests: [],
 };
 
-export const initialState = defaultState;
+export function getInitialState(): StateTree {
+  const hashContents = getGlobalStateFromURLHash();
+  return {
+    ...defaultState,
+    selections: {
+      ...defaultState.selections,
+      ...hashContents.selections,
+    },
+    thresholds: {
+      ...defaultState.thresholds,
+      ...hashContents.thresholds,
+    },
+  };
+}
 
-function dataReducer(state = initialState.data, action: Action): DataTree {
+function dataReducer(state = defaultState.data, action: Action): DataTree {
   switch (action.type) {
     case 'STORE_WATER_DATA':
       return {
@@ -57,7 +71,7 @@ function dataReducer(state = initialState.data, action: Action): DataTree {
 }
 
 function requestsReducer(
-  state = initialState.requests,
+  state = defaultState.requests,
   action: Action,
 ): string[] {
   switch (action.type) {
@@ -73,7 +87,7 @@ function requestsReducer(
 }
 
 function thresholdsReducer(
-  state = initialState.thresholds,
+  state = defaultState.thresholds,
   action: Action,
 ): ThresholdsTree {
   switch (action.type) {
@@ -89,7 +103,7 @@ function thresholdsReducer(
 }
 
 function selectionsReducer(
-  state = initialState.selections,
+  state = defaultState.selections,
   action: Action,
 ): SelectionsTree {
   switch (action.type) {
@@ -107,11 +121,15 @@ function selectionsReducer(
       return state;
     case 'STORE_WATER_DATA':
       // When we load a new data set, set the selected time index to the latest
-      // time period
-      return {
-        ...state,
-        historicalTimeIndex: action.data.length - 1,
-      };
+      // time period if the selected time is larger than the available data
+      if (state.historicalTimeIndex >= action.data.length) {
+        return {
+          ...state,
+          historicalTimeIndex: action.data.length - 1,
+        };
+      }
+
+      return state;
     case 'TOGGLE_SELECTED_REGION':
       if (state.region === action.id) {
         return {

@@ -14,7 +14,6 @@ import {
   getDefaultComparison,
   getDefaultFutureDataset,
   getDefaultFutureScenario,
-  isFutureDataType,
   StartingPoint,
   toEnsembleRegionId,
   toEnsembleWorldId,
@@ -28,19 +27,17 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
-import RadioSelector, { Option } from '../../generic/radio-selector';
+import {
+  addFuturePageStateToURL,
+  getFuturePageStateFromURLHash,
+} from '../../../url-state';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
-import {
-  DataTypeSelectorContainer,
-  SmallSectionHeader,
-  theme,
-  Title,
-  TitleContainer,
-} from '../../theme';
+import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
+import Header from './header';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
@@ -88,23 +85,21 @@ function ensembleRequestId(areaId: string, dataType: FutureDataType) {
   return `${dataType}-${areaId}`;
 }
 
-const DATA_TYPE_OPTIONS: Array<{ label: string; value: FutureDataType }> = [
-  { label: 'Water stress', value: 'stress' },
-  { label: 'Food production', value: 'kcal' },
-];
-
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegionId: number;
   waterRegions?: WaterRegionGeoJSON;
 }
 
-interface State {
-  selectedScenario: FutureScenario;
+interface PassedProps {
   selectedDataType: FutureDataType;
-  selectedDataset: FutureDataset;
+}
+
+export interface State {
   selectedTimeIndex: number;
   comparisonVariables: FutureDatasetVariables;
+  selectedScenario: FutureScenario;
+  selectedDataset: FutureDataset;
   hoveredScenarios?: FutureEnsembleData;
   ensemblesRequested: string[];
   scenariosRequested: string[];
@@ -118,11 +113,12 @@ interface State {
   };
 }
 
-type Props = GeneratedStateProps;
+export type Props = GeneratedStateProps & PassedProps;
+
+const initialURLContents = getFuturePageStateFromURLHash();
 
 class FutureBody extends React.Component<Props, State> {
   public state: State = {
-    selectedDataType: 'stress',
     selectedScenario: getDefaultFutureScenario(),
     selectedDataset: getDefaultFutureDataset(),
     selectedTimeIndex: 0,
@@ -131,20 +127,24 @@ class FutureBody extends React.Component<Props, State> {
     scenarioData: {},
     ensemblesRequested: [],
     scenariosRequested: [],
+    ...initialURLContents,
   };
 
   private getMapData = createSelector(
-    (state: State) => state.scenarioData[toScenarioId(state.selectedScenario)],
-    (state: State) => state.selectedTimeIndex,
-    (state: State) => state.selectedDataType,
+    (state: State, _props: Props) =>
+      state.scenarioData[toScenarioId(state.selectedScenario)],
+    (state: State, _props: Props) => state.selectedTimeIndex,
+    (_state: State, props: Props) => props.selectedDataType,
     (scenarioData, timeIndex, dataType) => {
       if (!scenarioData) {
         return undefined;
       }
 
-      const { y0: startYear, y1: endYear, data: timeData } = scenarioData[
-        timeIndex
-      ];
+      const timeObject = scenarioData[timeIndex];
+      if (!timeObject) {
+        return undefined;
+      }
+      const { y0: startYear, y1: endYear, data: timeData } = timeObject;
       return {
         startYear,
         endYear,
@@ -234,8 +234,8 @@ class FutureBody extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { selectedDataset, selectedScenario, selectedDataType } = this.state;
-    const { selectedWorldRegionId } = this.props;
+    const { selectedDataset, selectedScenario } = this.state;
+    const { selectedWorldRegionId, selectedDataType } = this.props;
 
     this.fetchFutureEnsembleData(
       selectedDataset,
@@ -245,15 +245,20 @@ class FutureBody extends React.Component<Props, State> {
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public componentWillReceiveProps({
+    selectedDataType,
+    selectedWaterRegionId,
+    selectedWorldRegionId,
+  }: Props) {
     if (
-      nextProps.selectedWaterRegionId !== this.props.selectedWaterRegionId ||
-      nextProps.selectedWorldRegionId !== this.props.selectedWorldRegionId
+      selectedWaterRegionId !== this.props.selectedWaterRegionId ||
+      selectedWorldRegionId !== this.props.selectedWorldRegionId ||
+      selectedDataType !== this.props.selectedDataType
     ) {
-      const { ensembleData, selectedDataset, selectedDataType } = this.state;
-      const ensembleAreaId = nextProps.selectedWaterRegionId
-        ? toEnsembleRegionId(nextProps.selectedWaterRegionId)
-        : toEnsembleWorldId(nextProps.selectedWorldRegionId);
+      const { selectedDataset, ensembleData } = this.state;
+      const ensembleAreaId = selectedWaterRegionId
+        ? toEnsembleRegionId(selectedWaterRegionId)
+        : toEnsembleWorldId(selectedWorldRegionId);
       if (!ensembleData[selectedDataType][ensembleAreaId]) {
         this.fetchFutureEnsembleData(
           selectedDataset,
@@ -264,28 +269,12 @@ class FutureBody extends React.Component<Props, State> {
     }
   }
 
-  private setDataType = ({ value: dataType }: Option) => {
-    if (!isFutureDataType(dataType)) {
-      console.error('Not a valid dataType', dataType);
-      return;
-    }
-    const { selectedDataType, ensembleData, selectedDataset } = this.state;
-    const { selectedWaterRegionId, selectedWorldRegionId } = this.props;
-    if (dataType !== selectedDataType) {
-      const areaId = selectedWaterRegionId
-        ? toEnsembleRegionId(selectedWaterRegionId)
-        : toEnsembleWorldId(selectedWorldRegionId);
-      if (!ensembleData[dataType][areaId]) {
-        this.fetchFutureEnsembleData(selectedDataset, areaId, dataType);
-      }
-      this.setState({ selectedDataType: dataType });
-    }
-  };
-
   private handleSetComparisonVariables = (
     comparisonVariables: FutureDatasetVariables,
   ) => {
-    this.setState({ comparisonVariables });
+    this.setState({ comparisonVariables }, () => {
+      addFuturePageStateToURL(this.state);
+    });
   };
 
   private handleSetSelectedScenario = (scenario: FutureScenario) => {
@@ -294,7 +283,9 @@ class FutureBody extends React.Component<Props, State> {
       if (!scenarioData[toScenarioId(scenario)]) {
         this.fetchFutureScenarioData(selectedDataset, scenario);
       }
-      this.setState({ selectedScenario: scenario });
+      this.setState({ selectedScenario: scenario }, () => {
+        addFuturePageStateToURL(this.state);
+      });
     }
   };
 
@@ -306,7 +297,9 @@ class FutureBody extends React.Component<Props, State> {
 
   private handleTimeIndexChange = (newIndex: number) => {
     if (this.state.selectedTimeIndex !== newIndex) {
-      this.setState({ selectedTimeIndex: newIndex });
+      this.setState({ selectedTimeIndex: newIndex }, () => {
+        addFuturePageStateToURL(this.state);
+      });
     }
   };
 
@@ -315,10 +308,10 @@ class FutureBody extends React.Component<Props, State> {
       waterRegions,
       selectedWaterRegionId,
       selectedWorldRegionId,
+      selectedDataType,
     } = this.props;
     const {
       selectedTimeIndex,
-      selectedDataType,
       selectedScenario,
       selectedDataset,
       comparisonVariables,
@@ -327,7 +320,7 @@ class FutureBody extends React.Component<Props, State> {
       ensembleData,
       hoveredScenarios,
     } = this.state;
-    const mapData = this.getMapData(this.state);
+    const mapData = this.getMapData(this.state, this.props);
     const ensembleAreaId = selectedWaterRegionId
       ? toEnsembleRegionId(selectedWaterRegionId)
       : toEnsembleWorldId(selectedWorldRegionId);
@@ -336,17 +329,11 @@ class FutureBody extends React.Component<Props, State> {
 
     return (
       <div>
-        <TitleContainer>
+        <TitleContainer className="container">
           <Title>Explore possible futures of water scarcity</Title>
-          <DataTypeSelectorContainer>
-            <RadioSelector
-              values={DATA_TYPE_OPTIONS}
-              selectedValue={selectedDataType}
-              onChange={this.setDataType}
-            />
-          </DataTypeSelectorContainer>
         </TitleContainer>
-        <BodyContainer>
+        <Header />
+        <BodyContainer className="container">
           <SelectorsContent>
             <FutureScenarioFilter
               setScenario={this.handleSetSelectedScenario}
@@ -432,10 +419,12 @@ class FutureBody extends React.Component<Props, State> {
   }
 }
 
-const Future = connect<GeneratedStateProps, {}, {}, StateTree>(state => ({
-  waterRegions: getWaterRegionData(state),
-  selectedWaterRegionId: getSelectedWaterRegionId(state),
-  selectedWorldRegionId: getSelectedWorldRegionId(state),
-}))(FutureBody);
+const Future = connect<GeneratedStateProps, {}, PassedProps, StateTree>(
+  state => ({
+    waterRegions: getWaterRegionData(state),
+    selectedWaterRegionId: getSelectedWaterRegionId(state),
+    selectedWorldRegionId: getSelectedWorldRegionId(state),
+  }),
+)(FutureBody);
 
 export default Future;

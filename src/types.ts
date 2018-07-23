@@ -65,5 +65,19 @@ export type HistoricalDataType = 'stress' | 'shortage' | 'scarcity';
 export type FutureDataType = 'stress' | 'kcal';
 export type AnyDataType = HistoricalDataType | FutureDataType;
 export type TimeScale = 'decadal' | 'annual';
+export enum AppType {
+  FUTURE,
+  PAST,
+  EMBED,
+}
 
+// Utility types
 export type Diff<T, U> = T extends U ? never : T;
+// tslint:disable:no-shadowed-variable
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T[P] extends ReadonlyArray<infer U>
+      ? ReadonlyArray<DeepPartial<U>>
+      : DeepPartial<T[P]>
+};
