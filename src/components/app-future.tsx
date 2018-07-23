@@ -68,7 +68,7 @@ export const AppFuture = hot(module)(
     null,
     dispatch => ({
       loadMapData: () => {
-        // TODO: remove 'as any' once this is resolved: https://github.com/gaearon/redux-thunk/issues/169
+        // TODO: Figure out how to type this: https://github.com/reduxjs/redux-thunk/issues/103
         dispatch(loadMapData() as any);
       },
     }),
