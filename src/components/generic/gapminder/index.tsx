@@ -25,10 +25,10 @@ const SVG = styled.svg`
   }
 
   & .gapminder-dot {
-    stroke: #000;
+    stroke: #999;
     stroke-opacity: 0.4;
     transition: opacity 100ms;
-    fill: #e5dddb;
+    fill: #dbe4e8;
 
     &.gapminder-fade-out {
       opacity: 0.1;
@@ -62,7 +62,8 @@ const AxisLabel = styled.text`
 `;
 
 const YearLabel = styled.text`
-  font: 600 50px 'Open Sans';
+  font-weight: 600;
+  font-family: 'Open Sans';
   fill: #ddd;
 
   &.gapminder-active {
@@ -202,16 +203,6 @@ class Gapminder extends React.Component<Props> {
 
   constructor(props: Props) {
     super(props);
-
-    this.storeSvgRef = this.storeSvgRef.bind(this);
-    this.enableInteraction = this.enableInteraction.bind(this);
-    this.circleOrder = this.circleOrder.bind(this);
-    this.drawCircle = this.drawCircle.bind(this);
-    this.drawSelectedPath = this.drawSelectedPath.bind(this);
-    this.drawSelectedDataPoint = this.drawSelectedDataPoint.bind(this);
-    this.handleCircleClick = this.handleCircleClick.bind(this);
-    this.setYearLabel = this.setYearLabel.bind(this);
-    this.drawBackgroundColors = this.drawBackgroundColors.bind(this);
 
     this.chartData = generateChartData(
       props.data,
@@ -403,7 +394,9 @@ class Gapminder extends React.Component<Props> {
   }
 
   // TODO: Add transitions to this?
-  private drawBackgroundColors(g: Selection<SVGGElement, undefined, any, any>) {
+  private drawBackgroundColors = (
+    g: Selection<SVGGElement, undefined, any, any>,
+  ) => {
     const {
       width,
       height,
@@ -475,24 +468,26 @@ class Gapminder extends React.Component<Props> {
           .attr('fill', d => yBackgroundColorScale(d.lowerBound));
       rectSelection.exit().remove();
     }
-  }
+  };
 
-  private setYearLabel(label: Selection<SVGTextElement, undefined, any, any>) {
+  private setYearLabel = (
+    label: Selection<SVGTextElement, undefined, any, any>,
+  ) => {
     const { data, selectedTimeIndex } = this.props;
 
     label.text(
       data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
     );
-  }
+  };
 
-  private handleCircleClick(d: ChartDatum) {
+  private handleCircleClick = (d: ChartDatum) => {
     const { onClick } = this.props;
     if (onClick) {
       onClick(d.id);
     }
-  }
+  };
 
-  private enableInteraction() {
+  private enableInteraction = () => {
     const { data, onHover } = this.props;
     const g = select<SVGElement, undefined>(this.svgRef!).select<SVGGElement>(
       'g#main-group',
@@ -525,47 +520,47 @@ class Gapminder extends React.Component<Props> {
         onHover(findClosestIndex(hoveredTime, data));
       }
     }
-  }
+  };
 
-  private drawCircle(
+  private drawCircle = (
     circle:
       | Selection<SVGCircleElement, ChartDatum, any, any>
       | Transition<SVGCircleElement, ChartDatum, any, any>,
-  ) {
+  ) => {
     const { selectedTimeIndex } = this.props;
     const { xScale, yScale, sizeScale } = this;
     circle
       .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
       .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
       .attr('r', d => sizeScale!(d.size[selectedTimeIndex]));
-  }
+  };
 
-  private drawSelectedPath(
+  private drawSelectedPath = (
     path: Selection<SVGPathElement, Array<[number, number]>, any, any>,
-  ) {
+  ) => {
     const lineGenerator = line<[number, number]>()
       .curve(curveLinear)
       .x(d => this.xScale!(d[0]))
       .y(d => this.yScale!(d[1]));
 
     path.attr('d', lineGenerator);
-  }
+  };
 
-  private drawSelectedDataPoint(
+  private drawSelectedDataPoint = (
     circle:
       | Selection<SVGCircleElement, [number, number], any, any>
       | Transition<SVGCircleElement, [number, number], any, any>,
-  ) {
+  ) => {
     const { xScale, yScale } = this;
     circle
       .attr('cx', d => xScale!(d[0]))
       .attr('cy', d => yScale!(d[1]))
       .attr('r', 2.5);
-  }
+  };
 
   // Defines a sort order so that the smallest dots are drawn on top.
   // Selected data is always on top.
-  private circleOrder(a: ChartDatum, b: ChartDatum) {
+  private circleOrder = (a: ChartDatum, b: ChartDatum) => {
     const { selectedTimeIndex, selectedData } = this.props;
     if (a.id === selectedData) {
       return 1;
@@ -576,7 +571,7 @@ class Gapminder extends React.Component<Props> {
     }
 
     return b.size[selectedTimeIndex] - a.size[selectedTimeIndex];
-  }
+  };
 
   private redrawChart() {
     const { data, selectedData, xSelector, ySelector, fadeOut } = this.props;
@@ -636,9 +631,9 @@ class Gapminder extends React.Component<Props> {
     }
   }
 
-  private storeSvgRef(el: SVGSVGElement) {
+  private storeSvgRef = (el: SVGSVGElement) => {
     this.svgRef = el;
-  }
+  };
 
   public render() {
     const {
@@ -669,7 +664,11 @@ class Gapminder extends React.Component<Props> {
           </clipPath>
         </defs>
         <g id="main-group" transform={`translate(${marginLeft},${marginTop})`}>
-          <YearLabel id="year-label" textAnchor="end" />
+          <YearLabel
+            style={{ fontSize: Math.round(width / 9) }}
+            id="year-label"
+            textAnchor="end"
+          />
           <XAxis
             id="x-axis"
             transform={`translate(0,${height - marginTop - marginBottom})`}
