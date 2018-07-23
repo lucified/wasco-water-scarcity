@@ -28,19 +28,13 @@ import {
   getWaterRegionData,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
-import RadioSelector, { Option } from '../../generic/radio-selector';
 import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
-import {
-  DataTypeSelectorContainer,
-  SmallSectionHeader,
-  theme,
-  Title,
-  TitleContainer,
-} from '../../theme';
+import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
+import Header from './header';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
@@ -87,11 +81,6 @@ const TimeSelectorContainer = styled.div`
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {
   return `${dataType}-${areaId}`;
 }
-
-const DATA_TYPE_OPTIONS: Array<{ label: string; value: FutureDataType }> = [
-  { label: 'Water stress', value: 'stress' },
-  { label: 'Food production', value: 'kcal' },
-];
 
 interface GeneratedStateProps {
   selectedWaterRegionId?: number;
@@ -336,17 +325,11 @@ class FutureBody extends React.Component<Props, State> {
 
     return (
       <div>
-        <TitleContainer>
+        <TitleContainer className="container">
           <Title>Explore possible futures of water scarcity</Title>
-          <DataTypeSelectorContainer>
-            <RadioSelector
-              values={DATA_TYPE_OPTIONS}
-              selectedValue={selectedDataType}
-              onChange={this.setDataType}
-            />
-          </DataTypeSelectorContainer>
         </TitleContainer>
-        <BodyContainer>
+        <Header {...this.props} />
+        <BodyContainer className="container">
           <SelectorsContent>
             <FutureScenarioFilter
               setScenario={this.handleSetSelectedScenario}
