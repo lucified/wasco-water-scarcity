@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { WaterRegionGeoJSON } from '../../../data';
 import { HistoricalDataType, TimeAggregate } from '../../../types';
 import Spinner from '../../generic/spinner';
-import Header from '../../header';
 import { ResponsiveMap } from '../../map/responsive';
 import SelectedRegionInformation from '../../selected-region-information';
 import { theme, Title, TitleContainer } from '../../theme';
@@ -12,6 +11,7 @@ import withMapData from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
+import Header from './header';
 const Sticky = require('react-stickynode');
 
 export const BodyContainer = styled.div`

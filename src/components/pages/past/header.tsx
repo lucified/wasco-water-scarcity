@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 const Root = styled.div`
   border-bottom: 1px solid #f2f2f2;
