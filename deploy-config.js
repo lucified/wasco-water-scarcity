@@ -2,17 +2,25 @@
 
 const lucifyDeployConfig = require('lucify-deploy-config').default; // eslint-disable-line
 
+let bucket, baseUrl;
+switch (process.env.APP) {
+  case 'embed':
+    bucket = 'lucify-wasco-embed';
+    baseUrl = 'https://wasco-embed.lucify.com';
+    break;
+  case 'future':
+    bucket = 'lucify-wasco-future';
+    baseUrl = 'https://wasco-future.lucify.com';
+    break;
+  default:
+    bucket = 'lucify-wasco';
+    baseUrl = 'https://wasco.lucify.com';
+    break;
+}
+
 const opts = {
-  bucket:
-    process.env.APP === 'embed'
-      ? 'lucify-wasco-embed'
-      : process.env.APP === 'future' ? 'lucify-wasco-future' : 'lucify-wasco',
-  baseUrl:
-    process.env.APP === 'embed'
-      ? 'https://wasco-embed.lucify.com'
-      : process.env.APP === 'future'
-        ? 'https://wasco-future.lucify.com'
-        : 'https://wasco.lucify.com',
+  bucket,
+  baseUrl,
   publicPath: '/',
 };
 
