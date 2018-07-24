@@ -45,11 +45,25 @@ const NavLink = styled.a`
   }
 `;
 
+// TODO: update to proper URLs
+const WEBSITE_URL = 'https://dev.mediapool.fi/wasco';
+const TOOLS = [
+  {
+    appType: AppType.PAST,
+    name: 'Exploration tool',
+    url: 'https://lucify-wasco-staging.netlify.com/',
+  },
+  {
+    appType: AppType.FUTURE,
+    name: 'Futures tool',
+    url: 'https://netlify-future--lucify-wasco-staging.netlify.com/',
+  },
+];
+
 interface Props {
   appType: AppType;
 }
 
-// TODO: update to proper URLs
 export function Header({ appType }: Props) {
   if (appType === AppType.EMBED) {
     return null;
@@ -57,25 +71,22 @@ export function Header({ appType }: Props) {
   return (
     <section>
       <LogoContainer className="container">
-        <a href="https://dev.mediapool.fi/wasco">
+        <a href={WEBSITE_URL}>
           <Logo src={logoFilename} />
         </a>
       </LogoContainer>
       <Navigation>
         <LinkContainer className="container">
-          <NavLink href="https://dev.mediapool.fi/wasco">Home</NavLink>
-          <NavLink
-            className={appType === AppType.PAST ? 'active' : ''}
-            href="https://lucify-wasco-staging.netlify.com/"
-          >
-            Exploration tool
-          </NavLink>
-          <NavLink
-            className={appType === AppType.FUTURE ? 'active' : ''}
-            href="https://netlify-future--lucify-wasco-staging.netlify.com/"
-          >
-            Futures tool
-          </NavLink>
+          <NavLink href={WEBSITE_URL}>Home</NavLink>
+          {TOOLS.map(({ appType: toolAppType, name, url }) => (
+            <NavLink
+              className={appType === toolAppType ? 'active' : ''}
+              href={url}
+              key={name}
+            >
+              {name}
+            </NavLink>
+          ))}
         </LinkContainer>
       </Navigation>
     </section>
