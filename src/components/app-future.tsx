@@ -19,9 +19,6 @@ import Future from './pages/future';
 import NotFound from './pages/not-found';
 import { theme } from './theme';
 
-// TODO: remove
-require('iframe-resizer/js/iframeResizer.contentWindow.min.js');
-
 import 'normalize.css/normalize.css';
 // tslint:disable-next-line:ordered-imports
 import 'flexboxgrid/dist/flexboxgrid.min.css';
