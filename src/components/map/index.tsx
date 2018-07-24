@@ -411,6 +411,10 @@ class Map extends React.Component<Props, State> {
       );
 
     function zoomed() {
+      svg
+        .select<SVGGElement>('g#water-regions')
+        .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+        .style('visibility', 'visible');
       select<SVGGElement, undefined>('g#water-regions').attr(
         'transform',
         event.transform,
@@ -753,7 +757,7 @@ class Map extends React.Component<Props, State> {
       svg
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-        .attr('fill', 'none')
+        .style('visibility', 'hidden')
         .attr('pointer-events', 'visible');
       select<SVGGElement, undefined>('g#clickable-water-regions').attr(
         'transform',
@@ -793,8 +797,8 @@ class Map extends React.Component<Props, State> {
         .attr('font-size', `${12 / event.transform.k}px`);
       select<SVGGElement, undefined>('g#places')
         .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('d', path.pointRadius(5 / event.transform.k) as any);
+        .selectAll<SVGPathElement, any>('path')
+        .attr('d', path.pointRadius(5 / event.transform.k));
       select<SVGGElement, undefined>('g#places-labels')
         .attr('transform', event.transform)
         .selectAll('text')
@@ -905,7 +909,7 @@ class Map extends React.Component<Props, State> {
           !this.state.regionData[selectedWaterRegionId] &&
           this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
             -1 && (
-            <SpinnerOverlay style={{ width, height }}>
+            <SpinnerOverlay style={{ width: width + 10, height }}>
               <div>
                 <p>Loading...</p>
                 <Spinner />
