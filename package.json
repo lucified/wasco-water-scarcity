@@ -104,7 +104,7 @@
     "deploy": "yarn run build && yarn run upload",
     "upload": "atomic-s3 --verbose",
     "compile": "tsc",
-    "lint": "yarn run tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js' && yarn run prettier --single-quote --trailing-comma all --list-different \"src/**/*.ts?(x)\" \"src/**/*.css\"",
+    "lint": "tslint -t verbose 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.js' && prettier --single-quote --trailing-comma all --list-different \"src/**/*.ts?(x)\" \"src/**/*.css\"",
     "prettify": "prettier --single-quote --trailing-comma all --write \"src/**/*.ts?(x)\" \"src/**/*.css\"",
     "upload-data": "atomic-s3 --path=data-external --bucket=lucify-large-files --region=eu-west-1",
     "test": "yarn run lint"
