@@ -13,6 +13,7 @@ const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   t: 'historicalTimeIndex',
   wr: 'worldRegion',
   r: 'region',
+  z: 'zoomedInToRegion',
 };
 const selectionsStateToUrl = invert(urlToSelectionsState);
 
@@ -41,7 +42,7 @@ function globalStateToHashObject(state: StateTree, appType: AppType) {
   switch (appType) {
     case AppType.FUTURE:
       // The future page stores selection state in the path (via react-router)
-      selectionMembersToUse = ['worldRegion', 'region'];
+      selectionMembersToUse = ['worldRegion', 'region', 'zoomedInToRegion'];
       thresholdMembersToUse = ['stress', 'shortage', 'kcal'];
       break;
     case AppType.PAST:
@@ -169,6 +170,9 @@ export function getGlobalStateFromURLHash(): {
           }
           thresholds[urlToThresholdsState[key]] = numberArray;
         }
+        break;
+      case 'z':
+        selections[urlToSelectionsState[key]] = value === 'true';
         break;
       default:
         return;
