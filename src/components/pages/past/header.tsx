@@ -49,13 +49,31 @@ export default function Header() {
           <div className="row">
             <div className="col-xs-12">
               <NavigationTheme>Water body:</NavigationTheme>
-              <NavigationItem to="/stress" activeClassName="selected">
+              <NavigationItem
+                to={`/stress${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/stress') === 0
+                }
+                activeClassName="selected"
+              >
                 Heavy water usage
               </NavigationItem>
-              <NavigationItem to="/shortage" activeClassName="selected">
+              <NavigationItem
+                to={`/shortage${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/shortage') === 0
+                }
+                activeClassName="selected"
+              >
                 Meeting water needs
               </NavigationItem>
-              <NavigationItem to="/scarcity" activeClassName="selected">
+              <NavigationItem
+                to={`/scarcity${window.location.hash}`}
+                isActive={(_match, location) =>
+                  location.pathname.indexOf('/scarcity') === 0
+                }
+                activeClassName="selected"
+              >
                 Water scarcity
               </NavigationItem>
             </div>
