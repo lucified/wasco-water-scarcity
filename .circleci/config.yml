@@ -9,6 +9,9 @@ jobs:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+      - restore_cache:
+          name: Restore node_modules cache
+          keys:
             - dependency-cache-{{ checksum "yarn.lock" }}
       - run:
           name: Install Dependencies
