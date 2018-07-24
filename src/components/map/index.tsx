@@ -31,6 +31,7 @@ import {
   isZoomedInToRegion,
 } from '../../selectors';
 import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
+import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
@@ -48,6 +49,17 @@ const ZoomButton = styled.button`
   position: absolute;
   right: 20px;
   bottom: 20px;
+`;
+
+const SpinnerOverlay = styled.div`
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5);
 `;
 
 const Land = styled.path`
@@ -159,6 +171,7 @@ interface State {
   regionData: {
     [id: string]: LocalData | undefined;
   };
+  fetchingDataForRegions: number[];
 }
 
 function getColorScale(dataType: AnyDataType, thresholds: number[]) {
@@ -176,6 +189,7 @@ function getColorScale(dataType: AnyDataType, thresholds: number[]) {
 class Map extends React.Component<Props, State> {
   public state: State = {
     regionData: {},
+    fetchingDataForRegions: [],
   };
 
   private svgRef!: SVGElement;
@@ -198,45 +212,73 @@ class Map extends React.Component<Props, State> {
       zoomInToRegion,
     } = this.props;
 
-    if (prevProps.width !== width) {
-      this.clearMap();
-      this.drawMap();
-    } else if (
+    // FIXME: This is fugly
+    const widthChanged = prevProps.width !== width;
+    const didZoomIn = !prevProps.zoomInToRegion && zoomInToRegion;
+    const didZoomOut = prevProps.zoomInToRegion && !zoomInToRegion;
+    const waterRegionSelectedAndChanged =
+      selectedWaterRegionId &&
+      prevProps.selectedWaterRegionId !== selectedWaterRegionId;
+    const waterRegionNoLongerSelected =
+      !selectedWaterRegionId &&
+      prevProps.selectedWaterRegionId !== selectedWaterRegionId;
+    const selectedWorldRegionChanged =
+      selectedWorldRegion !== prevProps.selectedWorldRegion;
+    const zoomedInDataLoaded =
+      selectedWaterRegionId &&
+      this.state.regionData[selectedWaterRegionId] &&
+      !prevState.regionData[selectedWaterRegionId];
+    const dataChanged =
+      prevProps.selectedData !== selectedData ||
       prevProps.selectedDataType !== selectedDataType ||
       prevProps.thresholds !== thresholds ||
       (selectedDataType === 'scarcity' &&
         (prevProps.stressThresholds !== stressThresholds ||
-          prevProps.shortageThresholds !== shortageThresholds)) ||
-      prevProps.selectedData !== selectedData ||
-      prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-      (prevProps.zoomInToRegion && !zoomInToRegion)
-    ) {
-      this.redrawFillsAndBorders();
-    }
+          prevProps.shortageThresholds !== shortageThresholds));
 
-    if (
-      prevProps.selectedWorldRegion !== selectedWorldRegion ||
-      (!zoomInToRegion && width !== prevProps.width)
-    ) {
-      this.zoomToGlobalArea();
-    }
+    if (widthChanged) {
+      // If width changes, redo everything
+      this.clearMap();
+      this.drawMap();
 
-    // TODO: this is a little ugly
-    if (
-      zoomInToRegion &&
-      (!prevProps.zoomInToRegion ||
-        prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-        prevProps.selectedData !== selectedData ||
-        prevProps.width !== width ||
-        prevProps.selectedDataType !== selectedDataType ||
-        (this.state.regionData[selectedWaterRegionId!] &&
-          !prevState.regionData[selectedWaterRegionId!]))
-    ) {
-      this.removeZoomedInElements();
-      this.zoomToWaterRegion();
-    } else if (prevProps.zoomInToRegion && !zoomInToRegion) {
-      this.removeZoomedInElements();
-      this.zoomToGlobalArea();
+      if (!zoomInToRegion) {
+        this.zoomToGlobalArea();
+      } else {
+        this.removeZoomedInElements();
+        this.zoomToWaterRegion();
+      }
+    } else {
+      // Width has stayed the same
+      if (zoomInToRegion) {
+        if (
+          didZoomIn ||
+          waterRegionSelectedAndChanged ||
+          zoomedInDataLoaded ||
+          dataChanged
+        ) {
+          this.removeZoomedInElements();
+          this.zoomToWaterRegion();
+        }
+      } else {
+        // Not zoomed in
+        if (dataChanged) {
+          this.redrawFillsAndBorders();
+        }
+
+        if (waterRegionSelectedAndChanged) {
+          this.zoomToWaterRegion();
+        }
+
+        if (waterRegionNoLongerSelected || selectedWorldRegionChanged) {
+          this.zoomToGlobalArea();
+        }
+
+        if (didZoomOut) {
+          this.removeZoomedInElements();
+          this.zoomToGlobalArea();
+          this.redrawFillsAndBorders();
+        }
+      }
     }
   }
 
@@ -389,6 +431,12 @@ class Map extends React.Component<Props, State> {
   }
 
   private handleRegionClick = (d: WaterRegionGeoJSONFeature) => {
+    if (
+      this.props.selectedWaterRegionId === d.properties.featureId &&
+      this.props.zoomInToRegion
+    ) {
+      this.props.setZoomInToRegion(false);
+    }
     this.props.toggleSelectedRegion(d.properties.featureId);
   };
 
@@ -429,15 +477,24 @@ class Map extends React.Component<Props, State> {
   }
 
   private async fetchRegionData(regionId: number) {
-    const data = await getLocalRegionData(regionId);
-    if (data) {
-      this.setState(state => ({
-        regionData: {
-          ...state.regionData,
-          [regionId]: data,
-        },
-      }));
+    if (this.state.fetchingDataForRegions.indexOf(regionId) > -1) {
+      return;
     }
+    this.setState(state => ({
+      fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
+    }));
+    const data = await getLocalRegionData(regionId);
+    this.setState(state => ({
+      fetchingDataForRegions: state.fetchingDataForRegions.filter(
+        id => id !== regionId,
+      ),
+      regionData: data
+        ? {
+            ...state.regionData,
+            [regionId]: data,
+          }
+        : state.regionData,
+    }));
   }
 
   private removeZoomedInElements() {
@@ -839,16 +896,29 @@ class Map extends React.Component<Props, State> {
           <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
-          <g id="clickable-water-regions" clipPath="url(#clip)" />
           {selectedDataType === 'scarcity' && this.getScarcityLegend()}
+          <g id="clickable-water-regions" clipPath="url(#clip)" />
         </SVG>
+        {/* Note: we currently don't give an error message if loading data fails */}
+        {zoomInToRegion &&
+          selectedWaterRegionId &&
+          !this.state.regionData[selectedWaterRegionId] &&
+          this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
+            -1 && (
+            <SpinnerOverlay style={{ width, height }}>
+              <div>
+                <p>Loading...</p>
+                <Spinner />
+              </div>
+            </SpinnerOverlay>
+          )}
         {selectedDataType !== 'scarcity' && (
           <StyledThresholdSelector
             style={{ left: width * 0.5, top: height - 40 }}
             dataType={selectedDataType}
           />
         )}
-        {selectedWaterRegionId !== null && (
+        {selectedWaterRegionId && (
           <ZoomButton onClick={this.toggleZoomInToRegion}>
             {zoomInToRegion ? 'Zoom out' : 'Zoom in'}
           </ZoomButton>
