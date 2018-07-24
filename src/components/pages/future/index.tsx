@@ -235,11 +235,19 @@ class FutureBody extends React.Component<Props, State> {
 
   public componentDidMount() {
     const { selectedDataset, selectedScenario } = this.state;
-    const { selectedWorldRegionId, selectedDataType } = this.props;
+    const {
+      selectedWorldRegionId,
+      selectedWaterRegionId,
+      selectedDataType,
+    } = this.props;
+
+    const ensembleAreaId = selectedWaterRegionId
+      ? toEnsembleRegionId(selectedWaterRegionId)
+      : toEnsembleWorldId(selectedWorldRegionId);
 
     this.fetchFutureEnsembleData(
       selectedDataset,
-      toEnsembleWorldId(selectedWorldRegionId),
+      ensembleAreaId,
       selectedDataType,
     );
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
