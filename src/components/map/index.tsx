@@ -44,6 +44,12 @@ const StyledThresholdSelector = styled(ThresholdSelector)`
   position: absolute;
 `;
 
+const ZoomButton = styled.button`
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+`;
+
 const Land = styled.path`
   fill: #d2e2e6;
 `;
@@ -151,7 +157,7 @@ type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 interface State {
   regionData: {
-    [id: string]: LocalData;
+    [id: string]: LocalData | undefined;
   };
 }
 
@@ -383,11 +389,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private handleRegionClick = (d: WaterRegionGeoJSONFeature) => {
-    if (d.properties.featureId === this.props.selectedWaterRegionId) {
-      this.toggleZoomInToRegion();
-    } else {
-      this.props.toggleSelectedRegion(d.properties.featureId);
-    }
+    this.props.toggleSelectedRegion(d.properties.featureId);
   };
 
   private toggleZoomInToRegion = () => {
@@ -501,9 +503,7 @@ class Map extends React.Component<Props, State> {
       return;
     }
 
-    const localData: LocalData | undefined = this.state.regionData[
-      selectedWaterRegionId
-    ];
+    const localData = this.state.regionData[selectedWaterRegionId];
     if (!localData) {
       this.fetchRegionData(selectedWaterRegionId);
       return;
@@ -801,7 +801,12 @@ class Map extends React.Component<Props, State> {
   }
 
   public render() {
-    const { selectedDataType, width } = this.props;
+    const {
+      selectedDataType,
+      width,
+      selectedWaterRegionId,
+      zoomInToRegion,
+    } = this.props;
     const height = this.getHeight();
 
     return (
@@ -842,6 +847,11 @@ class Map extends React.Component<Props, State> {
             style={{ left: width * 0.5, top: height - 40 }}
             dataType={selectedDataType}
           />
+        )}
+        {selectedWaterRegionId !== null && (
+          <ZoomButton onClick={this.toggleZoomInToRegion}>
+            {zoomInToRegion ? 'Zoom out' : 'Zoom in'}
+          </ZoomButton>
         )}
       </Container>
     );
