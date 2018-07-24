@@ -15,6 +15,7 @@ export interface SelectionsTree {
   timeScale: TimeScale; // Only used in Past pages
   worldRegion: number;
   region?: number;
+  zoomedInToRegion: boolean;
 }
 
 export type ThresholdsTree = { [dataType in AnyDataType]: number[] };

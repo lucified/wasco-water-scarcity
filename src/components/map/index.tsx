@@ -7,7 +7,11 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
-import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
+import {
+  setRegionZoom,
+  setSelectedRegion,
+  toggleSelectedRegion,
+} from '../../actions';
 import {
   belowThresholdColor,
   getDataTypeColors,
@@ -24,6 +28,7 @@ import {
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
+  isZoomedInToRegion,
 } from '../../selectors';
 import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
 import { theme } from '../theme';
@@ -133,17 +138,18 @@ interface GeneratedStateProps {
   thresholds: number[];
   stressThresholds: number[];
   shortageThresholds: number[];
+  zoomInToRegion: boolean;
 }
 
 interface GeneratedDispatchProps {
   toggleSelectedRegion: (regionId: number) => void;
   clearSelectedRegion: () => void;
+  setZoomInToRegion: (zoomedIn: boolean) => void;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 interface State {
-  zoomInToRegion: boolean;
   regionData: {
     [id: string]: LocalData;
   };
@@ -162,14 +168,9 @@ function getColorScale(dataType: AnyDataType, thresholds: number[]) {
 }
 
 class Map extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      zoomInToRegion: false,
-      regionData: {},
-    };
-  }
+  public state: State = {
+    regionData: {},
+  };
 
   private svgRef!: SVGElement;
 
@@ -188,8 +189,8 @@ class Map extends React.Component<Props, State> {
       thresholds,
       selectedWorldRegion,
       width,
+      zoomInToRegion,
     } = this.props;
-    const { zoomInToRegion } = this.state;
 
     if (prevProps.width !== width) {
       this.clearMap();
@@ -202,7 +203,7 @@ class Map extends React.Component<Props, State> {
           prevProps.shortageThresholds !== shortageThresholds)) ||
       prevProps.selectedData !== selectedData ||
       prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-      (prevState.zoomInToRegion && !zoomInToRegion)
+      (prevProps.zoomInToRegion && !zoomInToRegion)
     ) {
       this.redrawFillsAndBorders();
     }
@@ -217,7 +218,7 @@ class Map extends React.Component<Props, State> {
     // TODO: this is a little ugly
     if (
       zoomInToRegion &&
-      (!prevState.zoomInToRegion ||
+      (!prevProps.zoomInToRegion ||
         prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
         prevProps.selectedData !== selectedData ||
         prevProps.width !== width ||
@@ -227,7 +228,7 @@ class Map extends React.Component<Props, State> {
     ) {
       this.removeZoomedInElements();
       this.zoomToWaterRegion();
-    } else if (prevState.zoomInToRegion && !zoomInToRegion) {
+    } else if (prevProps.zoomInToRegion && !zoomInToRegion) {
       this.removeZoomedInElements();
       this.zoomToGlobalArea();
     }
@@ -389,9 +390,9 @@ class Map extends React.Component<Props, State> {
     }
   };
 
-  private toggleZoomInToRegion() {
-    this.setState(state => ({ zoomInToRegion: !state.zoomInToRegion }));
-  }
+  private toggleZoomInToRegion = () => {
+    this.props.setZoomInToRegion(!this.props.zoomInToRegion);
+  };
 
   private getColorForWaterRegion(featureId: number): string {
     const {
@@ -484,6 +485,7 @@ class Map extends React.Component<Props, State> {
       width,
       waterRegions: { features },
       selectedData: { startYear },
+      zoomInToRegion,
     } = this.props;
 
     const selectedWaterRegion =
@@ -492,7 +494,7 @@ class Map extends React.Component<Props, State> {
         : undefined;
 
     if (
-      !this.state.zoomInToRegion ||
+      !zoomInToRegion ||
       selectedWaterRegionId == null ||
       selectedWaterRegion == null
     ) {
@@ -862,11 +864,15 @@ export default connect<
       colorScale: getColorScale(selectedDataType, thresholds),
       stressThresholds: getThresholdsForDataType(state, 'stress'),
       shortageThresholds: getThresholdsForDataType(state, 'shortage'),
+      zoomInToRegion: isZoomedInToRegion(state),
     };
   },
   dispatch => ({
     toggleSelectedRegion: (regionId: number) => {
       dispatch(toggleSelectedRegion(regionId));
+    },
+    setZoomInToRegion: (zoomedIn: boolean) => {
+      dispatch(setRegionZoom(zoomedIn));
     },
     clearSelectedRegion: () => {
       dispatch(setSelectedRegion());

@@ -25,6 +25,7 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     worldRegion: 0, // 0 means global
+    zoomedInToRegion: false,
   },
   requests: [],
 };
@@ -126,6 +127,15 @@ function selectionsReducer(
         return {
           ...state,
           historicalTimeIndex: action.data.length - 1,
+        };
+      }
+
+      return state;
+    case 'SET_REGION_ZOOM':
+      if (state.zoomedInToRegion !== action.zoomedIn) {
+        return {
+          ...state,
+          zoomedInToRegion: action.zoomedIn,
         };
       }
 

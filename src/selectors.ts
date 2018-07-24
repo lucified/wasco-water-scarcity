@@ -192,6 +192,10 @@ export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
 }
 
+export function isZoomedInToRegion(state: StateTree) {
+  return state.selections.zoomedInToRegion;
+}
+
 function getRequestsTree(state: StateTree) {
   return state.requests;
 }

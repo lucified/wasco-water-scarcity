@@ -25,6 +25,17 @@ export function setTimeIndex(value: number): SetTimeIndexAction {
   };
 }
 
+export interface SetRegionZoomAction {
+  type: 'SET_REGION_ZOOM';
+  zoomedIn: boolean;
+}
+export function setRegionZoom(zoomedIn: boolean): SetRegionZoomAction {
+  return {
+    type: 'SET_REGION_ZOOM',
+    zoomedIn,
+  };
+}
+
 export interface ToggleSelectedRegionAction {
   type: 'TOGGLE_SELECTED_REGION';
   id: number;
@@ -250,6 +261,7 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | SetRegionZoomAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction
