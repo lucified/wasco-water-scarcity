@@ -1,6 +1,6 @@
 // react-hot-loader needs to be imported first
 import { hot } from 'react-hot-loader';
-// tslint:disable-next-line:ordered-imports
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import {
@@ -13,6 +13,8 @@ import {
 import styled, { injectGlobal } from 'styled-components';
 import { loadMapData } from '../actions';
 import { StateTree } from '../reducers';
+import { AppType } from '../types';
+import { Header } from './header';
 import Future from './pages/future';
 import NotFound from './pages/not-found';
 import { theme } from './theme';
@@ -64,6 +66,7 @@ class AppFuturePlain extends React.Component<Props> {
   public render() {
     return (
       <Root>
+        <Header appType={AppType.FUTURE} />
         <Switch>
           <Route
             path="/stress"

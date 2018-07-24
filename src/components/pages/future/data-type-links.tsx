@@ -41,14 +41,14 @@ const NavigationTheme = styled.div`
   color: ${theme.colors.gray};
 `;
 
-export default function Header() {
+export default function DataTypeLinks() {
   return (
     <Root>
       <Navigation>
         <div className="container">
           <div className="row">
             <div className="col-xs-12">
-              <NavigationTheme>Water body:</NavigationTheme>
+              <NavigationTheme>Future:</NavigationTheme>
               <NavigationItem
                 to={`/stress${window.location.hash}`}
                 isActive={(_match, location) =>
@@ -56,25 +56,16 @@ export default function Header() {
                 }
                 activeClassName="selected"
               >
-                Heavy water usage
+                Water stress
               </NavigationItem>
               <NavigationItem
-                to={`/shortage${window.location.hash}`}
+                to={`/kcal${window.location.hash}`}
                 isActive={(_match, location) =>
-                  location.pathname.indexOf('/shortage') === 0
+                  location.pathname.indexOf('/kcal') === 0
                 }
                 activeClassName="selected"
               >
-                Meeting water needs
-              </NavigationItem>
-              <NavigationItem
-                to={`/scarcity${window.location.hash}`}
-                isActive={(_match, location) =>
-                  location.pathname.indexOf('/scarcity') === 0
-                }
-                activeClassName="selected"
-              >
-                Water scarcity
+                Food production
               </NavigationItem>
             </div>
           </div>

@@ -35,9 +35,9 @@ import Spinner from '../../generic/spinner';
 import { ResponsiveMap } from '../../map/responsive';
 import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
+import DataTypeLinks from './data-type-links';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
-import Header from './header';
 import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
@@ -340,7 +340,7 @@ class FutureBody extends React.Component<Props, State> {
         <TitleContainer className="container">
           <Title>Explore possible futures of water scarcity</Title>
         </TitleContainer>
-        <Header />
+        <DataTypeLinks />
         <BodyContainer className="container">
           <SelectorsContent>
             <FutureScenarioFilter

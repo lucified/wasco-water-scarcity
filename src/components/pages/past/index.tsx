@@ -11,7 +11,7 @@ import withMapData from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
-import Header from './header';
+import DataTypeLinks from './data-type-links';
 const Sticky = require('react-stickynode');
 
 export const BodyContainer = styled.div`
@@ -72,7 +72,7 @@ export class PastBody extends React.Component<Props> {
         <TitleContainer className="container">
           <Title>Water scarcity exploration tool</Title>
         </TitleContainer>
-        <Header />
+        <DataTypeLinks />
         <BodyContainer className="container">
           <StickyGraphics>
             {isLoading || !waterRegions || !selectedWaterData ? (

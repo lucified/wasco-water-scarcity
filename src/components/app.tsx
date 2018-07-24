@@ -1,6 +1,6 @@
 // react-hot-loader needs to be imported first
 import { hot } from 'react-hot-loader';
-// tslint:disable-next-line:ordered-imports
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
@@ -13,7 +13,9 @@ import {
   getSelectedTimeScale,
   isRequestOngoing,
 } from '../selectors';
+import { AppType } from '../types';
 import { historicalDataRequestId } from '../utils';
+import { Header } from './header';
 import NotFound from './pages/not-found';
 import { Past } from './pages/past';
 import { theme } from './theme';
@@ -109,6 +111,7 @@ class AppPlain extends React.Component<Props> {
     const { isLoading } = this.props;
     return (
       <Root>
+        <Header appType={AppType.PAST} />
         <Switch>
           {/* These routes also handle any data loading or other onLoad trigger */}
           <Route
