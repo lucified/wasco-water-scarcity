@@ -109,46 +109,59 @@ const getAggregateData = createSelector(
           wholeGlobeRegion[field] += (region as any)[field];
         });
 
+        const noStress =
+          region.stress == null || region.stress < thresholds.stress[0];
+        const mediumStress =
+          region.stress != null && region.stress >= thresholds.stress[1];
+        const highStress =
+          region.stress != null && region.stress >= thresholds.stress[2];
+        const noShortage =
+          region.shortage == null || region.shortage > thresholds.shortage[2];
+        const mediumShortage =
+          region.shortage != null && region.shortage <= thresholds.shortage[1];
+        const highShortage =
+          region.shortage != null && region.shortage <= thresholds.shortage[0];
+
         // Stress
-        if (region.stress == null || region.stress >= thresholds.stress[2]) {
-          worldRegion.populationHighStress += population;
-          wholeGlobeRegion.populationHighStress += population;
-        } else if (region.stress >= thresholds.stress[1]) {
-          worldRegion.populationModerateStress += population;
-          wholeGlobeRegion.populationModerateStress += population;
-        } else if (region.stress >= thresholds.stress[0]) {
-          worldRegion.populationLowStress += population;
-          wholeGlobeRegion.populationLowStress += population;
-        } else {
+        if (noStress) {
           worldRegion.populationNoStress += population;
           wholeGlobeRegion.populationNoStress += population;
+        } else if (highStress) {
+          worldRegion.populationHighStress += population;
+          wholeGlobeRegion.populationHighStress += population;
+        } else if (mediumStress) {
+          worldRegion.populationModerateStress += population;
+          wholeGlobeRegion.populationModerateStress += population;
+        } else {
+          worldRegion.populationLowStress += population;
+          wholeGlobeRegion.populationLowStress += population;
         }
 
         // Shortage
-        if (region.shortage <= thresholds.shortage[0]) {
-          worldRegion.populationHighShortage += population;
-          wholeGlobeRegion.populationHighShortage += population;
-        } else if (region.shortage <= thresholds.shortage[1]) {
-          worldRegion.populationModerateShortage += population;
-          wholeGlobeRegion.populationModerateShortage += population;
-        } else if (region.shortage <= thresholds.shortage[2]) {
-          worldRegion.populationLowShortage += population;
-          wholeGlobeRegion.populationLowShortage += population;
-        } else {
+        if (noShortage) {
           worldRegion.populationNoShortage += population;
           wholeGlobeRegion.populationNoShortage += population;
+        } else if (highShortage) {
+          worldRegion.populationHighShortage += population;
+          wholeGlobeRegion.populationHighShortage += population;
+        } else if (mediumShortage) {
+          worldRegion.populationModerateShortage += population;
+          wholeGlobeRegion.populationModerateShortage += population;
+        } else {
+          worldRegion.populationLowShortage += population;
+          wholeGlobeRegion.populationLowShortage += population;
         }
 
         // Scarcity
-        if (region.stress == null || region.stress >= thresholds.stress[0]) {
-          if (region.shortage <= thresholds.shortage[2]) {
+        if (!noStress) {
+          if (!noShortage) {
             worldRegion.populationShortageAndStress += population;
             wholeGlobeRegion.populationShortageAndStress += population;
           } else {
             worldRegion.populationOnlyStress += population;
             wholeGlobeRegion.populationOnlyStress += population;
           }
-        } else if (region.shortage <= thresholds.shortage[2]) {
+        } else if (!noShortage) {
           worldRegion.populationOnlyShortage += population;
           wholeGlobeRegion.populationOnlyShortage += population;
         } else {

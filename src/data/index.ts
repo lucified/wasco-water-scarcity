@@ -395,8 +395,9 @@ export function scarcitySelector(
   shortageThresholds: number[],
 ) {
   return (d: StressShortageDatum) => {
-    const hasStress = d.stress >= stressThresholds[0];
-    const hasShortage = d.shortage <= shortageThresholds[2];
+    const hasStress = d.stress != null && d.stress >= stressThresholds[0];
+    const hasShortage =
+      d.shortage != null && d.shortage <= shortageThresholds[2];
     if (hasStress && hasShortage) {
       return scarcityThresholds[1] + 0.1;
     }

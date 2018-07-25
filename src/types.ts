@@ -57,8 +57,8 @@ export interface AggregateStressShortageDatum extends Datum {
 
 // All units have been converted to m^3 from km^3
 export interface StressShortageDatum extends Datum {
-  shortage: number;
-  stress: number;
+  shortage?: number;
+  stress?: number;
 }
 
 export type HistoricalDataType = 'stress' | 'shortage' | 'scarcity';

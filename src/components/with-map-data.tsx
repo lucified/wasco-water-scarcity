@@ -16,7 +16,7 @@ import {
 } from '../types';
 
 export interface GeneratedMapProps {
-  selectedWaterData?: TimeAggregate<number>;
+  selectedWaterData?: TimeAggregate<number | undefined>;
   waterRegions?: WaterRegionGeoJSON;
   isZoomedIn?: boolean;
 }

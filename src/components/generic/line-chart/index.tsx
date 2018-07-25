@@ -54,7 +54,7 @@ const SVG = styled.svg`
 `;
 
 export interface Datum {
-  value: number;
+  value: number | undefined;
   start: Date;
   end: Date;
 }
@@ -166,8 +166,9 @@ class LineChart extends React.Component<Props> {
       .range([chartHeight, 0]);
     this.lineGenerator = line<Datum>()
       .curve(curveLinear)
+      .defined(d => d.value != null)
       .x(d => this.xScale!(toMidpoint(d.start, d.end)))
-      .y(d => this.yScale!(d.value));
+      .y(d => this.yScale!(d.value!));
   }
 
   // We need to have a selectedTimeIndex and if the this.props.data is an array,
@@ -319,9 +320,9 @@ class LineChart extends React.Component<Props> {
           'transform',
           `translate(${xScale(
             toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
-          )},${yScale(selectedDataPoint.value)})`,
+          )},${yScale(selectedDataPoint.value!)})`,
         )
-        .text(this.numberFormatter(selectedDataPoint.value));
+        .text(this.numberFormatter(selectedDataPoint.value!));
     }
   }
 
@@ -505,9 +506,9 @@ class LineChart extends React.Component<Props> {
             'transform',
             `translate(${xScale(
               toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
-            )},${yScale(selectedDataPoint.value)})`,
+            )},${yScale(selectedDataPoint.value!)})`,
           )
-          .text(this.numberFormatter(selectedDataPoint.value));
+          .text(this.numberFormatter(selectedDataPoint.value!));
     }
   }
 

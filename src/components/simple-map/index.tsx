@@ -71,7 +71,7 @@ const CountryBorders = styled.g`
 
 interface PassedProps {
   width: number;
-  selectedData: TimeAggregate<number>;
+  selectedData: TimeAggregate<number | undefined>;
   waterRegions: WaterRegionGeoJSON;
   selectedDataType: HistoricalDataType;
 }
