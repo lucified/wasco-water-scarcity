@@ -35,7 +35,14 @@ const Separator = styled.hr`
 `;
 
 const StyledCSVButton = styled(DownloadCSV)`
-  margin-top: ${theme.margin(0.5)};
+  margin: ${theme.margin(0.5)} 0;
+`;
+
+const MoreInformation = styled.a`
+  color: ${theme.colors.gray};
+  font-size: 14px;
+  text-align: right;
+  display: block;
 `;
 
 const StickyGraphics = styled(Sticky)`
@@ -116,8 +123,16 @@ export class PastBody extends React.Component<Props> {
           </StickyGraphics>
           <SelectorsContent>
             <Choices dataType={selectedDataType} />
-            <Separator />
-            <StyledCSVButton />
+            {selectedWaterData && (
+              <>
+                <Separator />
+                <StyledCSVButton />
+                {/* TODO: change to proper URL */}
+                <MoreInformation href="https://dev.mediapool.fi/wasco/research-data/data-and-code/">
+                  More information
+                </MoreInformation>
+              </>
+            )}
           </SelectorsContent>
         </BodyContainer>
       </div>
