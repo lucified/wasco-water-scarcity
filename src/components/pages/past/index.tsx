@@ -11,6 +11,7 @@ import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
 import DataTypeLinks from './data-type-links';
+import { DownloadCSV } from './download-csv';
 const Sticky = require('react-stickynode');
 
 const BodyContainer = styled.div`
@@ -26,6 +27,15 @@ const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsWidth};
   padding-left: ${theme.margin()};
+  padding-bottom: ${theme.margin()};
+`;
+
+const Separator = styled.hr`
+  border-color: rgba(240, 240, 240, 0.4);
+`;
+
+const StyledCSVButton = styled(DownloadCSV)`
+  margin-top: ${theme.margin(0.5)};
 `;
 
 const StickyGraphics = styled(Sticky)`
@@ -106,6 +116,8 @@ export class PastBody extends React.Component<Props> {
           </StickyGraphics>
           <SelectorsContent>
             <Choices dataType={selectedDataType} />
+            <Separator />
+            <StyledCSVButton />
           </SelectorsContent>
         </BodyContainer>
       </div>
