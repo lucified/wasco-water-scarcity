@@ -35,8 +35,8 @@ const Box = styled.div`
 `;
 
 const Title = styled.div`
-  padding-left;: 5;px;
-  font-size;: 0.8;rem;
+  padding-left: 5px;
+  font-size: 0.8rem;
 `;
 
 export interface LegendItem {
@@ -56,20 +56,9 @@ interface State {
 }
 
 export default class Legend extends React.Component<Props, State> {
-  public static defaultProps = {
-    reverse: false,
-  };
+  public state: State = {};
 
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {};
-
-    this.onHoverEnter = this.onHoverEnter.bind(this);
-    this.onHoverLeave = this.onHoverLeave.bind(this);
-  }
-
-  private onHoverEnter(e: any) {
+  private onHoverEnter = (e: any) => {
     const { onHover } = this.props;
     if (onHover) {
       const titleElements = e.target.parentElement.getElementsByClassName(
@@ -83,15 +72,15 @@ export default class Legend extends React.Component<Props, State> {
         console.warn('Unknown title', titleElements);
       }
     }
-  }
+  };
 
-  private onHoverLeave() {
+  private onHoverLeave = () => {
     const { onHover } = this.props;
     if (onHover) {
       this.setState({ hoveredItemTitle: undefined });
       onHover();
     }
-  }
+  };
 
   private getLegendItem(text: string, color: string) {
     const style = { backgroundColor: color };

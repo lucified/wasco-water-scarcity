@@ -14,7 +14,7 @@ import { Choices } from './choices';
 import DataTypeLinks from './data-type-links';
 const Sticky = require('react-stickynode');
 
-export const BodyContainer = styled.div`
+const BodyContainer = styled.div`
   position: relative;
   display: flex;
   width: 100%;
@@ -23,13 +23,13 @@ export const BodyContainer = styled.div`
 
 const selectorsWidth = '320px';
 
-export const SelectorsContent = styled.div`
+const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsWidth};
   padding-left: ${theme.margin()};
 `;
 
-export const StickyGraphics = styled(Sticky)`
+const StickyGraphics = styled(Sticky)`
   width: calc(100% - ${selectorsWidth});
 `;
 
