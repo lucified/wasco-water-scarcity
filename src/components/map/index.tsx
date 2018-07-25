@@ -1,5 +1,7 @@
+import { axisBottom } from 'd3-axis';
+import { format } from 'd3-format';
 import { ExtendedFeature, geoNaturalEarth1, geoPath, GeoSphere } from 'd3-geo';
-import { scaleThreshold, ScaleThreshold } from 'd3-scale';
+import { scaleLog, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
@@ -17,7 +19,9 @@ import {
   getDataTypeColors,
   getLocalRegionData,
   GridData,
+  gridQuintileColors,
   GridVariable,
+  labelForGridData,
   LocalData,
   missingDataColor,
   WaterRegionGeoJSON,
@@ -510,6 +514,11 @@ class Map extends React.Component<Props, State> {
       fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
     }));
     const data = await getLocalRegionData(regionId);
+    if (!data && this.props.selectedWaterRegionId === regionId) {
+      // We're still waiting for the data to load for the selected region but the
+      // fetch failed, so zoom out.
+      this.props.setZoomInToRegion(false);
+    }
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.filter(
         id => id !== regionId,
@@ -704,12 +713,12 @@ class Map extends React.Component<Props, State> {
     const quintiles = localData.gridQuintiles[selectedGridVariable];
     if (quintiles != null) {
       // TODO: might be a more efficient way of doing this?
-      const griddataPoly: any = {
+      const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
         type: 'FeatureCollection',
         features: localData.grid.map((d: GridData) => ({
-          type: 'Feature',
+          type: 'Feature' as 'Feature',
           geometry: {
-            type: 'Polygon',
+            type: 'Polygon' as 'Polygon',
             coordinates: [
               [
                 [d.centre[0] - 0.25, d.centre[1] - 0.25],
@@ -727,10 +736,9 @@ class Map extends React.Component<Props, State> {
         })),
       };
 
-      // TODO: may want different color scales for each variable
       const colorScale = scaleThreshold<number, string>()
         .domain(quintiles)
-        .range(['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c']);
+        .range(gridQuintileColors[selectedGridVariable]);
 
       svg
         .select<SVGGElement>('g#grid-data')
@@ -738,17 +746,25 @@ class Map extends React.Component<Props, State> {
           SVGPathElement,
           ExtendedFeature<GeoJSON.Polygon, { data: number }>
         >('path')
-        .data<ExtendedFeature<GeoJSON.Polygon, { data: number }>>(
-          griddataPoly.features,
-        )
+        .data(griddataPoly.features)
         .enter()
         .append<SVGPathElement>('path')
         .attr('d', path)
         .attr(
           'fill',
           d =>
-            d.properties.data == null ? 'none' : colorScale(d.properties.data),
+            d.properties!.data == null
+              ? 'none'
+              : colorScale(d.properties!.data),
         );
+
+      this.addGridLegend(
+        colorScale,
+        // The log scale breaks if we pass in 0.
+        // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
+        [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
+        labelForGridData(selectedGridVariable),
+      );
     }
 
     const bounds = path.bounds(selectedWaterRegion);
@@ -833,6 +849,64 @@ class Map extends React.Component<Props, State> {
     }
   }
 
+  // Based on https://bl.ocks.org/mbostock/4573883
+  private addGridLegend(
+    colorScale: ScaleThreshold<number, string>,
+    valueDomain: number[],
+    label: string,
+  ) {
+    const legendWidth = 240;
+    // FIXME: Having a log scale here is a bit ugly, but the quintiles aren't linear
+    const legendX = scaleLog()
+      .domain(valueDomain)
+      .range([0, legendWidth]);
+
+    const xAxis = axisBottom(legendX)
+      .tickSize(13)
+      .tickValues(colorScale.domain())
+      .tickFormat(format('.2s'));
+
+    const g = select('g#grid-legend');
+    g.selectAll('*').remove();
+    g.call(xAxis as any);
+    g.select('.domain').remove();
+    g.selectAll('rect.bar')
+      .data(
+        colorScale.range().map(color => {
+          const d = colorScale.invertExtent(color);
+          if (d[0] == null) {
+            d[0] = legendX.domain()[0];
+          }
+          if (d[1] == null) {
+            d[1] = legendX.domain()[1];
+          }
+          return d;
+        }),
+      )
+      .enter()
+      .insert('rect', '.tick')
+      .attr('height', 8)
+      .attr('class', 'bar')
+      .attr('x', d => legendX(d[0]!))
+      .attr('width', d => legendX(d[1]!) - legendX(d[0]!))
+      .attr('fill', d => colorScale(d[0]!));
+
+    g.append('text')
+      .attr('fill', '#000')
+      .attr('font-weight', 'bold')
+      .attr('text-anchor', 'start')
+      .attr('y', -6)
+      .text(label);
+
+    g.insert('rect', '.bar')
+      .attr('fill', 'white')
+      .attr('opacity', 0.9)
+      .attr('width', legendWidth + 20)
+      .attr('height', 46)
+      .attr('x', -10)
+      .attr('y', -20);
+  }
+
   private getScarcityLegend() {
     const { width } = this.props;
     const height = this.getHeight();
@@ -891,6 +965,12 @@ class Map extends React.Component<Props, State> {
       zoomInToRegion,
     } = this.props;
     const height = this.getHeight();
+    // Even though zoomInToRegion might be true, we might not have the data loaded,
+    // in which case we're not yet zoomed in
+    const viewIsZoomedIn =
+      zoomInToRegion &&
+      !!selectedWaterRegionId &&
+      !!this.state.regionData[selectedWaterRegionId];
 
     return (
       <Container>
@@ -922,7 +1002,14 @@ class Map extends React.Component<Props, State> {
           <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
-          {selectedDataType === 'scarcity' && this.getScarcityLegend()}
+          {viewIsZoomedIn ? (
+            <g
+              transform={`translate(${width - 400},${height - 30})`}
+              id="grid-legend"
+            />
+          ) : (
+            selectedDataType === 'scarcity' && this.getScarcityLegend()
+          )}
           <g id="clickable-water-regions" clipPath="url(#clip)" />
         </SVG>
         {/* Note: we currently don't give an error message if loading data fails */}
@@ -938,12 +1025,13 @@ class Map extends React.Component<Props, State> {
               </div>
             </SpinnerOverlay>
           )}
-        {selectedDataType !== 'scarcity' && (
-          <StyledThresholdSelector
-            style={{ left: width * 0.5, top: height - 40 }}
-            dataType={selectedDataType}
-          />
-        )}
+        {!viewIsZoomedIn &&
+          selectedDataType !== 'scarcity' && (
+            <StyledThresholdSelector
+              style={{ left: width * 0.5, top: height - 40 }}
+              dataType={selectedDataType}
+            />
+          )}
         {selectedWaterRegionId && (
           <ZoomButton onClick={this.toggleZoomInToRegion}>
             {zoomInToRegion ? 'Zoom out' : 'Zoom in'}

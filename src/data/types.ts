@@ -240,7 +240,7 @@ type GridDataContents = {
 };
 
 type GridQuintile = { [key in GridVariable]?: number[] };
-
+export type GridQuintileColors = { [key in GridVariable]: string[] };
 export type GridVariable = 'pop' | 'elec' | 'dom' | 'man' | 'live' | 'irri';
 
 export interface LocalData {
