@@ -12,6 +12,7 @@ import {
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
+import { TimeScale } from '../types';
 import { historicalDataRequestId } from '../utils';
 import { ScarcityEmbed } from './embeds/scarcity';
 import { ShortageEmbed } from './embeds/shortage';
@@ -52,14 +53,14 @@ interface GeneratedDispatchProps {
   loadModelData: (
     climateModel: string,
     impactModel: string,
-    timeScale: string,
+    timeScale: TimeScale,
   ) => void;
 }
 
 interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
-  selectedTimeScale: string;
+  selectedTimeScale: TimeScale;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
@@ -109,7 +110,7 @@ export const AppEmbed = hot(module)(
       loadModelData: (
         climateModel: string,
         impactModel: string,
-        timeScale: string,
+        timeScale: TimeScale,
       ) => {
         // TODO: figure out how to type this: https://github.com/reduxjs/redux-thunk/issues/103
         dispatch(loadModelData(

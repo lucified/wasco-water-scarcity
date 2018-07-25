@@ -226,7 +226,7 @@ export function requestCompleted(id: string): RequestCompletedAction {
 export function loadModelData(
   climateModel: string,
   impactModel: string,
-  timeScale: string,
+  timeScale: TimeScale,
   requestId: string,
 ) {
   return async (dispatch: Dispatch<Action>) => {
