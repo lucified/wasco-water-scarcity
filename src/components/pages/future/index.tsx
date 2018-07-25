@@ -33,7 +33,6 @@ import {
   getFuturePageStateFromURLHash,
 } from '../../../url-state';
 import Spinner from '../../generic/spinner';
-import { GridVariableSelector } from '../../grid-variable-selector';
 import { ResponsiveMap } from '../../map/responsive';
 import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
@@ -395,11 +394,7 @@ class FutureBody extends React.Component<Props, State> {
                       waterRegions={waterRegions}
                       selectedDataType={selectedDataType}
                     />
-                    {isZoomedIn ? (
-                      <GridVariableSelector />
-                    ) : (
-                      <WorldRegionSelector />
-                    )}
+                    {!isZoomedIn && <WorldRegionSelector />}
                   </>
                 )}
                 {!ensembleData[selectedDataType][ensembleAreaId] ? (
