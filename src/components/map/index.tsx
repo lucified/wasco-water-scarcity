@@ -48,7 +48,29 @@ const StyledThresholdSelector = styled(ThresholdSelector)`
 const ZoomButton = styled.button`
   position: absolute;
   right: 20px;
-  bottom: 20px;
+  bottom: 5px;
+
+  background: transparent;
+  border-radius: 4px;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: white;
+  color: ${theme.colors.text};
+  border: 2px solid ${theme.colors.gray};
+
+  &:hover {
+    background-color: ${theme.colors.gray};
+    color: white;
+  }
+
+  &:focus {
+    outline: 0;
+  }
 `;
 
 const SpinnerOverlay = styled.div`
