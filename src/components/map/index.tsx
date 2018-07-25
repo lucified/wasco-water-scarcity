@@ -295,12 +295,12 @@ class Map extends React.Component<Props, State> {
         }
       } else {
         // Not zoomed in
-        if (dataChanged) {
+        if (
+          dataChanged ||
+          waterRegionSelectedAndChanged ||
+          waterRegionNoLongerSelected
+        ) {
           this.redrawFillsAndBorders();
-        }
-
-        if (waterRegionSelectedAndChanged) {
-          this.zoomToWaterRegion();
         }
 
         if (waterRegionNoLongerSelected || selectedWorldRegionChanged) {
