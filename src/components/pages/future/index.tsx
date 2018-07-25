@@ -25,6 +25,7 @@ import {
   getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getWaterRegionData,
+  isZoomedInToRegion,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
 import {
@@ -32,6 +33,7 @@ import {
   getFuturePageStateFromURLHash,
 } from '../../../url-state';
 import Spinner from '../../generic/spinner';
+import { GridVariableSelector } from '../../grid-variable-selector';
 import { ResponsiveMap } from '../../map/responsive';
 import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
@@ -89,6 +91,7 @@ interface GeneratedStateProps {
   selectedWaterRegionId?: number;
   selectedWorldRegionId: number;
   waterRegions?: WaterRegionGeoJSON;
+  isZoomedIn: boolean;
 }
 
 interface PassedProps {
@@ -317,6 +320,7 @@ class FutureBody extends React.Component<Props, State> {
       selectedWaterRegionId,
       selectedWorldRegionId,
       selectedDataType,
+      isZoomedIn,
     } = this.props;
     const {
       selectedTimeIndex,
@@ -391,7 +395,11 @@ class FutureBody extends React.Component<Props, State> {
                       waterRegions={waterRegions}
                       selectedDataType={selectedDataType}
                     />
-                    <WorldRegionSelector />
+                    {isZoomedIn ? (
+                      <GridVariableSelector />
+                    ) : (
+                      <WorldRegionSelector />
+                    )}
                   </>
                 )}
                 {!ensembleData[selectedDataType][ensembleAreaId] ? (
@@ -432,6 +440,7 @@ const Future = connect<GeneratedStateProps, {}, PassedProps, StateTree>(
     waterRegions: getWaterRegionData(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
+    isZoomedIn: isZoomedInToRegion(state),
   }),
 )(FutureBody);
 

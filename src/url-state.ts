@@ -3,6 +3,7 @@ import { parse, ParseOptions, stringify, StringifyOptions } from 'query-string';
 import { Middleware } from 'redux';
 import { Action } from './actions';
 import { State as FuturePageState } from './components/pages/future';
+import { GridVariable } from './data';
 import { SelectionsTree, StateTree, ThresholdsTree } from './reducers';
 import { AppType } from './types';
 
@@ -13,6 +14,7 @@ const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   t: 'historicalTimeIndex',
   wr: 'worldRegion',
   r: 'region',
+  gv: 'selectedGridVariable',
   z: 'zoomedInToRegion',
 };
 const selectionsStateToUrl = invert(urlToSelectionsState);
@@ -42,7 +44,12 @@ function globalStateToHashObject(state: StateTree, appType: AppType) {
   switch (appType) {
     case AppType.FUTURE:
       // The future page stores selection state in the path (via react-router)
-      selectionMembersToUse = ['worldRegion', 'region', 'zoomedInToRegion'];
+      selectionMembersToUse = [
+        'worldRegion',
+        'region',
+        'zoomedInToRegion',
+        'selectedGridVariable',
+      ];
       thresholdMembersToUse = ['stress', 'shortage', 'kcal'];
       break;
     case AppType.PAST:
@@ -151,6 +158,10 @@ export function getGlobalStateFromURLHash(): {
       case 'cm':
         // TODO: validate
         selections[urlToSelectionsState[key]] = value as string;
+        break;
+      case 'gv':
+        // TODO: validate
+        selections[urlToSelectionsState[key]] = value as GridVariable;
         break;
       case 'ts':
         if (['annual', 'decadal'].indexOf(value as string) === -1) {

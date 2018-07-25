@@ -422,8 +422,17 @@ export const gridQuintileColors: GridQuintileColors = {
   irri: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
 };
 
-export function labelForGridData(dataType: GridVariable) {
-  switch (dataType) {
+export const gridVariables: GridVariable[] = [
+  'pop',
+  'dom',
+  'elec',
+  'irri',
+  'live',
+  'man',
+];
+
+export function labelForGridVariable(variable: GridVariable) {
+  switch (variable) {
     case 'pop':
       return 'Population';
     case 'dom':

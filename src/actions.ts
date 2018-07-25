@@ -4,6 +4,7 @@ import {
   fetchWaterRegionsData,
   fetchWorldRegionsData,
   generateWaterToWorldRegionsMap,
+  GridVariable,
   WaterRegionGeoJSON,
 } from './data';
 import {
@@ -33,6 +34,19 @@ export function setRegionZoom(zoomedIn: boolean): SetRegionZoomAction {
   return {
     type: 'SET_REGION_ZOOM',
     zoomedIn,
+  };
+}
+
+export interface SetGridVariableAction {
+  type: 'SET_GRID_VARIABLE';
+  variable: GridVariable;
+}
+export function setSelectedGridVariable(
+  variable: GridVariable,
+): SetGridVariableAction {
+  return {
+    type: 'SET_GRID_VARIABLE',
+    variable,
   };
 }
 
@@ -261,6 +275,7 @@ export type Action =
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
   | SetTimeIndexAction
+  | SetGridVariableAction
   | SetRegionZoomAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction

@@ -12,6 +12,7 @@ const RegionsList = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   padding: ${theme.margin()} 0;
+  min-height: 80px;
 `;
 
 const Region = styled.div`

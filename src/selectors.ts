@@ -192,6 +192,10 @@ export function getSelectedTimeScale(state: StateTree) {
   return state.selections.timeScale;
 }
 
+export function getSelectedGridVariable(state: StateTree) {
+  return state.selections.selectedGridVariable;
+}
+
 export function isZoomedInToRegion(state: StateTree) {
   return state.selections.zoomedInToRegion;
 }

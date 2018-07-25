@@ -7,6 +7,7 @@ import {
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
+  isZoomedInToRegion,
 } from '../selectors';
 import {
   HistoricalDataType,
@@ -17,15 +18,20 @@ import {
 export interface GeneratedMapProps {
   selectedWaterData?: TimeAggregate<number>;
   waterRegions?: WaterRegionGeoJSON;
+  isZoomedIn?: boolean;
 }
 
 interface PassedProps {
   selectedDataType: HistoricalDataType;
 }
 
+export type Props = PassedProps & GeneratedMapProps;
+
 export default function withMapData<T extends PassedProps>(
   Component: React.ComponentType<T>,
 ) {
+  // This typing is actually incorrect but works because GenerateMapProps are all optional.
+  // The third type should be Omit<T, keyof GeneratedMapProps> or something.
   return connect<GeneratedMapProps, {}, T, StateTree>(
     (state, { selectedDataType }) => {
       const selectedData = getSelectedStressShortageData(state);
@@ -44,6 +50,7 @@ export default function withMapData<T extends PassedProps>(
       return {
         selectedWaterData: dataForComponent,
         waterRegions: getWaterRegionData(state),
+        isZoomedIn: isZoomedInToRegion(state),
       };
     },
   )(Component as any); // TODO: Fix typings
