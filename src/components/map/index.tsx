@@ -1,5 +1,7 @@
+import { axisBottom } from 'd3-axis';
+import { format } from 'd3-format';
 import { ExtendedFeature, geoNaturalEarth1, geoPath, GeoSphere } from 'd3-geo';
-import { scaleThreshold, ScaleThreshold } from 'd3-scale';
+import { scaleLog, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
@@ -7,13 +9,19 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
-import { setSelectedRegion, toggleSelectedRegion } from '../../actions';
+import {
+  setRegionZoom,
+  setSelectedRegion,
+  toggleSelectedRegion,
+} from '../../actions';
 import {
   belowThresholdColor,
   getDataTypeColors,
   getLocalRegionData,
   GridData,
+  gridQuintileColors,
   GridVariable,
+  labelForGridVariable,
   LocalData,
   missingDataColor,
   WaterRegionGeoJSON,
@@ -21,11 +29,14 @@ import {
 } from '../../data';
 import { StateTree } from '../../reducers';
 import {
+  getSelectedGridVariable,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
+  isZoomedInToRegion,
 } from '../../selectors';
 import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
+import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
@@ -37,6 +48,45 @@ const Container = styled.div`
 
 const StyledThresholdSelector = styled(ThresholdSelector)`
   position: absolute;
+`;
+
+const ZoomButton = styled.button`
+  position: absolute;
+  right: 20px;
+  bottom: 5px;
+
+  background: transparent;
+  border-radius: 4px;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: white;
+  color: ${theme.colors.text};
+  border: 2px solid ${theme.colors.gray};
+
+  &:hover {
+    background-color: ${theme.colors.gray};
+    color: white;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+`;
+
+const SpinnerOverlay = styled.div`
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5);
 `;
 
 const Land = styled.path`
@@ -133,20 +183,24 @@ interface GeneratedStateProps {
   thresholds: number[];
   stressThresholds: number[];
   shortageThresholds: number[];
+  isZoomedIn: boolean;
+  selectedGridVariable: GridVariable;
 }
 
 interface GeneratedDispatchProps {
   toggleSelectedRegion: (regionId: number) => void;
   clearSelectedRegion: () => void;
+  setZoomedInToRegion: (zoomedIn: boolean) => void;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 interface State {
-  zoomInToRegion: boolean;
   regionData: {
-    [id: string]: LocalData;
+    [id: string]: LocalData | undefined;
   };
+  fetchingDataForRegions: number[];
+  zoomInRequested: boolean;
 }
 
 function getColorScale(dataType: AnyDataType, thresholds: number[]) {
@@ -166,8 +220,9 @@ class Map extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      zoomInToRegion: false,
       regionData: {},
+      fetchingDataForRegions: [],
+      zoomInRequested: props.isZoomedIn,
     };
   }
 
@@ -189,47 +244,75 @@ class Map extends React.Component<Props, State> {
       selectedWorldRegion,
       width,
     } = this.props;
-    const { zoomInToRegion } = this.state;
+    const { zoomInRequested, regionData } = this.state;
 
-    if (prevProps.width !== width) {
-      this.clearMap();
-      this.drawMap();
-    } else if (
+    // FIXME: This is fugly
+    const widthChanged = prevProps.width !== width;
+    const didRequestZoomIn = !prevState.zoomInRequested && zoomInRequested;
+    const didRequestZoomOut = prevState.zoomInRequested && !zoomInRequested;
+    const waterRegionSelectedAndChanged =
+      selectedWaterRegionId &&
+      prevProps.selectedWaterRegionId !== selectedWaterRegionId;
+    const waterRegionNoLongerSelected =
+      !selectedWaterRegionId &&
+      prevProps.selectedWaterRegionId !== selectedWaterRegionId;
+    const selectedWorldRegionChanged =
+      selectedWorldRegion !== prevProps.selectedWorldRegion;
+    const zoomedInDataLoaded =
+      selectedWaterRegionId &&
+      regionData[selectedWaterRegionId] &&
+      !prevState.regionData[selectedWaterRegionId];
+    const dataChanged =
+      prevProps.selectedData !== selectedData ||
       prevProps.selectedDataType !== selectedDataType ||
       prevProps.thresholds !== thresholds ||
       (selectedDataType === 'scarcity' &&
         (prevProps.stressThresholds !== stressThresholds ||
-          prevProps.shortageThresholds !== shortageThresholds)) ||
-      prevProps.selectedData !== selectedData ||
-      prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-      (prevState.zoomInToRegion && !zoomInToRegion)
-    ) {
-      this.redrawFillsAndBorders();
-    }
+          prevProps.shortageThresholds !== shortageThresholds));
 
-    if (
-      prevProps.selectedWorldRegion !== selectedWorldRegion ||
-      (!zoomInToRegion && width !== prevProps.width)
-    ) {
-      this.zoomToGlobalArea();
-    }
+    if (widthChanged) {
+      // If width changes, redo everything
+      this.clearMap();
+      this.drawMap();
 
-    // TODO: this is a little ugly
-    if (
-      zoomInToRegion &&
-      (!prevState.zoomInToRegion ||
-        prevProps.selectedWaterRegionId !== selectedWaterRegionId ||
-        prevProps.selectedData !== selectedData ||
-        prevProps.width !== width ||
-        prevProps.selectedDataType !== selectedDataType ||
-        (this.state.regionData[selectedWaterRegionId!] &&
-          !prevState.regionData[selectedWaterRegionId!]))
-    ) {
-      this.removeZoomedInElements();
-      this.zoomToWaterRegion();
-    } else if (prevState.zoomInToRegion && !zoomInToRegion) {
-      this.removeZoomedInElements();
-      this.zoomToGlobalArea();
+      if (!zoomInRequested) {
+        this.zoomToGlobalArea();
+      } else {
+        this.removeZoomedInElements();
+        this.zoomToWaterRegion();
+      }
+    } else {
+      // Width has stayed the same
+      if (zoomInRequested) {
+        if (
+          didRequestZoomIn ||
+          waterRegionSelectedAndChanged ||
+          zoomedInDataLoaded ||
+          dataChanged
+        ) {
+          this.removeZoomedInElements();
+          this.zoomToWaterRegion();
+        }
+      } else {
+        // Not zoomed in
+        if (
+          dataChanged ||
+          waterRegionSelectedAndChanged ||
+          waterRegionNoLongerSelected
+        ) {
+          this.redrawFillsAndBorders();
+        }
+
+        if (waterRegionNoLongerSelected || selectedWorldRegionChanged) {
+          this.zoomToGlobalArea();
+        }
+
+        if (didRequestZoomOut) {
+          this.removeZoomedInElements();
+          this.zoomToGlobalArea();
+          this.redrawFillsAndBorders();
+        }
+      }
     }
   }
 
@@ -362,6 +445,10 @@ class Map extends React.Component<Props, State> {
       );
 
     function zoomed() {
+      svg
+        .select<SVGGElement>('g#water-regions')
+        .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
+        .style('visibility', 'visible');
       select<SVGGElement, undefined>('g#water-regions').attr(
         'transform',
         event.transform,
@@ -382,16 +469,21 @@ class Map extends React.Component<Props, State> {
   }
 
   private handleRegionClick = (d: WaterRegionGeoJSONFeature) => {
-    if (d.properties.featureId === this.props.selectedWaterRegionId) {
-      this.toggleZoomInToRegion();
-    } else {
+    // IF the user clicks on the selected region while zoomed in, do nothing.
+    if (
+      !this.props.isZoomedIn ||
+      this.props.selectedWaterRegionId !== d.properties.featureId
+    ) {
       this.props.toggleSelectedRegion(d.properties.featureId);
     }
   };
 
-  private toggleZoomInToRegion() {
-    this.setState(state => ({ zoomInToRegion: !state.zoomInToRegion }));
-  }
+  private toggleZoomInToRegion = () => {
+    if (this.state.zoomInRequested) {
+      this.props.setZoomedInToRegion(false);
+    }
+    this.setState(state => ({ zoomInRequested: !state.zoomInRequested }));
+  };
 
   private getColorForWaterRegion(featureId: number): string {
     const {
@@ -426,15 +518,24 @@ class Map extends React.Component<Props, State> {
   }
 
   private async fetchRegionData(regionId: number) {
-    const data = await getLocalRegionData(regionId);
-    if (data) {
-      this.setState(state => ({
-        regionData: {
-          ...state.regionData,
-          [regionId]: data,
-        },
-      }));
+    if (this.state.fetchingDataForRegions.indexOf(regionId) > -1) {
+      return;
     }
+    this.setState(state => ({
+      fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
+    }));
+    const data = await getLocalRegionData(regionId);
+    this.setState(state => ({
+      fetchingDataForRegions: state.fetchingDataForRegions.filter(
+        id => id !== regionId,
+      ),
+      regionData: data
+        ? {
+            ...state.regionData,
+            [regionId]: data,
+          }
+        : state.regionData,
+    }));
   }
 
   private removeZoomedInElements() {
@@ -481,10 +582,12 @@ class Map extends React.Component<Props, State> {
   private zoomToWaterRegion() {
     const {
       selectedWaterRegionId,
+      selectedGridVariable,
       width,
       waterRegions: { features },
       selectedData: { startYear },
     } = this.props;
+    const { zoomInRequested } = this.state;
 
     const selectedWaterRegion =
       selectedWaterRegionId != null
@@ -492,20 +595,21 @@ class Map extends React.Component<Props, State> {
         : undefined;
 
     if (
-      !this.state.zoomInToRegion ||
+      !zoomInRequested ||
       selectedWaterRegionId == null ||
       selectedWaterRegion == null
     ) {
       return;
     }
 
-    const localData: LocalData | undefined = this.state.regionData[
-      selectedWaterRegionId
-    ];
+    const localData = this.state.regionData[selectedWaterRegionId];
     if (!localData) {
       this.fetchRegionData(selectedWaterRegionId);
       return;
     }
+
+    // Having this side effect here is ugly
+    this.props.setZoomedInToRegion(true);
 
     const height = this.getHeight();
     const svg = select<SVGElement, undefined>(this.svgRef);
@@ -614,17 +718,17 @@ class Map extends React.Component<Props, State> {
         .text(d => d.properties.name);
     }
 
-    // TODO: add selector for variable
-    const selectedGridVariable: GridVariable = 'pop';
+    this.removeGridLegend();
+
     const quintiles = localData.gridQuintiles[selectedGridVariable];
     if (quintiles != null) {
       // TODO: might be a more efficient way of doing this?
-      const griddataPoly: any = {
+      const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
         type: 'FeatureCollection',
         features: localData.grid.map((d: GridData) => ({
-          type: 'Feature',
+          type: 'Feature' as 'Feature',
           geometry: {
-            type: 'Polygon',
+            type: 'Polygon' as 'Polygon',
             coordinates: [
               [
                 [d.centre[0] - 0.25, d.centre[1] - 0.25],
@@ -642,10 +746,9 @@ class Map extends React.Component<Props, State> {
         })),
       };
 
-      // TODO: may want different color scales for each variable
       const colorScale = scaleThreshold<number, string>()
         .domain(quintiles)
-        .range(['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c']);
+        .range(gridQuintileColors[selectedGridVariable]);
 
       svg
         .select<SVGGElement>('g#grid-data')
@@ -653,17 +756,25 @@ class Map extends React.Component<Props, State> {
           SVGPathElement,
           ExtendedFeature<GeoJSON.Polygon, { data: number }>
         >('path')
-        .data<ExtendedFeature<GeoJSON.Polygon, { data: number }>>(
-          griddataPoly.features,
-        )
+        .data(griddataPoly.features)
         .enter()
         .append<SVGPathElement>('path')
         .attr('d', path)
         .attr(
           'fill',
           d =>
-            d.properties.data == null ? 'none' : colorScale(d.properties.data),
+            d.properties!.data == null
+              ? 'none'
+              : colorScale(d.properties!.data),
         );
+
+      this.addGridLegend(
+        colorScale,
+        // The log scale breaks if we pass in 0.
+        // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
+        [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
+        labelForGridVariable(selectedGridVariable),
+      );
     }
 
     const bounds = path.bounds(selectedWaterRegion);
@@ -694,7 +805,7 @@ class Map extends React.Component<Props, State> {
       svg
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-        .attr('fill', 'none')
+        .style('visibility', 'hidden')
         .attr('pointer-events', 'visible');
       select<SVGGElement, undefined>('g#clickable-water-regions').attr(
         'transform',
@@ -734,8 +845,8 @@ class Map extends React.Component<Props, State> {
         .attr('font-size', `${12 / event.transform.k}px`);
       select<SVGGElement, undefined>('g#places')
         .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('d', path.pointRadius(5 / event.transform.k) as any);
+        .selectAll<SVGPathElement, any>('path')
+        .attr('d', path.pointRadius(5 / event.transform.k));
       select<SVGGElement, undefined>('g#places-labels')
         .attr('transform', event.transform)
         .selectAll('text')
@@ -746,6 +857,71 @@ class Map extends React.Component<Props, State> {
         event.transform,
       );
     }
+  }
+
+  private removeGridLegend() {
+    select(this.svgRef)
+      .select('g#grid-legend')
+      .selectAll('*')
+      .remove();
+  }
+
+  // Based on https://bl.ocks.org/mbostock/4573883
+  private addGridLegend(
+    colorScale: ScaleThreshold<number, string>,
+    valueDomain: number[],
+    label: string,
+  ) {
+    const legendWidth = 240;
+    // FIXME: Having a log scale here is a bit ugly, but the quintiles aren't linear
+    const legendX = scaleLog()
+      .domain(valueDomain)
+      .range([0, legendWidth]);
+
+    const xAxis = axisBottom(legendX)
+      .tickSize(13)
+      .tickValues(colorScale.domain())
+      .tickFormat(format('.2s'));
+
+    const g = select('g#grid-legend').call(xAxis as any);
+    g.select('.domain').remove();
+    g.selectAll('rect.bar')
+      .data(
+        colorScale.range().map(color => {
+          const d = colorScale.invertExtent(color);
+          if (d[0] == null) {
+            d[0] = legendX.domain()[0];
+          }
+          if (d[1] == null) {
+            d[1] = legendX.domain()[1];
+          }
+          return d;
+        }),
+      )
+      .enter()
+      .insert('rect', '.tick')
+      .attr('height', 8)
+      .attr('class', 'bar')
+      .attr('x', d => legendX(d[0]!))
+      .attr('width', d => legendX(d[1]!) - legendX(d[0]!))
+      .attr('fill', d => colorScale(d[0]!));
+
+    g.append('text')
+      .attr('fill', '#000')
+      .attr('font-family', theme.bodyFontFamily)
+      .attr('font-size', '14px')
+      .attr('font-weight', 'bold')
+      .attr('text-anchor', 'start')
+      .attr('y', -10)
+      .text(label);
+
+    g.insert('rect', '.bar')
+      .attr('fill', 'white')
+      .attr('opacity', 0.9)
+      .attr('width', legendWidth + 30)
+      .attr('height', 54)
+      .attr('x', -15)
+      .attr('y', -28);
   }
 
   private getScarcityLegend() {
@@ -799,8 +975,16 @@ class Map extends React.Component<Props, State> {
   }
 
   public render() {
-    const { selectedDataType, width } = this.props;
+    const {
+      selectedDataType,
+      width,
+      selectedWaterRegionId,
+      isZoomedIn,
+    } = this.props;
+    const { zoomInRequested } = this.state;
     const height = this.getHeight();
+    // Even though zoomInToRegion might be true, we might not have the data loaded,
+    // in which case we're not yet zoomed in
 
     return (
       <Container>
@@ -832,14 +1016,40 @@ class Map extends React.Component<Props, State> {
           <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
+          {isZoomedIn ? (
+            <g
+              transform={`translate(${width - 400},${height - 30})`}
+              id="grid-legend"
+            />
+          ) : (
+            selectedDataType === 'scarcity' && this.getScarcityLegend()
+          )}
           <g id="clickable-water-regions" clipPath="url(#clip)" />
-          {selectedDataType === 'scarcity' && this.getScarcityLegend()}
         </SVG>
-        {selectedDataType !== 'scarcity' && (
-          <StyledThresholdSelector
-            style={{ left: width * 0.5, top: height - 40 }}
-            dataType={selectedDataType}
-          />
+        {/* Note: we currently don't give an error message if loading data fails */}
+        {zoomInRequested &&
+          selectedWaterRegionId &&
+          !this.state.regionData[selectedWaterRegionId] &&
+          this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
+            -1 && (
+            <SpinnerOverlay style={{ width: width + 10, height }}>
+              <div>
+                <p>Loading...</p>
+                <Spinner />
+              </div>
+            </SpinnerOverlay>
+          )}
+        {!isZoomedIn &&
+          selectedDataType !== 'scarcity' && (
+            <StyledThresholdSelector
+              style={{ left: width * 0.5, top: height - 40 }}
+              dataType={selectedDataType}
+            />
+          )}
+        {selectedWaterRegionId && (
+          <ZoomButton onClick={this.toggleZoomInToRegion}>
+            {isZoomedIn ? 'Zoom out' : 'Zoom in'}
+          </ZoomButton>
         )}
       </Container>
     );
@@ -862,11 +1072,16 @@ export default connect<
       colorScale: getColorScale(selectedDataType, thresholds),
       stressThresholds: getThresholdsForDataType(state, 'stress'),
       shortageThresholds: getThresholdsForDataType(state, 'shortage'),
+      isZoomedIn: isZoomedInToRegion(state),
+      selectedGridVariable: getSelectedGridVariable(state),
     };
   },
   dispatch => ({
     toggleSelectedRegion: (regionId: number) => {
       dispatch(toggleSelectedRegion(regionId));
+    },
+    setZoomedInToRegion: (zoomedIn: boolean) => {
+      dispatch(setRegionZoom(zoomedIn));
     },
     clearSelectedRegion: () => {
       dispatch(setSelectedRegion());

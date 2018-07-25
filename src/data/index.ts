@@ -17,6 +17,8 @@ import {
   FutureScenarioData,
   FutureScenarioVariableName,
   FutureScenarioWithData,
+  GridQuintileColors,
+  GridVariable,
   LocalData,
   RawRegionStressShortageDatum,
   toStressShortageDatum,
@@ -409,6 +411,41 @@ export function scarcitySelector(
 
     return scarcityThresholds[0] - 0.1;
   };
+}
+
+export const gridQuintileColors: GridQuintileColors = {
+  pop: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+  elec: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+  dom: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+  man: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+  live: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+  irri: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
+};
+
+export const gridVariables: GridVariable[] = [
+  'pop',
+  'dom',
+  'elec',
+  'irri',
+  'live',
+  'man',
+];
+
+export function labelForGridVariable(variable: GridVariable) {
+  switch (variable) {
+    case 'pop':
+      return 'Population';
+    case 'dom':
+      return 'dom (TODO)';
+    case 'elec':
+      return 'elec (TODO)';
+    case 'irri':
+      return 'irri (TODO)';
+    case 'live':
+      return 'live (TODO)';
+    case 'man':
+      return 'man (TODO)';
+  }
 }
 
 export * from './types';

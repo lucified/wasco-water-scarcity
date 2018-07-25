@@ -1,4 +1,4 @@
-import { WaterRegionGeoJSON } from '../data';
+import { GridVariable, WaterRegionGeoJSON } from '../data';
 import {
   AnyDataType,
   StressShortageDatum,
@@ -15,6 +15,8 @@ export interface SelectionsTree {
   timeScale: TimeScale; // Only used in Past pages
   worldRegion: number;
   region?: number;
+  zoomedInToRegion: boolean;
+  selectedGridVariable: GridVariable;
 }
 
 export type ThresholdsTree = { [dataType in AnyDataType]: number[] };

@@ -1,13 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { WaterRegionGeoJSON } from '../../../data';
-import { HistoricalDataType, TimeAggregate } from '../../../types';
 import Spinner from '../../generic/spinner';
+import { GridVariableSelector } from '../../grid-variable-selector';
 import { ResponsiveMap } from '../../map/responsive';
 import SelectedRegionInformation from '../../selected-region-information';
 import { theme, Title, TitleContainer } from '../../theme';
 import TimeSelector from '../../time-selector';
-import withMapData from '../../with-map-data';
+import withMapData, { Props as MapDataProps } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
@@ -46,17 +45,11 @@ const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
 `;
 
-interface GeneratedStateProps {
-  waterRegions?: WaterRegionGeoJSON;
-  selectedWaterData?: TimeAggregate<number>;
-}
-
 interface PassedProps {
-  selectedDataType: HistoricalDataType;
   isLoading: boolean;
 }
 
-type Props = GeneratedStateProps & PassedProps;
+type Props = MapDataProps & PassedProps;
 
 export class PastBody extends React.Component<Props> {
   public render() {
@@ -65,6 +58,7 @@ export class PastBody extends React.Component<Props> {
       selectedDataType,
       selectedWaterData,
       isLoading,
+      isZoomedIn,
     } = this.props;
 
     return (
@@ -98,7 +92,11 @@ export class PastBody extends React.Component<Props> {
                   </MapContainer>
                 </div>
                 <div className="row">
-                  <WorldRegionSelector />
+                  {isZoomedIn ? (
+                    <GridVariableSelector />
+                  ) : (
+                    <WorldRegionSelector />
+                  )}
                 </div>
                 <div className="row">
                   <SelectedRegionInformation dataType={selectedDataType} />

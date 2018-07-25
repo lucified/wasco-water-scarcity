@@ -25,6 +25,8 @@ const defaultState: StateTree = {
     climateModel: getDefaultHistoricalClimateModel(),
     timeScale: 'decadal',
     worldRegion: 0, // 0 means global
+    zoomedInToRegion: false,
+    selectedGridVariable: 'pop',
   },
   requests: [],
 };
@@ -126,6 +128,24 @@ function selectionsReducer(
         return {
           ...state,
           historicalTimeIndex: action.data.length - 1,
+        };
+      }
+
+      return state;
+    case 'SET_REGION_ZOOM':
+      if (state.zoomedInToRegion !== action.zoomedIn) {
+        return {
+          ...state,
+          zoomedInToRegion: action.zoomedIn,
+        };
+      }
+
+      return state;
+    case 'SET_GRID_VARIABLE':
+      if (state.selectedGridVariable !== action.variable) {
+        return {
+          ...state,
+          selectedGridVariable: action.variable,
         };
       }
 
