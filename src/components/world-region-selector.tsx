@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { setSelectedWorldRegion } from '../../actions';
-import { StateTree } from '../../reducers';
-import { getSelectedWorldRegionId, getWorldRegionData } from '../../selectors';
-import { WorldRegion } from '../../types';
-import { theme } from '../theme';
+import { setSelectedWorldRegion } from '../actions';
+import { StateTree } from '../reducers';
+import { getSelectedWorldRegionId, getWorldRegionData } from '../selectors';
+import { WorldRegion } from '../types';
+import { theme } from './theme';
 
 const RegionsList = styled.div`
   display: flex;
