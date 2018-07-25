@@ -13,7 +13,7 @@ import {
   getSelectedTimeScale,
   isRequestOngoing,
 } from '../selectors';
-import { AppType } from '../types';
+import { AppType, TimeScale } from '../types';
 import { historicalDataRequestId } from '../utils';
 import { Header } from './header';
 import NotFound from './pages/not-found';
@@ -55,14 +55,14 @@ interface GeneratedDispatchProps {
   loadModelData: (
     climateModel: string,
     impactModel: string,
-    timeScale: string,
+    timeScale: TimeScale,
   ) => void;
 }
 
 interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
-  selectedTimeScale: string;
+  selectedTimeScale: TimeScale;
   isLoading: boolean;
 }
 
@@ -163,7 +163,7 @@ export const App = hot(module)(
       loadModelData: (
         climateModel: string,
         impactModel: string,
-        timeScale: string,
+        timeScale: TimeScale,
       ) => {
         // TODO: figure out how to type this: https://github.com/reduxjs/redux-thunk/issues/103
         dispatch(loadModelData(

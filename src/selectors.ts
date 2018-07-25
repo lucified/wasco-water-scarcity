@@ -8,7 +8,7 @@ import {
   TimeAggregate,
 } from './types';
 
-function getStressShortageData(state: StateTree) {
+export function getStressShortageData(state: StateTree) {
   return state.data.stressShortageData;
 }
 

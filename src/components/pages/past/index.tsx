@@ -11,6 +11,7 @@ import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
 import { Choices } from './choices';
 import DataTypeLinks from './data-type-links';
+import { DownloadCSV } from './download-csv';
 const Sticky = require('react-stickynode');
 
 const BodyContainer = styled.div`
@@ -26,6 +27,22 @@ const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsWidth};
   padding-left: ${theme.margin()};
+  padding-bottom: ${theme.margin()};
+`;
+
+const Separator = styled.hr`
+  border-color: rgba(240, 240, 240, 0.4);
+`;
+
+const StyledCSVButton = styled(DownloadCSV)`
+  margin: ${theme.margin(0.5)} 0;
+`;
+
+const MoreInformation = styled.a`
+  color: ${theme.colors.gray};
+  font-size: 14px;
+  text-align: right;
+  display: block;
 `;
 
 const StickyGraphics = styled(Sticky)`
@@ -106,6 +123,16 @@ export class PastBody extends React.Component<Props> {
           </StickyGraphics>
           <SelectorsContent>
             <Choices dataType={selectedDataType} />
+            {selectedWaterData && (
+              <>
+                <Separator />
+                <StyledCSVButton />
+                {/* TODO: change to proper URL */}
+                <MoreInformation href="https://dev.mediapool.fi/wasco/research-data/data-and-code/">
+                  More information
+                </MoreInformation>
+              </>
+            )}
           </SelectorsContent>
         </BodyContainer>
       </div>

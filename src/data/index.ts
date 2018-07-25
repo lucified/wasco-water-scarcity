@@ -53,7 +53,7 @@ function generateStressShortageData(
 export async function fetchHistoricalStressShortageData(
   climateModel: string,
   impactModel: string,
-  timeScale: string,
+  timeScale: TimeScale,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
   const dataset = historicalDatasets.find(
     d =>
