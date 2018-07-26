@@ -769,6 +769,9 @@ class Map extends React.Component<Props, State> {
     }
 
     const bounds = path.bounds(selectedWaterRegion);
+    const dy0 = bounds[1][1] - bounds[0][1];
+    const legendMargin = 54;
+    bounds[1][1] = bounds[1][1] + (legendMargin / height) * dy0;
     const dx = bounds[1][0] - bounds[0][0];
     const dy = bounds[1][1] - bounds[0][1];
     const x = (bounds[0][0] + bounds[1][0]) / 2;
