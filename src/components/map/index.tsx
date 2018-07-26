@@ -295,6 +295,7 @@ class Map extends React.Component<Props, State> {
         ) {
           this.removeZoomedInElements();
           this.zoomToWaterRegion();
+          this.redrawFillsAndBorders();
         }
       } else {
         // Not zoomed in
