@@ -112,13 +112,17 @@ const getAggregateData = createSelector(
         const noStress =
           region.stress == null || region.stress < thresholds.stress[0];
         const mediumStress =
-          region.stress != null && region.stress >= thresholds.stress[1];
+          region.stress != null &&
+          region.stress >= thresholds.stress[1] &&
+          region.stress < thresholds.stress[2];
         const highStress =
           region.stress != null && region.stress >= thresholds.stress[2];
         const noShortage =
           region.shortage == null || region.shortage > thresholds.shortage[2];
         const mediumShortage =
-          region.shortage != null && region.shortage <= thresholds.shortage[1];
+          region.shortage != null &&
+          region.shortage <= thresholds.shortage[1] &&
+          region.shortage < thresholds.shortage[2];
         const highShortage =
           region.shortage != null && region.shortage <= thresholds.shortage[0];
 
