@@ -18,6 +18,12 @@ const StyledYearLabel = styled(YearLabel)`
   right: 0;
 `;
 
+const SpinnerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 interface PassedProps {
   selectedDataType: HistoricalDataType;
   autoplay: boolean;
@@ -39,9 +45,12 @@ class CommonEmbedLayout extends React.Component<Props> {
       <div>
         {!selectedWaterData || !waterRegions ? (
           <div className="row middle-xs">
-            <div className="col-xs-12">
+            <SpinnerContainer
+              className="col-xs-12"
+              style={{ minHeight: 0.9 * width }}
+            >
               <Spinner />
-            </div>
+            </SpinnerContainer>
           </div>
         ) : (
           <div>
