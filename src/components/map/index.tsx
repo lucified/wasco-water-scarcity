@@ -107,6 +107,9 @@ const SVG = styled.svg`
       opacity: 0.5;
       transition: opacity 0.2s ease-out;
     }
+    &.hide-fill {
+      fill: none;
+    }
   }
 
   & .clickable-water-region {
@@ -448,7 +451,7 @@ class Map extends React.Component<Props, State> {
       svg
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-        .style('visibility', 'visible');
+        .classed('hide-fill', false);
       select<SVGGElement, undefined>('g#water-regions').attr(
         'transform',
         event.transform,
@@ -805,7 +808,7 @@ class Map extends React.Component<Props, State> {
       svg
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
-        .style('visibility', 'hidden')
+        .classed('hide-fill', true)
         .attr('pointer-events', 'visible');
       select<SVGGElement, undefined>('g#clickable-water-regions').attr(
         'transform',
