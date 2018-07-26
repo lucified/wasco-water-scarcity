@@ -100,7 +100,8 @@ const SVG = styled.svg`
     transition: opacity 0.2s ease-in;
 
     &.selected {
-      stroke: black;
+      stroke: #b300b3;
+      stroke-width: 0.75px;
       transition: opacity 0.2s ease-out;
     }
     &.unselected {
@@ -149,7 +150,7 @@ const Rivers = styled.g`
 
 const Basins = styled.g`
   stroke-width: 0.5px;
-  stroke: purple;
+  stroke: #2f819b;
   fill: none;
 `;
 
@@ -676,7 +677,7 @@ class Map extends React.Component<Props, State> {
         .append('text')
         .attr('x', d => path.centroid(d)[0])
         .attr('y', d => path.centroid(d)[1])
-        .style('fill', 'purple')
+        .style('fill', '#2f819b')
         .attr('text-anchor', 'middle')
         .attr('font-size', '12px')
         .text(d => d.properties.basinName);
