@@ -388,6 +388,7 @@ class Map extends React.Component<Props, State> {
         .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
+    svg.select<SVGGElement>('g#water-regions > path.selected').raise();
     svg
       .select<SVGGElement>('g#clickable-water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
@@ -506,6 +507,7 @@ class Map extends React.Component<Props, State> {
       )
       .transition(t as any)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
+      select<SVGPathElement, WaterRegionGeoJSONFeature>('g#water-regions > path.selected').raise();
   }
 
   private async fetchRegionData(regionId: number) {
