@@ -49,35 +49,11 @@ const StyledReactSlider = styled(ReactSlider)`
       background: ${stressColors[0]};
     }
 
-    &.bar-stress-2 {
-      background: ${stressColors[1]};
-    }
-
-    &.bar-stress-3 {
-      background: ${stressColors[2]};
-    }
-
     &.bar-shortage-0 {
-      background: ${shortageColors[2]};
-    }
-
-    &.bar-shortage-1 {
-      background: ${shortageColors[1]};
-    }
-
-    &.bar-shortage-2 {
       background: ${shortageColors[0]};
     }
 
     &.bar-kcal-0 {
-      background: ${kcalColors[2]};
-    }
-
-    &.bar-kcal-1 {
-      background: ${kcalColors[1]};
-    }
-
-    &.bar-kcal-2 {
       background: ${kcalColors[0]};
     }
   }
@@ -139,10 +115,12 @@ interface PassedProps {
 }
 
 interface GeneratedStateProps {
+  lowThreshold: number;
   thresholds: number[];
 }
 
 interface GeneratedDispatchProps {
+  setLowThreshold: (thresholds: number[]) => (value: number | number[]) => void;
   setThresholds: (values: number | number[]) => void;
 }
 
@@ -212,25 +190,25 @@ function getBarClassName(dataType: SupportedDataTypes) {
   }
 }
 
-function ThresholdSelector({
+function LowThresholdSelector({
   className,
-  thresholds,
+  lowThreshold,
   dataType,
+  setLowThreshold,
+  thresholds,
   setThresholds,
   style,
 }: Props) {
   const { step, min, max, formatter } = configurations[dataType];
-  const slidingMax = Math.max(thresholds[thresholds.length - 1] * 1.1, max);
+  const slidingMax = Math.max(lowThreshold * 1.1, max);
 
-  // ReactSlider modifies the contents of the values array. We need to clone it
   return (
     <Root style={style} className={className}>
       <Header>{getHeaderText(dataType)}</Header>
       <StyledReactSlider
         min={min}
         max={slidingMax}
-        value={thresholds.slice()}
-        minDistance={10 * step}
+        value={lowThreshold}
         pearling
         step={step}
         withBars
@@ -238,17 +216,16 @@ function ThresholdSelector({
         handleClassName="threshold-selector-handle"
         handleActiveClassName="threshold-selector-active"
         barClassName={getBarClassName(dataType)}
-        onChange={setThresholds}
+        onChange={setLowThreshold(thresholds)}
       />
       <Labels>
-        {thresholds.map((d, i) => (
-          <Label
-            style={{ left: `${((d - min) / (slidingMax - min)) * 100}%` }}
-            key={`${dataType}-threshold-label-${i}`}
-          >
-            {formatter(d)}
-          </Label>
-        ))}
+        <Label
+          style={{
+            left: `${((lowThreshold - min) / (slidingMax - min)) * 100}%`,
+          }}
+        >
+          {formatter(lowThreshold)}
+        </Label>
       </Labels>
       <Reset>
         <ResetLink
@@ -269,14 +246,46 @@ export default connect<
   PassedProps,
   StateTree
 >(
-  (state, ownProps) => ({
-    thresholds: getThresholdsForDataType(state, ownProps.dataType),
-  }),
+  (state, ownProps) => {
+    const thresholds = getThresholdsForDataType(state, ownProps.dataType);
+    return {
+      thresholds,
+      lowThreshold: thresholds[ownProps.dataType === 'stress' ? 0 : 2],
+    };
+  },
   (dispatch, ownProps) => ({
+    setLowThreshold: (thresholds: number[]) => (value: number | number[]) => {
+      const { dataType } = ownProps;
+      let [low, medium, high] = thresholds;
+      const newValue = Array.isArray(value) ? value[0] : value;
+
+      if (dataType === 'stress') {
+        if (value >= medium) {
+          medium = newValue + 10 * configurations.stress.step;
+        }
+        if (medium >= high) {
+          high = medium + 10 * configurations.stress.step;
+        }
+
+        dispatch(
+          setThresholdsForDataType(ownProps.dataType, [newValue, medium, high]),
+        );
+      } else {
+        if (newValue <= medium) {
+          medium = newValue - 10 * configurations[dataType].step;
+        }
+        if (medium <= low) {
+          low = medium - 10 * configurations[dataType].step;
+        }
+
+        dispatch(
+          setThresholdsForDataType(ownProps.dataType, [low, medium, newValue]),
+        );
+      }
+    },
     setThresholds: (values: number[] | number) => {
-      // NOTE! ReactSlider modifies the contents of the values array
       const thresholds = Array.isArray(values) ? values.slice() : [values];
       dispatch(setThresholdsForDataType(ownProps.dataType, thresholds));
     },
   }),
-)(ThresholdSelector);
+)(LowThresholdSelector);

@@ -14,8 +14,8 @@ import {
   getSelectedTimeScale,
 } from '../../../selectors';
 import { HistoricalDataType, TimeScale } from '../../../types';
+import LowThresholdSelector from '../../low-threshold-selector';
 import { BodyText, theme } from '../../theme';
-import ThresholdSelector from '../../threshold-selector';
 import { ModelSelector } from './model-selector';
 
 const Main = styled.div`
@@ -101,7 +101,7 @@ const timeScaleOptions: Array<{
   },
 ];
 
-const StyledThresholdSelector = styled(ThresholdSelector)`
+const StyledLowThresholdSelector = styled(LowThresholdSelector)`
   margin-bottom: ${theme.margin()};
 `;
 
@@ -134,8 +134,8 @@ class ChoicesPlain extends React.Component<Props> {
         <BodyText>{getDescriptionForDataType(dataType)}</BodyText>
         {dataType === 'scarcity' && (
           <>
-            <StyledThresholdSelector dataType="stress" />
-            <StyledThresholdSelector dataType="shortage" />
+            <StyledLowThresholdSelector dataType="stress" />
+            <StyledLowThresholdSelector dataType="shortage" />
           </>
         )}
         <ModelSelector
