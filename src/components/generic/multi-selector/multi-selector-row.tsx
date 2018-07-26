@@ -41,10 +41,10 @@ const Button = styled.div`
   padding-right: 10px;
   color: ${({ selected, disabled }: ButtonProps) =>
     disabled
-      ? theme.colors.grayLight
+      ? theme.colors.gray
       : selected
         ? theme.colors.textSelection
-        : theme.colors.textMenu};
+        : theme.colors.text};
   background-color: ${({ selected }: ButtonProps) =>
     selected ? theme.colors.selection : 'white'};
 
@@ -86,8 +86,12 @@ const Button = styled.div`
   }
 
   &:hover {
-    color: ${({ selected }: ButtonProps) =>
-      selected ? theme.colors.textSelection : theme.colors.textHover};
+    color: ${({ selected, disabled }: ButtonProps) =>
+      disabled
+        ? theme.colors.gray
+        : selected
+          ? theme.colors.textSelection
+          : theme.colors.textHover};
     background-color: ${theme.colors.selectionActive};
     ${({ selected }: ButtonProps) =>
       selected ? `text-decoration: none; box-shadow: none;` : ''};

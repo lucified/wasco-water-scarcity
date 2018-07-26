@@ -155,7 +155,15 @@ class ChoicesPlain extends React.Component<Props> {
         <ModelSelector
           title="Timescale"
           description="We use three different global water models, which use different methods to estimate water availability and use."
-          options={timeScaleOptions}
+          options={
+            climateModel === 'watch'
+              ? // WATCH data only has decadal data
+                timeScaleOptions.map(o => ({
+                  ...o,
+                  disabled: o.value === 'annual',
+                }))
+              : timeScaleOptions
+          }
           setModel={onTimeScaleChange}
           selectedValue={timeScale}
         />
