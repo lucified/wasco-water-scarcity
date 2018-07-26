@@ -1001,7 +1001,11 @@ class Map extends React.Component<Props, State> {
             </clipPath>
             <path id="sphere" />
           </defs>
-          <use id="globe-fill" xlinkHref="#sphere" style={{ fill: 'white' }} />
+          <use
+            id="globe-fill"
+            xlinkHref="#sphere"
+            style={{ fill: 'transparent' }}
+          />
           <g id="countries">
             <Land id="land" clipPath="url(#clip)" />
           </g>
