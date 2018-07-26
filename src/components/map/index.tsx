@@ -984,14 +984,14 @@ class Map extends React.Component<Props, State> {
           <g id="countries">
             <Land id="land" clipPath="url(#clip)" />
           </g>
-          <g id="water-regions" clipPath="url(#clip)" />
           <g id="grid-data" clipPath="url(#clip)" />
+          <DDM id="ddm" clipPath="url(#clip)" />
+          <g id="water-regions" clipPath="url(#clip)" />
           <SelectedRegion id="selected-region" clipPath="url(#clip)" />
-          <CountryBorders id="country-borders" clipPath="url(#clip)" />
           <Basins id="basins" clipPath="url(#clip)" />
+          <CountryBorders id="country-borders" clipPath="url(#clip)" />
           <g id="basin-labels" clipPath="url(#clip)" />
           <g id="country-labels" clipPath="url(#clip)" />
-          <DDM id="ddm" clipPath="url(#clip)" />
           <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
