@@ -509,7 +509,9 @@ class Map extends React.Component<Props, State> {
       )
       .transition(t as any)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
-      select<SVGPathElement, WaterRegionGeoJSONFeature>('g#water-regions > path.selected').raise();
+    select<SVGPathElement, WaterRegionGeoJSONFeature>(
+      'g#water-regions > path.selected',
+    ).raise();
   }
 
   private async fetchRegionData(regionId: number) {
