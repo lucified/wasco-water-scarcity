@@ -452,22 +452,10 @@ class Map extends React.Component<Props, State> {
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
         .classed('hide-fill', false);
-      select<SVGGElement, undefined>('g#water-regions').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#clickable-water-regions').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#countries').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#selected-region').attr(
-        'transform',
-        event.transform,
-      );
+      select('g#water-regions').attr('transform', event.transform);
+      select('g#clickable-water-regions').attr('transform', event.transform);
+      select('g#countries').attr('transform', event.transform);
+      select('g#selected-region').attr('transform', event.transform);
     }
   }
 
@@ -503,7 +491,7 @@ class Map extends React.Component<Props, State> {
       waterRegions: { features },
     } = this.props;
     const t = transition('waterRegion').duration(100);
-    select<SVGGElement, undefined>('g#water-regions')
+    select('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => d.properties.featureId.toString())
       .classed(
@@ -800,65 +788,49 @@ class Map extends React.Component<Props, State> {
       );
 
     function zoomed() {
-      select<SVGGElement, undefined>('g#water-regions').attr(
-        'transform',
-        event.transform,
-      );
-      // TODO: There's probably a better way of clearing the water region fill
+      select('g#water-regions').attr('transform', event.transform);
       svg
         .select<SVGGElement>('g#water-regions')
         .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
         .classed('hide-fill', true)
         .attr('pointer-events', 'visible');
-      select<SVGGElement, undefined>('g#clickable-water-regions').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#countries').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#selected-region').attr(
-        'transform',
-        event.transform,
-      );
-      select<SVGGElement, undefined>('g#ddm')
+      select('g#clickable-water-regions').attr('transform', event.transform);
+      select('g#countries').attr('transform', event.transform);
+      select('g#selected-region').attr('transform', event.transform);
+      select('g#ddm')
         .attr('transform', event.transform)
         .selectAll('path')
         .attr('stroke-width', `${1.5 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#rivers')
+      select('g#rivers')
         .attr('transform', event.transform)
         .selectAll('path')
         .attr('stroke-width', `${1.5 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#country-borders')
+      select('g#country-borders')
         .attr('transform', event.transform)
         .selectAll('path')
         .attr('stroke-width', `${1 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#country-labels')
+      select('g#country-labels')
         .attr('transform', event.transform)
         .selectAll('text')
         .attr('font-size', `${12 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#basins')
+      select('g#basins')
         .attr('transform', event.transform)
         .selectAll('path')
         .attr('stroke-width', `${1 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#basin-labels')
+      select('g#basin-labels')
         .attr('transform', event.transform)
         .selectAll('text')
         .attr('font-size', `${12 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#places')
+      select('g#places')
         .attr('transform', event.transform)
         .selectAll<SVGPathElement, any>('path')
         .attr('d', path.pointRadius(5 / event.transform.k));
-      select<SVGGElement, undefined>('g#places-labels')
+      select('g#places-labels')
         .attr('transform', event.transform)
         .selectAll('text')
         .attr('dx', 8 / event.transform.k)
         .attr('font-size', `${10 / event.transform.k}px`);
-      select<SVGGElement, undefined>('g#grid-data').attr(
-        'transform',
-        event.transform,
-      );
+      select('g#grid-data').attr('transform', event.transform);
     }
   }
 
