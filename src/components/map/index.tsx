@@ -5,11 +5,11 @@ import { scaleLog, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
+import { GeometryCollection } from 'geojson';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
-import { GeometryCollection } from 'topojson-specification';
 import {
   setRegionZoom,
   setSelectedRegion,
@@ -104,7 +104,7 @@ const MapTooltip = styled.div`
 `;
 
 const CountryLabels = styled.g`
-  point-events: none;
+  pointer-events: none;
   text-anchor: middle;
   font-size: 12px;
 `;
@@ -151,8 +151,7 @@ const CountryBorders = styled.g`
   fill: none;
 `;
 
-const DDM = styled.g`
-  vector-effect: non-scaling-stroke;
+const DDM = styled.g.attrs({ vectorEffect: 'non-scaling-stroke' })`
   stroke-width: 0.25px;
   stroke: #71bcd5;
   opacity: 0.8;
@@ -680,10 +679,9 @@ class Map extends React.Component<Props, State> {
     svg
       .select('g#country-borders')
       .selectAll('path')
-      .data(
-        feature(worldData, worldData.objects.countries as GeometryCollection<
-          null
-        >).features,
+      .data<GeometryCollection>(
+        // TODO: improve typings
+        (feature(worldData, worldData.objects.countries) as any).features,
       )
       .enter()
       .append('path')
