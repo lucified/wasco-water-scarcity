@@ -160,12 +160,6 @@ const Rivers = styled.g`
   fill: none;
 `;
 
-const Basins = styled.g`
-  stroke-width: 0.5px;
-  stroke: #2f819b;
-  fill: none;
-`;
-
 const scarcityColors = getDataTypeColors('scarcity');
 
 const ScarcityLegend = styled.g`
@@ -567,14 +561,6 @@ class Map extends React.Component<Props, State> {
       .selectAll('text')
       .remove();
     svg
-      .select('g#basins')
-      .selectAll('path')
-      .remove();
-    svg
-      .select('g#basin-labels')
-      .selectAll('text')
-      .remove();
-    svg
       .select('g#places')
       .selectAll('path')
       .remove();
@@ -676,29 +662,6 @@ class Map extends React.Component<Props, State> {
         .attr('y', d => path.centroid(d)[1])
         .attr('filter', 'url(#solid)')
         .text(d => d.properties.countryName);
-    }
-
-    if (localData.basins != null) {
-      svg
-        .select('g#basins')
-        .selectAll('path')
-        .data(localData.basins.features)
-        .enter()
-        .append('path')
-        .attr('d', path);
-
-      svg
-        .select('g#basin-labels')
-        .selectAll('text')
-        .data(localData.basins.features)
-        .enter()
-        .append('text')
-        .attr('x', d => path.centroid(d)[0])
-        .attr('y', d => path.centroid(d)[1])
-        .style('fill', '#2f819b')
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
-        .text(d => d.properties.basinName);
     }
 
     if (localData.places != null) {
@@ -832,14 +795,6 @@ class Map extends React.Component<Props, State> {
         .selectAll('path')
         .attr('stroke-width', `${1 / event.transform.k}px`);
       select('g#country-labels')
-        .attr('transform', event.transform)
-        .selectAll('text')
-        .attr('font-size', `${12 / event.transform.k}px`);
-      select('g#basins')
-        .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('stroke-width', `${1 / event.transform.k}px`);
-      select('g#basin-labels')
         .attr('transform', event.transform)
         .selectAll('text')
         .attr('font-size', `${12 / event.transform.k}px`);
@@ -1014,9 +969,7 @@ class Map extends React.Component<Props, State> {
           <DDM id="ddm" clipPath="url(#clip)" />
           <g id="water-regions" clipPath="url(#clip)" />
           <SelectedRegion id="selected-region" clipPath="url(#clip)" />
-          <Basins id="basins" clipPath="url(#clip)" />
           <CountryBorders id="country-borders" clipPath="url(#clip)" />
-          <g id="basin-labels" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
           {isZoomedIn ? (
             <g
