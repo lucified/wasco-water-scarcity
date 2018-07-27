@@ -618,6 +618,12 @@ class Map extends React.Component<Props, State> {
 
     const path = geoPath().projection(projection);
 
+    //Region dataset is not compatible with land borders -> looks ugly
+    svg
+      .select<SVGGElement>('g#selected-region')
+      .select<SVGPathElement>('path')
+      .remove();
+
     if (localData.ddm != null) {
       svg
         .select('g#ddm')
@@ -784,7 +790,6 @@ class Map extends React.Component<Props, State> {
         .attr('pointer-events', 'visible');
       select('g#clickable-water-regions').attr('transform', event.transform);
       select('g#countries').attr('transform', event.transform);
-      select('g#selected-region').attr('transform', event.transform);
       select('g#ddm').attr('transform', event.transform);
       select('g#rivers')
         .attr('transform', event.transform)
