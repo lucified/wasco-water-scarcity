@@ -617,6 +617,7 @@ class Map extends React.Component<Props, State> {
 
     const height = this.getHeight();
     const svg = select<SVGElement, undefined>(this.svgRef);
+    const svgRef = this.svgRef;
 
     // TODO?: projection should be specific to spatial unit
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
@@ -645,7 +646,6 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.rivers != null) {
-      const svgPos = this.svgRef.getBoundingClientRect() as DOMRect;
       const mapTooltipDiv = select(this.MapTooltipRef);
       svg
         .select('g#rivers')
@@ -655,6 +655,7 @@ class Map extends React.Component<Props, State> {
         .append('path')
         .attr('d', path)
         .on('mouseover', function(d) {
+          const svgPos = svgRef.getBoundingClientRect() as DOMRect;
           mapTooltipDiv
             .transition()
             .duration(200)
@@ -665,8 +666,14 @@ class Map extends React.Component<Props, State> {
                 d.properties.name
               }" target="_blank">${d.properties.name}</a>`,
             )
-            .style('left', event.pageX - svgPos.left + 5 + 'px')
-            .style('top', event.pageY - svgPos.top - 10 + 'px');
+            .style(
+              'left',
+              event.pageX - svgPos.left - window.scrollX + 5 + 'px',
+            )
+            .style(
+              'top',
+              event.pageY - svgPos.top - 10 - window.scrollY + 'px',
+            );
         });
     }
 
@@ -696,7 +703,6 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.places != null) {
-      const svgPos = this.svgRef.getBoundingClientRect() as DOMRect;
       const mapTooltipDiv = select(this.MapTooltipRef);
       svg
         .select('g#places')
@@ -707,6 +713,7 @@ class Map extends React.Component<Props, State> {
         .attr('d', path.pointRadius(5))
         .attr('fill', '#7b7c95')
         .on('mouseover', function(d) {
+          const svgPos = svgRef.getBoundingClientRect() as DOMRect;
           const pos = (this as SVGGraphicsElement).getBoundingClientRect() as DOMRect;
           mapTooltipDiv
             .transition()
