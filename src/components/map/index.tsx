@@ -136,10 +136,14 @@ const CountryBorders = styled.g`
 `;
 
 const DDM = styled.g`
+  vector-effect: non-scaling-stroke;
   stroke-width: 0.25px;
   stroke: #71bcd5;
   opacity: 0.8;
   fill: none;
+  & .ddm-small {
+    stroke-width: 0.1px;
+  }
 `;
 
 const Rivers = styled.g`
@@ -627,7 +631,8 @@ class Map extends React.Component<Props, State> {
         .data(localData.ddm.features)
         .enter()
         .append('path')
-        .attr('d', path);
+        .attr('d', path)
+        .classed('ddm-small', d => d.properties.strahler == 1);
     }
 
     if (localData.rivers != null) {
@@ -806,10 +811,7 @@ class Map extends React.Component<Props, State> {
       select('g#clickable-water-regions').attr('transform', event.transform);
       select('g#countries').attr('transform', event.transform);
       select('g#selected-region').attr('transform', event.transform);
-      select('g#ddm')
-        .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('stroke-width', `${1.5 / event.transform.k}px`);
+      select('g#ddm').attr('transform', event.transform);
       select('g#rivers')
         .attr('transform', event.transform)
         .selectAll('path')
