@@ -5,6 +5,7 @@ import { scaleLog, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
+import { GeometryCollection } from 'geojson';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -40,7 +41,7 @@ import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
-const worldData = require('world-atlas/world/110m.json');
+const worldData = require('world-atlas/world/50m.json');
 
 const Container = styled.div`
   position: relative;
@@ -93,6 +94,20 @@ const Land = styled.path`
   fill: #d2e2e6;
 `;
 
+const MapTooltip = styled.div`
+  position: absolute;
+  background: #d2e2e6;
+  border: 0px;
+  padding: 4px;
+  font-size: 12px;
+`;
+
+const CountryLabels = styled.g`
+  pointer-events: none;
+  text-anchor: middle;
+  font-size: 12px;
+`;
+
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
@@ -100,7 +115,8 @@ const SVG = styled.svg`
     transition: opacity 0.2s ease-in;
 
     &.selected {
-      stroke: black;
+      stroke: ${theme.colors.grayDark};
+      stroke-width: 0.75px;
       transition: opacity 0.2s ease-out;
     }
     &.unselected {
@@ -129,27 +145,24 @@ const SelectedRegion = styled.g`
 `;
 
 const CountryBorders = styled.g`
-  stroke-width: 1px;
-  stroke: black;
+  stroke-width: 0.5px;
+  stroke: #ccc;
   fill: none;
 `;
 
-const DDM = styled.g`
+const DDM = styled.g.attrs({ vectorEffect: 'non-scaling-stroke' })`
   stroke-width: 0.25px;
   stroke: #71bcd5;
   opacity: 0.8;
   fill: none;
+  & .ddm-small {
+    stroke-width: 0.1px;
+  }
 `;
 
 const Rivers = styled.g`
   stroke-width: 0.5px;
   stroke: blue;
-  fill: none;
-`;
-
-const Basins = styled.g`
-  stroke-width: 0.5px;
-  stroke: purple;
   fill: none;
 `;
 
@@ -230,6 +243,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private svgRef!: SVGElement;
+  private mapTooltipRef!: Element;
 
   public componentDidMount() {
     this.drawMap();
@@ -295,6 +309,7 @@ class Map extends React.Component<Props, State> {
         ) {
           this.removeZoomedInElements();
           this.zoomToWaterRegion();
+          this.redrawFillsAndBorders();
         }
       } else {
         // Not zoomed in
@@ -388,6 +403,7 @@ class Map extends React.Component<Props, State> {
         .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
         .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
+    svg.select<SVGGElement>('g#water-regions > path.selected').raise();
     svg
       .select<SVGGElement>('g#clickable-water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
@@ -506,6 +522,9 @@ class Map extends React.Component<Props, State> {
       )
       .transition(t as any)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
+    select<SVGPathElement, WaterRegionGeoJSONFeature>(
+      'g#water-regions > path.selected',
+    ).raise();
   }
 
   private async fetchRegionData(regionId: number) {
@@ -549,14 +568,6 @@ class Map extends React.Component<Props, State> {
       .selectAll('text')
       .remove();
     svg
-      .select('g#basins')
-      .selectAll('path')
-      .remove();
-    svg
-      .select('g#basin-labels')
-      .selectAll('text')
-      .remove();
-    svg
       .select('g#places')
       .selectAll('path')
       .remove();
@@ -568,6 +579,7 @@ class Map extends React.Component<Props, State> {
       .select('g#grid-data')
       .selectAll('path')
       .remove();
+    select(this.mapTooltipRef).style('opacity', 0);
   }
 
   private zoomToWaterRegion() {
@@ -604,6 +616,7 @@ class Map extends React.Component<Props, State> {
 
     const height = this.getHeight();
     const svg = select<SVGElement, undefined>(this.svgRef);
+    const svgRef = this.svgRef;
 
     // TODO?: projection should be specific to spatial unit
     // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
@@ -614,6 +627,12 @@ class Map extends React.Component<Props, State> {
 
     const path = geoPath().projection(projection);
 
+    // Region dataset is not compatible with land borders -> looks ugly
+    svg
+      .select<SVGGElement>('g#selected-region')
+      .select<SVGPathElement>('path')
+      .remove();
+
     if (localData.ddm != null) {
       svg
         .select('g#ddm')
@@ -621,28 +640,54 @@ class Map extends React.Component<Props, State> {
         .data(localData.ddm.features)
         .enter()
         .append('path')
-        .attr('d', path);
+        .attr('d', path)
+        .classed('ddm-small', d => d.properties.strahler === 1);
     }
 
     if (localData.rivers != null) {
+      const mapTooltipDiv = select(this.mapTooltipRef);
       svg
         .select('g#rivers')
         .selectAll('path')
         .data(localData.rivers.features)
         .enter()
         .append('path')
-        .attr('d', path);
+        .attr('d', path)
+        .on('mouseover', d => {
+          const svgPos = svgRef.getBoundingClientRect() as DOMRect;
+          mapTooltipDiv
+            .transition()
+            .duration(200)
+            .style('opacity', 0.9);
+          mapTooltipDiv
+            .html(
+              `<a href= "https://en.wikipedia.org/w/index.php?search=${
+                d.properties.name
+              }" target="_blank">${d.properties.name}</a>`,
+            )
+            .style(
+              'left',
+              event.pageX - svgPos.left - window.scrollX + 5 + 'px',
+            )
+            .style(
+              'top',
+              event.pageY - svgPos.top - 10 - window.scrollY + 'px',
+            );
+        });
     }
 
-    if (localData.countries != null) {
-      svg
-        .select('g#country-borders')
-        .selectAll('path')
-        .data(localData.countries.features)
-        .enter()
-        .append('path')
-        .attr('d', path);
+    svg
+      .select('g#country-borders')
+      .selectAll('path')
+      .data<GeometryCollection>(
+        // TODO: improve typings
+        (feature(worldData, worldData.objects.countries) as any).features,
+      )
+      .enter()
+      .append('path')
+      .attr('d', path);
 
+    if (localData.countries != null) {
       svg
         .select('g#country-labels')
         .selectAll('text')
@@ -651,35 +696,12 @@ class Map extends React.Component<Props, State> {
         .append('text')
         .attr('x', d => path.centroid(d)[0])
         .attr('y', d => path.centroid(d)[1])
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
+        .attr('filter', 'url(#solid)')
         .text(d => d.properties.countryName);
     }
 
-    if (localData.basins != null) {
-      svg
-        .select('g#basins')
-        .selectAll('path')
-        .data(localData.basins.features)
-        .enter()
-        .append('path')
-        .attr('d', path);
-
-      svg
-        .select('g#basin-labels')
-        .selectAll('text')
-        .data(localData.basins.features)
-        .enter()
-        .append('text')
-        .attr('x', d => path.centroid(d)[0])
-        .attr('y', d => path.centroid(d)[1])
-        .style('fill', 'purple')
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
-        .text(d => d.properties.basinName);
-    }
-
     if (localData.places != null) {
+      const mapTooltipDiv = select(this.mapTooltipRef);
       svg
         .select('g#places')
         .selectAll('path')
@@ -687,26 +709,31 @@ class Map extends React.Component<Props, State> {
         .enter()
         .append('path')
         .attr('d', path.pointRadius(5))
-        .attr('fill', 'grey');
-
-      svg
-        .select('g#places-labels')
-        .selectAll('text')
-        .data(localData.places.features)
-        .enter()
-        .append('text')
-        .attr(
-          'x',
-          d => projection(d.geometry.coordinates as [number, number])![0],
-        )
-        .attr(
-          'y',
-          d => projection(d.geometry.coordinates as [number, number])![1],
-        )
-        .attr('text-anchor', 'left')
-        .attr('dx', 2)
-        .attr('font-size', '10px')
-        .text(d => d.properties.name);
+        .attr('fill', '#7b7c95')
+        .on('mouseover', function(d) {
+          const svgPos = svgRef.getBoundingClientRect() as DOMRect;
+          const pos = (this as SVGPathElement).getBoundingClientRect() as DOMRect;
+          mapTooltipDiv
+            .transition()
+            .duration(200)
+            .style('opacity', 0.9);
+          mapTooltipDiv
+            .html(
+              `<a href= "https://en.wikipedia.org/w/index.php?search=${
+                d.properties.name
+              }" target="_blank">${d.properties.name}</a>`,
+            )
+            .style('left', pos.right - svgPos.left + 5 + 'px')
+            .style('top', pos.top - pos.height / 2 - svgPos.top + 'px');
+          // FIXME: if user never mouses over the tooltip, it won't disappear
+          // FIXME: This was being triggered if the user moused over the wikipedia link
+          // .on('mouseout', () =>
+          //   mapTooltipDiv
+          //     .transition()
+          //     .duration(200)
+          //     .style('opacity', 0),
+          // );
+        });
     }
 
     this.removeGridLegend();
@@ -769,6 +796,9 @@ class Map extends React.Component<Props, State> {
     }
 
     const bounds = path.bounds(selectedWaterRegion);
+    const dy0 = bounds[1][1] - bounds[0][1];
+    const legendMargin = 54;
+    bounds[1][1] = bounds[1][1] + (legendMargin / height) * dy0;
     const dx = bounds[1][0] - bounds[0][0];
     const dy = bounds[1][1] - bounds[0][1];
     const x = (bounds[0][0] + bounds[1][0]) / 2;
@@ -796,11 +826,7 @@ class Map extends React.Component<Props, State> {
         .attr('pointer-events', 'visible');
       select('g#clickable-water-regions').attr('transform', event.transform);
       select('g#countries').attr('transform', event.transform);
-      select('g#selected-region').attr('transform', event.transform);
-      select('g#ddm')
-        .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('stroke-width', `${1.5 / event.transform.k}px`);
+      select('g#ddm').attr('transform', event.transform);
       select('g#rivers')
         .attr('transform', event.transform)
         .selectAll('path')
@@ -810,14 +836,6 @@ class Map extends React.Component<Props, State> {
         .selectAll('path')
         .attr('stroke-width', `${1 / event.transform.k}px`);
       select('g#country-labels')
-        .attr('transform', event.transform)
-        .selectAll('text')
-        .attr('font-size', `${12 / event.transform.k}px`);
-      select('g#basins')
-        .attr('transform', event.transform)
-        .selectAll('path')
-        .attr('stroke-width', `${1 / event.transform.k}px`);
-      select('g#basin-labels')
         .attr('transform', event.transform)
         .selectAll('text')
         .attr('font-size', `${12 / event.transform.k}px`);
@@ -963,6 +981,11 @@ class Map extends React.Component<Props, State> {
 
     return (
       <Container>
+        <MapTooltip
+          innerRef={ref => {
+            this.mapTooltipRef = ref;
+          }}
+        />
         <SVG
           width={width}
           height={height}
@@ -975,6 +998,10 @@ class Map extends React.Component<Props, State> {
               <use xlinkHref="#sphere" />
             </clipPath>
             <path id="sphere" />
+            <filter x="0" y="0" width="1" height="1" id="solid">
+              <feFlood flood-color="#d2e2e6" floodOpacity="0.7" />
+              <feComposite in="SourceGraphic" />
+            </filter>
           </defs>
           <use
             id="globe-fill"
@@ -984,17 +1011,16 @@ class Map extends React.Component<Props, State> {
           <g id="countries">
             <Land id="land" clipPath="url(#clip)" />
           </g>
-          <g id="water-regions" clipPath="url(#clip)" />
           <g id="grid-data" clipPath="url(#clip)" />
+          <DDM id="ddm" clipPath="url(#clip)" />
+          <g id="water-regions" clipPath="url(#clip)" />
           <SelectedRegion id="selected-region" clipPath="url(#clip)" />
           <CountryBorders id="country-borders" clipPath="url(#clip)" />
-          <Basins id="basins" clipPath="url(#clip)" />
-          <g id="basin-labels" clipPath="url(#clip)" />
-          <g id="country-labels" clipPath="url(#clip)" />
-          <DDM id="ddm" clipPath="url(#clip)" />
+          <g id="places-labels" clipPath="url(#clip)" />
+          <g id="clickable-water-regions" clipPath="url(#clip)" />
           <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
-          <g id="places-labels" clipPath="url(#clip)" />
+          <CountryLabels id="country-labels" clipPath="url(#clip)" />
           {isZoomedIn ? (
             <g
               transform={`translate(${width - 400},${height - 30})`}
@@ -1003,7 +1029,6 @@ class Map extends React.Component<Props, State> {
           ) : (
             selectedDataType === 'scarcity' && this.getScarcityLegend()
           )}
-          <g id="clickable-water-regions" clipPath="url(#clip)" />
         </SVG>
         {/* Note: we currently don't give an error message if loading data fails */}
         {zoomInRequested &&

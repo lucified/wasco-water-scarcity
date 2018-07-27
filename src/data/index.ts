@@ -437,15 +437,15 @@ export function labelForGridVariable(variable: GridVariable) {
     case 'pop':
       return 'Population';
     case 'dom':
-      return 'dom (TODO)';
+      return 'Domestic';
     case 'elec':
-      return 'elec (TODO)';
+      return 'Electricity';
     case 'irri':
-      return 'irri (TODO)';
+      return 'Irrigation';
     case 'live':
-      return 'live (TODO)';
+      return 'Livestock';
     case 'man':
-      return 'man (TODO)';
+      return 'Manufacturing';
   }
 }
 
