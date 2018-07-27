@@ -9,6 +9,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { feature } from 'topojson';
+import { GeometryCollection } from 'topojson-specification';
 import {
   setRegionZoom,
   setSelectedRegion,
@@ -40,7 +41,7 @@ import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
-const worldData = require('world-atlas/world/110m.json');
+const worldData = require('world-atlas/world/50m.json');
 
 const Container = styled.div`
   position: relative;
@@ -130,8 +131,8 @@ const SelectedRegion = styled.g`
 `;
 
 const CountryBorders = styled.g`
-  stroke-width: 1px;
-  stroke: black;
+  stroke-width: 0.5px;
+  stroke: #696969;
   fill: none;
 `;
 
@@ -645,15 +646,19 @@ class Map extends React.Component<Props, State> {
         .attr('d', path);
     }
 
-    if (localData.countries != null) {
       svg
         .select('g#country-borders')
         .selectAll('path')
-        .data(localData.countries.features)
+      .data(
+        feature(worldData, worldData.objects.countries as GeometryCollection<
+          null
+        >).features,
+      )
         .enter()
         .append('path')
         .attr('d', path);
 
+    if (localData.countries != null) {
       svg
         .select('g#country-labels')
         .selectAll('text')
