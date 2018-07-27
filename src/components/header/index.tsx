@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { AppType } from '../../types';
+import { theme } from '../theme';
 
 const logoFilename = require('./wasco-logo.svg');
 
@@ -39,9 +40,12 @@ const NavLink = styled.a`
   text-decoration: none;
 
   &:focus,
-  &:hover,
-  &.active {
+  &:hover {
     color: #1468a0;
+  }
+
+  &.active {
+    color: ${theme.colors.text};
   }
 `;
 
