@@ -98,8 +98,7 @@ const MapTooltip = styled.div`
   position: absolute;
   background: #d2e2e6;
   border: 0px;
-  border-radius: 8px;
-  padding: 10 px;
+  padding: 4px;
   font-size: 12px;
 `;
 
@@ -116,7 +115,7 @@ const SVG = styled.svg`
     transition: opacity 0.2s ease-in;
 
     &.selected {
-      stroke: #b300b3;
+      stroke: ${theme.colors.grayDark};
       stroke-width: 0.75px;
       transition: opacity 0.2s ease-out;
     }
@@ -147,7 +146,7 @@ const SelectedRegion = styled.g`
 
 const CountryBorders = styled.g`
   stroke-width: 0.5px;
-  stroke: #696969;
+  stroke: #ccc;
   fill: none;
 `;
 
@@ -725,14 +724,15 @@ class Map extends React.Component<Props, State> {
               }" target="_blank">${d.properties.name}</a>`,
             )
             .style('left', pos.right - svgPos.left + 5 + 'px')
-            .style('top', pos.top - pos.height / 2 - svgPos.top + 'px')
-            // FIXME: if user never mouses over the tooltip, it won't disappear
-            .on('mouseout', () =>
-              mapTooltipDiv
-                .transition()
-                .duration(200)
-                .style('opacity', 0),
-            );
+            .style('top', pos.top - pos.height / 2 - svgPos.top + 'px');
+          // FIXME: if user never mouses over the tooltip, it won't disappear
+          // FIXME: This was being triggered if the user moused over the wikipedia link
+          // .on('mouseout', () =>
+          //   mapTooltipDiv
+          //     .transition()
+          //     .duration(200)
+          //     .style('opacity', 0),
+          // );
         });
     }
 
