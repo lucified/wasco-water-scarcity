@@ -1037,6 +1037,10 @@ class Map extends React.Component<Props, State> {
           <SelectedRegion id="selected-region" clipPath="url(#clip)" />
           <CountryBorders id="country-borders" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
+          <g id="clickable-water-regions" clipPath="url(#clip)" />
+          <Rivers id="rivers" clipPath="url(#clip)" />
+          <g id="places" clipPath="url(#clip)" />
+          <CountryLabels id="country-labels" clipPath="url(#clip)" />
           {isZoomedIn ? (
             <g
               transform={`translate(${width - 400},${height - 30})`}
@@ -1045,10 +1049,6 @@ class Map extends React.Component<Props, State> {
           ) : (
             selectedDataType === 'scarcity' && this.getScarcityLegend()
           )}
-          <g id="clickable-water-regions" clipPath="url(#clip)" />
-          <Rivers id="rivers" clipPath="url(#clip)" />
-          <g id="places" clipPath="url(#clip)" />
-          <CountryLabels id="country-labels" clipPath="url(#clip)" />
         </SVG>
         {/* Note: we currently don't give an error message if loading data fails */}
         {zoomInRequested &&
