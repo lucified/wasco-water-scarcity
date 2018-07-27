@@ -670,17 +670,17 @@ class Map extends React.Component<Props, State> {
         });
     }
 
-      svg
-        .select('g#country-borders')
-        .selectAll('path')
+    svg
+      .select('g#country-borders')
+      .selectAll('path')
       .data(
         feature(worldData, worldData.objects.countries as GeometryCollection<
           null
         >).features,
       )
-        .enter()
-        .append('path')
-        .attr('d', path);
+      .enter()
+      .append('path')
+      .attr('d', path);
 
     if (localData.countries != null) {
       svg
@@ -696,6 +696,8 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.places != null) {
+      const svgPos = this.svgRef.getBoundingClientRect() as DOMRect;
+      const mapTooltipDiv = select(this.MapTooltipRef);
       svg
         .select('g#places')
         .selectAll('path')
@@ -703,26 +705,48 @@ class Map extends React.Component<Props, State> {
         .enter()
         .append('path')
         .attr('d', path.pointRadius(5))
-        .attr('fill', 'grey');
+        .attr('fill', '#7b7c95')
+        .on('mouseover', function(d) {
+          const pos = (this as SVGGraphicsElement).getBoundingClientRect() as DOMRect;
+          mapTooltipDiv
+            .transition()
+            .duration(200)
+            .style('opacity', 0.9);
+          mapTooltipDiv
+            .html(
+              `<a href= "https://en.wikipedia.org/w/index.php?search=${
+                d.properties.name
+              }" target="_blank">${d.properties.name}</a>`,
+            )
+            .style('left', pos.right - svgPos.left + 5 + 'px')
+            .style('top', pos.top - pos.height / 2 - svgPos.top + 'px')
+            //FIXME: if user never mouses over the tooltip, it won't disappear
+            .on('mouseout', () =>
+              mapTooltipDiv
+                .transition()
+                .duration(200)
+                .style('opacity', 0),
+            );
+        });
 
-      svg
-        .select('g#places-labels')
-        .selectAll('text')
-        .data(localData.places.features)
-        .enter()
-        .append('text')
-        .attr(
-          'x',
-          d => projection(d.geometry.coordinates as [number, number])![0],
-        )
-        .attr(
-          'y',
-          d => projection(d.geometry.coordinates as [number, number])![1],
-        )
-        .attr('text-anchor', 'left')
-        .attr('dx', 2)
-        .attr('font-size', '10px')
-        .text(d => d.properties.name);
+      // svg
+      //   .select('g#places-labels')
+      //   .selectAll('text')
+      //   .data(localData.places.features)
+      //   .enter()
+      //   .append('text')
+      //   .attr(
+      //     'x',
+      //     d => projection(d.geometry.coordinates as [number, number])![0],
+      //   )
+      //   .attr(
+      //     'y',
+      //     d => projection(d.geometry.coordinates as [number, number])![1],
+      //   )
+      //   .attr('text-anchor', 'left')
+      //   .attr('dx', 2)
+      //   .attr('font-size', '10px')
+      //   .text(d => d.properties.name);
     }
 
     this.removeGridLegend();
