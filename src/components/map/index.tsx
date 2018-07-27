@@ -628,7 +628,7 @@ class Map extends React.Component<Props, State> {
 
     const path = geoPath().projection(projection);
 
-    //Region dataset is not compatible with land borders -> looks ugly
+    // Region dataset is not compatible with land borders -> looks ugly
     svg
       .select<SVGGElement>('g#selected-region')
       .select<SVGPathElement>('path')
@@ -642,7 +642,7 @@ class Map extends React.Component<Props, State> {
         .enter()
         .append('path')
         .attr('d', path)
-        .classed('ddm-small', d => d.properties.strahler == 1);
+        .classed('ddm-small', d => d.properties.strahler === 1);
     }
 
     if (localData.rivers != null) {
@@ -654,7 +654,7 @@ class Map extends React.Component<Props, State> {
         .enter()
         .append('path')
         .attr('d', path)
-        .on('mouseover', function(d) {
+        .on('mouseover', d => {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
           mapTooltipDiv
             .transition()
@@ -727,7 +727,7 @@ class Map extends React.Component<Props, State> {
             )
             .style('left', pos.right - svgPos.left + 5 + 'px')
             .style('top', pos.top - pos.height / 2 - svgPos.top + 'px')
-            //FIXME: if user never mouses over the tooltip, it won't disappear
+            // FIXME: if user never mouses over the tooltip, it won't disappear
             .on('mouseout', () =>
               mapTooltipDiv
                 .transition()
