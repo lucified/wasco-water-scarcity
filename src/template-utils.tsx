@@ -95,10 +95,22 @@ export function contextToHelmet(webpackCompilation: any) {
       {assets.js.map((src: string) => (
         <script key={src} type="text/javascript" src={src} />
       ))}
-      <meta {...{ charset: 'utf-8' } as any} />
+      <meta charSet="utf-8" />
       <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        href="favicon-32x32.png"
+        sizes="32x32"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        href="favicon-16x16.png"
+        sizes="16x16"
       />
     </Helmet>
   );

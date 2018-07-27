@@ -5,6 +5,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
+import { Helmet } from '../../node_modules/@types/react-helmet';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
@@ -84,6 +85,7 @@ class AppEmbedPlain extends React.Component<Props> {
   public render() {
     return (
       <Root>
+        <Helmet title="Water Scarcity Atlas embeddable visualizations" />
         <Switch>
           <Route path="/shortage/:play?" component={ShortageEmbed} />
           <Route path="/scarcity/:play?" component={ScarcityEmbed} />

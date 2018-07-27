@@ -2,6 +2,7 @@
 import { hot } from 'react-hot-loader';
 
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
@@ -47,6 +48,14 @@ const Root = styled.div`
   flex-flow: column;
   height: 100%;
 `;
+
+// TODO: go over copy
+const TITLE = 'Exploration tool – Water Scarcity Atlas';
+const DESCRIPTION =
+  'Explore how water stress, shortage and scarcity have changed in the past using different models';
+const META_IMAGE = `${
+  process.env.HOST
+}${require('../../images/screenshot-explore.png')}`;
 
 type PassedProps = RouteComponentProps<{}>;
 
@@ -106,8 +115,52 @@ class AppPlain extends React.Component<Props> {
 
   public render() {
     const { isLoading } = this.props;
+
     return (
       <Root>
+        <Helmet
+          title={TITLE}
+          meta={[
+            {
+              name: 'keywords',
+              content:
+                'water scarcity atlas, water scarcity, water stress, water shortage, atlas, visualization',
+            },
+            { name: 'description', content: DESCRIPTION },
+            {
+              property: 'og:description',
+              content: DESCRIPTION,
+            },
+            {
+              property: 'og:image',
+              content: META_IMAGE,
+            },
+            {
+              property: 'og:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:text:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:description',
+              content: DESCRIPTION,
+            },
+            {
+              name: 'twitter:image',
+              content: META_IMAGE,
+            },
+            {
+              name: 'twitter:card',
+              content: 'summary_large_image',
+            },
+          ]}
+        />
         <Header appType={AppType.PAST} />
         <Switch>
           {/* These routes also handle any data loading or other onLoad trigger */}

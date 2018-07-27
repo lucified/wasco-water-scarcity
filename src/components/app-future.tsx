@@ -2,6 +2,7 @@
 import { hot } from 'react-hot-loader';
 
 import * as React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import {
   Redirect,
@@ -47,6 +48,14 @@ const Root = styled.div`
   height: 100%;
 `;
 
+// TODO: go over copy
+const TITLE = 'Futures tool – Water Scarcity Atlas';
+const DESCRIPTION =
+  'Compare different future scenarios for global water stress and food production';
+const META_IMAGE = `${
+  process.env.HOST
+}${require('../../images/screenshot-futures.png')}`;
+
 interface GeneratedDispatchProps {
   loadMapData: () => void;
 }
@@ -63,6 +72,49 @@ class AppFuturePlain extends React.Component<Props> {
   public render() {
     return (
       <Root>
+        <Helmet
+          title={TITLE}
+          meta={[
+            {
+              name: 'keywords',
+              content:
+                'water scarcity atlas, water scarcity, water stress, water shortage, atlas, visualization',
+            },
+            { name: 'description', content: DESCRIPTION },
+            {
+              property: 'og:description',
+              content: DESCRIPTION,
+            },
+            {
+              property: 'og:image',
+              content: META_IMAGE,
+            },
+            {
+              property: 'og:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:text:title',
+              content: TITLE,
+            },
+            {
+              name: 'twitter:description',
+              content: DESCRIPTION,
+            },
+            {
+              name: 'twitter:image',
+              content: META_IMAGE,
+            },
+            {
+              name: 'twitter:card',
+              content: 'summary_large_image',
+            },
+          ]}
+        />
         <Header appType={AppType.FUTURE} />
         <Switch>
           <Route

@@ -114,7 +114,24 @@ function getAppEntrypoint(appType) {
   }
 }
 
-console.log(`Building the ${getAppType()} app`);
+function getHostName(env, appType) {
+  if (env !== 'production') {
+    return '';
+  }
+
+  switch (appType) {
+    case 'future':
+      return 'https://futures.waterscarcityatlas.org';
+    case 'embed':
+      return 'https://embed.waterscarcityatlas.org';
+    case 'past':
+      return 'https://explore.waterscarcityatlas.org';
+  }
+}
+
+const appType = getAppType();
+
+console.log(`Building the ${appType} app`);
 
 const config = {
   resolve: {
@@ -130,7 +147,7 @@ const config = {
     path: path.resolve(deployConfig.base.dest),
     publicPath: deployConfig.base.publicPath,
   },
-  entry: [require.resolve('babel-polyfill'), getAppEntrypoint(getAppType())],
+  entry: [require.resolve('babel-polyfill'), getAppEntrypoint(appType)],
   plugins: [
     new HtmlWebpackPlugin({
       template: require.resolve(`${__dirname}/src/index-template.tsx`),
@@ -157,6 +174,9 @@ const config = {
     ]),
     new webpack.DefinePlugin({
       'process.env.ENV': JSON.stringify(deployConfig.env),
+      'process.env.HOST': JSON.stringify(
+        getHostName(deployConfig.env, appType),
+      ),
     }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
