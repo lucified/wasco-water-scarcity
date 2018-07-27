@@ -94,6 +94,14 @@ const Land = styled.path`
   fill: #d2e2e6;
 `;
 
+const MapTooltip = styled.div`
+  position: absolute;
+  background: #d2e2e6;
+  border: 0px;
+  border-radius: 8px;
+  padding: 10 px;
+  font-size: 12px;
+`;
 
 const CountryLabels = styled.g`
   point-events: none;
@@ -237,6 +245,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private svgRef!: SVGElement;
+  private MapTooltipRef!: Element;
 
   public componentDidMount() {
     this.drawMap();
@@ -636,13 +645,29 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.rivers != null) {
+      const svgPos = this.svgRef.getBoundingClientRect() as DOMRect;
+      const mapTooltipDiv = select(this.MapTooltipRef);
       svg
         .select('g#rivers')
         .selectAll('path')
         .data(localData.rivers.features)
         .enter()
         .append('path')
-        .attr('d', path);
+        .attr('d', path)
+        .on('mouseover', function(d) {
+          mapTooltipDiv
+            .transition()
+            .duration(200)
+            .style('opacity', 0.9);
+          mapTooltipDiv
+            .html(
+              `<a href= "https://en.wikipedia.org/w/index.php?search=${
+                d.properties.name
+              }" target="_blank">${d.properties.name}</a>`,
+            )
+            .style('left', event.pageX - svgPos.left + 5 + 'px')
+            .style('top', event.pageY - svgPos.top - 10 + 'px');
+        });
     }
 
       svg
@@ -945,6 +970,11 @@ class Map extends React.Component<Props, State> {
 
     return (
       <Container>
+        <MapTooltip
+          innerRef={(input: any) => {
+            this.MapTooltipRef = input;
+          }}
+        />
         <SVG
           width={width}
           height={height}
@@ -985,6 +1015,7 @@ class Map extends React.Component<Props, State> {
             selectedDataType === 'scarcity' && this.getScarcityLegend()
           )}
           <g id="clickable-water-regions" clipPath="url(#clip)" />
+          <Rivers id="rivers" clipPath="url(#clip)" />
           <g id="places" clipPath="url(#clip)" />
           <CountryLabels id="country-labels" clipPath="url(#clip)" />
         </SVG>
