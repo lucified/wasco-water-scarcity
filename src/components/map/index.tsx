@@ -244,7 +244,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private svgRef!: SVGElement;
-  private MapTooltipRef!: Element;
+  private mapTooltipRef!: Element;
 
   public componentDidMount() {
     this.drawMap();
@@ -580,6 +580,7 @@ class Map extends React.Component<Props, State> {
       .select('g#grid-data')
       .selectAll('path')
       .remove();
+    select(this.mapTooltipRef).style('opacity', 0);
   }
 
   private zoomToWaterRegion() {
@@ -645,7 +646,7 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.rivers != null) {
-      const mapTooltipDiv = select(this.MapTooltipRef);
+      const mapTooltipDiv = select(this.mapTooltipRef);
       svg
         .select('g#rivers')
         .selectAll('path')
@@ -701,7 +702,7 @@ class Map extends React.Component<Props, State> {
     }
 
     if (localData.places != null) {
-      const mapTooltipDiv = select(this.MapTooltipRef);
+      const mapTooltipDiv = select(this.mapTooltipRef);
       svg
         .select('g#places')
         .selectAll('path')
@@ -712,7 +713,7 @@ class Map extends React.Component<Props, State> {
         .attr('fill', '#7b7c95')
         .on('mouseover', function(d) {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
-          const pos = (this as SVGGraphicsElement).getBoundingClientRect() as DOMRect;
+          const pos = (this as SVGPathElement).getBoundingClientRect() as DOMRect;
           mapTooltipDiv
             .transition()
             .duration(200)
@@ -733,25 +734,6 @@ class Map extends React.Component<Props, State> {
                 .style('opacity', 0),
             );
         });
-
-      // svg
-      //   .select('g#places-labels')
-      //   .selectAll('text')
-      //   .data(localData.places.features)
-      //   .enter()
-      //   .append('text')
-      //   .attr(
-      //     'x',
-      //     d => projection(d.geometry.coordinates as [number, number])![0],
-      //   )
-      //   .attr(
-      //     'y',
-      //     d => projection(d.geometry.coordinates as [number, number])![1],
-      //   )
-      //   .attr('text-anchor', 'left')
-      //   .attr('dx', 2)
-      //   .attr('font-size', '10px')
-      //   .text(d => d.properties.name);
     }
 
     this.removeGridLegend();
@@ -1000,8 +982,8 @@ class Map extends React.Component<Props, State> {
     return (
       <Container>
         <MapTooltip
-          innerRef={(input: any) => {
-            this.MapTooltipRef = input;
+          innerRef={ref => {
+            this.mapTooltipRef = ref;
           }}
         />
         <SVG
