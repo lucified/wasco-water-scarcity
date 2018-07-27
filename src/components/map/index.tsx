@@ -94,6 +94,13 @@ const Land = styled.path`
   fill: #d2e2e6;
 `;
 
+
+const CountryLabels = styled.g`
+  point-events: none;
+  text-anchor: middle;
+  font-size: 12px;
+`;
+
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
@@ -667,8 +674,7 @@ class Map extends React.Component<Props, State> {
         .append('text')
         .attr('x', d => path.centroid(d)[0])
         .attr('y', d => path.centroid(d)[1])
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
+        .attr('filter', 'url(#solid)')
         .text(d => d.properties.countryName);
     }
 
@@ -991,6 +997,10 @@ class Map extends React.Component<Props, State> {
               <use xlinkHref="#sphere" />
             </clipPath>
             <path id="sphere" />
+            <filter x="0" y="0" width="1" height="1" id="solid">
+              <feFlood flood-color="#d2e2e6" floodOpacity="0.7" />
+              <feComposite in="SourceGraphic" />
+            </filter>
           </defs>
           <use
             id="globe-fill"
@@ -1007,9 +1017,6 @@ class Map extends React.Component<Props, State> {
           <Basins id="basins" clipPath="url(#clip)" />
           <CountryBorders id="country-borders" clipPath="url(#clip)" />
           <g id="basin-labels" clipPath="url(#clip)" />
-          <g id="country-labels" clipPath="url(#clip)" />
-          <Rivers id="rivers" clipPath="url(#clip)" />
-          <g id="places" clipPath="url(#clip)" />
           <g id="places-labels" clipPath="url(#clip)" />
           {isZoomedIn ? (
             <g
@@ -1020,6 +1027,8 @@ class Map extends React.Component<Props, State> {
             selectedDataType === 'scarcity' && this.getScarcityLegend()
           )}
           <g id="clickable-water-regions" clipPath="url(#clip)" />
+          <g id="places" clipPath="url(#clip)" />
+          <CountryLabels id="country-labels" clipPath="url(#clip)" />
         </SVG>
         {/* Note: we currently don't give an error message if loading data fails */}
         {zoomInRequested &&
