@@ -1043,7 +1043,7 @@ class Map extends React.Component<Props, State> {
                 </clipPath>
                 <path id="sphere" />
                 <filter x="0" y="0" width="1" height="1" id="solid">
-                  <feFlood flood-color="#d2e2e6" floodOpacity="0.7" />
+                  <feFlood floodColor="#d2e2e6" floodOpacity="0.7" />
                   <feComposite in="SourceGraphic" />
                 </filter>
               </defs>

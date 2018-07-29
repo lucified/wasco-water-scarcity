@@ -196,7 +196,7 @@ export class MultiSelectorRow extends React.Component<Props> {
             width={20}
             height={20}
             fill="white"
-            backgroundColor={theme.colors.grayLight}
+            backgroundColor={theme.colors.gray}
           />
         )}
       </Row>

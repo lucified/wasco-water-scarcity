@@ -29,22 +29,53 @@ const Section = styled.div`
 
 const StartingPointSelector = styled.div`
   margin: ${theme.defaultMargin}px auto;
-  display: flex;
-  justify-content: center;
+  width: 100%;
 `;
 
 const StartingPointValue = styled.a`
   display: block;
   flex-basis: 0;
   flex-grow: 1;
-  font-size: 14px;
-  border-radius: 4px;
-  color: ${({ selected }: { selected: boolean }) =>
-    selected ? 'white' : theme.colors.text};
-  background-color: ${({ selected }: { selected: boolean }) =>
-    selected ? 'black' : 'white'};
+  width: 100%;
+  background-image: linear-gradient(-270deg, #25c3c3 5%, #256ec3 100%);
+  border-radius: 5px;
+  text-transform: uppercase;
+  color: white;
+  padding: 1rem;
+  white-space: nowrap;
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
   text-align: center;
-  padding: 10px 20px;
+  cursor: pointer;
+  &:hover {
+    background-color: '#256EC3';
+  }
+
+  & + & {
+    margin-top: 20px;
+  }
+`;
+
+const SubText = styled.div`
+  text-transform: none;
+  font-weight: normal;
+  margin-top: 5px;
+`;
+
+const SelectionModeSelector = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+`;
+
+const SelectionModeValue = styled.div`
+  padding: 1rem;
+  font-size: 14px;
+  border-bottom: 3px solid
+    ${({ selected }: { selected: boolean }) => (selected ? '#256EC3' : 'white')};
   cursor: pointer;
 `;
 
@@ -544,7 +575,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
       comparisonVariables,
       className,
     } = this.props;
-    const { selectedStartingPoint, selectionMode } = this.state;
+    const { selectionMode } = this.state;
     const isMultiselect = selectionMode === 'comparisons';
 
     return (
@@ -556,7 +587,6 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         </BodyText>
         <StartingPointSelector>
           <StartingPointValue
-            selected={selectedStartingPoint === StartingPoint.CHANGE_THE_WORLD}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
@@ -566,10 +596,10 @@ class FutureScenarioFilter extends React.Component<Props, State> {
               );
             }}
           >
-            Let's change the world
+            <div>Let's change the world</div>
+            <SubText>Make changes to the status quo</SubText>
           </StartingPointValue>
           <StartingPointValue
-            selected={selectedStartingPoint === StartingPoint.ANYTHING_POSSIBLE}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.ANYTHING_POSSIBLE,
@@ -580,11 +610,12 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             }}
           >
             Anything is possible
+            <SubText>Narrow down from a variety of options</SubText>
           </StartingPointValue>
         </StartingPointSelector>
         {/* TODO: new styling for selection mode selector */}
-        <StartingPointSelector>
-          <StartingPointValue
+        <SelectionModeSelector>
+          <SelectionModeValue
             selected={selectionMode === 'scenario'}
             onClick={() => {
               this.setState({
@@ -593,8 +624,8 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             }}
           >
             Selected scenario
-          </StartingPointValue>
-          <StartingPointValue
+          </SelectionModeValue>
+          <SelectionModeValue
             selected={selectionMode === 'comparisons'}
             onClick={() => {
               this.setState({
@@ -602,9 +633,9 @@ class FutureScenarioFilter extends React.Component<Props, State> {
               });
             }}
           >
-            Comparison scenarios
-          </StartingPointValue>
-        </StartingPointSelector>
+            Select comparison scenarios
+          </SelectionModeValue>
+        </SelectionModeSelector>
         {Object.keys(sections).map(sectionTitle => (
           <Section key={sectionTitle}>
             <SectionHeader>{sectionTitle}</SectionHeader>
