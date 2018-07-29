@@ -28,7 +28,7 @@ const Section = styled.div`
 `;
 
 const StartingPointSelector = styled.div`
-  margin: ${theme.defaultMargin}px auto;
+  margin-bottom: ${theme.defaultMargin}px;
   width: 100%;
 `;
 
@@ -49,12 +49,13 @@ const StartingPointValue = styled.a`
   letter-spacing: 1px;
   text-align: center;
   cursor: pointer;
-  &:hover {
-    background-color: '#256EC3';
-  }
+  margin-top: ${theme.defaultMargin}px;
+  border: 1px solid
+    ${({ selected }: { selected: boolean }) => (selected ? '#256EC3' : 'white')};
 
-  & + & {
-    margin-top: 20px;
+  &:hover {
+    background-color: #256ec3;
+    background-image: none;
   }
 `;
 
@@ -68,7 +69,10 @@ const SelectionModeSelector = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  justify-content: flex-start;
   align-items: flex-start;
+  width: 100%;
+  border-bottom: 1px solid ${theme.colors.grayLighter};
 `;
 
 const SelectionModeValue = styled.div`
@@ -587,6 +591,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         </BodyText>
         <StartingPointSelector>
           <StartingPointValue
+            selected={selectedStartingPoint === StartingPoint.CHANGE_THE_WORLD}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.CHANGE_THE_WORLD,
@@ -600,6 +605,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             <SubText>Make changes to the status quo</SubText>
           </StartingPointValue>
           <StartingPointValue
+            selected={selectedStartingPoint === StartingPoint.ANYTHING_POSSIBLE}
             onClick={() => {
               this.setState({
                 selectedStartingPoint: StartingPoint.ANYTHING_POSSIBLE,
