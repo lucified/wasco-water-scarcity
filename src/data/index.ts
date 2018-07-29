@@ -158,15 +158,15 @@ export function getDefaultFutureScenario(): FutureScenario {
     dietChange: 'current',
     foodLossRed: 'current',
     trade: 'current volume',
+    reuse: 'meetfood',
     agriExp: 'current',
-    reuse: 'minwater',
     // Social uncertainties
-    population: 'SSP2',
+    population: 'SSP1',
     climateExperiment: 'rcp4p5',
     alloc: 'discharge',
     // Scientific uncertainties
-    impactModel: 'watergap', // TODO: change to mean
-    climateModel: 'gfdl-esm2m', // TODO: change to mean
+    impactModel: 'mean',
+    climateModel: 'mean',
   };
 }
 
@@ -362,9 +362,14 @@ export function getDefaultComparison(
     case StartingPoint.CHANGE_THE_WORLD:
       return {
         ...allOptions,
-        // TODO: change these to mean
-        impactModel: ['watergap'],
-        climateModel: ['gfdl-esm2m'],
+        dietChange: ['current'],
+        foodLossRed: ['current'],
+        yieldGap: ['current'],
+        agriExp: ['current'],
+        reuse: ['meetfood'],
+        trade: ['current volume'],
+        impactModel: ['mean'],
+        climateModel: ['mean'],
       };
   }
 }
