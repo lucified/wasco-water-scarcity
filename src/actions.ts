@@ -1,8 +1,7 @@
 import { Dispatch } from 'redux';
 import {
   fetchHistoricalStressShortageData,
-  fetchWaterRegionsData,
-  fetchWorldRegionsData,
+  fetchWaterRegionsTopojson,
   generateWaterToWorldRegionsMap,
   GridVariable,
   WaterRegionGeoJSON,
@@ -247,22 +246,22 @@ export function loadMapData() {
   return async (dispatch: Dispatch<Action>) => {
     const requestId = 'mapdata';
     dispatch(requestStarted(requestId));
-    const [waterRegionData, worldRegionsData] = await Promise.all([
-      fetchWaterRegionsData(),
-      fetchWorldRegionsData(),
-    ]);
+    const results = await fetchWaterRegionsTopojson();
     dispatch(requestCompleted(requestId));
-    if (waterRegionData) {
-      dispatch(storeWaterRegionData(waterRegionData));
-      dispatch(
-        storeWaterToWorldRegionMap(
-          generateWaterToWorldRegionsMap(waterRegionData),
-        ),
-      );
-    }
+    if (results) {
+      const [waterRegionData, worldRegionsData] = results;
+      if (waterRegionData) {
+        dispatch(storeWaterRegionData(waterRegionData));
+        dispatch(
+          storeWaterToWorldRegionMap(
+            generateWaterToWorldRegionsMap(waterRegionData),
+          ),
+        );
+      }
 
-    if (worldRegionsData) {
-      dispatch(storeWorldRegionData(worldRegionsData));
+      if (worldRegionsData) {
+        dispatch(storeWorldRegionData(worldRegionsData));
+      }
     }
   };
 }

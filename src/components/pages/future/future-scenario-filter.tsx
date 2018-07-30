@@ -1,6 +1,8 @@
+import { every, values } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import {
+  allFutureScenarioVariables,
   FutureDataset,
   FutureDatasetVariables,
   FutureEnsembleData,
@@ -46,12 +48,20 @@ const StartingPointValue = styled.a`
   cursor: pointer;
 `;
 
+interface RequiredScenarioValues {
+  [varname: string]: string[];
+}
+
+export interface RaggedOption extends Option {
+  requiredValues?: RequiredScenarioValues;
+}
+
 const sections: {
   [sectionTitle: string]: Array<{
     title: string;
     description: string;
     variable: FutureScenarioVariableName;
-    options: Option[];
+    options: RaggedOption[];
     furtherInformation?: JSX.Element;
   }>;
 } = {
@@ -239,7 +249,8 @@ const sections: {
       title: 'Climate',
       description:
         'Estimated temperature and rainfall for different greenhouse gas concentrations, ' +
-        'defined as increases in energy input in 2100 relative to pre-industrial times',
+        'defined as increases in energy input in 2100 relative to pre-industrial times. ' +
+        '(Defined by the selected SSP)',
       variable: 'climateExperiment',
       furtherInformation: (
         <div>
@@ -257,16 +268,13 @@ const sections: {
           title: 'RCP 4.5',
           description: '+4.5 W/m2 in 2100',
           value: 'rcp4p5',
+          requiredValues: { population: ['SSP1'] },
         },
         {
           title: 'RCP 6.0',
           description: '+6.0 W/m2 in 2100',
           value: 'rcp6p0',
-        },
-        {
-          title: 'RCP 8.5',
-          description: '+8.5 W/m2 in 2100',
-          value: 'rcp8p5',
+          requiredValues: { population: ['SSP2', 'SSP3'] },
         },
       ],
     },
@@ -314,35 +322,100 @@ const sections: {
         },
         {
           title: 'Mean',
-          description: 'The mean value of the different models',
+          description: 'Average across water and climate models',
           value: 'mean',
         },
       ],
     },
     {
       title: 'Climate models',
-      description: 'TODO',
+      description:
+        'Temperature and rainfall for each water model comes from two different climate models. ' +
+        'We then take the average across both water and climate models',
       variable: 'climateModel',
       options: [
         {
           title: 'GFDL-ESM2M',
           description: 'NOAA Geophysical Fluid Dynamics Laboratory',
           value: 'gfdl-esm2m',
+          requiredValues: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
         },
         {
           title: 'HadGEM2-ES',
           description: 'UK MET office Hadley Centre ',
           value: 'hadgem2-es',
+          requiredValues: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
         },
         {
           title: 'Mean',
-          description: 'The mean value of the different models',
+          description: 'Average across water and climate models',
           value: 'mean',
+          requiredValues: { impactModel: ['mean'] },
         },
       ],
     },
   ],
 };
+
+interface ScenarioDependencies {
+  [variableName: string]: { [value: string]: RequiredScenarioValues };
+}
+
+// Not very nice, but allows dependencies to be given with other variable information
+const scenarioDependencies: ScenarioDependencies = {};
+values(sections).forEach(section => {
+  section.forEach(({ variable, options }) => {
+    options.forEach(({ requiredValues, value }) => {
+      if (requiredValues) {
+        if (!scenarioDependencies[variable]) {
+          scenarioDependencies[variable] = {};
+        }
+
+        scenarioDependencies[variable][value] = requiredValues;
+      }
+    });
+  });
+});
+
+// Scenario must have any combination of the given values for each variable
+function scenarioIsInvalid(
+  requiredValues: RequiredScenarioValues,
+  scenario: FutureScenario,
+) {
+  return !every(
+    requiredValues,
+    (vals, varname) =>
+      vals.indexOf(scenario[varname as FutureScenarioVariableName]) > -1,
+  );
+}
+
+function getEnabledScenario(scenario: FutureScenario) {
+  const validScenario: FutureScenario = {
+    ...scenario,
+  };
+  // Note: Recursive dependencies are not handled
+  Object.keys(scenarioDependencies).forEach(scenvar => {
+    const scenarioVariable = scenvar as FutureScenarioVariableName;
+    const dependenciesForVariable = scenarioDependencies[scenarioVariable];
+    const requiredValues = dependenciesForVariable[scenario[scenarioVariable]];
+    if (scenarioIsInvalid(requiredValues, validScenario)) {
+      const firstGoodValue = Object.keys(dependenciesForVariable).find(
+        val => !scenarioIsInvalid(dependenciesForVariable[val], scenario),
+      );
+      if (firstGoodValue) {
+        validScenario[scenarioVariable] = firstGoodValue;
+      } else {
+        console.error(
+          'Unable to find a valid scenario',
+          validScenario,
+          scenarioVariable,
+        );
+      }
+    }
+  });
+  // NOTE: Might not actually be valid if we were unable to find an alternative
+  return validScenario;
+}
 
 interface PassedProps {
   className?: string;
@@ -372,11 +445,11 @@ class FutureScenarioFilter extends React.Component<Props, State> {
 
   private handleChangeComparison = (
     field: FutureScenarioVariableName,
-    values: string[],
+    vals: string[],
   ) => {
     this.props.setComparisonVariables({
       ...this.props.comparisonVariables,
-      [field]: values,
+      [field]: vals,
     });
   };
 
@@ -384,17 +457,24 @@ class FutureScenarioFilter extends React.Component<Props, State> {
     field: FutureScenarioVariableName,
     value: string,
   ) => {
-    this.props.setScenario({
-      ...this.props.selectedScenario,
-      [field]: value,
-    });
+    this.props.setScenario(
+      getEnabledScenario({
+        ...this.props.selectedScenario,
+        [field]: value,
+      }),
+    );
   };
 
   private handleHoverEnter = (
     hoveredVariable: FutureScenarioVariableName,
     hoveredValue: string,
   ) => {
-    const { selectedScenario, ensembleData, setHoveredScenarios } = this.props;
+    const {
+      selectedScenario,
+      ensembleData,
+      setHoveredScenarios,
+      comparisonVariables,
+    } = this.props;
     if (
       ensembleData &&
       (this.state.hoveredValue !== hoveredValue ||
@@ -407,10 +487,12 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         // Don't create hover effects for selected scenario
         selectedScenario[hoveredVariable] !== hoveredValue
       ) {
-        const hoveredScenario = {
+        // Note: switches to enabled scenarios on the basis that hover is a preview of the final result
+        // Assumes that user will realise other variables have also changed
+        const hoveredScenario = getEnabledScenario({
           ...selectedScenario,
           [hoveredVariable]: hoveredValue,
-        };
+        });
         const hoveredScenarioWithData = ensembleData.find(d =>
           isScenarioEqual(d, hoveredScenario),
         );
@@ -422,7 +504,20 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         this.setState({ hoveredValue, hoveredVariable });
       } else if (selectionMode === 'comparisons') {
         setHoveredScenarios(
-          ensembleData.filter(d => d[hoveredVariable] === hoveredValue),
+          ensembleData.filter(d =>
+            allFutureScenarioVariables.every(variable => {
+              const value = d[variable as FutureScenarioVariableName];
+              if (variable === hoveredVariable) {
+                return value === hoveredValue;
+              } else {
+                return (
+                  comparisonVariables[
+                    variable as FutureScenarioVariableName
+                  ].indexOf(value) > -1
+                );
+              }
+            }),
+          ),
         );
         this.setState({ hoveredValue, hoveredVariable });
       }
@@ -497,7 +592,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
               });
             }}
           >
-            Select scenario
+            Selected scenario
           </StartingPointValue>
           <StartingPointValue
             selected={selectionMode === 'comparisons'}

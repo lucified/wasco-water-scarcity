@@ -1,4 +1,5 @@
 import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
+import { feature } from 'topojson';
 import {
   AnyDataType,
   FutureDataType,
@@ -33,8 +34,7 @@ import {
 // require('file-loader!file.json')). Once the following issue has been
 // resolved, change the filenames back to .json:
 // https://github.com/webpack/webpack/issues/6586
-const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
-const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
+const fpuTopojsonFilename = require('file-loader!../../data/FPU_topojson.jsonfix');
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
@@ -158,15 +158,15 @@ export function getDefaultFutureScenario(): FutureScenario {
     dietChange: 'current',
     foodLossRed: 'current',
     trade: 'current volume',
+    reuse: 'meetfood',
     agriExp: 'current',
-    reuse: 'minwater',
     // Social uncertainties
-    population: 'SSP2',
+    population: 'SSP1',
     climateExperiment: 'rcp4p5',
     alloc: 'discharge',
     // Scientific uncertainties
-    impactModel: 'watergap', // TODO: change to mean
-    climateModel: 'gfdl-esm2m', // TODO: change to mean
+    impactModel: 'mean',
+    climateModel: 'mean',
   };
 }
 
@@ -258,25 +258,6 @@ export function isFutureScenarioInComparisonVariables(
   };
 }
 
-export async function fetchWorldRegionsData(): Promise<
-  WorldRegion[] | undefined
-> {
-  try {
-    const result = await fetch(worldRegionsFilename, {
-      credentials: 'include',
-    });
-    const parsedData: WorldRegionGeoJSON = await result.json();
-    return generateWorldRegionsData(parsedData);
-  } catch (error) {
-    console.error(
-      'Unable to fetch world regions data',
-      worldRegionsFilename,
-      error,
-    );
-    return undefined;
-  }
-}
-
 export const defaultDataTypeThresholds: {
   [dataType in AnyDataType]: number[]
 } = {
@@ -312,20 +293,34 @@ export function generateWaterToWorldRegionsMap(
   waterRegionsData: WaterRegionGeoJSON,
 ) {
   const map: { [waterRegionId: number]: number } = {};
-  waterRegionsData.features.forEach(feature => {
-    map[feature.properties.featureId] = feature.properties.worldRegionID;
+  waterRegionsData.features.forEach(region => {
+    map[region.properties.featureId] = region.properties.worldRegionID;
   });
   return map;
 }
 
-export async function fetchWaterRegionsData(): Promise<
-  WaterRegionGeoJSON | undefined
+export async function fetchWaterRegionsTopojson(): Promise<
+  [WaterRegionGeoJSON, WorldRegion[]] | undefined
 > {
   try {
-    const result = await fetch(fpuFilename, { credentials: 'include' });
-    return (await result.json()) as WaterRegionGeoJSON;
+    const result = await fetch(fpuTopojsonFilename, { credentials: 'include' });
+    const waterRegionTopojson: TopoJSON.Topology = await result.json();
+    const waterRegionData: WaterRegionGeoJSON = feature(
+      waterRegionTopojson,
+      waterRegionTopojson.objects.waterRegions,
+    ) as any; // TODO: fix typings
+    const worldRegionsGeoJSON: WorldRegionGeoJSON = feature(
+      waterRegionTopojson,
+      waterRegionTopojson.objects.worldRegions,
+    ) as any; // TODO: fix typings
+    const worldRegionsData = generateWorldRegionsData(worldRegionsGeoJSON);
+    return [waterRegionData, worldRegionsData];
   } catch (error) {
-    console.error('Unable to fetch water regions data', fpuFilename, error);
+    console.error(
+      'Unable to fetch water regions data',
+      fpuTopojsonFilename,
+      error,
+    );
     return undefined;
   }
 }
@@ -362,9 +357,14 @@ export function getDefaultComparison(
     case StartingPoint.CHANGE_THE_WORLD:
       return {
         ...allOptions,
-        // TODO: change these to mean
-        impactModel: ['watergap'],
-        climateModel: ['gfdl-esm2m'],
+        dietChange: ['current'],
+        foodLossRed: ['current'],
+        yieldGap: ['current'],
+        agriExp: ['current'],
+        reuse: ['meetfood'],
+        trade: ['current volume'],
+        impactModel: ['mean'],
+        climateModel: ['mean'],
       };
   }
 }

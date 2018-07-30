@@ -2,8 +2,9 @@ import { extent } from 'd3-array';
 import { format } from 'd3-format';
 import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
-import { flatMap, isEqual } from 'lodash';
+import { flatMap, isEqual, sortedUniq } from 'lodash';
 import * as React from 'react';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 
@@ -193,49 +194,54 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const { left } = this.svgRef.getBoundingClientRect();
     let x = event.pageX - left - marginLeft!;
     const chartWidth = this.chartWidth();
+    const { xPoints } = this.getScales(this.props);
 
     if (x < 0) {
       x = 0;
     } else if (x > chartWidth) {
       x = chartWidth;
     }
-    const index = scaleLinear()
-      .domain([0, chartWidth])
-      .rangeRound([0, selectedSerie.points.length - 1])(x);
+    const index = Math.min(
+      scaleLinear()
+        .domain([0, chartWidth])
+        .rangeRound([0, xPoints.length - 1])(x),
+      selectedSerie.points.length - 1,
+    );
 
     if (index !== selectedTimeIndex) {
       onSetSelectedTimeIndex(index);
     }
   }
 
-  // Should this be memoized?
-  private getScales() {
-    const { series, selectedSerie, hoveredSeries } = this
-      .props as PropsWithDefaults;
+  private getScales = createSelector(
+    (props: Props) => props.series,
+    (props: Props) => props.hoveredSeries,
+    (props: Props) => props.selectedSerie,
+    (series, hoveredSeries, selectedSerie) => {
+      const chartWidth = this.chartWidth();
+      const chartHeight = this.chartHeight();
 
-    const chartWidth = this.chartWidth();
-    const chartHeight = this.chartHeight();
+      const allData = series.concat(
+        hoveredSeries || [],
+        selectedSerie ? [selectedSerie] : [],
+      );
 
-    const allData = series.concat(
-      hoveredSeries || [],
-      selectedSerie ? [selectedSerie] : [],
-    );
+      const xPoints = sortedUniq(
+        flatMap(allData, d => d.points.map(p => p.time.getTime())).sort(),
+      ).map(t => new Date(t));
+      const x = scaleTime()
+        .domain([xPoints[0], xPoints[xPoints.length - 1]])
+        .range([0, chartWidth]);
+      const y = scaleLinear()
+        .domain(extent(flatMap(allData, d => d.points.map(p => p.value))) as [
+          number,
+          number
+        ])
+        .range([chartHeight, 0]);
 
-    const x = scaleTime()
-      .domain(extent(flatMap(allData, d => d.points.map(p => p.time))) as [
-        Date,
-        Date
-      ])
-      .range([0, chartWidth]);
-    const y = scaleLinear()
-      .domain(extent(flatMap(allData, d => d.points.map(p => p.value))) as [
-        number,
-        number
-      ])
-      .range([chartHeight, 0]);
-
-    return { x, y };
-  }
+      return { x, y, xPoints };
+    },
+  );
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart(
@@ -253,7 +259,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       height,
     } = this.props as PropsWithDefaults;
 
-    const { x, y } = this.getScales();
+    const { x, y } = this.getScales(this.props);
 
     let redrawEverything = false;
     const currentYDomain = y.domain();
@@ -279,8 +285,11 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       this.drawXAxis(context, x);
       this.drawYAxis(context, y);
 
-      context.globalAlpha = 0.2;
-      context.lineWidth = 0.2;
+      context.globalAlpha = Math.min(
+        1,
+        Math.max(0.2, 1 - (series.length - 100) / 2000),
+      );
+      context.lineWidth = series.length > 50 ? 0.2 : 0.5;
       series.forEach(d => {
         context.beginPath();
         lineGenerator(d.points);
@@ -300,8 +309,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       context.translate(marginLeft, marginTop);
 
       if (hoveredSeries) {
-        context.globalAlpha = 0.5;
-        context.lineWidth = hoveredSeries.length > 5 ? 0.2 : 1;
+        context.globalAlpha = 0.7;
+        context.lineWidth = hoveredSeries.length > 50 ? 0.2 : 1;
         hoveredSeries.forEach(d => {
           context.beginPath();
           lineGenerator(d.points);
@@ -346,14 +355,16 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.beginPath();
     ticks.forEach(d => {
-      context.moveTo(x(d), chartHeight);
-      context.lineTo(x(d), chartHeight + tickSize);
+      const xPosition = x(d);
+      context.moveTo(xPosition, chartHeight);
+      context.lineTo(xPosition, chartHeight + tickSize);
     });
     context.strokeStyle = 'black';
     context.stroke();
 
     context.textAlign = 'center';
     context.textBaseline = 'top';
+    context.fillStyle = 'black';
     ticks.forEach(d => {
       context.fillText(tickFormat(d), x(d), chartHeight + tickSize);
     });
@@ -372,8 +383,9 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.beginPath();
     ticks.forEach(d => {
-      context.moveTo(0, y(d));
-      context.lineTo(-6, y(d));
+      const yPosition = y(d);
+      context.moveTo(0, yPosition);
+      context.lineTo(-6, yPosition);
     });
     context.strokeStyle = 'black';
     context.stroke();
@@ -404,7 +416,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const hiDPIWidth = width * PIXEL_RATIO;
     const hiDIPHeight = height * PIXEL_RATIO;
 
-    const { x, y } = this.getScales();
+    const { x, y } = this.getScales(this.props);
     const {
       marginLeft,
       marginTop,

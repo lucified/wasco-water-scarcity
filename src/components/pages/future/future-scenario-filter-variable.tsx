@@ -1,3 +1,4 @@
+import { every } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import {
@@ -6,8 +7,9 @@ import {
   FutureScenario,
   FutureScenarioVariableName,
 } from '../../../data';
-import MultiSelector, { Option } from '../../generic/multi-selector';
+import MultiSelector from '../../generic/multi-selector';
 import { SelectorDescription, SelectorHeader, theme } from '../../theme';
+import { RaggedOption } from './future-scenario-filter';
 
 const Variable = styled.div`
   display: flex;
@@ -43,7 +45,7 @@ interface Props {
   description: string;
   multiselect: boolean;
   furtherInformation?: JSX.Element;
-  options: Option[];
+  options: RaggedOption[];
   selectedFutureDataset: FutureDataset;
   comparisonVariables: FutureDatasetVariables;
   selectedScenario: FutureScenario;
@@ -113,6 +115,21 @@ export class FutureScenarioFilterVariable extends React.Component<
     } = this.props;
     const { furtherInformationOpen } = this.state;
 
+    const filteredOptions = options
+      .filter(
+        option => selectedFutureDataset[variable].indexOf(option.value) > -1,
+      )
+      .map(o => ({
+        ...o,
+        disabled: !every(
+          o.requiredValues,
+          (vals, varname) =>
+            vals.indexOf(
+              selectedScenario[varname as FutureScenarioVariableName],
+            ) > -1,
+        ),
+      }));
+
     return (
       <Variable key={variable}>
         <SelectorHeader>{title}</SelectorHeader>
@@ -120,10 +137,7 @@ export class FutureScenarioFilterVariable extends React.Component<
         <StyledMultiSelector
           multiselect={multiselect}
           multiSelectedValues={comparisonVariables[variable]}
-          options={options.filter(
-            option =>
-              selectedFutureDataset[variable].indexOf(option.value) > -1,
-          )}
+          options={filteredOptions}
           selectedValue={selectedScenario[variable]}
           onChangeMultiSelect={this.handleChangeComparison}
           onChangeSelect={this.handleSetSelectedScenario}

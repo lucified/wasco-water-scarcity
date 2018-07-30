@@ -375,6 +375,8 @@ class FutureBody extends React.Component<Props, State> {
                         labelStyle={{
                           fontFamily: theme.bodyFontFamily,
                           fontSize: 14,
+                          width: '50%',
+                          marginLeft: '-25%',
                         }}
                       />
                     )}

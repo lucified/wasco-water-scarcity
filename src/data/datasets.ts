@@ -193,15 +193,15 @@ export const futureDatasets: FutureDataset[] = [
   // Note: there will be datasets for other variables
   {
     urlTemplateEnsemble:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/ensemble_fpu_decadal/{{variableName}}/{{featureId}}/all.json',
+      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v4-20180727/ensemble_fpu_decadal/{{variableName}}/{{featureId}}/all.json',
     urlTemplateScenario:
-      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v3-20180322/scenario_fpu_decadal/' +
-      'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc_2011_2090/' +
+      'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/futuredata_v4-20180727/scenario_fpu_decadal/' +
+      'fpu_decadal_bluewater_{{impactModel}}_{{climateModel}}_{{climateExperiment}}_pressoc/' +
       '{{yieldGap}}_{{dietChange}}_{{foodLossRed}}_{{population}}_{{trade}}_{{agriExp}}_{{reuse}}_{{alloc}}.json',
     variableName: ['stress', 'kcal'],
-    impactModel: ['h08', 'pcrglobwb', 'watergap'],
-    climateModel: ['gfdl-esm2m', 'hadgem2-es'],
-    climateExperiment: ['rcp4p5', 'rcp8p5'],
+    impactModel: ['h08', 'pcrglobwb', 'watergap', 'mean'],
+    climateModel: ['gfdl-esm2m', 'hadgem2-es', 'mean'],
+    climateExperiment: ['rcp4p5', 'rcp6p0'],
     yieldGap: ['current', 'medium', 'high'],
     dietChange: ['current', 'medium', 'high'],
     foodLossRed: ['current', 'medium', 'high'],
