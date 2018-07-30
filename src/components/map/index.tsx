@@ -266,6 +266,10 @@ class Map extends React.Component<Props, State> {
     } = this.props;
     const { zoomInRequested, regionData, worldGeoData } = this.state;
 
+    if (!worldGeoData) {
+      return;
+    }
+
     if (worldGeoData && !prevState.worldGeoData) {
       // Map data was loaded
       this.drawMap();
