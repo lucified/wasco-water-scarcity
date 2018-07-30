@@ -2,10 +2,10 @@
 import { hot } from 'react-hot-loader';
 
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
-import { Helmet } from '../../node_modules/@types/react-helmet';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
