@@ -2,6 +2,7 @@ import { every, values } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import {
+  allFutureScenarioVariables,
   FutureDataset,
   FutureDatasetVariables,
   FutureEnsembleData,
@@ -10,7 +11,6 @@ import {
   getDefaultComparison,
   isScenarioEqual,
   StartingPoint,
-  allFutureScenarioVariables,
 } from '../../../data';
 import { Option } from '../../generic/multi-selector';
 import { BodyText, SectionHeader, theme } from '../../theme';

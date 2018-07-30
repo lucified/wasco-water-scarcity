@@ -1,4 +1,4 @@
-import { every, some } from 'lodash';
+import { every } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import {
@@ -121,11 +121,12 @@ export class FutureScenarioFilterVariable extends React.Component<
       )
       .map(o => ({
         ...o,
-        disabled: !every(o.requiredValues, (vals, varname) =>
-          some(
-            vals,
-            v => selectedScenario[varname as FutureScenarioVariableName] === v,
-          ),
+        disabled: !every(
+          o.requiredValues,
+          (vals, varname) =>
+            vals.indexOf(
+              selectedScenario[varname as FutureScenarioVariableName],
+            ) > -1,
         ),
       }));
 
