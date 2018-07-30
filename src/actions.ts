@@ -246,25 +246,22 @@ export function loadMapData() {
   return async (dispatch: Dispatch<Action>) => {
     const requestId = 'mapdata';
     dispatch(requestStarted(requestId));
-    const [
-      waterRegionData,
-      worldRegionsData,
-    ] = (await fetchWaterRegionsTopojson()) as [
-      WaterRegionGeoJSON,
-      WorldRegion[]
-    ];
+    const results = await fetchWaterRegionsTopojson();
     dispatch(requestCompleted(requestId));
-    if (waterRegionData) {
-      dispatch(storeWaterRegionData(waterRegionData));
-      dispatch(
-        storeWaterToWorldRegionMap(
-          generateWaterToWorldRegionsMap(waterRegionData),
-        ),
-      );
-    }
+    if (results) {
+      const [waterRegionData, worldRegionsData] = results;
+      if (waterRegionData) {
+        dispatch(storeWaterRegionData(waterRegionData));
+        dispatch(
+          storeWaterToWorldRegionMap(
+            generateWaterToWorldRegionsMap(waterRegionData),
+          ),
+        );
+      }
 
-    if (worldRegionsData) {
-      dispatch(storeWorldRegionData(worldRegionsData));
+      if (worldRegionsData) {
+        dispatch(storeWorldRegionData(worldRegionsData));
+      }
     }
   };
 }

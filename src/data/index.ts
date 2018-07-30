@@ -299,21 +299,22 @@ export function generateWaterToWorldRegionsMap(
   return map;
 }
 
-// TODO: improve types?
-export async function fetchWaterRegionsTopojson(): Promise<any | undefined> {
+export async function fetchWaterRegionsTopojson(): Promise<
+  [WaterRegionGeoJSON, WorldRegion[]] | undefined
+> {
   try {
     const result = await fetch(fpuTopojsonFilename, { credentials: 'include' });
-    const waterRegionTopojson = await result.json();
+    const waterRegionTopojson: TopoJSON.Topology = await result.json();
     const waterRegionData: WaterRegionGeoJSON = feature(
       waterRegionTopojson,
       waterRegionTopojson.objects.waterRegions,
-    ) as any;
+    ) as any; // TODO: fix typings
     const worldRegionsGeoJSON: WorldRegionGeoJSON = feature(
       waterRegionTopojson,
       waterRegionTopojson.objects.worldRegions,
-    ) as any;
+    ) as any; // TODO: fix typings
     const worldRegionsData = generateWorldRegionsData(worldRegionsGeoJSON);
-    return await [waterRegionData, worldRegionsData];
+    return [waterRegionData, worldRegionsData];
   } catch (error) {
     console.error(
       'Unable to fetch water regions data',
