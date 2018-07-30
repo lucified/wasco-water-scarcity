@@ -352,14 +352,16 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.beginPath();
     ticks.forEach(d => {
-      context.moveTo(x(d), chartHeight);
-      context.lineTo(x(d), chartHeight + tickSize);
+      const xPosition = x(d);
+      context.moveTo(xPosition, chartHeight);
+      context.lineTo(xPosition, chartHeight + tickSize);
     });
     context.strokeStyle = 'black';
     context.stroke();
 
     context.textAlign = 'center';
     context.textBaseline = 'top';
+    context.fillStyle = 'black';
     ticks.forEach(d => {
       context.fillText(tickFormat(d), x(d), chartHeight + tickSize);
     });
@@ -378,8 +380,9 @@ export class CanvasLineChart extends React.PureComponent<Props> {
 
     context.beginPath();
     ticks.forEach(d => {
-      context.moveTo(0, y(d));
-      context.lineTo(-6, y(d));
+      const yPosition = y(d);
+      context.moveTo(0, yPosition);
+      context.lineTo(-6, yPosition);
     });
     context.strokeStyle = 'black';
     context.stroke();
