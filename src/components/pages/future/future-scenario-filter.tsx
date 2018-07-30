@@ -604,7 +604,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
               );
             }}
           >
-            <div>Let's change the world</div>
+            Let's change the world
             <SubText>Make changes to the status quo</SubText>
           </StartingPointValue>
           <StartingPointValue
