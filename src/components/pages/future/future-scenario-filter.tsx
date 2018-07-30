@@ -37,7 +37,12 @@ const StartingPointValue = styled.a`
   flex-basis: 0;
   flex-grow: 1;
   width: 100%;
-  background-image: linear-gradient(-270deg, #25c3c3 5%, #256ec3 100%);
+  background-image: ${({ selected }: { selected: boolean }) =>
+    selected
+      ? 'linear-gradient(-270deg, #25c3c3 5%, #256ec3 100%)'
+      : `linear-gradient(-270deg, ${theme.colors.gray} 5%, ${
+          theme.colors.gray
+        } 100%)`};
   border-radius: 5px;
   text-transform: uppercase;
   color: white;
@@ -50,8 +55,6 @@ const StartingPointValue = styled.a`
   text-align: center;
   cursor: pointer;
   margin-top: ${theme.defaultMargin}px;
-  border: 1px solid
-    ${({ selected }: { selected: boolean }) => (selected ? '#256EC3' : 'white')};
 
   &:hover {
     background-color: #256ec3;
