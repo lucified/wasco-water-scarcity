@@ -1017,7 +1017,7 @@ class Map extends React.Component<Props, State> {
       <Container>
         {!worldGeoData ? (
           <div style={{ width, height }}>
-            <SpinnerOverlay style={{ width, height }}>
+            <SpinnerOverlay style={{ width: width + 10, height }}>
               <div>
                 <p>Loading...</p>
                 <Spinner />
