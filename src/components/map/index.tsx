@@ -103,6 +103,7 @@ const MapTooltip = styled.div`
   border: 0px;
   padding: 4px;
   font-size: 12px;
+  opacity: 0;
 `;
 
 const CountryLabels = styled.g`
