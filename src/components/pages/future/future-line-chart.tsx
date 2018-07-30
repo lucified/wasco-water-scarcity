@@ -92,7 +92,7 @@ const getHoveredSeries = createSelector(
     data &&
     data.map(datum => ({
       id: toScenarioId(datum),
-      color: theme.colors.textHover,
+      color: theme.colors.gray,
       points: datum.data.map(d => ({
         value: d.value,
         time: new Date((d.y0 + d.y1) / 2, 0),

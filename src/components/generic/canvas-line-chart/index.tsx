@@ -285,8 +285,11 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       this.drawXAxis(context, x);
       this.drawYAxis(context, y);
 
-      context.globalAlpha = 0.2;
-      context.lineWidth = 0.2;
+      context.globalAlpha = Math.min(
+        1,
+        Math.max(0.2, 1 - (series.length - 100) / 2000),
+      );
+      context.lineWidth = series.length > 50 ? 0.2 : 0.5;
       series.forEach(d => {
         context.beginPath();
         lineGenerator(d.points);
