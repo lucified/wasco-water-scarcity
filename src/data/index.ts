@@ -1,4 +1,5 @@
 import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
+import { feature } from 'topojson';
 import {
   AnyDataType,
   FutureDataType,
@@ -33,8 +34,7 @@ import {
 // require('file-loader!file.json')). Once the following issue has been
 // resolved, change the filenames back to .json:
 // https://github.com/webpack/webpack/issues/6586
-const worldRegionsFilename = require('file-loader!../../data/worldRegion.jsonfix');
-const fpuFilename = require('file-loader!../../data/FPU.jsonfix');
+const fpuTopojsonFilename = require('file-loader!../../data/FPU_topojson.jsonfix');
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
@@ -258,25 +258,6 @@ export function isFutureScenarioInComparisonVariables(
   };
 }
 
-export async function fetchWorldRegionsData(): Promise<
-  WorldRegion[] | undefined
-> {
-  try {
-    const result = await fetch(worldRegionsFilename, {
-      credentials: 'include',
-    });
-    const parsedData: WorldRegionGeoJSON = await result.json();
-    return generateWorldRegionsData(parsedData);
-  } catch (error) {
-    console.error(
-      'Unable to fetch world regions data',
-      worldRegionsFilename,
-      error,
-    );
-    return undefined;
-  }
-}
-
 export const defaultDataTypeThresholds: {
   [dataType in AnyDataType]: number[]
 } = {
@@ -312,20 +293,33 @@ export function generateWaterToWorldRegionsMap(
   waterRegionsData: WaterRegionGeoJSON,
 ) {
   const map: { [waterRegionId: number]: number } = {};
-  waterRegionsData.features.forEach(feature => {
-    map[feature.properties.featureId] = feature.properties.worldRegionID;
+  waterRegionsData.features.forEach(region => {
+    map[region.properties.featureId] = region.properties.worldRegionID;
   });
   return map;
 }
 
-export async function fetchWaterRegionsData(): Promise<
-  WaterRegionGeoJSON | undefined
-> {
+// TODO: improve types?
+export async function fetchWaterRegionsTopojson(): Promise<any | undefined> {
   try {
-    const result = await fetch(fpuFilename, { credentials: 'include' });
-    return (await result.json()) as WaterRegionGeoJSON;
+    const result = await fetch(fpuTopojsonFilename, { credentials: 'include' });
+    const waterRegionTopojson = await result.json();
+    const waterRegionData: WaterRegionGeoJSON = feature(
+      waterRegionTopojson,
+      waterRegionTopojson.objects.waterRegions,
+    ) as any;
+    const worldRegionsGeoJSON: WorldRegionGeoJSON = feature(
+      waterRegionTopojson,
+      waterRegionTopojson.objects.worldRegions,
+    ) as any;
+    const worldRegionsData = generateWorldRegionsData(worldRegionsGeoJSON);
+    return await [waterRegionData, worldRegionsData];
   } catch (error) {
-    console.error('Unable to fetch water regions data', fpuFilename, error);
+    console.error(
+      'Unable to fetch water regions data',
+      fpuTopojsonFilename,
+      error,
+    );
     return undefined;
   }
 }

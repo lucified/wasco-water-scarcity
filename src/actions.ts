@@ -1,8 +1,7 @@
 import { Dispatch } from 'redux';
 import {
   fetchHistoricalStressShortageData,
-  fetchWaterRegionsData,
-  fetchWorldRegionsData,
+  fetchWaterRegionsTopojson,
   generateWaterToWorldRegionsMap,
   GridVariable,
   WaterRegionGeoJSON,
@@ -247,10 +246,13 @@ export function loadMapData() {
   return async (dispatch: Dispatch<Action>) => {
     const requestId = 'mapdata';
     dispatch(requestStarted(requestId));
-    const [waterRegionData, worldRegionsData] = await Promise.all([
-      fetchWaterRegionsData(),
-      fetchWorldRegionsData(),
-    ]);
+    const [
+      waterRegionData,
+      worldRegionsData,
+    ] = (await fetchWaterRegionsTopojson()) as [
+      WaterRegionGeoJSON,
+      WorldRegion[]
+    ];
     dispatch(requestCompleted(requestId));
     if (waterRegionData) {
       dispatch(storeWaterRegionData(waterRegionData));
