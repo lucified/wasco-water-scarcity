@@ -309,8 +309,8 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       context.translate(marginLeft, marginTop);
 
       if (hoveredSeries) {
-        context.globalAlpha = 0.5;
-        context.lineWidth = hoveredSeries.length > 5 ? 0.2 : 1;
+        context.globalAlpha = 0.7;
+        context.lineWidth = hoveredSeries.length > 50 ? 0.2 : 1;
         hoveredSeries.forEach(d => {
           context.beginPath();
           lineGenerator(d.points);

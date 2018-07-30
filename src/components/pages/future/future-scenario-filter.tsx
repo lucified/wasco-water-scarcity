@@ -10,6 +10,7 @@ import {
   getDefaultComparison,
   isScenarioEqual,
   StartingPoint,
+  allFutureScenarioVariables,
 } from '../../../data';
 import { Option } from '../../generic/multi-selector';
 import { BodyText, SectionHeader, theme } from '../../theme';
@@ -468,7 +469,12 @@ class FutureScenarioFilter extends React.Component<Props, State> {
     hoveredVariable: FutureScenarioVariableName,
     hoveredValue: string,
   ) => {
-    const { selectedScenario, ensembleData, setHoveredScenarios } = this.props;
+    const {
+      selectedScenario,
+      ensembleData,
+      setHoveredScenarios,
+      comparisonVariables,
+    } = this.props;
     if (
       ensembleData &&
       (this.state.hoveredValue !== hoveredValue ||
@@ -498,7 +504,20 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         this.setState({ hoveredValue, hoveredVariable });
       } else if (selectionMode === 'comparisons') {
         setHoveredScenarios(
-          ensembleData.filter(d => d[hoveredVariable] === hoveredValue),
+          ensembleData.filter(d =>
+            allFutureScenarioVariables.every(variable => {
+              const value = d[variable as FutureScenarioVariableName];
+              if (variable === hoveredVariable) {
+                return value === hoveredValue;
+              } else {
+                return (
+                  comparisonVariables[
+                    variable as FutureScenarioVariableName
+                  ].indexOf(value) > -1
+                );
+              }
+            }),
+          ),
         );
         this.setState({ hoveredValue, hoveredVariable });
       }
