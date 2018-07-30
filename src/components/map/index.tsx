@@ -41,7 +41,10 @@ import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
-const worldData = require('world-atlas/world/50m.json');
+// tslint:disable:no-implicit-dependencies
+const worldDataFilename = require('file-loader!../../../data/50m.jsonfix');
+// For reduced file size and accuracy, uncomment the below:
+// const worldDataFilename = require('file-loader!../../../data/110m.jsonfix');
 
 const Container = styled.div`
   position: relative;
@@ -185,6 +188,18 @@ const LegendLabel = styled.text`
   text-anchor: middle;
 `;
 
+function getColorScale(dataType: AnyDataType, thresholds: number[]) {
+  const colors =
+    // These data types have a larger = better scale
+    dataType === 'shortage' || dataType === 'kcal'
+      ? [belowThresholdColor, ...getDataTypeColors(dataType)].reverse()
+      : [belowThresholdColor, ...getDataTypeColors(dataType)];
+
+  return scaleThreshold<number, string>()
+    .domain(thresholds)
+    .range(colors);
+}
+
 interface PassedProps {
   width: number;
   selectedData: TimeAggregate<number | undefined>;
@@ -217,18 +232,7 @@ interface State {
   };
   fetchingDataForRegions: number[];
   zoomInRequested: boolean;
-}
-
-function getColorScale(dataType: AnyDataType, thresholds: number[]) {
-  const colors =
-    // These data types have a larger = better scale
-    dataType === 'shortage' || dataType === 'kcal'
-      ? [belowThresholdColor, ...getDataTypeColors(dataType)].reverse()
-      : [belowThresholdColor, ...getDataTypeColors(dataType)];
-
-  return scaleThreshold<number, string>()
-    .domain(thresholds)
-    .range(colors);
+  worldGeoData?: TopoJSON.Topology;
 }
 
 class Map extends React.Component<Props, State> {
@@ -246,8 +250,7 @@ class Map extends React.Component<Props, State> {
   private mapTooltipRef!: Element;
 
   public componentDidMount() {
-    this.drawMap();
-    this.zoomToGlobalArea(false);
+    this.fetchWorldGeoData();
   }
 
   public componentDidUpdate(prevProps: Props, prevState: State) {
@@ -261,7 +264,14 @@ class Map extends React.Component<Props, State> {
       selectedWorldRegion,
       width,
     } = this.props;
-    const { zoomInRequested, regionData } = this.state;
+    const { zoomInRequested, regionData, worldGeoData } = this.state;
+
+    if (worldGeoData && !prevState.worldGeoData) {
+      // Map data was loaded
+      this.drawMap();
+      this.zoomToGlobalArea(false);
+      return;
+    }
 
     // FIXME: This is fugly
     const widthChanged = prevProps.width !== width;
@@ -351,7 +361,22 @@ class Map extends React.Component<Props, State> {
       .remove();
   }
 
+  private async fetchWorldGeoData() {
+    try {
+      const result = await fetch(worldDataFilename);
+      const parsedData: TopoJSON.Topology = await result.json();
+      this.setState({ worldGeoData: parsedData });
+    } catch (error) {
+      console.error('Unable to fetch map data:', error);
+    }
+  }
+
   private drawMap() {
+    const { worldGeoData } = this.state;
+    if (!worldGeoData) {
+      return;
+    }
+
     const {
       clearSelectedRegion,
       selectedWaterRegionId,
@@ -378,7 +403,7 @@ class Map extends React.Component<Props, State> {
     // Countries land mass
     svg
       .select<SVGPathElement>('path#land')
-      .datum(feature(worldData, worldData.objects.land))
+      .datum(feature(worldGeoData, worldGeoData.objects.land))
       .attr('d', path);
 
     // Water regions
@@ -583,6 +608,11 @@ class Map extends React.Component<Props, State> {
   }
 
   private zoomToWaterRegion() {
+    const { worldGeoData } = this.state;
+    if (!worldGeoData) {
+      return;
+    }
+
     const {
       selectedWaterRegionId,
       selectedGridVariable,
@@ -681,7 +711,7 @@ class Map extends React.Component<Props, State> {
       .selectAll('path')
       .data<GeometryCollection>(
         // TODO: improve typings
-        (feature(worldData, worldData.objects.countries) as any).features,
+        (feature(worldGeoData, worldGeoData.objects.countries) as any).features,
       )
       .enter()
       .append('path')
@@ -974,86 +1004,99 @@ class Map extends React.Component<Props, State> {
       selectedWaterRegionId,
       isZoomedIn,
     } = this.props;
-    const { zoomInRequested } = this.state;
+    const { zoomInRequested, worldGeoData } = this.state;
     const height = this.getHeight();
     // Even though zoomInToRegion might be true, we might not have the data loaded,
     // in which case we're not yet zoomed in
 
     return (
       <Container>
-        <MapTooltip
-          innerRef={ref => {
-            this.mapTooltipRef = ref;
-          }}
-        />
-        <SVG
-          width={width}
-          height={height}
-          innerRef={ref => {
-            this.svgRef = ref;
-          }}
-        >
-          <defs>
-            <clipPath id="clip">
-              <use xlinkHref="#sphere" />
-            </clipPath>
-            <path id="sphere" />
-            <filter x="0" y="0" width="1" height="1" id="solid">
-              <feFlood flood-color="#d2e2e6" floodOpacity="0.7" />
-              <feComposite in="SourceGraphic" />
-            </filter>
-          </defs>
-          <use
-            id="globe-fill"
-            xlinkHref="#sphere"
-            style={{ fill: 'transparent' }}
-          />
-          <g id="countries">
-            <Land id="land" clipPath="url(#clip)" />
-          </g>
-          <g id="grid-data" clipPath="url(#clip)" />
-          <DDM id="ddm" clipPath="url(#clip)" />
-          <g id="water-regions" clipPath="url(#clip)" />
-          <SelectedRegion id="selected-region" clipPath="url(#clip)" />
-          <CountryBorders id="country-borders" clipPath="url(#clip)" />
-          <g id="places-labels" clipPath="url(#clip)" />
-          <g id="clickable-water-regions" clipPath="url(#clip)" />
-          <Rivers id="rivers" clipPath="url(#clip)" />
-          <g id="places" clipPath="url(#clip)" />
-          <CountryLabels id="country-labels" clipPath="url(#clip)" />
-          {isZoomedIn ? (
-            <g
-              transform={`translate(${width - 400},${height - 30})`}
-              id="grid-legend"
-            />
-          ) : (
-            selectedDataType === 'scarcity' && this.getScarcityLegend()
-          )}
-        </SVG>
-        {/* Note: we currently don't give an error message if loading data fails */}
-        {zoomInRequested &&
-          selectedWaterRegionId &&
-          !this.state.regionData[selectedWaterRegionId] &&
-          this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
-            -1 && (
-            <SpinnerOverlay style={{ width: width + 10, height }}>
+        {!worldGeoData ? (
+          <div style={{ width, height }}>
+            <SpinnerOverlay style={{ width, height }}>
               <div>
                 <p>Loading...</p>
                 <Spinner />
               </div>
             </SpinnerOverlay>
-          )}
-        {!isZoomedIn &&
-          selectedDataType !== 'scarcity' && (
-            <StyledThresholdSelector
-              style={{ left: width * 0.5, top: height - 40 }}
-              dataType={selectedDataType}
+          </div>
+        ) : (
+          <>
+            <MapTooltip
+              innerRef={ref => {
+                this.mapTooltipRef = ref;
+              }}
             />
-          )}
-        {selectedWaterRegionId && (
-          <ZoomButton onClick={this.toggleZoomInToRegion}>
-            {isZoomedIn ? 'Zoom out' : 'Zoom in'}
-          </ZoomButton>
+            <SVG
+              width={width}
+              height={height}
+              innerRef={ref => {
+                this.svgRef = ref;
+              }}
+            >
+              <defs>
+                <clipPath id="clip">
+                  <use xlinkHref="#sphere" />
+                </clipPath>
+                <path id="sphere" />
+                <filter x="0" y="0" width="1" height="1" id="solid">
+                  <feFlood flood-color="#d2e2e6" floodOpacity="0.7" />
+                  <feComposite in="SourceGraphic" />
+                </filter>
+              </defs>
+              <use
+                id="globe-fill"
+                xlinkHref="#sphere"
+                style={{ fill: 'transparent' }}
+              />
+              <g id="countries">
+                <Land id="land" clipPath="url(#clip)" />
+              </g>
+              <g id="grid-data" clipPath="url(#clip)" />
+              <DDM id="ddm" clipPath="url(#clip)" />
+              <g id="water-regions" clipPath="url(#clip)" />
+              <SelectedRegion id="selected-region" clipPath="url(#clip)" />
+              <CountryBorders id="country-borders" clipPath="url(#clip)" />
+              <g id="places-labels" clipPath="url(#clip)" />
+              <g id="clickable-water-regions" clipPath="url(#clip)" />
+              <Rivers id="rivers" clipPath="url(#clip)" />
+              <g id="places" clipPath="url(#clip)" />
+              <CountryLabels id="country-labels" clipPath="url(#clip)" />
+              {isZoomedIn ? (
+                <g
+                  transform={`translate(${width - 400},${height - 30})`}
+                  id="grid-legend"
+                />
+              ) : (
+                selectedDataType === 'scarcity' && this.getScarcityLegend()
+              )}
+            </SVG>
+            {/* Note: we currently don't give an error message if loading data fails */}
+            {zoomInRequested &&
+              selectedWaterRegionId &&
+              !this.state.regionData[selectedWaterRegionId] &&
+              this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
+                -1 && (
+                <SpinnerOverlay style={{ width: width + 10, height }}>
+                  <div>
+                    <p>Loading...</p>
+                    <Spinner />
+                  </div>
+                </SpinnerOverlay>
+              )}
+            {!isZoomedIn &&
+              selectedDataType !== 'scarcity' && (
+                <StyledThresholdSelector
+                  style={{ left: width * 0.5, top: height - 40 }}
+                  dataType={selectedDataType}
+                />
+              )}
+            {selectedWaterRegionId && (
+              <ZoomButton onClick={this.toggleZoomInToRegion}>
+                {isZoomedIn ? 'Zoom out' : 'Zoom in'}
+              </ZoomButton>
+            )}
+          </>
         )}
       </Container>
     );

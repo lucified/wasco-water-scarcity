@@ -58,6 +58,19 @@ To test embeds inside an iframe, start the development server for the `embed`
 APP (`APP=embed yarn start`) and open the `src/embed-test.html` page in a
 browser.
 
+## World countries data
+
+In order to be able to load the map geographic data dynamically, the filenames
+needed to be changed from `.json` to `.jsonfix`. We use the JSON files from the
+`world-atlas` package by copying them into `data/` and changing the filenames:
+
+```
+cp node_modules/world-atlas/world/*.json data/
+cd data
+mv 50m.json 50m.jsonfix
+mv 110m.json 110m.jsonfix
+```
+
 ## Using new datasets
 
 The datasets are defined in `src/data/datasets.ts`. The URL defined in the `url`
