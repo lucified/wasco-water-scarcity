@@ -196,7 +196,8 @@ export class MultiSelectorRow extends React.Component<Props> {
             width={20}
             height={20}
             fill="white"
-            backgroundColor={theme.colors.grayLight}
+            tooltip="Included in comparison scenarios"
+            backgroundColor={theme.colors.gray}
           />
         )}
       </Row>

@@ -28,23 +28,61 @@ const Section = styled.div`
 `;
 
 const StartingPointSelector = styled.div`
-  margin: ${theme.defaultMargin}px auto;
-  display: flex;
-  justify-content: center;
+  margin-bottom: ${theme.defaultMargin}px;
+  width: 100%;
 `;
 
 const StartingPointValue = styled.a`
   display: block;
   flex-basis: 0;
   flex-grow: 1;
-  font-size: 14px;
-  border-radius: 4px;
-  color: ${({ selected }: { selected: boolean }) =>
-    selected ? 'white' : theme.colors.text};
-  background-color: ${({ selected }: { selected: boolean }) =>
-    selected ? 'black' : 'white'};
+  width: 100%;
+  background-image: ${({ selected }: { selected: boolean }) =>
+    selected
+      ? 'linear-gradient(-270deg, #25c3c3 5%, #256ec3 100%)'
+      : `linear-gradient(-270deg, ${theme.colors.gray} 5%, ${
+          theme.colors.gray
+        } 100%)`};
+  border-radius: 5px;
+  text-transform: uppercase;
+  color: white;
+  padding: 1rem;
+  white-space: nowrap;
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
   text-align: center;
-  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: ${theme.defaultMargin}px;
+
+  &:hover {
+    background-color: #256ec3;
+    background-image: none;
+  }
+`;
+
+const SubText = styled.div`
+  text-transform: none;
+  font-weight: normal;
+  margin-top: 5px;
+`;
+
+const SelectionModeSelector = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  border-bottom: 1px solid ${theme.colors.grayLighter};
+`;
+
+const SelectionModeValue = styled.div`
+  padding: 1rem;
+  font-size: 14px;
+  border-bottom: 3px solid
+    ${({ selected }: { selected: boolean }) => (selected ? '#256EC3' : 'white')};
   cursor: pointer;
 `;
 
@@ -567,6 +605,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             }}
           >
             Let's change the world
+            <SubText>Make changes to the status quo</SubText>
           </StartingPointValue>
           <StartingPointValue
             selected={selectedStartingPoint === StartingPoint.ANYTHING_POSSIBLE}
@@ -580,11 +619,11 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             }}
           >
             Anything is possible
+            <SubText>Narrow down from a variety of options</SubText>
           </StartingPointValue>
         </StartingPointSelector>
-        {/* TODO: new styling for selection mode selector */}
-        <StartingPointSelector>
-          <StartingPointValue
+        <SelectionModeSelector>
+          <SelectionModeValue
             selected={selectionMode === 'scenario'}
             onClick={() => {
               this.setState({
@@ -593,8 +632,8 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             }}
           >
             Selected scenario
-          </StartingPointValue>
-          <StartingPointValue
+          </SelectionModeValue>
+          <SelectionModeValue
             selected={selectionMode === 'comparisons'}
             onClick={() => {
               this.setState({
@@ -602,9 +641,9 @@ class FutureScenarioFilter extends React.Component<Props, State> {
               });
             }}
           >
-            Comparison scenarios
-          </StartingPointValue>
-        </StartingPointSelector>
+            Select comparison scenarios
+          </SelectionModeValue>
+        </SelectionModeSelector>
         {Object.keys(sections).map(sectionTitle => (
           <Section key={sectionTitle}>
             <SectionHeader>{sectionTitle}</SectionHeader>
