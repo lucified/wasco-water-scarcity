@@ -2,8 +2,9 @@ import { extent } from 'd3-array';
 import { format } from 'd3-format';
 import { scaleLinear, ScaleLinear, scaleTime, ScaleTime } from 'd3-scale';
 import { curveMonotoneX, line } from 'd3-shape';
-import { flatMap, isEqual } from 'lodash';
+import { flatMap, isEqual, sortedUniq } from 'lodash';
 import * as React from 'react';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 
@@ -193,49 +194,54 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const { left } = this.svgRef.getBoundingClientRect();
     let x = event.pageX - left - marginLeft!;
     const chartWidth = this.chartWidth();
+    const { xPoints } = this.getScales(this.props);
 
     if (x < 0) {
       x = 0;
     } else if (x > chartWidth) {
       x = chartWidth;
     }
-    const index = scaleLinear()
-      .domain([0, chartWidth])
-      .rangeRound([0, selectedSerie.points.length - 1])(x);
+    const index = Math.min(
+      scaleLinear()
+        .domain([0, chartWidth])
+        .rangeRound([0, xPoints.length - 1])(x),
+      selectedSerie.points.length - 1,
+    );
 
     if (index !== selectedTimeIndex) {
       onSetSelectedTimeIndex(index);
     }
   }
 
-  // Should this be memoized?
-  private getScales() {
-    const { series, selectedSerie, hoveredSeries } = this
-      .props as PropsWithDefaults;
+  private getScales = createSelector(
+    (props: Props) => props.series,
+    (props: Props) => props.hoveredSeries,
+    (props: Props) => props.selectedSerie,
+    (series, hoveredSeries, selectedSerie) => {
+      const chartWidth = this.chartWidth();
+      const chartHeight = this.chartHeight();
 
-    const chartWidth = this.chartWidth();
-    const chartHeight = this.chartHeight();
+      const allData = series.concat(
+        hoveredSeries || [],
+        selectedSerie ? [selectedSerie] : [],
+      );
 
-    const allData = series.concat(
-      hoveredSeries || [],
-      selectedSerie ? [selectedSerie] : [],
-    );
+      const xPoints = sortedUniq(
+        flatMap(allData, d => d.points.map(p => p.time.getTime())).sort(),
+      ).map(t => new Date(t));
+      const x = scaleTime()
+        .domain([xPoints[0], xPoints[xPoints.length - 1]])
+        .range([0, chartWidth]);
+      const y = scaleLinear()
+        .domain(extent(flatMap(allData, d => d.points.map(p => p.value))) as [
+          number,
+          number
+        ])
+        .range([chartHeight, 0]);
 
-    const x = scaleTime()
-      .domain(extent(flatMap(allData, d => d.points.map(p => p.time))) as [
-        Date,
-        Date
-      ])
-      .range([0, chartWidth]);
-    const y = scaleLinear()
-      .domain(extent(flatMap(allData, d => d.points.map(p => p.value))) as [
-        number,
-        number
-      ])
-      .range([chartHeight, 0]);
-
-    return { x, y };
-  }
+      return { x, y, xPoints };
+    },
+  );
 
   // Based on https://bl.ocks.org/mbostock/1550e57e12e73b86ad9e
   private drawChart(
@@ -253,7 +259,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
       height,
     } = this.props as PropsWithDefaults;
 
-    const { x, y } = this.getScales();
+    const { x, y } = this.getScales(this.props);
 
     let redrawEverything = false;
     const currentYDomain = y.domain();
@@ -404,7 +410,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const hiDPIWidth = width * PIXEL_RATIO;
     const hiDIPHeight = height * PIXEL_RATIO;
 
-    const { x, y } = this.getScales();
+    const { x, y } = this.getScales(this.props);
     const {
       marginLeft,
       marginTop,
