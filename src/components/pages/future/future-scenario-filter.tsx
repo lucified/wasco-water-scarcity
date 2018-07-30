@@ -579,7 +579,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
       comparisonVariables,
       className,
     } = this.props;
-    const { selectionMode } = this.state;
+    const { selectionMode, selectedStartingPoint } = this.state;
     const isMultiselect = selectionMode === 'comparisons';
 
     return (
