@@ -1010,8 +1010,6 @@ class Map extends React.Component<Props, State> {
     } = this.props;
     const { zoomInRequested, worldGeoData } = this.state;
     const height = this.getHeight();
-    // Even though zoomInToRegion might be true, we might not have the data loaded,
-    // in which case we're not yet zoomed in
 
     return (
       <Container>
