@@ -141,6 +141,8 @@ interface State {
 }
 
 class TimeSelector extends React.PureComponent<Props, State> {
+  private timerReference: any;
+
   public state = {
     isPlaying: false,
   };
@@ -163,8 +165,6 @@ class TimeSelector extends React.PureComponent<Props, State> {
     }
   }
 
-  private timerReference: any;
-
   private generateBarChartData = memoize(
     (data: AggregateStressShortageDatum[], dataType: HistoricalDataType) =>
       data.map((d, i) => ({
@@ -183,6 +183,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
   };
 
   private handleHover = (item: BarChartDatum) => {
+    this.pause();
     this.props.setSelectedTime(item.key);
   };
 
@@ -195,8 +196,14 @@ class TimeSelector extends React.PureComponent<Props, State> {
   };
 
   private pause() {
-    clearInterval(this.timerReference);
-    this.setState({ isPlaying: false });
+    if (this.timerReference) {
+      clearInterval(this.timerReference);
+      this.timerReference = null;
+    }
+
+    if (this.state.isPlaying) {
+      this.setState({ isPlaying: false });
+    }
   }
 
   private play() {
