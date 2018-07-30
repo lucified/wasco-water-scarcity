@@ -582,7 +582,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
       comparisonVariables,
       className,
     } = this.props;
-    const { selectionMode, selectedStartingPoint } = this.state;
+    const { selectedStartingPoint, selectionMode } = this.state;
     const isMultiselect = selectionMode === 'comparisons';
 
     return (
@@ -622,7 +622,6 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             <SubText>Narrow down from a variety of options</SubText>
           </StartingPointValue>
         </StartingPointSelector>
-        {/* TODO: new styling for selection mode selector */}
         <SelectionModeSelector>
           <SelectionModeValue
             selected={selectionMode === 'scenario'}
