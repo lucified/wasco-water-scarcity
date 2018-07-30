@@ -121,7 +121,7 @@ export class FutureScenarioFilterVariable extends React.Component<
       )
       .map(o => ({
         ...o,
-        disabled: !every(o.requiredVals, (vals, varname) =>
+        disabled: !every(o.requiredValues, (vals, varname) =>
           some(
             vals,
             v => selectedScenario[varname as FutureScenarioVariableName] === v,

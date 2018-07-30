@@ -1,4 +1,4 @@
-import { every, some } from 'lodash';
+import { every, values } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import {
@@ -47,12 +47,12 @@ const StartingPointValue = styled.a`
   cursor: pointer;
 `;
 
-interface RequiredScenValues {
+interface RequiredScenarioValues {
   [varname: string]: string[];
 }
 
 export interface RaggedOption extends Option {
-  requiredVals?: RequiredScenValues;
+  requiredValues?: RequiredScenarioValues;
 }
 
 const sections: {
@@ -267,13 +267,13 @@ const sections: {
           title: 'RCP 4.5',
           description: '+4.5 W/m2 in 2100',
           value: 'rcp4p5',
-          requiredVals: { population: ['SSP1'] },
+          requiredValues: { population: ['SSP1'] },
         },
         {
           title: 'RCP 6.0',
           description: '+6.0 W/m2 in 2100',
           value: 'rcp6p0',
-          requiredVals: { population: ['SSP2', 'SSP3'] },
+          requiredValues: { population: ['SSP2', 'SSP3'] },
         },
       ],
     },
@@ -337,19 +337,19 @@ const sections: {
           title: 'GFDL-ESM2M',
           description: 'NOAA Geophysical Fluid Dynamics Laboratory',
           value: 'gfdl-esm2m',
-          requiredVals: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
+          requiredValues: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
         },
         {
           title: 'HadGEM2-ES',
           description: 'UK MET office Hadley Centre ',
           value: 'hadgem2-es',
-          requiredVals: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
+          requiredValues: { impactModel: ['h08', 'pcrglobwb', 'watergap'] },
         },
         {
           title: 'Mean',
           description: 'Average across water and climate models',
           value: 'mean',
-          requiredVals: { impactModel: ['mean'] },
+          requiredValues: { impactModel: ['mean'] },
         },
       ],
     },
@@ -357,54 +357,63 @@ const sections: {
 };
 
 interface ScenarioDependencies {
-  [key: string]: { [key: string]: RequiredScenValues };
+  [variableName: string]: { [value: string]: RequiredScenarioValues };
 }
 
 // Not very nice, but allows dependencies to be given with other variable information
 const scenarioDependencies: ScenarioDependencies = {};
-for (const section in sections) {
-  if (sections.hasOwnProperty(section)) {
-    for (const variable of sections[section]) {
-      scenarioDependencies[variable.variable] = {};
-      for (const o of variable.options) {
-        if (o.requiredVals) {
-          scenarioDependencies[variable.variable][o.value] = o.requiredVals;
+values(sections).forEach(section => {
+  section.forEach(({ variable, options }) => {
+    options.forEach(({ requiredValues, value }) => {
+      if (requiredValues) {
+        if (!scenarioDependencies[variable]) {
+          scenarioDependencies[variable] = {};
         }
+
+        scenarioDependencies[variable][value] = requiredValues;
       }
-    }
-  }
-}
+    });
+  });
+});
 
 // Scenario must have any combination of the given values for each variable
-function scenValueIsDisabled(
-  requiredVals: RequiredScenValues,
-  scen: FutureScenario,
+function scenarioIsInvalid(
+  requiredValues: RequiredScenarioValues,
+  scenario: FutureScenario,
 ) {
-  return !every(requiredVals, (vals, varname) =>
-    some(vals, v => scen[varname as FutureScenarioVariableName] === v),
+  return !every(
+    requiredValues,
+    (vals, varname) =>
+      vals.indexOf(scenario[varname as FutureScenarioVariableName]) > -1,
   );
 }
 
-function getEnabledScenario(scen: FutureScenario) {
+function getEnabledScenario(scenario: FutureScenario) {
+  const validScenario: FutureScenario = {
+    ...scenario,
+  };
   // Note: Recursive dependencies are not handled
-  for (const scenvar in scenarioDependencies) {
-    if (scenarioDependencies.hasOwnProperty(scenvar)) {
-      const requiredVals =
-        scenarioDependencies[scenvar][
-          scen[scenvar as FutureScenarioVariableName]
-        ];
-      if (scenValueIsDisabled(requiredVals, scen)) {
-        const firstGoodVal = Object.keys(scenarioDependencies[scenvar]).find(
-          (val: string) =>
-            !scenValueIsDisabled(scenarioDependencies[scenvar][val], scen),
+  Object.keys(scenarioDependencies).forEach(scenvar => {
+    const scenarioVariable = scenvar as FutureScenarioVariableName;
+    const dependenciesForVariable = scenarioDependencies[scenarioVariable];
+    const requiredValues = dependenciesForVariable[scenario[scenarioVariable]];
+    if (scenarioIsInvalid(requiredValues, validScenario)) {
+      const firstGoodValue = Object.keys(dependenciesForVariable).find(
+        val => !scenarioIsInvalid(dependenciesForVariable[val], scenario),
+      );
+      if (firstGoodValue) {
+        validScenario[scenarioVariable] = firstGoodValue;
+      } else {
+        console.error(
+          'Unable to find a valid scenario',
+          validScenario,
+          scenarioVariable,
         );
-        if (firstGoodVal) {
-          scen[scenvar as FutureScenarioVariableName] = firstGoodVal;
-        }
       }
     }
-  }
-  return scen;
+  });
+  // NOTE: Might not actually be valid if we were unable to find an alternative
+  return validScenario;
 }
 
 interface PassedProps {
@@ -435,11 +444,11 @@ class FutureScenarioFilter extends React.Component<Props, State> {
 
   private handleChangeComparison = (
     field: FutureScenarioVariableName,
-    values: string[],
+    vals: string[],
   ) => {
     this.props.setComparisonVariables({
       ...this.props.comparisonVariables,
-      [field]: values,
+      [field]: vals,
     });
   };
 
