@@ -2,6 +2,7 @@ import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import styled from 'styled-components';
 import { StressShortageDatum } from '../../types';
+import { formatAxisNumber, formatLabel } from '../../utils';
 import LineChart, { Data } from '../generic/line-chart';
 import responsive from '../generic/responsive';
 import { theme } from '../theme';
@@ -66,6 +67,8 @@ function DataLineChart({
       width={width}
       height={180}
       yAxisLabel={yAxisLabel}
+      yAxisFormatter={formatAxisNumber}
+      labelFormatter={formatLabel}
       selectedDataSeries={id}
       selectedTimeIndex={selectedTimeIndex}
       onChartHover={onTimeIndexChange}

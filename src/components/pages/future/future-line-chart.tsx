@@ -17,7 +17,11 @@ import {
   getThresholdsForDataType,
 } from '../../../selectors';
 import { FutureDataType } from '../../../types';
-import { formatPopulation } from '../../../utils';
+import {
+  formatAxisNumber,
+  formatLabel,
+  formatPopulation,
+} from '../../../utils';
 import { CanvasLineChart } from '../../generic/canvas-line-chart';
 import { CompareIcon } from '../../generic/compare-icon';
 import responsive from '../../generic/responsive';
@@ -255,8 +259,11 @@ function FutureLineChart(props: Props) {
         width={width || 600}
         height={height || 240}
         yAxisLabel={yAxisLabel}
-        yAxisFormatter={isWaterRegionSelected ? undefined : formatPopulation}
+        yAxisFormatter={
+          isWaterRegionSelected ? formatAxisNumber : formatPopulation
+        }
         yAxisColor={isWaterRegionSelected ? yAxisLabelColor : undefined}
+        labelFormatter={formatLabel}
       />
     </>
   );

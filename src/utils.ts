@@ -2,9 +2,13 @@ import { format } from 'd3-format';
 
 import { Datum } from './types';
 
-export function formatPopulation(d: number) {
-  return format('.2s')(d).replace('G', 'B');
+export function formatAxisNumber(d: number) {
+  return d > 90000 ? format('.2s')(d).replace('G', 'B') : format('.2r')(d);
 }
+
+export const formatPopulation = formatAxisNumber;
+
+export const formatLabel = format(',');
 
 export function formatYearRange(d: Datum, longForm = false) {
   const shortFormatter = format('02d');

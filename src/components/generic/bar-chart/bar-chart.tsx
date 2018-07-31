@@ -18,7 +18,7 @@ const Background = styled.rect`
   fill: transparent;
 `;
 
-const Axis = styled(AxisComponent)`
+const StyledAxisComponent = styled(AxisComponent)`
   font: 0.65rem sans-serif;
   overflow-y: hidden;
 
@@ -398,12 +398,12 @@ export default class BarChart extends React.Component<Props, {}> {
         <g transform={`translate(${marginLeft}, ${marginTop})`}>
           <Background width={contentWidth} height={contentHeight} />
           {this.getSelectionBackground()}
-          <Axis
+          <StyledAxisComponent
             axis={this.getXAxis()}
             transform={`translate(0,${contentHeight})`}
             transitionDuration={transitionDuration}
           />
-          <Axis
+          <StyledAxisComponent
             axis={this.getYAxis()}
             transitionDuration={transitionDuration}
           />

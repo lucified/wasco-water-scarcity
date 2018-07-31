@@ -85,6 +85,8 @@ interface PassedProps {
   onLineHover?: (hoveredLineId: string) => void; // Hovered on line
   onClick?: () => void;
   backgroundColorScale?: ScaleThreshold<number, string>;
+  yAxisFormatter?: (num: number, index?: number) => string;
+  labelFormatter?: (num: number, index?: number) => string;
 }
 
 interface DefaultProps {
@@ -117,7 +119,6 @@ class LineChart extends React.Component<Props> {
   }
 
   private svgRef?: SVGElement;
-  private numberFormatter = format('.3g');
   private xScale?: ScaleTime<number, number>;
   private yScale?: ScaleLinear<number, number>;
   private lineGenerator?: Line<Datum>;
@@ -205,6 +206,8 @@ class LineChart extends React.Component<Props> {
       backgroundColorScale,
       data,
       onLineHover,
+      labelFormatter,
+      yAxisFormatter,
     } = this.props as PropsWithDefaults;
 
     const seriesData = Array.isArray(data)
@@ -257,7 +260,9 @@ class LineChart extends React.Component<Props> {
       axisBottom(xScale).ticks(Math.round(chartWidth / 50)),
     );
     g.select<SVGGElement>('g#y-axis').call(
-      axisLeft(yScale).ticks(Math.round(chartHeight / 30)),
+      axisLeft(yScale)
+        .tickFormat(yAxisFormatter || (yScale.tickFormat() as any)) // TODO: fix typings
+        .ticks(Math.round(chartHeight / 30)),
     );
 
     if (selectedDataPoint) {
@@ -322,7 +327,7 @@ class LineChart extends React.Component<Props> {
             toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
           )},${yScale(selectedDataPoint.value!)})`,
         )
-        .text(this.numberFormatter(selectedDataPoint.value!));
+        .text((labelFormatter || format('.3s'))(selectedDataPoint.value!));
     }
   }
 
@@ -384,6 +389,8 @@ class LineChart extends React.Component<Props> {
       selectedTimeIndexLocked,
       data,
       onLineHover,
+      yAxisFormatter,
+      labelFormatter,
     } = this.props as PropsWithDefaults;
 
     const seriesData = Array.isArray(data)
@@ -449,7 +456,11 @@ class LineChart extends React.Component<Props> {
     g
       .select('g#y-axis')
       .transition(t as any)
-        .call(axisLeft(yScale).ticks(Math.round(chartHeight / 30)) as any);
+        .call(
+          axisLeft(yScale)
+            .tickFormat(yAxisFormatter || (yScale.tickFormat() as any)) // TODO: fix typings
+            .ticks(Math.round(chartHeight / 30)) as any,
+        );
 
     const lineGroup = g
       .selectAll<SVGGElement, Data>('g.line-group')
@@ -508,7 +519,7 @@ class LineChart extends React.Component<Props> {
               toMidpoint(selectedDataPoint.start, selectedDataPoint.end),
             )},${yScale(selectedDataPoint.value!)})`,
           )
-          .text(this.numberFormatter(selectedDataPoint.value!));
+          .text((labelFormatter || format('.3s'))(selectedDataPoint.value!));
     }
   }
 

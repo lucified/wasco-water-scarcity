@@ -98,6 +98,7 @@ interface PassedProps {
   yAxisLabel?: string;
   yAxisFormatter?: (d: number) => string;
   yAxisColor?: (d: number) => string;
+  labelFormatter?: (d: number) => string;
 }
 
 interface DefaultProps {
@@ -413,7 +414,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
   }
 
   public render() {
-    const { width, height, className } = this.props;
+    const { width, height, className, labelFormatter } = this.props;
     const hiDPIWidth = width * PIXEL_RATIO;
     const hiDIPHeight = height * PIXEL_RATIO;
 
@@ -501,7 +502,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
                   dx={positionLabelLeft ? -5 : 5}
                   textAnchor={positionLabelLeft ? 'end' : 'start'}
                 >
-                  {format('.3g')(selectedPoint.value)}
+                  {(labelFormatter || format(','))(selectedPoint.value)}
                 </SelectedPointLabel>
               </SelectedPointLabelContainer>
             </g>
