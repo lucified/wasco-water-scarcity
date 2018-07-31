@@ -115,6 +115,12 @@ const CountryLabels = styled.g`
   font-size: 12px;
 `;
 
+const PlaceLabels = styled.g`
+  pointer-events: none;
+  text-anchor: left;
+  font-size: 10px;
+`;
+
 const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
@@ -799,67 +805,88 @@ class Map extends React.Component<Props, State> {
           //     .style('opacity', 0),
           // );
         });
+
+      svg
+        .select('g#places-labels')
+        .selectAll('text')
+        .data(localData.places.features)
+        .enter()
+        .append('text')
+        // Only keep major cities
+        // TODO: including other scaleranks?
+        .filter(d => d.properties.SCALERANK === 0)
+        .attr(
+          'x',
+          d => projection(d.geometry.coordinates as [number, number])![0],
+        )
+        .attr(
+          'y',
+          d => projection(d.geometry.coordinates as [number, number])![1],
+        )
+        .attr('dx', 2)
+        .attr('filter', 'url(#solid)')
+        .text(d => d.properties.name);
     }
 
     this.removeGridLegend();
 
     if (localData.grid != null && localData.gridQuintiles != null) {
-    const quintiles = localData.gridQuintiles[selectedGridVariable];
-    if (quintiles != null) {
-      // TODO: might be a more efficient way of doing this?
-      const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
-        type: 'FeatureCollection',
-        features: localData.grid.map((d: GridData) => ({
-          type: 'Feature' as 'Feature',
-          geometry: {
-            type: 'Polygon' as 'Polygon',
-            coordinates: [
-              [
-                [d.centre[0] - 0.25, d.centre[1] - 0.25],
-                [d.centre[0] - 0.25, d.centre[1] + 0.25],
-                [d.centre[0] + 0.25, d.centre[1] + 0.25],
-                [d.centre[0] + 0.25, d.centre[1] - 0.25],
-                [d.centre[0] - 0.25, d.centre[1] - 0.25],
+      const quintiles = localData.gridQuintiles[selectedGridVariable];
+      if (quintiles != null) {
+        // TODO: might be a more efficient way of doing this?
+        const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
+          type: 'FeatureCollection',
+          features: localData.grid.map((d: GridData) => ({
+            type: 'Feature' as 'Feature',
+            geometry: {
+              type: 'Polygon' as 'Polygon',
+              coordinates: [
+                [
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                ],
               ],
-            ],
-          },
-          properties: {
-            data:
-              d[selectedGridVariable] && d[selectedGridVariable]![startYear],
-          },
-        })),
-      };
+            },
+            properties: {
+              data:
+                d[selectedGridVariable] && d[selectedGridVariable]![startYear],
+            },
+          })),
+        };
 
-      const colorScale = scaleThreshold<number, string>()
-        .domain(quintiles)
-        .range(gridQuintileColors[selectedGridVariable]);
+        const colorScale = scaleThreshold<number, string>()
+          .domain(quintiles)
+          .range(gridQuintileColors[selectedGridVariable]);
 
-      svg
-        .select<SVGGElement>('g#grid-data')
-        .selectAll<
-          SVGPathElement,
-          ExtendedFeature<GeoJSON.Polygon, { data: number }>
-        >('path')
-        .data(griddataPoly.features)
-        .enter()
-        .append<SVGPathElement>('path')
-        .attr('d', path)
-        .attr(
-          'fill',
-          d =>
-            d.properties!.data == null
-              ? 'none'
-              : colorScale(d.properties!.data),
+        svg
+          .select<SVGGElement>('g#grid-data')
+          .selectAll<
+            SVGPathElement,
+            ExtendedFeature<GeoJSON.Polygon, { data: number }>
+          >('path')
+          .data(griddataPoly.features)
+          .enter()
+          .append<SVGPathElement>('path')
+          .attr('d', path)
+          .attr(
+            'fill',
+            d =>
+              d.properties!.data == null
+                ? 'none'
+                : colorScale(d.properties!.data),
+          );
+
+        this.addGridLegend(
+          colorScale,
+          // The log scale breaks if we pass in 0.
+          // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
+          [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
+          labelForGridVariable(selectedGridVariable),
         );
-
-      this.addGridLegend(
-        colorScale,
-        // The log scale breaks if we pass in 0.
-        // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
-        [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
-        labelForGridVariable(selectedGridVariable),
-      );
-    }
+      }
     }
 
     const bounds = path.bounds(selectedWaterRegion);
@@ -1092,11 +1119,11 @@ class Map extends React.Component<Props, State> {
               <g id="water-regions" clipPath="url(#clip)" />
               <SelectedRegion id="selected-region" clipPath="url(#clip)" />
               <CountryBorders id="country-borders" clipPath="url(#clip)" />
-              <g id="places-labels" clipPath="url(#clip)" />
               <g id="clickable-water-regions" clipPath="url(#clip)" />
               <Rivers id="rivers" clipPath="url(#clip)" />
               <g id="places" clipPath="url(#clip)" />
               <CountryLabels id="country-labels" clipPath="url(#clip)" />
+              <PlaceLabels id="places-labels" clipPath="url(#clip)" />
               {isZoomedIn ? (
                 <g
                   transform={`translate(${width - 400},${height - 30})`}
