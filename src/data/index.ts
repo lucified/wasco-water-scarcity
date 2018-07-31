@@ -33,8 +33,8 @@ import {
 
 const allTimeScales: TimeScale[] = ['annual', 'decadal'];
 
-export function isTimeScale(x: string): x is TimeScale {
-  return allTimeScales.indexOf(x as TimeScale) > -1;
+export function isTimeScale(x: any): x is TimeScale {
+  return typeof x === 'string' && allTimeScales.indexOf(x as TimeScale) > -1;
 }
 
 function generateStressShortageData(

@@ -5,7 +5,7 @@ import { Action } from './actions';
 import { State as FuturePageState } from './components/pages/future';
 import { GridVariable, isTimeScale, KcalEnsembleThreshold } from './data';
 import { SelectionsTree, StateTree, ThresholdsTree } from './reducers';
-import { AppType, TimeScale } from './types';
+import { AppType } from './types';
 
 const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   im: 'impactModel',
@@ -87,9 +87,10 @@ export function futurePageStateToHashObject(state: FuturePageState) {
         result[futurePageStateToUrl[member]] = state[member];
         break;
       case 'ensembleThresholds':
-        result[futurePageStateToUrl[member]] = `${
-          state.ensembleThresholds.stress
-        };${state.ensembleThresholds.kcal}`;
+        result[futurePageStateToUrl[member]] = [
+          state.ensembleThresholds.stress,
+          state.ensembleThresholds.kcal,
+        ].join(';');
         break;
     }
     return result;
@@ -179,11 +180,11 @@ export function getGlobalStateFromURLHash(): {
         selections[property] = value as GridVariable;
         break;
       case 'timeScale':
-        if (!isTimeScale(value as string)) {
+        if (!isTimeScale(value)) {
           console.error('Invalid value for time scale', value);
           return;
         }
-        selections[property] = value as TimeScale;
+        selections[property] = value;
         break;
       case 'stress':
       case 'shortage':
