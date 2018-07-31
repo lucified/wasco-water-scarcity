@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { AppType } from '../../../types';
 import Spinner from '../../generic/spinner';
 import { GridVariableSelector } from '../../grid-variable-selector';
 import { ResponsiveMap } from '../../map/responsive';
@@ -76,6 +77,7 @@ export class PastBody extends React.Component<Props> {
       selectedWaterData,
       isLoading,
       isZoomedIn,
+      scenarioId,
     } = this.props;
 
     return (
@@ -105,6 +107,8 @@ export class PastBody extends React.Component<Props> {
                       selectedData={selectedWaterData}
                       selectedDataType={selectedDataType}
                       waterRegions={waterRegions}
+                      appType={AppType.PAST}
+                      selectedScenarioId={scenarioId}
                     />
                   </MapContainer>
                 </div>

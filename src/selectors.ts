@@ -288,6 +288,14 @@ export const getNameForWorldRegionId = createSelector(
   },
 );
 
+export const getHistoricalScenarioId = createSelector(
+  getSelectedClimateModel,
+  getSelectedImpactModel,
+  getSelectedTimeScale,
+  (climateModel, impactModel, timeScale) =>
+    `FPU_${timeScale}_bluewater_${impactModel}_${climateModel}`,
+);
+
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
 export const getDataByRegion = createSelector(

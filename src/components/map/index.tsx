@@ -18,7 +18,8 @@ import {
 import {
   belowThresholdColor,
   getDataTypeColors,
-  getLocalRegionData,
+  getFutureLocalRegionData,
+  getPastLocalRegionData,
   GridData,
   gridQuintileColors,
   GridVariable,
@@ -36,7 +37,7 @@ import {
   getThresholdsForDataType,
   isZoomedInToRegion,
 } from '../../selectors';
-import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
+import { AnyDataType, AppType, TimeAggregate, WorldRegion } from '../../types';
 import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
@@ -215,6 +216,8 @@ interface PassedProps {
   selectedData: TimeAggregate<number | undefined>;
   waterRegions: WaterRegionGeoJSON;
   selectedDataType: AnyDataType;
+  appType: AppType;
+  selectedScenarioId?: string;
 }
 
 interface GeneratedStateProps {
@@ -584,10 +587,14 @@ class Map extends React.Component<Props, State> {
     if (this.state.fetchingDataForRegions.indexOf(regionId) > -1) {
       return;
     }
+    const { appType, selectedScenarioId } = this.props;
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
     }));
-    const data = await getLocalRegionData(regionId);
+    const data =
+      appType === AppType.FUTURE
+        ? await getFutureLocalRegionData(regionId)
+        : await getPastLocalRegionData(regionId, selectedScenarioId!); // Ugly: we assume scenarioId exists
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.filter(
         id => id !== regionId,
@@ -812,8 +819,8 @@ class Map extends React.Component<Props, State> {
         .data(
           // Only keep major cities
           // TODO: including other scaleranks?
-          localData.places.features.filter(d => d.properties.SCALERANK === 0)
-          )
+          localData.places.features.filter(d => d.properties.SCALERANK === 0),
+        )
         .enter()
         .append('text')
         .attr(
