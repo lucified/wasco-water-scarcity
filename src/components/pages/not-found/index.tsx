@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function NotFound() {
   return (
@@ -6,7 +7,9 @@ export default function NotFound() {
       <h1>Page not available</h1>
       <div className="row">
         <div className="col-xs-12">
-          <p>This section has not yet been implemented.</p>
+          <p>
+            Return to the <Link to="/">tool</Link>.
+          </p>
         </div>
       </div>
     </div>

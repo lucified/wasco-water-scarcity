@@ -7,15 +7,16 @@ import {
   WorldRegion,
 } from '../types';
 
+// Most of these are used only in the past page
 export interface SelectionsTree {
   historicalTimeIndex: number;
   lockHistoricalTimeIndex: boolean;
-  impactModel: string; // Only used in Past pages
-  climateModel: string; // Only used in Past pages
-  timeScale: TimeScale; // Only used in Past pages
-  worldRegion: number;
-  region?: number;
-  zoomedInToRegion: boolean;
+  impactModel: string;
+  climateModel: string;
+  timeScale: TimeScale;
+  worldRegion: number; // Also used in future page
+  region?: number; // Also used in future page
+  zoomedInToRegion: boolean; // Also used in future page
   selectedGridVariable: GridVariable;
 }
 

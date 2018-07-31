@@ -302,9 +302,7 @@ class SimpleMap extends React.Component<Props> {
           .tickSize(13)
           .tickValues(this.colorScale!.domain())
           .tickFormat(
-            selectedDataType === 'stress'
-              ? format('.2f')
-              : (format('d') as any), // TODO: fix typing
+            selectedDataType === 'stress' ? format('.2f') : format('d'),
           ),
       )
         .select('.domain')
