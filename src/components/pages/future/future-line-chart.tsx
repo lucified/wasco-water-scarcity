@@ -178,18 +178,32 @@ function FutureLineChart(props: Props) {
       );
 
   const colors = getDataTypeColors(selectedDataType);
-  const yAxisLabelColor = (d: number) => {
-    if (d > thresholds[2]) {
-      return colors[2];
-    } else if (d > thresholds[1]) {
-      return colors[1];
-    } else if (d > thresholds[0]) {
-      return colors[0];
-    }
+  const yAxisLabelColor =
+    selectedDataType === 'kcal'
+      ? (d: number) => {
+          if (d <= thresholds[0]) {
+            return colors[2];
+          } else if (d <= thresholds[1]) {
+            return colors[1];
+          } else if (d <= thresholds[0]) {
+            return colors[0];
+          }
 
-    // belowThresholdColor is a bit too light
-    return theme.colors.gray;
-  };
+          // belowThresholdColor is a bit too light
+          return theme.colors.gray;
+        }
+      : (d: number) => {
+          if (d >= thresholds[2]) {
+            return colors[2];
+          } else if (d >= thresholds[1]) {
+            return colors[1];
+          } else if (d >= thresholds[0]) {
+            return colors[0];
+          }
+
+          // belowThresholdColor is a bit too light
+          return theme.colors.gray;
+        };
 
   return (
     <>
