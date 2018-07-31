@@ -27,14 +27,7 @@ import {
   WorldRegionGeoJSON,
 } from './types';
 
-// tslint:disable:no-implicit-dependencies
-// FIXME: We needed to change the file extension for this in order to override
-// Webpack's built-in JSON imports because it currently seems that we can't
-// override JSON importing with inline loader declarations (e.g.
-// require('file-loader!file.json')). Once the following issue has been
-// resolved, change the filenames back to .json:
-// https://github.com/webpack/webpack/issues/6586
-const fpuTopojsonFilename = require('file-loader!../../data/FPU_topojson.jsonfix');
+/* PAST */
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
@@ -78,6 +71,44 @@ export async function fetchHistoricalStressShortageData(
   }
 }
 
+export function getHistoricalClimateModels() {
+  return uniq(historicalDatasets.map(d => d.climateModel)).sort();
+}
+
+export function getHistoricalImpactModels() {
+  return uniq(historicalDatasets.map(d => d.impactModel)).sort();
+}
+
+export function getDefaultHistoricalClimateModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
+  return defaultDataset ? defaultDataset.climateModel : 'watch';
+}
+
+export function getDefaultHistoricalImpactModel() {
+  const defaultDataset = historicalDatasets.find(d => !!d.default);
+  return defaultDataset ? defaultDataset.impactModel : 'watergap';
+}
+
+export async function getLocalRegionData(regionId: number) {
+  try {
+    const result = await fetch(
+      // tslint:disable-next-line:max-line-length
+      `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`,
+    );
+    const parsedData: LocalData = await result.json();
+    return parsedData;
+  } catch (error) {
+    console.error(
+      'Unable to fetch local region data for region:',
+      regionId,
+      error,
+    );
+    return undefined;
+  }
+}
+
+/* FUTURE */
+
 export async function fetchFutureEnsembleData(
   dataset: FutureDataset,
   featureId: string,
@@ -114,81 +145,6 @@ export function removeDataFromScenario(
   return pick(scenarioWithData, allFutureScenarioVariables);
 }
 
-export async function fetchFutureScenarioData(
-  dataset: FutureDataset,
-  scenario: FutureScenario,
-): Promise<FutureScenarioData | undefined> {
-  const url = getFutureScenarioURL(dataset, scenario);
-  try {
-    const response = await fetch(url, { credentials: 'same-origin' });
-    const parsedResult: FutureScenarioData = await response.json();
-    return parsedResult;
-  } catch (error) {
-    console.error('Unable to fetch future scenario data', error);
-    return undefined;
-  }
-}
-
-export function getTimeScales(): TimeScale[] {
-  return ['annual', 'decadal'];
-}
-
-/* Historical */
-export function getHistoricalClimateModels() {
-  return uniq(historicalDatasets.map(d => d.climateModel)).sort();
-}
-
-export function getHistoricalImpactModels() {
-  return uniq(historicalDatasets.map(d => d.impactModel)).sort();
-}
-
-export function getDefaultHistoricalClimateModel() {
-  const defaultDataset = historicalDatasets.find(d => !!d.default);
-  return defaultDataset ? defaultDataset.climateModel : 'watch';
-}
-
-export function getDefaultHistoricalImpactModel() {
-  const defaultDataset = historicalDatasets.find(d => !!d.default);
-  return defaultDataset ? defaultDataset.impactModel : 'watergap';
-}
-
-export function getDefaultFutureScenario(): FutureScenario {
-  return {
-    yieldGap: 'current',
-    dietChange: 'current',
-    foodLossRed: 'current',
-    trade: 'current volume',
-    reuse: 'meetfood',
-    agriExp: 'current',
-    // Social uncertainties
-    population: 'SSP1',
-    climateExperiment: 'rcp4p5',
-    alloc: 'discharge',
-    // Scientific uncertainties
-    impactModel: 'mean',
-    climateModel: 'mean',
-  };
-}
-
-export async function getLocalRegionData(regionId: number) {
-  try {
-    const result = await fetch(
-      // tslint:disable-next-line:max-line-length
-      `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`,
-    );
-    const parsedData: LocalData = await result.json();
-    return parsedData;
-  } catch (error) {
-    console.error(
-      'Unable to fetch local region data for region:',
-      regionId,
-      error,
-    );
-    return undefined;
-  }
-}
-
-/* Future */
 function getFutureEnsembleURL(
   dataset: FutureDataset,
   featureId: string,
@@ -211,6 +167,39 @@ function getFutureScenarioURL(
       ),
     dataset.urlTemplateScenario,
   );
+}
+
+export async function fetchFutureScenarioData(
+  dataset: FutureDataset,
+  scenario: FutureScenario,
+): Promise<FutureScenarioData | undefined> {
+  const url = getFutureScenarioURL(dataset, scenario);
+  try {
+    const response = await fetch(url, { credentials: 'same-origin' });
+    const parsedResult: FutureScenarioData = await response.json();
+    return parsedResult;
+  } catch (error) {
+    console.error('Unable to fetch future scenario data', error);
+    return undefined;
+  }
+}
+
+export function getDefaultFutureScenario(): FutureScenario {
+  return {
+    yieldGap: 'current',
+    dietChange: 'current',
+    foodLossRed: 'current',
+    trade: 'current volume',
+    reuse: 'meetfood',
+    agriExp: 'current',
+    // Social uncertainties
+    population: 'SSP1',
+    climateExperiment: 'rcp4p5',
+    alloc: 'discharge',
+    // Scientific uncertainties
+    impactModel: 'mean',
+    climateModel: 'mean',
+  };
 }
 
 export function isFutureDataType(value: string): value is FutureDataType {
@@ -258,6 +247,8 @@ export function isFutureScenarioInComparisonVariables(
   };
 }
 
+/* COMMON */
+
 export const defaultDataTypeThresholds: {
   [dataType in AnyDataType]: number[]
 } = {
@@ -298,6 +289,15 @@ export function generateWaterToWorldRegionsMap(
   });
   return map;
 }
+
+// tslint:disable:no-implicit-dependencies
+// FIXME: We needed to change the file extension for this in order to override
+// Webpack's built-in JSON imports because it currently seems that we can't
+// override JSON importing with inline loader declarations (e.g.
+// require('file-loader!file.json')). Once the following issue has been
+// resolved, change the filenames back to .json:
+// https://github.com/webpack/webpack/issues/6586
+const fpuTopojsonFilename = require('file-loader!../../data/FPU_topojson.jsonfix');
 
 export async function fetchWaterRegionsTopojson(): Promise<
   [WaterRegionGeoJSON, WorldRegion[]] | undefined
