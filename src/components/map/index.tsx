@@ -104,6 +104,9 @@ const MapTooltip = styled.div`
   padding: 4px;
   font-size: 12px;
   opacity: 0;
+  & .river-tooltip {
+    color: blue;
+  }
 `;
 
 const CountryLabels = styled.g`
@@ -701,16 +704,24 @@ class Map extends React.Component<Props, State> {
         .attr('d', path)
         .on('mouseover', d => {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
+          const url =
+            d.properties.enwiki != null
+              ? `https://en.wikipedia.org/wiki/${d.properties.enwiki}`
+              : `https://en.wikipedia.org/w/index.php?search=${
+                  d.properties.name
+                }`;
+          const tooltipText =
+            d.properties.name != null
+              ? `<a href= "${url}" target="_blank" class="river-tooltip">${
+                  d.properties.name
+                }</a>`
+              : '(Name unknown)';
           mapTooltipDiv
             .transition()
             .duration(200)
             .style('opacity', 0.9);
           mapTooltipDiv
-            .html(
-              `<a href= "https://en.wikipedia.org/w/index.php?search=${
-                d.properties.name
-              }" target="_blank">${d.properties.name}</a>`,
-            )
+            .html(tooltipText)
             .style(
               'left',
               event.pageX - svgPos.left - window.scrollX + 5 + 'px',
@@ -765,16 +776,18 @@ class Map extends React.Component<Props, State> {
         .on('mouseover', function(d) {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
           const pos = (this as SVGPathElement).getBoundingClientRect() as DOMRect;
+          const url =
+            d.properties.enwiki != null
+              ? `https://en.wikipedia.org/wiki/${d.properties.enwiki}`
+              : `https://en.wikipedia.org/w/index.php?search=${
+                  d.properties.name
+                }`;
           mapTooltipDiv
             .transition()
             .duration(200)
             .style('opacity', 0.9);
           mapTooltipDiv
-            .html(
-              `<a href= "https://en.wikipedia.org/w/index.php?search=${
-                d.properties.name
-              }" target="_blank">${d.properties.name}</a>`,
-            )
+            .html(`<a href= "${url}" target="_blank">${d.properties.name}</a>`)
             .style('left', pos.right - svgPos.left + 5 + 'px')
             .style('top', pos.top - pos.height / 2 - svgPos.top + 'px');
           // FIXME: if user never mouses over the tooltip, it won't disappear
