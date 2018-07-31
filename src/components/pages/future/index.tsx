@@ -343,12 +343,17 @@ class FutureBody extends React.Component<Props, State> {
           selectedDataType,
         );
       }
-      this.setState(state => ({
-        ensembleThresholds: {
-          ...state.ensembleThresholds,
-          [selectedDataType]: ensembleThreshold,
+      this.setState(
+        state => ({
+          ensembleThresholds: {
+            ...state.ensembleThresholds,
+            [selectedDataType]: ensembleThreshold,
+          },
+        }),
+        () => {
+          addFuturePageStateToURL(this.state);
         },
-      }));
+      );
     }
   };
 

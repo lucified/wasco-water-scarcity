@@ -30,7 +30,7 @@ const urlToFuturePageState: { [paramName: string]: keyof FuturePageState } = {
   scen: 'selectedScenario',
   comp: 'comparisonVariables',
   ti: 'selectedTimeIndex',
-  // TODO: threshold for populations
+  enth: 'ensembleThresholds',
 };
 const futurePageStateToUrl = invert(urlToFuturePageState);
 
@@ -85,6 +85,11 @@ export function futurePageStateToHashObject(state: FuturePageState) {
       case 'selectedTimeIndex':
         result[futurePageStateToUrl[member]] = state[member];
         break;
+      case 'ensembleThresholds':
+        result[futurePageStateToUrl[member]] = `${
+          state.ensembleThresholds.stress
+        };${state.ensembleThresholds.kcal}`;
+        break;
     }
     return result;
   }, {});
@@ -107,6 +112,13 @@ export function getFuturePageStateFromURLHash(): Partial<FuturePageState> {
         case 'scen':
         case 'comp':
           ret[urlToFuturePageState[key]] = fromBase64String(value);
+          break;
+        case 'enth':
+          const [stress, kcal] = value.split(';');
+          ret[urlToFuturePageState[key]] = {
+            stress,
+            kcal,
+          };
           break;
       }
     },
