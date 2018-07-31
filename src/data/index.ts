@@ -1,4 +1,13 @@
-import { groupBy, keyBy, mapValues, omit, pick, uniq, values } from 'lodash';
+import {
+  flatMap,
+  groupBy,
+  keyBy,
+  mapValues,
+  omit,
+  pick,
+  uniq,
+  values,
+} from 'lodash';
 import { feature } from 'topojson';
 import {
   AnyDataType,
@@ -450,7 +459,7 @@ export const gridQuintileColors: GridQuintileColors = {
   irri: ['none', '#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'],
 };
 
-export const gridVariables: GridVariable[] = [
+export const allGridVariables: GridVariable[] = [
   'pop',
   'dom',
   'elec',
@@ -458,6 +467,12 @@ export const gridVariables: GridVariable[] = [
   'live',
   'man',
 ];
+
+export function isGridVariable(x: any): x is GridVariable {
+  return (
+    typeof x === 'string' && allGridVariables.indexOf(x as GridVariable) > -1
+  );
+}
 
 export function labelForGridVariable(variable: GridVariable) {
   switch (variable) {
@@ -475,5 +490,17 @@ export function labelForGridVariable(variable: GridVariable) {
       return 'Manufacturing';
   }
 }
+
+export const availableImpactModels = uniq(
+  historicalDatasets
+    .map(d => d.impactModel)
+    .concat(flatMap(futureDatasets, dataset => dataset.impactModel)),
+);
+
+export const availableClimateModels = uniq(
+  historicalDatasets
+    .map(d => d.climateModel)
+    .concat(flatMap(futureDatasets, dataset => dataset.climateModel)),
+);
 
 export * from './types';

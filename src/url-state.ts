@@ -3,7 +3,13 @@ import { parse, ParseOptions, stringify, StringifyOptions } from 'query-string';
 import { Middleware } from 'redux';
 import { Action } from './actions';
 import { State as FuturePageState } from './components/pages/future';
-import { GridVariable, isTimeScale, KcalEnsembleThreshold } from './data';
+import {
+  availableClimateModels,
+  availableImpactModels,
+  isGridVariable,
+  isTimeScale,
+  KcalEnsembleThreshold,
+} from './data';
 import { SelectionsTree, StateTree, ThresholdsTree } from './reducers';
 import { AppType } from './types';
 
@@ -168,16 +174,29 @@ export function getGlobalStateFromURLHash(): {
           console.error('Invalid value', value, 'for key', key);
           return;
         }
+        // TODO: validate number
         selections[property] = num;
         break;
       case 'impactModel':
+        if (
+          typeof value === 'string' &&
+          availableImpactModels.indexOf(value) > -1
+        ) {
+          selections[property] = value;
+        }
+        break;
       case 'climateModel':
-        // TODO: validate
-        selections[property] = value as string;
+        if (
+          typeof value === 'string' &&
+          availableClimateModels.indexOf(value) > -1
+        ) {
+          selections[property] = value;
+        }
         break;
       case 'selectedGridVariable':
-        // TODO: validate
-        selections[property] = value as GridVariable;
+        if (isGridVariable(value)) {
+          selections[property] = value;
+        }
         break;
       case 'timeScale':
         if (!isTimeScale(value)) {

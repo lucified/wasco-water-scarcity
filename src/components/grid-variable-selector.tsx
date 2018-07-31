@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { setSelectedGridVariable } from '../actions';
-import { GridVariable, gridVariables, labelForGridVariable } from '../data';
+import { allGridVariables, GridVariable, labelForGridVariable } from '../data';
 import { StateTree } from '../reducers';
 import { getSelectedGridVariable } from '../selectors';
 import { theme } from './theme';
@@ -43,7 +43,7 @@ interface DispatchProps {
   onSetGridVariable: (variable: GridVariable) => void;
 }
 
-const GRID_DATA_VARIABLES = gridVariables.map(variable => ({
+const GRID_DATA_VARIABLES = allGridVariables.map(variable => ({
   variable,
   label: labelForGridVariable(variable),
 }));
