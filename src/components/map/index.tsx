@@ -740,8 +740,14 @@ class Map extends React.Component<Props, State> {
         .data(localData.countries.features)
         .enter()
         .append('text')
-        .attr('x', d => path.centroid(d)[0])
-        .attr('y', d => path.centroid(d)[1])
+        .attr(
+          'x',
+          d => projection(d.geometry.coordinates as [number, number])![0],
+        )
+        .attr(
+          'y',
+          d => projection(d.geometry.coordinates as [number, number])![1],
+        )
         .attr('filter', 'url(#solid)')
         .text(d => d.properties.countryName);
     }
@@ -784,6 +790,7 @@ class Map extends React.Component<Props, State> {
 
     this.removeGridLegend();
 
+    if (localData.grid != null && localData.gridQuintiles != null) {
     const quintiles = localData.gridQuintiles[selectedGridVariable];
     if (quintiles != null) {
       // TODO: might be a more efficient way of doing this?
@@ -839,6 +846,7 @@ class Map extends React.Component<Props, State> {
         [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
         labelForGridVariable(selectedGridVariable),
       );
+    }
     }
 
     const bounds = path.bounds(selectedWaterRegion);
