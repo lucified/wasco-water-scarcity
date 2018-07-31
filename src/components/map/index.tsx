@@ -56,7 +56,7 @@ const StyledThresholdSelector = styled(ThresholdSelector)`
 
 const ZoomButton = styled.button`
   position: absolute;
-  right: 20px;
+  right: 5px;
   bottom: 5px;
 
   background: transparent;
@@ -319,7 +319,11 @@ class Map extends React.Component<Props, State> {
       }
     } else {
       // Width has stayed the same
-      if (zoomInRequested) {
+      if (waterRegionNoLongerSelected) {
+        this.removeZoomedInElements();
+        this.zoomToGlobalArea();
+        this.redrawFillsAndBorders();
+      } else if (zoomInRequested) {
         if (
           didRequestZoomIn ||
           waterRegionSelectedAndChanged ||
@@ -330,17 +334,17 @@ class Map extends React.Component<Props, State> {
           this.zoomToWaterRegion();
           this.redrawFillsAndBorders();
         }
+
+        if (zoomedInDataLoaded) {
+          this.props.setZoomedInToRegion(true);
+        }
       } else {
         // Not zoomed in
-        if (
-          dataChanged ||
-          waterRegionSelectedAndChanged ||
-          waterRegionNoLongerSelected
-        ) {
+        if (dataChanged || waterRegionSelectedAndChanged) {
           this.redrawFillsAndBorders();
         }
 
-        if (waterRegionNoLongerSelected || selectedWorldRegionChanged) {
+        if (selectedWorldRegionChanged) {
           this.zoomToGlobalArea();
         }
 
@@ -387,7 +391,6 @@ class Map extends React.Component<Props, State> {
     }
 
     const {
-      clearSelectedRegion,
       selectedWaterRegionId,
       waterRegions: { features },
       width,
@@ -407,7 +410,13 @@ class Map extends React.Component<Props, State> {
       .datum<GeoSphere>({ type: 'Sphere' })
       .attr('d', path);
 
-    svg.select('use#globe-fill').on('click', clearSelectedRegion);
+    svg.select('use#globe-fill').on('click', () => {
+      if (this.props.isZoomedIn) {
+        this.props.setZoomedInToRegion(false);
+        this.setState({ zoomInRequested: false });
+      }
+      this.props.clearSelectedRegion();
+    });
 
     // Countries land mass
     svg
@@ -650,9 +659,6 @@ class Map extends React.Component<Props, State> {
       this.fetchRegionData(selectedWaterRegionId);
       return;
     }
-
-    // Having this side effect here is ugly
-    this.props.setZoomedInToRegion(true);
 
     const height = this.getHeight();
     const svg = select<SVGElement, undefined>(this.svgRef);
@@ -1095,7 +1101,7 @@ class Map extends React.Component<Props, State> {
             {!isZoomedIn &&
               selectedDataType !== 'scarcity' && (
                 <StyledThresholdSelector
-                  style={{ left: width * 0.5, top: height - 40 }}
+                  style={{ right: 120, top: height - 48 }}
                   dataType={selectedDataType}
                 />
               )}
