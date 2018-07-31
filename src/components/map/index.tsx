@@ -554,6 +554,7 @@ class Map extends React.Component<Props, State> {
           selectedWaterRegionId !== undefined &&
           selectedWaterRegionId !== d.properties.featureId,
       )
+      .attr('vector-effect', 'non-scaling-stroke')
       .transition(t as any)
       .attr('fill', d => this.getColorForWaterRegion(d.properties.featureId));
     select<SVGPathElement, WaterRegionGeoJSONFeature>(
