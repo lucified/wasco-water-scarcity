@@ -1,4 +1,4 @@
-import { invert, pick } from 'lodash';
+import { invert, omit, pick } from 'lodash';
 import { parse, ParseOptions, stringify, StringifyOptions } from 'query-string';
 import { Middleware } from 'redux';
 import { Action } from './actions';
@@ -18,6 +18,7 @@ const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   z: 'zoomedInToRegion',
 };
 const selectionsStateToUrl = invert(urlToSelectionsState);
+const clearableGlobalStateValues: Array<keyof SelectionsTree> = ['region'];
 
 const urlToThresholdsState: { [paramName: string]: keyof ThresholdsTree } = {
   strt: 'stress',
@@ -212,7 +213,12 @@ export function createMiddleware(appType: AppType): Middleware {
       // We need to combine existing data in the URL since it also contains
       // future page state in it.
       hashData = {
-        ...parse(window.location.hash, QUERY_STRING_OPTIONS),
+        // We need to manually remove the clearable values since otherwise any
+        // value in the URL will always remain there.
+        ...omit(
+          parse(window.location.hash, QUERY_STRING_OPTIONS),
+          ...clearableGlobalStateValues.map(key => selectionsStateToUrl[key]),
+        ),
         ...globalStateToHashObject(getState(), appType),
       };
     } else {
