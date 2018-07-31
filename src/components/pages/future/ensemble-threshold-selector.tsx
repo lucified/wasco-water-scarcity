@@ -13,12 +13,24 @@ import { FutureDataType } from '../../../types';
 import { theme } from '../../theme';
 
 const Container = styled.div`
-  width: 280px;
+  width: 220px;
   max-width: 100%;
   float: right;
 `;
 
+const Title = styled.div`
+  width: 100%;
+  text-align: right;
+  font-size: 12px;
+  color: ${theme.colors.grayDarker};
+  margin-bottom: 6px;
+  position: relative;
+  right: -4px;
+`;
+
 const StyledSlider = styled(Slider)`
+  margin-bottom: ${theme.margin(2)};
+
   & .rc-slider-handle {
     border-color: ${theme.colors.textSelection};
   }
@@ -32,6 +44,11 @@ const StyledSlider = styled(Slider)`
   & .rc-slider-handle:focus {
     border-color: ${theme.colors.blueDarker};
     box-shadow: 0 0 0 5px ${theme.colors.textSelection};
+  }
+
+  & .rc-slider-mark {
+    font-size: 11px;
+    top: 16px;
   }
 
   & .rc-slider-dot-active {
@@ -72,6 +89,7 @@ export function EnsembleThresholdSelector({
     };
     return result;
   }, {});
+  const title = `Threshold for ${isStressEnsemble ? 'stress' : 'kcal per day'}`;
 
   const slider = isStressEnsemble ? (
     <StyledSlider
@@ -101,5 +119,10 @@ export function EnsembleThresholdSelector({
     />
   );
 
-  return <Container>{slider}</Container>;
+  return (
+    <Container>
+      <Title>{title}</Title>
+      {slider}
+    </Container>
+  );
 }
