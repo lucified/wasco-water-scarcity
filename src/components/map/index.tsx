@@ -809,12 +809,13 @@ class Map extends React.Component<Props, State> {
       svg
         .select('g#places-labels')
         .selectAll('text')
-        .data(localData.places.features)
+        .data(
+          // Only keep major cities
+          // TODO: including other scaleranks?
+          localData.places.features.filter(d => d.properties.SCALERANK === 0)
+          )
         .enter()
         .append('text')
-        // Only keep major cities
-        // TODO: including other scaleranks?
-        .filter(d => d.properties.SCALERANK === 0)
         .attr(
           'x',
           d => projection(d.geometry.coordinates as [number, number])![0],
