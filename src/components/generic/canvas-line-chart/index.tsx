@@ -22,6 +22,7 @@ const SVG = styled.svg`
   left: 0;
   cursor: ew-resize;
   touch-action: none; /* needed for Pointer Events */
+  overflow: visible;
 `;
 
 const SelectedLine = styled.line`
