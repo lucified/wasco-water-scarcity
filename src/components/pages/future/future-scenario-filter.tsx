@@ -16,6 +16,12 @@ import { Option } from '../../generic/multi-selector';
 import { BodyText, SectionHeader, theme } from '../../theme';
 import { FutureScenarioFilterVariable } from './future-scenario-filter-variable';
 
+const Sticky = require('react-stickynode');
+
+const StyledSticky = styled(Sticky)`
+  width: 100%;
+`;
+
 const Main = styled.div`
   display: flex;
   flex-direction: column;
@@ -69,6 +75,7 @@ const SubText = styled.div`
 `;
 
 const SelectionModeSelector = styled.div`
+  background-color: white;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -80,7 +87,9 @@ const SelectionModeSelector = styled.div`
 
 const SelectionModeValue = styled.div`
   padding: 1rem;
+  flex-grow: 1;
   font-size: 14px;
+  text-align: center;
   border-bottom: 3px solid
     ${({ selected }: { selected: boolean }) => (selected ? '#256EC3' : 'white')};
   cursor: pointer;
@@ -622,28 +631,30 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             <SubText>Narrow down from a variety of options</SubText>
           </StartingPointValue>
         </StartingPointSelector>
-        <SelectionModeSelector>
-          <SelectionModeValue
-            selected={selectionMode === 'scenario'}
-            onClick={() => {
-              this.setState({
-                selectionMode: 'scenario',
-              });
-            }}
-          >
-            Selected scenario
-          </SelectionModeValue>
-          <SelectionModeValue
-            selected={selectionMode === 'comparisons'}
-            onClick={() => {
-              this.setState({
-                selectionMode: 'comparisons',
-              });
-            }}
-          >
-            Select comparison scenarios
-          </SelectionModeValue>
-        </SelectionModeSelector>
+        <StyledSticky innerZ={9}>
+          <SelectionModeSelector>
+            <SelectionModeValue
+              selected={selectionMode === 'scenario'}
+              onClick={() => {
+                this.setState({
+                  selectionMode: 'scenario',
+                });
+              }}
+            >
+              Selected scenario
+            </SelectionModeValue>
+            <SelectionModeValue
+              selected={selectionMode === 'comparisons'}
+              onClick={() => {
+                this.setState({
+                  selectionMode: 'comparisons',
+                });
+              }}
+            >
+              Select comparison scenarios
+            </SelectionModeValue>
+          </SelectionModeSelector>
+        </StyledSticky>
         {Object.keys(sections).map(sectionTitle => (
           <Section key={sectionTitle}>
             <SectionHeader>{sectionTitle}</SectionHeader>
