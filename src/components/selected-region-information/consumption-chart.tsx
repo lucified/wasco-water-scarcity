@@ -1,12 +1,10 @@
 import { max } from 'd3-array';
-import { format } from 'd3-format';
 import { schemeBlues } from 'd3-scale-chromatic';
-import { range } from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import memoize from '../../memoize';
 import { Datum } from '../../types';
-import { formatYearRange } from '../../utils';
+import { formatAxisNumber, formatYearRange } from '../../utils';
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 import Legend, { LegendItem } from '../generic/legend';
 import { theme } from '../theme';
@@ -39,8 +37,6 @@ type Props = PassedProps;
 interface State {
   hoveredType?: keyof Datum;
 }
-
-const yTickFormatter = format('.2s');
 
 const colorScale = schemeBlues[9];
 
@@ -125,16 +121,6 @@ class ConsumptionChart extends React.Component<Props, State> {
     return formatYearRange(d);
   };
 
-  private getXTickValues() {
-    const { data } = this.props;
-
-    if (data.length <= 10) {
-      return undefined;
-    }
-
-    return range(0, data.length, Math.floor(data.length / 10)).map(String);
-  }
-
   public render() {
     const { data, maxY, selectedTimeIndex, timeIndexLocked } = this.props;
     const { hoveredType } = this.state;
@@ -150,9 +136,8 @@ class ConsumptionChart extends React.Component<Props, State> {
           marginRight={0}
           marginTop={15}
           marginLeft={40}
-          yTickFormat={yTickFormatter}
+          yTickFormat={formatAxisNumber}
           xTickFormat={this.xTickFormatter}
-          xTickValues={this.getXTickValues()}
           selectedIndex={selectedTimeIndex}
           onClick={this.handleClick}
           indexLocked={timeIndexLocked}

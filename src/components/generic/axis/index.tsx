@@ -11,16 +11,7 @@ interface Props {
 }
 
 export default class AxisComponent extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-    this.storeAxisRef = this.storeAxisRef.bind(this);
-  }
-
-  private axisRef!: SVGGElement;
-
-  private storeAxisRef(ref: SVGGElement) {
-    this.axisRef = ref;
-  }
+  private axisRef!: SVGGElement | null;
 
   public componentDidMount() {
     this.drawAxes(true);
@@ -35,12 +26,12 @@ export default class AxisComponent extends React.Component<Props> {
   private drawAxes(initialDraw: boolean) {
     const { axis, transitionDuration } = this.props;
     if (initialDraw) {
-      select(this.axisRef).call(axis);
+      select(this.axisRef!).call(axis);
     } else {
       const t = transition('axis-transition').duration(
         transitionDuration || 250,
       );
-      select(this.axisRef)
+      select(this.axisRef!)
         .transition(t as any)
         .call(axis);
     }
@@ -49,7 +40,11 @@ export default class AxisComponent extends React.Component<Props> {
   public render() {
     const { className, transform } = this.props;
     return (
-      <g className={className} transform={transform} ref={this.storeAxisRef} />
+      <g
+        className={className}
+        transform={transform}
+        ref={ref => (this.axisRef = ref)}
+      />
     );
   }
 }

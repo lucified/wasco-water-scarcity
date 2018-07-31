@@ -1,4 +1,3 @@
-import { range } from 'lodash';
 import * as React from 'react';
 import memoize from '../../memoize';
 import { Datum } from '../../types';
@@ -40,16 +39,6 @@ export default class PopulationChart extends React.PureComponent<Props> {
     onTimeIndexChange(item.key);
   };
 
-  private getXTickValues() {
-    const { data } = this.props;
-
-    if (data.length <= 10) {
-      return undefined;
-    }
-
-    return range(0, data.length, Math.floor(data.length / 10)).map(String);
-  }
-
   public render() {
     const {
       data,
@@ -80,7 +69,6 @@ export default class PopulationChart extends React.PureComponent<Props> {
         marginLeft={40}
         yTickFormat={formatPopulation}
         xTickFormat={xTickFormatter}
-        xTickValues={this.getXTickValues()}
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}
         onClick={this.handleClick}

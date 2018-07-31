@@ -176,6 +176,8 @@ export default class BarChart extends React.Component<Props, {}> {
 
   private getXAxis() {
     const { xTickValues } = this.props as PropsWithDefaults;
+    const data = this.getEnrichedData();
+    const maxWidthOfBar = this.getContentWidth() / data.length;
     if (!this._xAxis) {
       const xscale = this.getXScale();
       this._xAxis = axisBottom<string>(xscale)
@@ -183,6 +185,16 @@ export default class BarChart extends React.Component<Props, {}> {
         .tickFormat(this.props.xTickFormat!);
       if (xTickValues) {
         this._xAxis.tickValues(xTickValues);
+      } else if (maxWidthOfBar < 17) {
+        // select only every fourth value
+        this._xAxis.tickValues(
+          data.filter((_d, i) => i % 4 === 0).map(d => String(d.key)),
+        );
+      } else if (maxWidthOfBar < 35) {
+        // select only every other value
+        this._xAxis.tickValues(
+          data.filter((_d, i) => i % 2 === 0).map(d => String(d.key)),
+        );
       }
     }
     return this._xAxis!;

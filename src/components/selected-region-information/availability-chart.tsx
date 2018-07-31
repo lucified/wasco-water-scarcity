@@ -1,11 +1,7 @@
-import { format } from 'd3-format';
-import { range } from 'lodash';
 import * as React from 'react';
-
 import memoize from '../../memoize';
 import { Datum } from '../../types';
-import { formatYearRange } from '../../utils';
-
+import { formatAxisNumber, formatYearRange } from '../../utils';
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
 interface PassedProps {
@@ -18,8 +14,6 @@ interface PassedProps {
 }
 
 type Props = PassedProps;
-
-const yTickFormatter = format('.2s');
 
 export default class AvailabilityChart extends React.PureComponent<Props> {
   private generateBarChartData = memoize((data: Datum[]) =>
@@ -43,16 +37,6 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
     }
     onTimeIndexChange(item.key);
   };
-
-  private getXTickValues() {
-    const { data } = this.props;
-
-    if (data.length <= 10) {
-      return undefined;
-    }
-
-    return range(0, data.length, Math.floor(data.length / 10)).map(String);
-  }
 
   public render() {
     const {
@@ -82,9 +66,8 @@ export default class AvailabilityChart extends React.PureComponent<Props> {
         marginRight={0}
         marginTop={15}
         marginLeft={40}
-        yTickFormat={yTickFormatter}
+        yTickFormat={formatAxisNumber}
         xTickFormat={xTickFormatter}
-        xTickValues={this.getXTickValues()}
         selectedIndex={selectedTimeIndex}
         indexLocked={timeIndexLocked}
         onMouseEnter={handleHover}
