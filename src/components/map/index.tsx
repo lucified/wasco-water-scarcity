@@ -274,7 +274,11 @@ class Map extends React.Component<Props, State> {
     if (worldGeoData && !prevState.worldGeoData) {
       // Map data was loaded
       this.drawMap();
-      this.zoomToGlobalArea(false);
+      if (zoomInRequested) {
+        this.zoomToWaterRegion();
+      } else {
+        this.zoomToGlobalArea(false);
+      }
       return;
     }
 
