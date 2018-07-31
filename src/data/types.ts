@@ -81,6 +81,9 @@ export const allFutureScenarioVariables: FutureScenarioVariableName[] = [
   'alloc',
 ];
 
+export type StressEnsembleThreshold = '0.2' | '0.4' | '0.6' | '0.8' | '1';
+export type KcalEnsembleThreshold = 1000 | 1845 | 2355 | 2894 | 4000;
+
 export interface FutureScenarioWithData extends FutureScenario {
   data: Array<{
     y0: number; // start year

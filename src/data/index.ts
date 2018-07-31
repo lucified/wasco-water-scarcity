@@ -20,14 +20,22 @@ import {
   FutureScenarioWithData,
   GridQuintileColors,
   GridVariable,
+  KcalEnsembleThreshold,
   LocalData,
   RawRegionStressShortageDatum,
+  StressEnsembleThreshold,
   toStressShortageDatum,
   WaterRegionGeoJSON,
   WorldRegionGeoJSON,
 } from './types';
 
 /* PAST */
+
+const allTimeScales: TimeScale[] = ['annual', 'decadal'];
+
+export function isTimeScale(x: any): x is TimeScale {
+  return typeof x === 'string' && allTimeScales.indexOf(x as TimeScale) > -1;
+}
 
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
@@ -125,8 +133,27 @@ export async function fetchFutureEnsembleData(
   }
 }
 
-export function toEnsembleWorldId(worldRegionId: number) {
-  return `world-${worldRegionId}_0.2`;
+export const allStressEnsembleThresholds: StressEnsembleThreshold[] = [
+  '0.2',
+  '0.4',
+  '0.6',
+  '0.8',
+  '1',
+];
+
+export const allKcalEnsembleThresholds: KcalEnsembleThreshold[] = [
+  1000,
+  1845,
+  2355,
+  2894,
+  4000,
+];
+
+export function toEnsembleWorldId(
+  worldRegionId: number,
+  threshold: StressEnsembleThreshold | KcalEnsembleThreshold,
+) {
+  return `world-${worldRegionId}_${threshold}`;
 }
 
 export function toEnsembleRegionId(regionId: number) {

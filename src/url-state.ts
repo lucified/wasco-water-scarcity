@@ -1,9 +1,9 @@
-import { invert, pick } from 'lodash';
+import { invert, omit, pick } from 'lodash';
 import { parse, ParseOptions, stringify, StringifyOptions } from 'query-string';
 import { Middleware } from 'redux';
 import { Action } from './actions';
 import { State as FuturePageState } from './components/pages/future';
-import { GridVariable } from './data';
+import { GridVariable, isTimeScale, KcalEnsembleThreshold } from './data';
 import { SelectionsTree, StateTree, ThresholdsTree } from './reducers';
 import { AppType } from './types';
 
@@ -18,6 +18,7 @@ const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   z: 'zoomedInToRegion',
 };
 const selectionsStateToUrl = invert(urlToSelectionsState);
+const clearableGlobalStateValues: Array<keyof SelectionsTree> = ['region'];
 
 const urlToThresholdsState: { [paramName: string]: keyof ThresholdsTree } = {
   strt: 'stress',
@@ -30,7 +31,7 @@ const urlToFuturePageState: { [paramName: string]: keyof FuturePageState } = {
   scen: 'selectedScenario',
   comp: 'comparisonVariables',
   ti: 'selectedTimeIndex',
-  // TODO: threshold for populations
+  enth: 'ensembleThresholds',
 };
 const futurePageStateToUrl = invert(urlToFuturePageState);
 
@@ -85,6 +86,12 @@ export function futurePageStateToHashObject(state: FuturePageState) {
       case 'selectedTimeIndex':
         result[futurePageStateToUrl[member]] = state[member];
         break;
+      case 'ensembleThresholds':
+        result[futurePageStateToUrl[member]] = [
+          state.ensembleThresholds.stress,
+          state.ensembleThresholds.kcal,
+        ].join(';');
+        break;
     }
     return result;
   }, {});
@@ -97,16 +104,24 @@ export function getFuturePageStateFromURLHash(): Partial<FuturePageState> {
   Object.keys(pick(hashContents, Object.keys(urlToFuturePageState))).forEach(
     key => {
       const value = hashContents[key];
-      switch (key) {
-        case 'ti':
+      const property: keyof FuturePageState = urlToFuturePageState[key];
+      switch (property) {
+        case 'selectedTimeIndex':
           const parsedNumber = parseInt(value, 10);
           if (!isNaN(parsedNumber)) {
-            ret[urlToFuturePageState[key]] = parsedNumber;
+            ret[property] = parsedNumber;
           }
           break;
-        case 'scen':
-        case 'comp':
-          ret[urlToFuturePageState[key]] = fromBase64String(value);
+        case 'selectedScenario':
+        case 'comparisonVariables':
+          ret[property] = fromBase64String(value);
+          break;
+        case 'ensembleThresholds':
+          const [stress, kcal] = value.split(';');
+          ret[property] = {
+            stress,
+            kcal: parseInt(kcal, 10) as KcalEnsembleThreshold,
+          };
           break;
       }
     },
@@ -136,49 +151,55 @@ export function getGlobalStateFromURLHash(): {
 
   Object.keys(hashContents).forEach(key => {
     const value: string | string[] = hashContents[key];
+    const property: keyof SelectionsTree | keyof ThresholdsTree | undefined =
+      Object.keys(urlToSelectionsState).indexOf(key) > -1
+        ? urlToSelectionsState[key]
+        : Object.keys(urlToThresholdsState).indexOf(key) > -1
+          ? urlToThresholdsState[key]
+          : undefined;
     let num: number;
 
-    switch (key) {
-      case 't':
-      case 'r':
-      case 'wr':
+    switch (property) {
+      case 'historicalTimeIndex':
+      case 'region':
+      case 'worldRegion':
         num = parseInt(value as string, 10);
         if (isNaN(num)) {
           console.error('Invalid value', value, 'for key', key);
           return;
         }
-        selections[urlToSelectionsState[key]] = num;
+        selections[property] = num;
         break;
-      case 'im':
-      case 'cm':
+      case 'impactModel':
+      case 'climateModel':
         // TODO: validate
-        selections[urlToSelectionsState[key]] = value as string;
+        selections[property] = value as string;
         break;
-      case 'gv':
+      case 'selectedGridVariable':
         // TODO: validate
-        selections[urlToSelectionsState[key]] = value as GridVariable;
+        selections[property] = value as GridVariable;
         break;
-      case 'ts':
-        if (['annual', 'decadal'].indexOf(value as string) === -1) {
+      case 'timeScale':
+        if (!isTimeScale(value)) {
           console.error('Invalid value for time scale', value);
           return;
         }
-        selections[urlToSelectionsState[key]] = value as string;
+        selections[property] = value;
         break;
-      case 'strt':
-      case 'shot':
-      case 'kcat':
+      case 'stress':
+      case 'shortage':
+      case 'kcal':
         if (Array.isArray(value)) {
           const numberArray = value.map(Number);
           if (numberArray.some(isNaN)) {
             console.error('Invalid value', value, 'for key', key);
             return;
           }
-          thresholds[urlToThresholdsState[key]] = numberArray;
+          thresholds[property] = numberArray;
         }
         break;
-      case 'z':
-        selections[urlToSelectionsState[key]] = value === 'true';
+      case 'zoomedInToRegion':
+        selections[property] = value === 'true';
         break;
       default:
         return;
@@ -200,7 +221,12 @@ export function createMiddleware(appType: AppType): Middleware {
       // We need to combine existing data in the URL since it also contains
       // future page state in it.
       hashData = {
-        ...parse(window.location.hash, QUERY_STRING_OPTIONS),
+        // We need to manually remove the clearable values since otherwise any
+        // value in the URL will always remain there.
+        ...omit(
+          parse(window.location.hash, QUERY_STRING_OPTIONS),
+          ...clearableGlobalStateValues.map(key => selectionsStateToUrl[key]),
+        ),
         ...globalStateToHashObject(getState(), appType),
       };
     } else {
