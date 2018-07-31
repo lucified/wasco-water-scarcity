@@ -72,31 +72,34 @@ export function EnsembleThresholdSelector({
     };
     return result;
   }, {});
-  const min = isStressEnsemble ? 0 : allKcalEnsembleThresholds[0];
-  const max = isStressEnsemble
-    ? allStressEnsembleThresholds.length - 1
-    : allKcalEnsembleThresholds[allKcalEnsembleThresholds.length - 1];
-  const value = isStressEnsemble
-    ? thresholds.indexOf(threshold)
-    : (threshold as number);
-  const onChangeHandler = isStressEnsemble
-    ? (index: number) => {
-        onChange(thresholds[index]);
-      }
-    : onChange;
 
-  return (
-    <Container>
-      <StyledSlider
-        className={className}
-        value={value}
-        onChange={onChangeHandler}
-        step={null}
-        marks={marks}
-        included={true}
-        min={min}
-        max={max}
-      />
-    </Container>
+  const slider = isStressEnsemble ? (
+    <StyledSlider
+      className={className}
+      value={allStressEnsembleThresholds.indexOf(
+        threshold as StressEnsembleThreshold,
+      )}
+      onChange={index => {
+        onChange(allStressEnsembleThresholds[index]);
+      }}
+      step={null}
+      marks={marks}
+      included={true}
+      min={0}
+      max={allStressEnsembleThresholds.length - 1}
+    />
+  ) : (
+    <StyledSlider
+      className={className}
+      value={threshold as KcalEnsembleThreshold}
+      onChange={onChange}
+      step={null}
+      marks={marks}
+      included={true}
+      min={allKcalEnsembleThresholds[0]}
+      max={allKcalEnsembleThresholds[allKcalEnsembleThresholds.length - 1]}
+    />
   );
+
+  return <Container>{slider}</Container>;
 }

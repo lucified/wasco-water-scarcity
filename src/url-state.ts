@@ -3,9 +3,9 @@ import { parse, ParseOptions, stringify, StringifyOptions } from 'query-string';
 import { Middleware } from 'redux';
 import { Action } from './actions';
 import { State as FuturePageState } from './components/pages/future';
-import { GridVariable } from './data';
+import { GridVariable, isTimeScale, KcalEnsembleThreshold } from './data';
 import { SelectionsTree, StateTree, ThresholdsTree } from './reducers';
-import { AppType } from './types';
+import { AppType, TimeScale } from './types';
 
 const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   im: 'impactModel',
@@ -103,22 +103,23 @@ export function getFuturePageStateFromURLHash(): Partial<FuturePageState> {
   Object.keys(pick(hashContents, Object.keys(urlToFuturePageState))).forEach(
     key => {
       const value = hashContents[key];
-      switch (key) {
-        case 'ti':
+      const property: keyof FuturePageState = urlToFuturePageState[key];
+      switch (property) {
+        case 'selectedTimeIndex':
           const parsedNumber = parseInt(value, 10);
           if (!isNaN(parsedNumber)) {
-            ret[urlToFuturePageState[key]] = parsedNumber;
+            ret[property] = parsedNumber;
           }
           break;
-        case 'scen':
-        case 'comp':
-          ret[urlToFuturePageState[key]] = fromBase64String(value);
+        case 'selectedScenario':
+        case 'comparisonVariables':
+          ret[property] = fromBase64String(value);
           break;
-        case 'enth':
+        case 'ensembleThresholds':
           const [stress, kcal] = value.split(';');
-          ret[urlToFuturePageState[key]] = {
+          ret[property] = {
             stress,
-            kcal,
+            kcal: parseInt(kcal, 10) as KcalEnsembleThreshold,
           };
           break;
       }
@@ -149,49 +150,55 @@ export function getGlobalStateFromURLHash(): {
 
   Object.keys(hashContents).forEach(key => {
     const value: string | string[] = hashContents[key];
+    const property: keyof SelectionsTree | keyof ThresholdsTree | undefined =
+      Object.keys(urlToSelectionsState).indexOf(key) > -1
+        ? urlToSelectionsState[key]
+        : Object.keys(urlToThresholdsState).indexOf(key) > -1
+          ? urlToThresholdsState[key]
+          : undefined;
     let num: number;
 
-    switch (key) {
-      case 't':
-      case 'r':
-      case 'wr':
+    switch (property) {
+      case 'historicalTimeIndex':
+      case 'region':
+      case 'worldRegion':
         num = parseInt(value as string, 10);
         if (isNaN(num)) {
           console.error('Invalid value', value, 'for key', key);
           return;
         }
-        selections[urlToSelectionsState[key]] = num;
+        selections[property] = num;
         break;
-      case 'im':
-      case 'cm':
+      case 'impactModel':
+      case 'climateModel':
         // TODO: validate
-        selections[urlToSelectionsState[key]] = value as string;
+        selections[property] = value as string;
         break;
-      case 'gv':
+      case 'selectedGridVariable':
         // TODO: validate
-        selections[urlToSelectionsState[key]] = value as GridVariable;
+        selections[property] = value as GridVariable;
         break;
-      case 'ts':
-        if (['annual', 'decadal'].indexOf(value as string) === -1) {
+      case 'timeScale':
+        if (!isTimeScale(value as string)) {
           console.error('Invalid value for time scale', value);
           return;
         }
-        selections[urlToSelectionsState[key]] = value as string;
+        selections[property] = value as TimeScale;
         break;
-      case 'strt':
-      case 'shot':
-      case 'kcat':
+      case 'stress':
+      case 'shortage':
+      case 'kcal':
         if (Array.isArray(value)) {
           const numberArray = value.map(Number);
           if (numberArray.some(isNaN)) {
             console.error('Invalid value', value, 'for key', key);
             return;
           }
-          thresholds[urlToThresholdsState[key]] = numberArray;
+          thresholds[property] = numberArray;
         }
         break;
-      case 'z':
-        selections[urlToSelectionsState[key]] = value === 'true';
+      case 'zoomedInToRegion':
+        selections[property] = value === 'true';
         break;
       default:
         return;

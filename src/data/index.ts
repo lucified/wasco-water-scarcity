@@ -31,6 +31,12 @@ import {
 
 /* PAST */
 
+const allTimeScales: TimeScale[] = ['annual', 'decadal'];
+
+export function isTimeScale(x: string): x is TimeScale {
+  return allTimeScales.indexOf(x as TimeScale) > -1;
+}
+
 function generateStressShortageData(
   rawData: RawRegionStressShortageDatum[],
 ): Array<TimeAggregate<StressShortageDatum>> {
