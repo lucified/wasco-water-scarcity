@@ -14,7 +14,9 @@ import {
   getDefaultComparison,
   getDefaultFutureDataset,
   getDefaultFutureScenario,
+  KcalEnsembleThreshold,
   StartingPoint,
+  StressEnsembleThreshold,
   toEnsembleRegionId,
   toEnsembleWorldId,
   toScenarioId,
@@ -37,6 +39,7 @@ import { ResponsiveMap } from '../../map/responsive';
 import { SmallSectionHeader, theme, Title, TitleContainer } from '../../theme';
 import WorldRegionSelector from '../../world-region-selector';
 import DataTypeLinks from './data-type-links';
+import { EnsembleThresholdSelector } from './ensemble-threshold-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
 import MapPlaceholder from './map-placeholder';
@@ -103,6 +106,10 @@ export interface State {
   selectedScenario: FutureScenario;
   selectedDataset: FutureDataset;
   hoveredScenarios?: FutureEnsembleData;
+  ensembleThresholds: {
+    stress: StressEnsembleThreshold;
+    kcal: KcalEnsembleThreshold;
+  };
   ensemblesRequested: string[];
   scenariosRequested: string[];
   ensembleData: {
@@ -124,6 +131,10 @@ class FutureBody extends React.Component<Props, State> {
     selectedScenario: getDefaultFutureScenario(),
     selectedDataset: getDefaultFutureDataset(),
     selectedTimeIndex: 0,
+    ensembleThresholds: {
+      stress: '0.2',
+      kcal: 2355,
+    },
     comparisonVariables: getDefaultComparison(StartingPoint.CHANGE_THE_WORLD),
     ensembleData: { stress: {}, kcal: {} },
     scenarioData: {},
@@ -236,7 +247,11 @@ class FutureBody extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const { selectedDataset, selectedScenario } = this.state;
+    const {
+      selectedDataset,
+      selectedScenario,
+      ensembleThresholds,
+    } = this.state;
     const {
       selectedWorldRegionId,
       selectedWaterRegionId,
@@ -245,7 +260,10 @@ class FutureBody extends React.Component<Props, State> {
 
     const ensembleAreaId = selectedWaterRegionId
       ? toEnsembleRegionId(selectedWaterRegionId)
-      : toEnsembleWorldId(selectedWorldRegionId);
+      : toEnsembleWorldId(
+          selectedWorldRegionId,
+          ensembleThresholds[selectedDataType],
+        );
 
     this.fetchFutureEnsembleData(
       selectedDataset,
@@ -265,10 +283,13 @@ class FutureBody extends React.Component<Props, State> {
       selectedWorldRegionId !== this.props.selectedWorldRegionId ||
       selectedDataType !== this.props.selectedDataType
     ) {
-      const { selectedDataset, ensembleData } = this.state;
+      const { selectedDataset, ensembleData, ensembleThresholds } = this.state;
       const ensembleAreaId = selectedWaterRegionId
         ? toEnsembleRegionId(selectedWaterRegionId)
-        : toEnsembleWorldId(selectedWorldRegionId);
+        : toEnsembleWorldId(
+            selectedWorldRegionId,
+            ensembleThresholds[selectedDataType],
+          );
       if (!ensembleData[selectedDataType][ensembleAreaId]) {
         this.fetchFutureEnsembleData(
           selectedDataset,
@@ -305,6 +326,32 @@ class FutureBody extends React.Component<Props, State> {
     this.setState({ hoveredScenarios });
   };
 
+  private handleSetEnsembleThreshold = (
+    ensembleThreshold: StressEnsembleThreshold | KcalEnsembleThreshold,
+  ) => {
+    const { selectedWorldRegionId, selectedDataType } = this.props;
+    const { selectedDataset, ensembleData, ensembleThresholds } = this.state;
+    if (ensembleThresholds[selectedDataType] !== ensembleThreshold) {
+      const featureId = toEnsembleWorldId(
+        selectedWorldRegionId,
+        ensembleThreshold,
+      );
+      if (!ensembleData[selectedDataType][featureId]) {
+        this.fetchFutureEnsembleData(
+          selectedDataset,
+          featureId,
+          selectedDataType,
+        );
+      }
+      this.setState(state => ({
+        ensembleThresholds: {
+          ...state.ensembleThresholds,
+          [selectedDataType]: ensembleThreshold,
+        },
+      }));
+    }
+  };
+
   private handleTimeIndexChange = (newIndex: number) => {
     if (this.state.selectedTimeIndex !== newIndex) {
       this.setState({ selectedTimeIndex: newIndex }, () => {
@@ -330,11 +377,15 @@ class FutureBody extends React.Component<Props, State> {
       ensemblesRequested,
       ensembleData,
       hoveredScenarios,
+      ensembleThresholds,
     } = this.state;
     const mapData = this.getMapData(this.state, this.props);
     const ensembleAreaId = selectedWaterRegionId
       ? toEnsembleRegionId(selectedWaterRegionId)
-      : toEnsembleWorldId(selectedWorldRegionId);
+      : toEnsembleWorldId(
+          selectedWorldRegionId,
+          ensembleThresholds[selectedDataType],
+        );
 
     const timeLabels = this.getTimeLabels(this.state);
 
@@ -403,9 +454,13 @@ class FutureBody extends React.Component<Props, State> {
                   ensemblesRequested.indexOf(
                     ensembleRequestId(ensembleAreaId, selectedDataType),
                   ) > -1 ? (
-                    <StyledSpinner />
+                    <div style={{ height: 220 }}>
+                      <StyledSpinner />
+                    </div>
                   ) : (
-                    <Error>No data found for selected area.</Error>
+                    <Error style={{ height: 220 }}>
+                      No data found for selected area.
+                    </Error>
                   )
                 ) : (
                   <FutureLineChart
@@ -421,6 +476,13 @@ class FutureBody extends React.Component<Props, State> {
                     selectedScenario={selectedScenario}
                     onTimeIndexChange={this.handleTimeIndexChange}
                     hoveredScenarios={hoveredScenarios}
+                  />
+                )}
+                {selectedWaterRegionId == null && (
+                  <EnsembleThresholdSelector
+                    threshold={ensembleThresholds[selectedDataType]}
+                    dataType={selectedDataType}
+                    onChange={this.handleSetEnsembleThreshold}
                   />
                 )}
               </>
