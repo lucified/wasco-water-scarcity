@@ -541,9 +541,7 @@ class Map extends React.Component<Props, State> {
   };
 
   private toggleZoomInToRegion = () => {
-    if (this.state.zoomInRequested) {
-      this.props.setZoomedInToRegion(false);
-    }
+    this.props.setZoomedInToRegion(!this.state.zoomInRequested);
     this.setState(state => ({ zoomInRequested: !state.zoomInRequested }));
   };
 
