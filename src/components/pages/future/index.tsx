@@ -29,7 +29,7 @@ import {
   getWaterRegionData,
   isZoomedInToRegion,
 } from '../../../selectors';
-import { FutureDataType } from '../../../types';
+import { AppType, FutureDataType } from '../../../types';
 import {
   addFuturePageStateToURL,
   getFuturePageStateFromURLHash,
@@ -451,6 +451,7 @@ class FutureBody extends React.Component<Props, State> {
                       selectedData={mapData}
                       waterRegions={waterRegions}
                       selectedDataType={selectedDataType}
+                      appType={AppType.FUTURE}
                     />
                     {!isZoomedIn && <WorldRegionSelector />}
                   </>

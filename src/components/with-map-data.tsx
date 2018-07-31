@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { scarcitySelector, WaterRegionGeoJSON } from '../data';
 import { StateTree } from '../reducers';
 import {
+  getHistoricalScenarioId,
   getSelectedStressShortageData,
   getThresholdsForDataType,
   getWaterRegionData,
@@ -18,7 +19,8 @@ import {
 export interface GeneratedMapProps {
   selectedWaterData?: TimeAggregate<number | undefined>;
   waterRegions?: WaterRegionGeoJSON;
-  isZoomedIn?: boolean;
+  isZoomedIn: boolean;
+  scenarioId: string;
 }
 
 interface PassedProps {
@@ -27,12 +29,12 @@ interface PassedProps {
 
 export type Props = PassedProps & GeneratedMapProps;
 
-export default function withMapData<T extends PassedProps>(
+export default function withMapData<T extends Props>(
   Component: React.ComponentType<T>,
 ) {
-  // This typing is actually incorrect but works because GenerateMapProps are all optional.
-  // The third type should be Omit<T, keyof GeneratedMapProps> or something.
-  return connect<GeneratedMapProps, {}, T, StateTree>(
+  // TODO: fix any below. This now loses type information to consumers of the HOC
+  // Should be Omit<T, keyof GeneratedStateProps> or something similar.
+  return connect<GeneratedMapProps, {}, any, StateTree>(
     (state, { selectedDataType }) => {
       const selectedData = getSelectedStressShortageData(state);
       const selector =
@@ -42,7 +44,7 @@ export default function withMapData<T extends PassedProps>(
               getThresholdsForDataType(state, 'stress'),
               getThresholdsForDataType(state, 'shortage'),
             )
-          : (d: StressShortageDatum) => d[selectedDataType];
+          : (d: StressShortageDatum) => (d as any)[selectedDataType]; // TODO: fix typings
       const dataForComponent = selectedData && {
         ...selectedData,
         data: mapValues(selectedData.data, d => selector(d)),
@@ -51,6 +53,7 @@ export default function withMapData<T extends PassedProps>(
         selectedWaterData: dataForComponent,
         waterRegions: getWaterRegionData(state),
         isZoomedIn: isZoomedInToRegion(state),
+        scenarioId: getHistoricalScenarioId(state),
       };
     },
   )(Component as any); // TODO: Fix typings

@@ -1,3 +1,4 @@
+// tslint:disable:max-line-length
 import {
   flatMap,
   groupBy,
@@ -106,12 +107,15 @@ export function getDefaultHistoricalImpactModel() {
   return defaultDataset ? defaultDataset.impactModel : 'watergap';
 }
 
-export async function getLocalRegionData(regionId: number) {
+export async function getPastLocalRegionData(
+  regionId: number,
+  _scenarioId: string,
+) {
   try {
-    const result = await fetch(
-      // tslint:disable-next-line:max-line-length
-      `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`,
-    );
+    // TODO: use this format:
+    // const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v2_20180801/${scenarioId}/${regionId}.json`;
+    const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`;
+    const result = await fetch(url, { credentials: 'same-origin' });
     const parsedData: LocalData = await result.json();
     return parsedData;
   } catch (error) {
@@ -125,6 +129,22 @@ export async function getLocalRegionData(regionId: number) {
 }
 
 /* FUTURE */
+
+export async function getFutureLocalRegionData(regionId: number) {
+  try {
+    const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_future_v1_20180731/${regionId}.json`;
+    const result = await fetch(url, { credentials: 'same-origin' });
+    const parsedData: LocalData = await result.json();
+    return parsedData;
+  } catch (error) {
+    console.error(
+      'Unable to fetch local region data for region:',
+      regionId,
+      error,
+    );
+    return undefined;
+  }
+}
 
 export async function fetchFutureEnsembleData(
   dataset: FutureDataset,

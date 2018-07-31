@@ -209,29 +209,22 @@ export function toStressShortageDatum({
 }
 
 interface RiverData {
-  scalerank: string;
-  featurecla: string;
-  name: string;
-  note?: string;
+  name?: string;
+  enwiki?: string;
 }
 
-interface CountryBorder {
-  featureid: number;
+interface CountryLabel {
   countryName: string;
-}
-
-interface Basin {
-  featureid: number;
-  basinName: string;
 }
 
 interface PopulatedPlaces {
   name: string;
+  enwiki?: string;
+  SCALERANK: number;
 }
 
 interface DrainageDirection {
   strahler: number;
-  basin: number;
 }
 
 export type GridData = {
@@ -247,14 +240,11 @@ export type GridQuintileColors = { [key in GridVariable]: string[] };
 export type GridVariable = 'pop' | 'elec' | 'dom' | 'man' | 'live' | 'irri';
 
 export interface LocalData {
-  basins?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.MultiPolygon, Basin>
-  >;
   places?: ExtendedFeatureCollection<
     ExtendedFeature<GeoJSON.Point, PopulatedPlaces>
   >;
   countries?: ExtendedFeatureCollection<
-    ExtendedFeature<GeoJSON.MultiPolygon, CountryBorder>
+    ExtendedFeature<GeoJSON.Point, CountryLabel>
   >;
   rivers?: ExtendedFeatureCollection<
     ExtendedFeature<GeoJSON.MultiLineString, RiverData>
@@ -262,6 +252,6 @@ export interface LocalData {
   ddm?: ExtendedFeatureCollection<
     ExtendedFeature<GeoJSON.Point, DrainageDirection>
   >;
-  grid: GridData[];
-  gridQuintiles: GridQuintile;
+  grid?: GridData[];
+  gridQuintiles?: GridQuintile;
 }

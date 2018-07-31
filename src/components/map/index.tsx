@@ -18,7 +18,8 @@ import {
 import {
   belowThresholdColor,
   getDataTypeColors,
-  getLocalRegionData,
+  getFutureLocalRegionData,
+  getPastLocalRegionData,
   GridData,
   gridQuintileColors,
   GridVariable,
@@ -36,7 +37,7 @@ import {
   getThresholdsForDataType,
   isZoomedInToRegion,
 } from '../../selectors';
-import { AnyDataType, TimeAggregate, WorldRegion } from '../../types';
+import { AnyDataType, AppType, TimeAggregate, WorldRegion } from '../../types';
 import Spinner from '../generic/spinner';
 import { theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
@@ -104,12 +105,21 @@ const MapTooltip = styled.div`
   padding: 4px;
   font-size: 12px;
   opacity: 0;
+  & .river-tooltip {
+    color: blue;
+  }
 `;
 
 const CountryLabels = styled.g`
   pointer-events: none;
   text-anchor: middle;
   font-size: 12px;
+`;
+
+const PlaceLabels = styled.g`
+  pointer-events: none;
+  text-anchor: left;
+  font-size: 10px;
 `;
 
 const SVG = styled.svg`
@@ -206,6 +216,8 @@ interface PassedProps {
   selectedData: TimeAggregate<number | undefined>;
   waterRegions: WaterRegionGeoJSON;
   selectedDataType: AnyDataType;
+  appType: AppType;
+  selectedScenarioId?: string;
 }
 
 interface GeneratedStateProps {
@@ -529,9 +541,7 @@ class Map extends React.Component<Props, State> {
   };
 
   private toggleZoomInToRegion = () => {
-    if (this.state.zoomInRequested) {
-      this.props.setZoomedInToRegion(false);
-    }
+    this.props.setZoomedInToRegion(!this.state.zoomInRequested);
     this.setState(state => ({ zoomInRequested: !state.zoomInRequested }));
   };
 
@@ -575,10 +585,14 @@ class Map extends React.Component<Props, State> {
     if (this.state.fetchingDataForRegions.indexOf(regionId) > -1) {
       return;
     }
+    const { appType, selectedScenarioId } = this.props;
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
     }));
-    const data = await getLocalRegionData(regionId);
+    const data =
+      appType === AppType.FUTURE
+        ? await getFutureLocalRegionData(regionId)
+        : await getPastLocalRegionData(regionId, selectedScenarioId!); // Ugly: we assume scenarioId exists
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.filter(
         id => id !== regionId,
@@ -701,16 +715,24 @@ class Map extends React.Component<Props, State> {
         .attr('d', path)
         .on('mouseover', d => {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
+          const url =
+            d.properties.enwiki != null
+              ? `https://en.wikipedia.org/wiki/${d.properties.enwiki}`
+              : `https://en.wikipedia.org/w/index.php?search=${
+                  d.properties.name
+                }`;
+          const tooltipText =
+            d.properties.name != null
+              ? `<a href= "${url}" target="_blank" class="river-tooltip">${
+                  d.properties.name
+                }</a>`
+              : '(Name unknown)';
           mapTooltipDiv
             .transition()
             .duration(200)
             .style('opacity', 0.9);
           mapTooltipDiv
-            .html(
-              `<a href= "https://en.wikipedia.org/w/index.php?search=${
-                d.properties.name
-              }" target="_blank">${d.properties.name}</a>`,
-            )
+            .html(tooltipText)
             .style(
               'left',
               event.pageX - svgPos.left - window.scrollX + 5 + 'px',
@@ -740,8 +762,14 @@ class Map extends React.Component<Props, State> {
         .data(localData.countries.features)
         .enter()
         .append('text')
-        .attr('x', d => path.centroid(d)[0])
-        .attr('y', d => path.centroid(d)[1])
+        .attr(
+          'x',
+          d => projection(d.geometry.coordinates as [number, number])![0],
+        )
+        .attr(
+          'y',
+          d => projection(d.geometry.coordinates as [number, number])![1],
+        )
         .attr('filter', 'url(#solid)')
         .text(d => d.properties.countryName);
     }
@@ -759,16 +787,18 @@ class Map extends React.Component<Props, State> {
         .on('mouseover', function(d) {
           const svgPos = svgRef.getBoundingClientRect() as DOMRect;
           const pos = (this as SVGPathElement).getBoundingClientRect() as DOMRect;
+          const url =
+            d.properties.enwiki != null
+              ? `https://en.wikipedia.org/wiki/${d.properties.enwiki}`
+              : `https://en.wikipedia.org/w/index.php?search=${
+                  d.properties.name
+                }`;
           mapTooltipDiv
             .transition()
             .duration(200)
             .style('opacity', 0.9);
           mapTooltipDiv
-            .html(
-              `<a href= "https://en.wikipedia.org/w/index.php?search=${
-                d.properties.name
-              }" target="_blank">${d.properties.name}</a>`,
-            )
+            .html(`<a href= "${url}" target="_blank">${d.properties.name}</a>`)
             .style('left', pos.right - svgPos.left + 5 + 'px')
             .style('top', pos.top - pos.height / 2 - svgPos.top + 'px');
           // FIXME: if user never mouses over the tooltip, it won't disappear
@@ -780,65 +810,89 @@ class Map extends React.Component<Props, State> {
           //     .style('opacity', 0),
           // );
         });
+
+      svg
+        .select('g#places-labels')
+        .selectAll('text')
+        .data(
+          // Only keep major cities
+          // TODO: including other scaleranks?
+          localData.places.features.filter(d => d.properties.SCALERANK === 0),
+        )
+        .enter()
+        .append('text')
+        .attr(
+          'x',
+          d => projection(d.geometry.coordinates as [number, number])![0],
+        )
+        .attr(
+          'y',
+          d => projection(d.geometry.coordinates as [number, number])![1],
+        )
+        .attr('dx', 2)
+        .attr('filter', 'url(#solid)')
+        .text(d => d.properties.name);
     }
 
     this.removeGridLegend();
 
-    const quintiles = localData.gridQuintiles[selectedGridVariable];
-    if (quintiles != null) {
-      // TODO: might be a more efficient way of doing this?
-      const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
-        type: 'FeatureCollection',
-        features: localData.grid.map((d: GridData) => ({
-          type: 'Feature' as 'Feature',
-          geometry: {
-            type: 'Polygon' as 'Polygon',
-            coordinates: [
-              [
-                [d.centre[0] - 0.25, d.centre[1] - 0.25],
-                [d.centre[0] - 0.25, d.centre[1] + 0.25],
-                [d.centre[0] + 0.25, d.centre[1] + 0.25],
-                [d.centre[0] + 0.25, d.centre[1] - 0.25],
-                [d.centre[0] - 0.25, d.centre[1] - 0.25],
+    if (localData.grid != null && localData.gridQuintiles != null) {
+      const quintiles = localData.gridQuintiles[selectedGridVariable];
+      if (quintiles != null) {
+        // TODO: might be a more efficient way of doing this?
+        const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
+          type: 'FeatureCollection',
+          features: localData.grid.map((d: GridData) => ({
+            type: 'Feature' as 'Feature',
+            geometry: {
+              type: 'Polygon' as 'Polygon',
+              coordinates: [
+                [
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                ],
               ],
-            ],
-          },
-          properties: {
-            data:
-              d[selectedGridVariable] && d[selectedGridVariable]![startYear],
-          },
-        })),
-      };
+            },
+            properties: {
+              data:
+                d[selectedGridVariable] && d[selectedGridVariable]![startYear],
+            },
+          })),
+        };
 
-      const colorScale = scaleThreshold<number, string>()
-        .domain(quintiles)
-        .range(gridQuintileColors[selectedGridVariable]);
+        const colorScale = scaleThreshold<number, string>()
+          .domain(quintiles)
+          .range(gridQuintileColors[selectedGridVariable]);
 
-      svg
-        .select<SVGGElement>('g#grid-data')
-        .selectAll<
-          SVGPathElement,
-          ExtendedFeature<GeoJSON.Polygon, { data: number }>
-        >('path')
-        .data(griddataPoly.features)
-        .enter()
-        .append<SVGPathElement>('path')
-        .attr('d', path)
-        .attr(
-          'fill',
-          d =>
-            d.properties!.data == null
-              ? 'none'
-              : colorScale(d.properties!.data),
+        svg
+          .select<SVGGElement>('g#grid-data')
+          .selectAll<
+            SVGPathElement,
+            ExtendedFeature<GeoJSON.Polygon, { data: number }>
+          >('path')
+          .data(griddataPoly.features)
+          .enter()
+          .append<SVGPathElement>('path')
+          .attr('d', path)
+          .attr(
+            'fill',
+            d =>
+              d.properties!.data == null
+                ? 'none'
+                : colorScale(d.properties!.data),
+          );
+
+        this.addGridLegend(
+          colorScale,
+          // The log scale breaks if we pass in 0.
+          // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
+          [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
+          labelForGridVariable(selectedGridVariable),
         );
-
-      this.addGridLegend(
-        colorScale,
-        // The log scale breaks if we pass in 0.
-        // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
-        [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
-        labelForGridVariable(selectedGridVariable),
-      );
+      }
     }
 
     const bounds = path.bounds(selectedWaterRegion);
@@ -1071,11 +1125,11 @@ class Map extends React.Component<Props, State> {
               <g id="water-regions" clipPath="url(#clip)" />
               <SelectedRegion id="selected-region" clipPath="url(#clip)" />
               <CountryBorders id="country-borders" clipPath="url(#clip)" />
-              <g id="places-labels" clipPath="url(#clip)" />
               <g id="clickable-water-regions" clipPath="url(#clip)" />
               <Rivers id="rivers" clipPath="url(#clip)" />
               <g id="places" clipPath="url(#clip)" />
               <CountryLabels id="country-labels" clipPath="url(#clip)" />
+              <PlaceLabels id="places-labels" clipPath="url(#clip)" />
               {isZoomedIn ? (
                 <g
                   transform={`translate(${width - 400},${height - 30})`}
