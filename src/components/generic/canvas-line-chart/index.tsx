@@ -469,6 +469,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
             {...{ touchAction: 'none' }}
           >
             <g
+              transform={`translate(${marginLeft}, ${marginTop})`}
               style={{
                 transform: `translate(${marginLeft}px, ${marginTop}px)`,
               }}
@@ -478,12 +479,14 @@ export class CanvasLineChart extends React.PureComponent<Props> {
                 y1={0}
                 x2={0}
                 y2={chartHeight}
+                transform={`translate(${selectedPointX}, 0)`}
                 style={{ transform: `translate(${selectedPointX}px, 0)` }}
               />
               <SelectedPoint
                 x={0}
                 y={0}
                 r={5}
+                transform={`translate(${selectedPointX}, ${selectedPointY})`}
                 style={{
                   transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
                 }}
@@ -491,6 +494,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
               {/* Safari doesn't support CSS transitions on <text> elements (!!).
                 Need to wrap it in a <g>. */}
               <SelectedPointLabelContainer
+                transform={`translate(${selectedPointX}, ${selectedPointY})`}
                 style={{
                   transform: `translate(${selectedPointX}px, ${selectedPointY}px)`,
                 }}

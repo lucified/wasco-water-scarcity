@@ -4,10 +4,6 @@ import MultiSelector, { Option } from '../../generic/multi-selector';
 import { SelectorDescription, SelectorHeader, theme } from '../../theme';
 
 const Variable = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
   margin-bottom: ${theme.defaultMargin}px;
 
   font-size: 14px;

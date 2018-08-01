@@ -22,12 +22,6 @@ const StyledSticky = styled(Sticky)`
   width: 100%;
 `;
 
-const Main = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
 const Section = styled.div`
   margin-bottom: ${theme.defaultMargin}px;
   width: 100%;
@@ -595,7 +589,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
     const isMultiselect = selectionMode === 'comparisons';
 
     return (
-      <Main className={className}>
+      <div className={className}>
         <BodyText>
           The future depends on the actions we take, with outcomes that are also
           uncertain. We provide two starting points to explore the future of
@@ -674,7 +668,7 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             ))}
           </Section>
         ))}
-      </Main>
+      </div>
     );
   }
 }

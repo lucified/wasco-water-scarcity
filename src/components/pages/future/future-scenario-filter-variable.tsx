@@ -12,10 +12,6 @@ import { SelectorDescription, SelectorHeader, theme } from '../../theme';
 import { RaggedOption } from './future-scenario-filter';
 
 const Variable = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
   margin-bottom: ${theme.defaultMargin}px;
 
   font-size: 14px;

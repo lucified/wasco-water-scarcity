@@ -18,12 +18,6 @@ import LowThresholdSelector from '../../low-threshold-selector';
 import { BodyText, theme } from '../../theme';
 import { ModelSelector } from './model-selector';
 
-const Main = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
 interface StateProps {
   impactModel: string;
   climateModel: string;
@@ -130,7 +124,7 @@ class ChoicesPlain extends React.Component<Props> {
     } = this.props;
 
     return (
-      <Main className={className}>
+      <div className={className}>
         <BodyText>{getDescriptionForDataType(dataType)}</BodyText>
         {dataType === 'scarcity' && (
           <>
@@ -180,7 +174,7 @@ class ChoicesPlain extends React.Component<Props> {
           selectedValue="fpu"
         />
         <ModelSelector title="Population data" description="TODO" />
-      </Main>
+      </div>
     );
   }
 }
