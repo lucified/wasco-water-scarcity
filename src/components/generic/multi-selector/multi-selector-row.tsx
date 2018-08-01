@@ -177,7 +177,11 @@ export class MultiSelectorRow extends React.Component<Props> {
     return (
       <Row
         onClick={
-          multiselect ? this.handleMultiselectChange : this.handleSelectToggle
+          disabled
+            ? undefined
+            : multiselect
+              ? this.handleMultiselectChange
+              : this.handleSelectToggle
         }
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
