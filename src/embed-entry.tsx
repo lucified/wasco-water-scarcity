@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import 'whatwg-fetch'; // Need polyfill to support IE11
 import { AppEmbed } from './components/app-embed';
 import configureStore from './configure-store';
 import { getInitialState } from './reducers';
