@@ -17,6 +17,7 @@ import {
 import { AppType, TimeScale } from '../types';
 import { historicalDataRequestId } from '../utils';
 import { Header } from './header';
+import { MinWidthWarning } from './min-width-warning';
 import NotFound from './pages/not-found';
 import { Past } from './pages/past';
 import { theme } from './theme';
@@ -162,29 +163,31 @@ class AppPlain extends React.Component<Props> {
           ]}
         />
         <Header appType={AppType.PAST} />
-        <Switch>
-          {/* These routes also handle any data loading or other onLoad trigger */}
-          <Route
-            path="/stress"
-            render={() => (
-              <Past isLoading={isLoading} selectedDataType="stress" />
-            )}
-          />
-          <Route
-            path="/shortage"
-            render={() => (
-              <Past isLoading={isLoading} selectedDataType="shortage" />
-            )}
-          />
-          <Route
-            path="/scarcity"
-            render={() => (
-              <Past isLoading={isLoading} selectedDataType="scarcity" />
-            )}
-          />
-          <Route path="/" exact render={() => <Redirect to="/stress" />} />
-          <Route component={NotFound} />
-        </Switch>
+        <MinWidthWarning minWidth={720}>
+          <Switch>
+            {/* These routes also handle any data loading or other onLoad trigger */}
+            <Route
+              path="/stress"
+              render={() => (
+                <Past isLoading={isLoading} selectedDataType="stress" />
+              )}
+            />
+            <Route
+              path="/shortage"
+              render={() => (
+                <Past isLoading={isLoading} selectedDataType="shortage" />
+              )}
+            />
+            <Route
+              path="/scarcity"
+              render={() => (
+                <Past isLoading={isLoading} selectedDataType="scarcity" />
+              )}
+            />
+            <Route path="/" exact render={() => <Redirect to="/stress" />} />
+            <Route component={NotFound} />
+          </Switch>
+        </MinWidthWarning>
       </Root>
     );
   }
