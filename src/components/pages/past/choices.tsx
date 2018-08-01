@@ -7,6 +7,7 @@ import {
   setSelectedImpactModel,
   setSelectedTimeScale,
 } from '../../../actions';
+import { isTimeScale } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
   getSelectedClimateModel,
@@ -57,7 +58,7 @@ const impactModelOptions = [
 const climateModelOptions = [
   {
     title: 'WATCH reanalysis 1900-2010',
-    description: 'Adapted from European Union WATCH project (decadal only)',
+    description: 'Adapted from the EU WATCH project (decadal only)',
     value: 'watch',
   },
   {
@@ -94,6 +95,14 @@ const StyledLowThresholdSelector = styled(LowThresholdSelector)`
   margin-bottom: ${theme.margin()};
 `;
 
+const ReadMore = styled.a`
+  color: ${theme.colors.gray};
+  font-size: 14px;
+  display: inline-block;
+`;
+
+// TODO: Update all URLs to production URLs
+
 function getDescriptionForDataType(dataType: HistoricalDataType) {
   switch (dataType) {
     case 'scarcity':
@@ -102,23 +111,25 @@ function getDescriptionForDataType(dataType: HistoricalDataType) {
       return (
         <div>
           Water stress reflects impacts of high water use relative to water
-          availability. (<a
+          availability.
+          <ReadMore
             href="https://dev.mediapool.fi/wasco/water-stress/"
             target="_blank"
           >
             Read more
-          </a>).
+          </ReadMore>
         </div>
       );
     case 'shortage':
       return (
         <div>
-          Water shortage means there is not enough water to meet human needs. (<a
+          Water shortage means there is not enough water to meet human needs.
+          <ReadMore
             href="https://dev.mediapool.fi/wasco/water-shortage/"
             target="_blank"
           >
             Read more
-          </a>).
+          </ReadMore>
         </div>
       );
   }
@@ -150,7 +161,7 @@ class ChoicesPlain extends React.Component<Props> {
           title="Spatial unit of analysis"
           description={
             'We aggregate water availability and water use spatially to account for water infrastructure, ' +
-            'movement of water users, and uncertainty in location of water'
+            'movement of water users, and uncertainty in location of water.'
           }
           options={[
             {
@@ -164,23 +175,25 @@ class ChoicesPlain extends React.Component<Props> {
           furtherInformation={
             <div>
               Data on water availability and use is aggregated to regions that
-              are mix of river basins and country borders, as used in{' '}
+              are a mix of river basins and country borders, as used in{' '}
               <a href="https://dev.mediapool.fi/wasco/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
                 Kummu et al. 2016
               </a>. It is assumed that water can be managed and moved within
               these regions in order to make as much water as possible available
               for use. Water would only be used from outside these regions if
               scarcity occurs. In large basins, water is allocated between FPUs
-              according to discharge.{' '}
-              <a href="http://waterscarcityatlas.org">
-                (Full description of analysis)
-              </a>
+              according to discharge.
+              <p>
+                <a href="http://waterscarcityatlas.org">
+                  Full description of analysis
+                </a>
+              </p>
             </div>
           }
         />
         <ModelSelector
           title="Timescale"
-          description="We aggregate water availability and water use over time to account for water storage and uncertainty in timing"
+          description="We aggregate water availability and water use over time to account for water storage and uncertainty in timing."
           options={timeScaleOptions}
           setModel={onTimeScaleChange}
           selectedValue={timeScale}
@@ -194,10 +207,12 @@ class ChoicesPlain extends React.Component<Props> {
               across years. If water availability is overestimated
               (underestimated), more (less) regions will appear stressed, but
               this can help highlight areas where storage and variability over
-              time are important.{' '}
-              <a href="http://waterscarcityatlas.org">
-                (Full description of analysis)
-              </a>
+              time are important.
+              <p>
+                <a href="http://waterscarcityatlas.org">
+                  Full description of analysis
+                </a>
+              </p>
             </div>
           }
         />
@@ -219,10 +234,12 @@ class ChoicesPlain extends React.Component<Props> {
             <div>
               The WATCH climate forcing dataset was created as part of the
               European Union WATCH project. It provides temperature and
-              precipitation data for 1900-2001 for the water models to use.{' '}
-              <a href="http://waterscarcityatlas.org">
-                (Full description of analysis)
-              </a>
+              precipitation data for 1900-2001 for the water models to use.
+              <p>
+                <a href="http://waterscarcityatlas.org">
+                  Full description of analysis
+                </a>
+              </p>
             </div>
           }
         />
@@ -244,10 +261,12 @@ class ChoicesPlain extends React.Component<Props> {
             <div>
               WaterGAP WATCH data is from{' '}
               <a href="http://waterscarcityatlas.org">Kummu et al. 2016</a>. All
-              other data from the ISIMIP Fast-Track project.{' '}
-              <a href="http://waterscarcityatlas.org">
-                (Full description of analysis)
-              </a>
+              other data is from the ISIMIP Fast-Track project.
+              <p>
+                <a href="http://waterscarcityatlas.org">
+                  Full description of analysis
+                </a>
+              </p>
             </div>
           }
         />
@@ -275,7 +294,9 @@ export const Choices = connect<
       dispatch(setSelectedClimateModel(value));
     },
     onTimeScaleChange: (value: string) => {
-      dispatch(setSelectedTimeScale(value as TimeScale));
+      if (isTimeScale(value)) {
+        dispatch(setSelectedTimeScale(value));
+      }
     },
   }),
 )(ChoicesPlain);
