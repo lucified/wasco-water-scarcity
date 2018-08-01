@@ -82,11 +82,11 @@ export class PastBody extends React.Component<Props> {
 
     return (
       <div>
-        <TitleContainer className="container">
+        <TitleContainer className="container-fluid">
           <Title>Water scarcity exploration tool</Title>
         </TitleContainer>
         <DataTypeLinks />
-        <BodyContainer className="container">
+        <BodyContainer className="container-fluid">
           <StickyGraphics>
             {isLoading || !waterRegions || !selectedWaterData ? (
               <StyledSpinner />

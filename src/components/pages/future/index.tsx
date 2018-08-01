@@ -400,11 +400,11 @@ class FutureBody extends React.Component<Props, State> {
 
     return (
       <div>
-        <TitleContainer className="container">
+        <TitleContainer className="container-fluid">
           <Title>Explore possible futures of water scarcity</Title>
         </TitleContainer>
         <DataTypeLinks />
-        <BodyContainer className="container">
+        <BodyContainer className="container-fluid">
           <SelectorsContent>
             <FutureScenarioFilter
               setScenario={this.handleSetSelectedScenario}

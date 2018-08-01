@@ -45,7 +45,7 @@ export default function DataTypeLinks() {
   return (
     <Root>
       <Navigation>
-        <div className="container">
+        <div className="container-fluid">
           <div className="row">
             <div className="col-xs-12">
               <NavigationTheme>Water body:</NavigationTheme>
