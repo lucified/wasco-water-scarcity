@@ -86,7 +86,7 @@ const MapHeaderRow = styled.div`
 const TimeSelectorContainer = styled.div`
   max-width: 300px;
   width: 100%;
-  padding-right: ${theme.defaultMargin}px;
+  padding-right: ${theme.margin()};
 `;
 
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {

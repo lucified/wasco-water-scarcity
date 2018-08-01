@@ -4,22 +4,22 @@ import MultiSelector, { Option } from '../../generic/multi-selector';
 import { SelectorDescription, SelectorHeader, theme } from '../../theme';
 
 const Variable = styled.div`
-  margin-bottom: ${theme.defaultMargin}px;
+  margin-bottom: ${theme.margin()};
 
   font-size: 14px;
   font-family: ${theme.labelFontFamily};
 `;
 
 const StyledMultiSelector = styled(MultiSelector)`
-  margin-top: ${theme.defaultMargin / 2}px;
+  margin-top: ${theme.margin(0.5)};
 `;
 
 const MoreInformationContainer = styled.div`
-  margin-top: ${theme.defaultMargin / 2}px;
+  margin-top: ${theme.margin(0.5)};
 `;
 
 const MoreInformationContent = styled.div`
-  margin-bottom: ${theme.defaultMargin / 2}px;
+  margin-bottom: ${theme.margin(0.5)};
 `;
 
 const MoreInformationLink = styled.a`

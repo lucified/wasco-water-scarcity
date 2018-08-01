@@ -23,12 +23,12 @@ const StyledSticky = styled(Sticky)`
 `;
 
 const Section = styled.div`
-  margin-bottom: ${theme.defaultMargin}px;
+  margin-bottom: ${theme.margin()};
   width: 100%;
 `;
 
 const StartingPointSelector = styled.div`
-  margin-bottom: ${theme.defaultMargin}px;
+  margin-bottom: ${theme.margin()};
   width: 100%;
 `;
 
@@ -54,7 +54,7 @@ const StartingPointValue = styled.a`
   letter-spacing: 1px;
   text-align: center;
   cursor: pointer;
-  margin-top: ${theme.defaultMargin}px;
+  margin-top: ${theme.margin()};
 
   &:hover {
     background-color: #256ec3;

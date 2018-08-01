@@ -35,11 +35,11 @@ const HeaderRow = styled.div`
 
 const LegendContainer = styled.div`
   display: flex;
-  padding-right: ${theme.defaultMargin}px;
+  padding-right: ${theme.margin()};
 `;
 
 const LegendItem = styled.div`
-  margin-left: ${theme.defaultMargin}px;
+  margin-left: ${theme.margin()};
   font-size: 12px;
   display: flex;
   align-items: center;
