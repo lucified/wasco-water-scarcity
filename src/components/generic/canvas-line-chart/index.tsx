@@ -126,15 +126,23 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     marginBottom: 40,
   };
 
-  private chartWidth() {
-    const { width, marginLeft, marginRight } = this.props as PropsWithDefaults;
-    return width - marginLeft - marginRight;
-  }
+  private chartWidth = createSelector(
+    (props: Props) => props.width,
+    (props: Props) => props.marginLeft,
+    (props: Props) => props.marginRight,
+    (width, marginLeft, marginRight) => {
+      return width - marginLeft! - marginRight!;
+    },
+  );
 
-  private chartHeight() {
-    const { height, marginTop, marginBottom } = this.props as PropsWithDefaults;
-    return height - marginTop - marginBottom;
-  }
+  private chartHeight = createSelector(
+    (props: Props) => props.height,
+    (props: Props) => props.marginTop,
+    (props: Props) => props.marginBottom,
+    (height, marginTop, marginBottom) => {
+      return height - marginTop! - marginBottom!;
+    },
+  );
 
   public componentDidMount() {
     this.drawChart();
@@ -195,7 +203,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     }
     const { left } = this.svgRef.getBoundingClientRect();
     let x = event.pageX - left - marginLeft!;
-    const chartWidth = this.chartWidth();
+    const chartWidth = this.chartWidth(this.props);
     const { xPoints } = this.getScales(this.props);
 
     if (x < 0) {
@@ -219,10 +227,9 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     (props: Props) => props.series,
     (props: Props) => props.hoveredSeries,
     (props: Props) => props.selectedSerie,
-    (series, hoveredSeries, selectedSerie) => {
-      const chartWidth = this.chartWidth();
-      const chartHeight = this.chartHeight();
-
+    this.chartWidth,
+    this.chartHeight,
+    (series, hoveredSeries, selectedSerie, chartWidth, chartHeight) => {
       const allData = series.concat(
         hoveredSeries || [],
         selectedSerie ? [selectedSerie] : [],
@@ -349,7 +356,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     context: CanvasRenderingContext2D,
     x: ScaleTime<number, number>,
   ) {
-    const chartHeight = this.chartHeight();
+    const chartHeight = this.chartHeight(this.props);
     const tickCount = 10;
     const tickSize = 6;
     const ticks = x.ticks(tickCount);
@@ -433,7 +440,7 @@ export class CanvasLineChart extends React.PureComponent<Props> {
     const selectedPointY = selectedPoint && Math.round(y(selectedPoint.value));
     const positionLabelLeft =
       selectedPoint && selectedTimeIndex! > selectedSerie!.points.length / 2;
-    const chartHeight = this.chartHeight();
+    const chartHeight = this.chartHeight(this.props);
 
     return (
       <div
