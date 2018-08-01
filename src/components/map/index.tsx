@@ -39,7 +39,7 @@ import {
 } from '../../selectors';
 import { AnyDataType, AppType, TimeAggregate, WorldRegion } from '../../types';
 import Spinner from '../generic/spinner';
-import { theme } from '../theme';
+import { Button, theme } from '../theme';
 import ThresholdSelector from '../threshold-selector';
 
 // tslint:disable:no-implicit-dependencies
@@ -55,32 +55,12 @@ const StyledThresholdSelector = styled(ThresholdSelector)`
   position: absolute;
 `;
 
-const ZoomButton = styled.button`
+const ZoomButton = Button.extend`
   position: absolute;
   right: 5px;
   bottom: 5px;
 
-  background: transparent;
-  border-radius: 4px;
-  color: white;
   padding: 5px 10px;
-  text-align: center;
-  font-size: 16px;
-  cursor: pointer;
-  text-decoration: none;
-  text-transform: uppercase;
-  background-color: white;
-  color: ${theme.colors.text};
-  border: 2px solid ${theme.colors.gray};
-
-  &:hover {
-    background-color: ${theme.colors.gray};
-    color: white;
-  }
-
-  &:focus {
-    outline: 0;
-  }
 `;
 
 const SpinnerOverlay = styled.div`

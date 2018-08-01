@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import responsive from './generic/responsive';
-import { theme } from './theme';
+import { Button, theme } from './theme';
 
 const Root = styled.div`
   width: 100%;
@@ -26,31 +26,6 @@ const OverlayText = styled.div`
   max-width: 100%;
   margin: ${theme.margin(2)} ${theme.margin()} 0;
   text-align: center;
-`;
-
-const Button = styled.button`
-  margin-top: ${theme.margin()};
-  background: transparent;
-  border-radius: 4px;
-  color: white;
-  padding: 5px 20px;
-  text-align: center;
-  font-size: 16px;
-  cursor: pointer;
-  text-decoration: none;
-  text-transform: uppercase;
-  background-color: white;
-  color: ${theme.colors.text};
-  border: 2px solid ${theme.colors.gray};
-
-  &:hover {
-    background-color: ${theme.colors.gray};
-    color: white;
-  }
-
-  &:focus {
-    outline: 0;
-  }
 `;
 
 interface Props {
