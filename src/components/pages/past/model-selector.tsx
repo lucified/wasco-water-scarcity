@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { CaretIcon } from '../../caret-icon';
 import MultiSelector, { Option } from '../../generic/multi-selector';
 import { SelectorDescription, SelectorHeader, theme } from '../../theme';
 
@@ -25,6 +26,13 @@ const MoreInformationContent = styled.div`
 const MoreInformationLink = styled.a`
   display: block;
   cursor: pointer;
+  color: ${theme.colors.gray};
+  text-align: center;
+`;
+
+const StyledCaretIcon = styled(CaretIcon)`
+  position: relative;
+  top: 3px;
 `;
 
 interface Props {
@@ -84,7 +92,27 @@ export class ModelSelector extends React.Component<Props, State> {
               </MoreInformationContent>
             )}
             <MoreInformationLink onClick={this.toggleFurtherInformation}>
-              {furtherInformationOpen ? 'Hide' : 'Show more information'}
+              {furtherInformationOpen ? (
+                <span>
+                  Hide{' '}
+                  <StyledCaretIcon
+                    direction="up"
+                    color={theme.colors.gray}
+                    width={16}
+                    height={16}
+                  />
+                </span>
+              ) : (
+                <span>
+                  Show more information{' '}
+                  <StyledCaretIcon
+                    direction="down"
+                    color={theme.colors.gray}
+                    width={16}
+                    height={16}
+                  />
+                </span>
+              )}
             </MoreInformationLink>
           </MoreInformationContainer>
         )}
