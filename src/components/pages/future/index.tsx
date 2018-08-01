@@ -50,7 +50,6 @@ const BodyContainer = styled.div`
   position: relative;
   display: flex;
   width: 100%;
-  margin-top: ${theme.margin()};
 `;
 
 const selectorsWidth = '400px';
@@ -59,10 +58,15 @@ const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsWidth};
   padding-right: ${theme.margin()};
+  margin-top: ${theme.margin()};
 `;
 
 const StickyGraphics = styled(Sticky)`
   width: calc(100% - ${selectorsWidth});
+`;
+
+const GraphicsContainer = styled.div`
+  margin-top: ${theme.margin()};
 `;
 
 const StyledSpinner = styled(Spinner)`
@@ -413,86 +417,88 @@ class FutureBody extends React.Component<Props, State> {
             />
           </SelectorsContent>
           <StickyGraphics>
-            {!waterRegions ||
-            (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
-              <StyledSpinner />
-            ) : (
-              <>
-                <MapHeaderRow>
-                  <SmallSectionHeader>Selected scenario</SmallSectionHeader>
-                  <TimeSelectorContainer>
-                    {timeLabels && (
-                      <TimeSelector
-                        min={0}
-                        max={Object.keys(timeLabels).length - 1}
-                        value={selectedTimeIndex}
-                        onChange={this.handleTimeIndexChange}
-                        labels={timeLabels}
-                        labelStyle={{
-                          fontFamily: theme.bodyFontFamily,
-                          fontSize: 14,
-                          width: '50%',
-                          marginLeft: '-25%',
-                        }}
+            <GraphicsContainer>
+              {!waterRegions ||
+              (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
+                <StyledSpinner />
+              ) : (
+                <>
+                  <MapHeaderRow>
+                    <SmallSectionHeader>Selected scenario</SmallSectionHeader>
+                    <TimeSelectorContainer>
+                      {timeLabels && (
+                        <TimeSelector
+                          min={0}
+                          max={Object.keys(timeLabels).length - 1}
+                          value={selectedTimeIndex}
+                          onChange={this.handleTimeIndexChange}
+                          labels={timeLabels}
+                          labelStyle={{
+                            fontFamily: theme.bodyFontFamily,
+                            fontSize: 14,
+                            width: '50%',
+                            marginLeft: '-25%',
+                          }}
+                        />
+                      )}
+                    </TimeSelectorContainer>
+                  </MapHeaderRow>
+                  {!mapData ? (
+                    scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
+                    -1 ? (
+                      <MapPlaceholder />
+                    ) : (
+                      <Error>No data found for selected scenario.</Error>
+                    )
+                  ) : (
+                    <>
+                      <ResponsiveMap
+                        selectedData={mapData}
+                        waterRegions={waterRegions}
+                        selectedDataType={selectedDataType}
+                        appType={AppType.FUTURE}
                       />
-                    )}
-                  </TimeSelectorContainer>
-                </MapHeaderRow>
-                {!mapData ? (
-                  scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
-                  -1 ? (
-                    <MapPlaceholder />
+                      {!isZoomedIn && <WorldRegionSelector />}
+                    </>
+                  )}
+                  {!ensembleData[selectedDataType][ensembleAreaId] ? (
+                    ensemblesRequested.indexOf(
+                      ensembleRequestId(ensembleAreaId, selectedDataType),
+                    ) > -1 ? (
+                      <div style={{ height: 220 }}>
+                        <StyledSpinner />
+                      </div>
+                    ) : (
+                      <Error style={{ height: 220 }}>
+                        No data found for selected area.
+                      </Error>
+                    )
                   ) : (
-                    <Error>No data found for selected scenario.</Error>
-                  )
-                ) : (
-                  <>
-                    <ResponsiveMap
-                      selectedData={mapData}
-                      waterRegions={waterRegions}
+                    <FutureLineChart
+                      height={220}
+                      selectedTimeIndex={selectedTimeIndex}
                       selectedDataType={selectedDataType}
-                      appType={AppType.FUTURE}
+                      ensembleData={
+                        ensembleData[selectedDataType][ensembleAreaId]!
+                      }
+                      selectedWorldRegionId={selectedWorldRegionId}
+                      selectedWaterRegionId={selectedWaterRegionId}
+                      comparisonVariables={comparisonVariables}
+                      selectedScenario={selectedScenario}
+                      onTimeIndexChange={this.handleTimeIndexChange}
+                      hoveredScenarios={hoveredScenarios}
                     />
-                    {!isZoomedIn && <WorldRegionSelector />}
-                  </>
-                )}
-                {!ensembleData[selectedDataType][ensembleAreaId] ? (
-                  ensemblesRequested.indexOf(
-                    ensembleRequestId(ensembleAreaId, selectedDataType),
-                  ) > -1 ? (
-                    <div style={{ height: 220 }}>
-                      <StyledSpinner />
-                    </div>
-                  ) : (
-                    <Error style={{ height: 220 }}>
-                      No data found for selected area.
-                    </Error>
-                  )
-                ) : (
-                  <FutureLineChart
-                    height={220}
-                    selectedTimeIndex={selectedTimeIndex}
-                    selectedDataType={selectedDataType}
-                    ensembleData={
-                      ensembleData[selectedDataType][ensembleAreaId]!
-                    }
-                    selectedWorldRegionId={selectedWorldRegionId}
-                    selectedWaterRegionId={selectedWaterRegionId}
-                    comparisonVariables={comparisonVariables}
-                    selectedScenario={selectedScenario}
-                    onTimeIndexChange={this.handleTimeIndexChange}
-                    hoveredScenarios={hoveredScenarios}
-                  />
-                )}
-                {selectedWaterRegionId == null && (
-                  <EnsembleThresholdSelector
-                    threshold={ensembleThresholds[selectedDataType]}
-                    dataType={selectedDataType}
-                    onChange={this.handleSetEnsembleThreshold}
-                  />
-                )}
-              </>
-            )}
+                  )}
+                  {selectedWaterRegionId == null && (
+                    <EnsembleThresholdSelector
+                      threshold={ensembleThresholds[selectedDataType]}
+                      dataType={selectedDataType}
+                      onChange={this.handleSetEnsembleThreshold}
+                    />
+                  )}
+                </>
+              )}
+            </GraphicsContainer>
           </StickyGraphics>
         </BodyContainer>
       </div>

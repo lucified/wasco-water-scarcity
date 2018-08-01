@@ -19,7 +19,6 @@ const BodyContainer = styled.div`
   position: relative;
   display: flex;
   width: 100%;
-  margin-top: ${theme.margin()};
 `;
 
 const selectorsWidth = '320px';
@@ -29,6 +28,7 @@ const SelectorsContent = styled.div`
   width: ${selectorsWidth};
   padding-left: ${theme.margin()};
   padding-bottom: ${theme.margin()};
+  margin-top: ${theme.margin()};
 `;
 
 const Separator = styled.hr`
