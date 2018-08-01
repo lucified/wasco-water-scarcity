@@ -16,6 +16,7 @@ import { loadMapData } from '../actions';
 import { StateTree } from '../reducers';
 import { AppType } from '../types';
 import { Header } from './header';
+import { MinWidthWarning } from './min-width-warning';
 import Future from './pages/future';
 import NotFound from './pages/not-found';
 import { theme } from './theme';
@@ -116,18 +117,20 @@ class AppFuturePlain extends React.Component<Props> {
           ]}
         />
         <Header appType={AppType.FUTURE} />
-        <Switch>
-          <Route
-            path="/stress"
-            render={() => <Future selectedDataType="stress" />}
-          />
-          <Route
-            path="/kcal"
-            render={() => <Future selectedDataType="kcal" />}
-          />
-          <Route path="/" exact render={() => <Redirect to="/stress" />} />
-          <Route component={NotFound} />
-        </Switch>
+        <MinWidthWarning minWidth={768}>
+          <Switch>
+            <Route
+              path="/stress"
+              render={() => <Future selectedDataType="stress" />}
+            />
+            <Route
+              path="/kcal"
+              render={() => <Future selectedDataType="kcal" />}
+            />
+            <Route path="/" exact render={() => <Redirect to="/stress" />} />
+            <Route component={NotFound} />
+          </Switch>
+        </MinWidthWarning>
       </Root>
     );
   }

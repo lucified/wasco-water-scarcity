@@ -39,7 +39,9 @@ const LegendContainer = styled.div`
 `;
 
 const LegendItem = styled.div`
-  margin-left: ${theme.margin()};
+  &:not(:first-child) {
+    margin-left: ${theme.margin()};
+  }
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -215,7 +217,10 @@ function FutureLineChart(props: Props) {
         <SmallSectionHeader>{title}</SmallSectionHeader>
         <LegendContainer>
           <LegendItem style={{ color: theme.colors.textSelection }}>
-            <svg style={{ width: 22, height: 22, marginRight: 6 }}>
+            <svg
+              viewBox="0 0 22 22"
+              style={{ width: 22, height: 22, marginRight: 6 }}
+            >
               <circle
                 cx={11}
                 cy={11}

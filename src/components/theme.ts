@@ -90,6 +90,7 @@ export const SectionHeader = styled.h2`
 
 export const SmallSectionHeader = styled.h3`
   margin-top: 0;
+  margin-right: 30px;
 `;
 
 export const BodyText = styled.div`
@@ -117,6 +118,30 @@ export const SecondaryContent = BodyText.extend`
   padding-left: ${defaultMargin}px;
   padding-top: 5px;
   border-left: 1px solid ${colors.grayLight};
+`;
+
+export const Button = styled.button`
+  background: transparent;
+  border-radius: 4px;
+  color: white;
+  padding: 5px 20px;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: white;
+  color: ${colors.text};
+  border: 2px solid ${colors.gray};
+
+  &:hover {
+    background-color: ${colors.gray};
+    color: white;
+  }
+
+  &:focus {
+    outline: 0;
+  }
 `;
 
 export const theme = {

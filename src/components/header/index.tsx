@@ -74,13 +74,13 @@ export function Header({ appType }: Props) {
   }
   return (
     <section>
-      <LogoContainer className="container">
+      <LogoContainer className="container-fluid">
         <a href={WEBSITE_URL}>
           <Logo src={logoFilename} />
         </a>
       </LogoContainer>
       <Navigation>
-        <LinkContainer className="container">
+        <LinkContainer className="container-fluid">
           <NavLink href={WEBSITE_URL}>Home</NavLink>
           {TOOLS.map(({ appType: toolAppType, name, url }) => (
             <NavLink

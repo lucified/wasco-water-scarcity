@@ -52,17 +52,27 @@ const BodyContainer = styled.div`
   width: 100%;
 `;
 
-const selectorsWidth = '400px';
+const desktopBreakpoint = '1000px';
+const selectorsDesktopWidth = '400px';
+const selectorsTabletWidth = '320px';
 
 const SelectorsContent = styled.div`
   position: relative;
-  width: ${selectorsWidth};
+  width: ${selectorsTabletWidth};
   padding-right: ${theme.margin()};
   margin-top: ${theme.margin()};
+
+  @media screen and (min-width: ${desktopBreakpoint}) {
+    width: ${selectorsDesktopWidth};
+  }
 `;
 
 const StickyGraphics = styled(Sticky)`
-  width: calc(100% - ${selectorsWidth});
+  width: calc(100% - ${selectorsTabletWidth});
+
+  @media screen and (min-width: ${desktopBreakpoint}) {
+    width: calc(100% - ${selectorsDesktopWidth});
+  }
 `;
 
 const GraphicsContainer = styled.div`
@@ -400,11 +410,11 @@ class FutureBody extends React.Component<Props, State> {
 
     return (
       <div>
-        <TitleContainer className="container">
+        <TitleContainer className="container-fluid">
           <Title>Explore possible futures of water scarcity</Title>
         </TitleContainer>
         <DataTypeLinks />
-        <BodyContainer className="container">
+        <BodyContainer className="container-fluid">
           <SelectorsContent>
             <FutureScenarioFilter
               setScenario={this.handleSetSelectedScenario}
