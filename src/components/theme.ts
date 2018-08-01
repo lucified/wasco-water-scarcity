@@ -90,6 +90,7 @@ export const SectionHeader = styled.h2`
 
 export const SmallSectionHeader = styled.h3`
   margin-top: 0;
+  margin-right: 30px;
 `;
 
 export const BodyText = styled.div`
