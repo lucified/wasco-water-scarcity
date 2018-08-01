@@ -37,6 +37,9 @@ const Land = styled.path`
 `;
 
 const SVG = styled.svg`
+  /* Needed for IE11 */
+  overflow: hidden;
+
   & .water-region {
     stroke-width: 0.5px;
     stroke: #ecf4f8;
