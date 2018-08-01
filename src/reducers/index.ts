@@ -184,11 +184,34 @@ function selectionsReducer(
       return state;
     case 'SET_SELECTED_IMPACT_MODEL':
       if (action.impactModel !== state.impactModel) {
-        let { climateModel } = state;
+        return {
+          ...state,
+          impactModel: action.impactModel,
+        };
+      }
 
-        // If watch was previously selected, we need to switch to a
-        // valid climateModel.
-        if (climateModel === 'watch') {
+      return state;
+    case 'SET_SELECTED_CLIMATE_MODEL':
+      if (action.climateModel !== state.climateModel) {
+        let { impactModel } = state;
+
+        if (action.climateModel === 'watch') {
+          impactModel = 'watergap';
+        }
+
+        return {
+          ...state,
+          impactModel,
+          climateModel: action.climateModel,
+        };
+      }
+
+      return state;
+    case 'SET_SELECTED_TIME_SCALE':
+      let { climateModel } = state;
+
+      if (action.timeScale !== state.timeScale) {
+        if (action.timeScale === 'annual' && state.climateModel === 'watch') {
           climateModel = getHistoricalClimateModels().filter(
             m => m !== 'watch',
           )[0];
@@ -197,38 +220,6 @@ function selectionsReducer(
         return {
           ...state,
           climateModel,
-          impactModel: action.impactModel,
-        };
-      }
-
-      return state;
-    case 'SET_SELECTED_CLIMATE_MODEL':
-      if (action.climateModel !== state.climateModel) {
-        let { impactModel, timeScale } = state;
-
-        if (action.climateModel === 'watch') {
-          impactModel = 'watergap';
-          timeScale = 'decadal';
-        }
-
-        return {
-          ...state,
-          timeScale,
-          impactModel,
-          climateModel: action.climateModel,
-        };
-      }
-
-      return state;
-    case 'SET_SELECTED_TIME_SCALE':
-      if (action.timeScale !== state.timeScale) {
-        if (action.timeScale === 'annual' && state.climateModel === 'watch') {
-          // WATCH dataset only has decadal data
-          return state;
-        }
-
-        return {
-          ...state,
           timeScale: action.timeScale,
         };
       }
