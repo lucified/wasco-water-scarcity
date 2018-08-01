@@ -27,7 +27,11 @@ const MoreInformationLink = styled.a`
   display: block;
   cursor: pointer;
   color: ${theme.colors.gray};
-  text-align: center;
+  text-align: right;
+
+  &:hover {
+    color: ${theme.colors.text};
+  }
 `;
 
 const StyledCaretIcon = styled(CaretIcon)`

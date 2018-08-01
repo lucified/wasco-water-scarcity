@@ -7,6 +7,7 @@ import {
   FutureScenario,
   FutureScenarioVariableName,
 } from '../../../data';
+import { CaretIcon } from '../../caret-icon';
 import MultiSelector from '../../generic/multi-selector';
 import { SelectorDescription, SelectorHeader, theme } from '../../theme';
 import { RaggedOption } from './future-scenario-filter';
@@ -33,6 +34,17 @@ const MoreInformationContent = styled.div`
 const MoreInformationLink = styled.a`
   display: block;
   cursor: pointer;
+  color: ${theme.colors.gray};
+  text-align: right;
+
+  &:hover {
+    color: ${theme.colors.text};
+  }
+`;
+
+const StyledCaretIcon = styled(CaretIcon)`
+  position: relative;
+  top: 3px;
 `;
 
 interface Props {
@@ -148,7 +160,27 @@ export class FutureScenarioFilterVariable extends React.Component<
               </MoreInformationContent>
             )}
             <MoreInformationLink onClick={this.toggleFurtherInformation}>
-              {furtherInformationOpen ? 'Hide' : 'Show more information'}
+              {furtherInformationOpen ? (
+                <span>
+                  Hide{' '}
+                  <StyledCaretIcon
+                    direction="up"
+                    color={theme.colors.gray}
+                    width={16}
+                    height={16}
+                  />
+                </span>
+              ) : (
+                <span>
+                  Show more information{' '}
+                  <StyledCaretIcon
+                    direction="down"
+                    color={theme.colors.gray}
+                    width={16}
+                    height={16}
+                  />
+                </span>
+              )}
             </MoreInformationLink>
           </MoreInformationContainer>
         )}
