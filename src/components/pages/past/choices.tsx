@@ -16,7 +16,7 @@ import {
 } from '../../../selectors';
 import { HistoricalDataType, TimeScale } from '../../../types';
 import LowThresholdSelector from '../../low-threshold-selector';
-import { BodyText, theme } from '../../theme';
+import { BodyText, SelectorHeader, theme } from '../../theme';
 import { ModelSelector } from './model-selector';
 
 interface StateProps {
@@ -153,6 +153,7 @@ class ChoicesPlain extends React.Component<Props> {
         <BodyText>{getDescriptionForDataType(dataType)}</BodyText>
         {dataType === 'scarcity' && (
           <>
+            <SelectorHeader>Thresholds</SelectorHeader>
             <StyledLowThresholdSelector dataType="stress" />
             <StyledLowThresholdSelector dataType="shortage" />
           </>
