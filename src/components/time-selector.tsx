@@ -152,7 +152,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
       this.props.setSelectedTime(0);
       setTimeout(() => {
         this.play();
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -161,7 +161,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
       this.props.setSelectedTime(0);
       setTimeout(() => {
         this.play();
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -218,7 +218,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
     } else {
       setSelectedTime(selectedIndex + 1);
     }
-    this.timerReference = setInterval(this.setNextPeriod, 500);
+    this.timerReference = setInterval(this.setNextPeriod, 1500);
   }
 
   private setNextPeriod = () => {
