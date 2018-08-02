@@ -6,15 +6,15 @@ let bucket, baseUrl;
 switch (process.env.APP) {
   case 'embed':
     bucket = 'lucify-wasco-embed';
-    baseUrl = 'https://wasco-embed.lucify.com';
+    baseUrl = 'https://embed.waterscarcityatlas.org';
     break;
   case 'future':
     bucket = 'lucify-wasco-future';
-    baseUrl = 'https://wasco-future.lucify.com';
+    baseUrl = 'https://futures.waterscarcityatlas.org';
     break;
   default:
     bucket = 'lucify-wasco';
-    baseUrl = 'https://wasco.lucify.com';
+    baseUrl = 'https://explore.waterscarcityatlas.org';
     break;
 }
 
