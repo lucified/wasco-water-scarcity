@@ -542,7 +542,7 @@ class Map extends React.Component<Props, State> {
       selectedWaterRegionId,
       waterRegions: { features },
     } = this.props;
-    const t = transition('waterRegion').duration(100);
+    const t = transition('waterRegion').duration(200);
     select('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => d.properties.featureId.toString())

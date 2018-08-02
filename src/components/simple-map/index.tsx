@@ -43,7 +43,7 @@ const SVG = styled.svg`
   & .water-region {
     stroke-width: 0.5px;
     stroke: #ecf4f8;
-    transition: opacity 0.2s ease-in;
+    transition: opacity 300ms ease-in;
   }
 `;
 
@@ -404,7 +404,7 @@ class SimpleMap extends React.Component<Props> {
     const {
       waterRegions: { features },
     } = this.props;
-    const t = transition('waterRegion').duration(100);
+    const t = transition('waterRegion').duration(300);
     select<SVGGElement, undefined>('g#water-regions')
       .selectAll<SVGPathElement, WaterRegionGeoJSONFeature>('path')
       .data(features, d => d.properties.featureId.toString())
