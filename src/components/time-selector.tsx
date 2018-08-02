@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
 import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
 import { belowThresholdColor, getDataTypeColors } from '../data';
-import memoize from '../memoize';
 import { StateTree } from '../reducers';
 import {
   getSelectedHistoricalTimeIndex,
@@ -165,8 +165,11 @@ class TimeSelector extends React.PureComponent<Props, State> {
     }
   }
 
-  private generateBarChartData = memoize(
-    (data: AggregateStressShortageDatum[], dataType: HistoricalDataType) =>
+  private generateBarChartData = createSelector(
+    (props: Props) => props.data,
+    (props: Props) => props.dataType,
+    (data, dataType) =>
+      data &&
       data.map((d, i) => ({
         key: i,
         total: d.population,
@@ -261,7 +264,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
           <div style={{ height: 120 + 3, width: '100%' }} />
         ) : (
           <BarChart
-            data={this.generateBarChartData(data, dataType)}
+            data={this.generateBarChartData(this.props)!}
             height={120}
             marginBottom={20}
             marginRight={0}

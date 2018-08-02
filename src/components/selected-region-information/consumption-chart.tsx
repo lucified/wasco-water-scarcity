@@ -1,8 +1,8 @@
 import { max } from 'd3-array';
 import { schemeBlues } from 'd3-scale-chromatic';
 import * as React from 'react';
+import { createSelector } from 'reselect';
 import styled from 'styled-components';
-import memoize from '../../memoize';
 import { Datum } from '../../types';
 import { formatAxisNumber, formatYearRange } from '../../utils';
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
@@ -71,8 +71,10 @@ const legendItems: Array<LegendItem & { field: keyof Datum }> = [
 class ConsumptionChart extends React.Component<Props, State> {
   public state: State = {};
 
-  private generateBarChartData = memoize(
-    (data: Datum[], hoveredType?: keyof Datum) =>
+  private generateBarChartData = createSelector(
+    (props: Props, _state: State) => props.data,
+    (_props: Props, state: State) => state.hoveredType,
+    (data, hoveredType) =>
       data.map((d, i) => ({
         key: i,
         total: d.consumptionTotal,
@@ -129,7 +131,7 @@ class ConsumptionChart extends React.Component<Props, State> {
     return (
       <div>
         <BarChart
-          data={this.generateBarChartData(data, hoveredType)}
+          data={this.generateBarChartData(this.props, this.state)}
           maxYValue={chartMaxValue}
           height={180}
           marginBottom={20}

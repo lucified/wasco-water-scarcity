@@ -1,8 +1,7 @@
 import * as React from 'react';
-import memoize from '../../memoize';
+import { createSelector } from 'reselect';
 import { Datum } from '../../types';
 import { formatPopulation, formatYearRange } from '../../utils';
-
 import BarChart, { BarChartDatum } from '../generic/bar-chart';
 
 interface PassedProps {
@@ -17,18 +16,20 @@ interface PassedProps {
 type Props = PassedProps;
 
 export default class PopulationChart extends React.PureComponent<Props> {
-  private generateBarChartData = memoize((data: Datum[]) =>
-    data.map((d, i) => ({
-      key: i,
-      total: d.population,
-      values: [
-        {
-          key: 'Population',
-          total: d.population,
-          color: '#D3E4E6',
-        },
-      ],
-    })),
+  private generateBarChartData = createSelector(
+    (props: Props) => props.data,
+    data =>
+      data.map((d, i) => ({
+        key: i,
+        total: d.population,
+        values: [
+          {
+            key: 'Population',
+            total: d.population,
+            color: '#D3E4E6',
+          },
+        ],
+      })),
   );
 
   private handleClick = (item: BarChartDatum) => {
@@ -47,7 +48,7 @@ export default class PopulationChart extends React.PureComponent<Props> {
       maxY,
       timeIndexLocked,
     } = this.props;
-    const barChartData: BarChartDatum[] = this.generateBarChartData(data);
+    const barChartData: BarChartDatum[] = this.generateBarChartData(this.props);
 
     function handleHover(item: BarChartDatum) {
       onTimeIndexChange(item.key);
