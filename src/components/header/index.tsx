@@ -55,12 +55,12 @@ const TOOLS = [
   {
     appType: AppType.PAST,
     name: 'Exploration tool',
-    url: 'https://lucify-wasco-staging.netlify.com/',
+    url: 'https://explore.waterscarcityatlas.org/',
   },
   {
     appType: AppType.FUTURE,
     name: 'Futures tool',
-    url: 'https://netlify-future--lucify-wasco-staging.netlify.com/',
+    url: 'https://futures.waterscarcityatlas.org/',
   },
 ];
 
