@@ -179,9 +179,9 @@ class ChoicesPlain extends React.Component<Props> {
               are a mix of river basins and country borders, as used in{' '}
               <a href="https://dev.mediapool.fi/wasco/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
                 Kummu et al. 2016
-              </a>. It is assumed that water can be managed and moved within
-              these regions in order to make as much water as possible available
-              for use. Water would only be used from outside these regions if
+              </a>. It is assumed that water can be managed and moved within these
+              regions in order to make as much water as possible available for
+              use. Water would only be used from outside these regions if
               scarcity occurs. In large basins, water is allocated between FPUs
               according to discharge.
               <p>
