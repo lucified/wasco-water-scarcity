@@ -148,6 +148,7 @@ class ChoicesPlain extends React.Component<Props> {
       dataType,
     } = this.props;
 
+    // prettier-ignore
     return (
       <div className={className}>
         <BodyText>{getDescriptionForDataType(dataType)}</BodyText>
