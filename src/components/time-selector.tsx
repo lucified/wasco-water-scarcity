@@ -258,7 +258,7 @@ class TimeSelector extends React.PureComponent<Props, State> {
           )}
         </h3>
         {!data ? (
-          <div style={{ height: 120, width: '100%' }} />
+          <div style={{ height: 120 + 3, width: '100%' }} />
         ) : (
           <BarChart
             data={this.generateBarChartData(data, dataType)}

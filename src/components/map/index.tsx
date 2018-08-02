@@ -1087,7 +1087,9 @@ class Map extends React.Component<Props, State> {
     return (
       <Container>
         {!selectedData || !worldGeoData ? (
-          <div style={{ width, height }}>{this.getSpinnerOverlay()}</div>
+          <div style={{ width, height: height + 3 }}>
+            {this.getSpinnerOverlay()}
+          </div>
         ) : (
           <>
             <MapTooltip
