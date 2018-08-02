@@ -42,7 +42,6 @@ import DataTypeLinks from './data-type-links';
 import { EnsembleThresholdSelector } from './ensemble-threshold-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
-import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
 
@@ -96,6 +95,7 @@ const MapHeaderRow = styled.div`
 const TimeSelectorContainer = styled.div`
   max-width: 300px;
   width: 100%;
+  height: 40px;
   padding-right: ${theme.margin()};
 `;
 
@@ -439,13 +439,10 @@ class FutureBody extends React.Component<Props, State> {
                       )}
                     </TimeSelectorContainer>
                   </MapHeaderRow>
-                  {!mapData ? (
-                    scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
+                  {!mapData &&
+                  scenariosRequested.indexOf(toScenarioId(selectedScenario)) ===
                     -1 ? (
-                      <MapPlaceholder />
-                    ) : (
-                      <Error>No data found for selected scenario.</Error>
-                    )
+                    <Error>No data found for selected scenario.</Error>
                   ) : (
                     <>
                       <ResponsiveMap
@@ -454,7 +451,11 @@ class FutureBody extends React.Component<Props, State> {
                         selectedDataType={selectedDataType}
                         appType={AppType.FUTURE}
                       />
-                      {!isZoomedIn && <WorldRegionSelector />}
+                      {isZoomedIn ? (
+                        <div style={{ margin: theme.margin() }} />
+                      ) : (
+                        <WorldRegionSelector />
+                      )}
                     </>
                   )}
                   {!ensembleData[selectedDataType][ensembleAreaId] ? (
