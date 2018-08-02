@@ -329,10 +329,6 @@ class Map extends React.Component<Props, State> {
           this.zoomToWaterRegion();
           this.redrawFillsAndBorders();
         }
-
-        if (zoomedInDataLoaded) {
-          this.props.setZoomedInToRegion(true);
-        }
       } else {
         // Not zoomed in
         if (dataChanged || waterRegionSelectedAndChanged) {
@@ -576,6 +572,13 @@ class Map extends React.Component<Props, State> {
       appType === AppType.FUTURE
         ? await getFutureLocalRegionData(regionId)
         : await getPastLocalRegionData(regionId, selectedScenarioId!); // Ugly: we assume scenarioId exists
+    if (
+      data &&
+      this.props.selectedWaterRegionId === regionId &&
+      this.state.zoomInRequested
+    ) {
+      this.props.setZoomedInToRegion(true);
+    }
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.filter(
         id => id !== regionId,
