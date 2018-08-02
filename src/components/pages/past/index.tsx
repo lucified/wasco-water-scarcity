@@ -63,6 +63,12 @@ const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
 `;
 
+const Error = styled.div`
+  width: 100%;
+  text-align: center;
+  margin: 100px 0;
+`;
+
 interface PassedProps {
   isLoading: boolean;
 }
@@ -77,6 +83,7 @@ export class PastBody extends React.Component<Props> {
       selectedWaterData,
       isZoomedIn,
       scenarioId,
+      isLoading,
     } = this.props;
 
     return (
@@ -98,19 +105,25 @@ export class PastBody extends React.Component<Props> {
                 </div>
                 <div className="row ">
                   <MapContainer className="col-xs-12">
-                    {selectedWaterData && (
-                      <StyledYearLabel
-                        startYear={selectedWaterData.startYear}
-                        endYear={selectedWaterData.endYear}
-                      />
+                    {!selectedWaterData && !isLoading ? (
+                      <Error>Unable to load data for scenario</Error>
+                    ) : (
+                      <>
+                        {selectedWaterData && (
+                          <StyledYearLabel
+                            startYear={selectedWaterData.startYear}
+                            endYear={selectedWaterData.endYear}
+                          />
+                        )}
+                        <ResponsiveMap
+                          selectedData={selectedWaterData}
+                          selectedDataType={selectedDataType}
+                          waterRegions={waterRegions}
+                          appType={AppType.PAST}
+                          selectedScenarioId={scenarioId}
+                        />
+                      </>
                     )}
-                    <ResponsiveMap
-                      selectedData={selectedWaterData}
-                      selectedDataType={selectedDataType}
-                      waterRegions={waterRegions}
-                      appType={AppType.PAST}
-                      selectedScenarioId={scenarioId}
-                    />
                   </MapContainer>
                 </div>
                 <div className="row">
