@@ -1,4 +1,4 @@
-import { max } from 'd3-array';
+import { max, sum } from 'd3-array';
 import { schemeBlues } from 'd3-scale-chromatic';
 import * as React from 'react';
 import { createSelector } from 'reselect';
@@ -75,21 +75,24 @@ class ConsumptionChart extends React.Component<Props, State> {
     (props: Props, _state: State) => props.data,
     (_props: Props, state: State) => state.hoveredType,
     (data, hoveredType) =>
-      data.map((d, i) => ({
-        key: i,
-        total: d.consumptionTotal,
-        values: legendItems
-          // Filter out fields with zero and if we're hovered, only the hovered type
-          .filter(
-            ({ field }) =>
-              d[field] > 0 && hoveredType ? field === hoveredType : true,
-          )
+      data.map((d, i) => {
+        const values = legendItems
+          .filter(({ field }) => !hoveredType || field === hoveredType)
           .map(({ title, field, color }) => ({
             key: title,
             total: d[field],
             color,
-          })),
-      })),
+          }));
+        const total = hoveredType
+          ? sum(values.map(v => v.total))
+          : d.consumptionTotal;
+
+        return {
+          key: i,
+          total,
+          values,
+        };
+      }),
   );
 
   private handleLegendHover = (title?: string) => {
