@@ -103,7 +103,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       return `Blue water ${type} for ${selectedWorldRegion.name}`;
     }
 
-    return `Global blue water ${type}`;
+    return `Blue water ${type}`;
   }
 
   private getStressChart() {

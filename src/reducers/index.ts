@@ -11,7 +11,9 @@ import { getGlobalStateFromURLHash } from '../url-state';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 
 const defaultState: StateTree = {
-  data: {},
+  data: {
+    stressShortageData: {},
+  },
   thresholds: {
     stress: [...defaultDataTypeThresholds.stress],
     shortage: [...defaultDataTypeThresholds.shortage],
@@ -51,7 +53,10 @@ function dataReducer(state = defaultState.data, action: Action): DataTree {
     case 'STORE_WATER_DATA':
       return {
         ...state,
-        stressShortageData: action.data,
+        stressShortageData: {
+          ...state.stressShortageData,
+          [action.scenarioId]: action.data,
+        },
       };
     case 'STORE_WATER_REGION_DATA':
       return {

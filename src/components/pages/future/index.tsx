@@ -42,7 +42,6 @@ import DataTypeLinks from './data-type-links';
 import { EnsembleThresholdSelector } from './ensemble-threshold-selector';
 import FutureLineChart from './future-line-chart';
 import FutureScenarioFilter from './future-scenario-filter';
-import MapPlaceholder from './map-placeholder';
 import { TimeSelector } from './time-selector';
 const Sticky = require('react-stickynode');
 
@@ -96,6 +95,7 @@ const MapHeaderRow = styled.div`
 const TimeSelectorContainer = styled.div`
   max-width: 300px;
   width: 100%;
+  height: 40px;
   padding-right: ${theme.margin()};
 `;
 
@@ -180,8 +180,18 @@ class FutureBody extends React.Component<Props, State> {
     },
   );
 
+  private getEnsembleAreaId = createSelector(
+    (_state: State, props: Props) => props.selectedWaterRegionId,
+    (_state: State, props: Props) => props.selectedWorldRegionId,
+    (state: State, props: Props) =>
+      state.ensembleThresholds[props.selectedDataType],
+    (waterRegionId, worldRegionId, ensembleThreshold) =>
+      waterRegionId != null
+        ? toEnsembleRegionId(waterRegionId)
+        : toEnsembleWorldId(worldRegionId, ensembleThreshold),
+  );
+
   private getTimeLabels = createSelector(
-    // Note: the time labels should be the same for all scenarios
     (state: State) => state.scenarioData[toScenarioId(state.selectedScenario)],
     scenarioData => {
       if (!scenarioData) {
@@ -261,24 +271,10 @@ class FutureBody extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
-    const {
-      selectedDataset,
-      selectedScenario,
-      ensembleThresholds,
-    } = this.state;
-    const {
-      selectedWorldRegionId,
-      selectedWaterRegionId,
-      selectedDataType,
-    } = this.props;
+    const { selectedDataset, selectedScenario } = this.state;
+    const { selectedDataType } = this.props;
 
-    const ensembleAreaId = selectedWaterRegionId
-      ? toEnsembleRegionId(selectedWaterRegionId)
-      : toEnsembleWorldId(
-          selectedWorldRegionId,
-          ensembleThresholds[selectedDataType],
-        );
-
+    const ensembleAreaId = this.getEnsembleAreaId(this.state, this.props);
     this.fetchFutureEnsembleData(
       selectedDataset,
       ensembleAreaId,
@@ -287,23 +283,19 @@ class FutureBody extends React.Component<Props, State> {
     this.fetchFutureScenarioData(selectedDataset, selectedScenario);
   }
 
-  public componentWillReceiveProps({
-    selectedDataType,
-    selectedWaterRegionId,
-    selectedWorldRegionId,
-  }: Props) {
+  public componentWillReceiveProps(nextProps: Props) {
+    const {
+      selectedDataType,
+      selectedWaterRegionId,
+      selectedWorldRegionId,
+    } = nextProps;
     if (
       selectedWaterRegionId !== this.props.selectedWaterRegionId ||
       selectedWorldRegionId !== this.props.selectedWorldRegionId ||
       selectedDataType !== this.props.selectedDataType
     ) {
-      const { selectedDataset, ensembleData, ensembleThresholds } = this.state;
-      const ensembleAreaId = selectedWaterRegionId
-        ? toEnsembleRegionId(selectedWaterRegionId)
-        : toEnsembleWorldId(
-            selectedWorldRegionId,
-            ensembleThresholds[selectedDataType],
-          );
+      const { selectedDataset, ensembleData } = this.state;
+      const ensembleAreaId = this.getEnsembleAreaId(this.state, nextProps);
       if (!ensembleData[selectedDataType][ensembleAreaId]) {
         this.fetchFutureEnsembleData(
           selectedDataset,
@@ -399,13 +391,7 @@ class FutureBody extends React.Component<Props, State> {
       ensembleThresholds,
     } = this.state;
     const mapData = this.getMapData(this.state, this.props);
-    const ensembleAreaId = selectedWaterRegionId
-      ? toEnsembleRegionId(selectedWaterRegionId)
-      : toEnsembleWorldId(
-          selectedWorldRegionId,
-          ensembleThresholds[selectedDataType],
-        );
-
+    const ensembleAreaId = this.getEnsembleAreaId(this.state, this.props);
     const timeLabels = this.getTimeLabels(this.state);
 
     return (
@@ -453,13 +439,10 @@ class FutureBody extends React.Component<Props, State> {
                       )}
                     </TimeSelectorContainer>
                   </MapHeaderRow>
-                  {!mapData ? (
-                    scenariosRequested.indexOf(toScenarioId(selectedScenario)) >
+                  {!mapData &&
+                  scenariosRequested.indexOf(toScenarioId(selectedScenario)) ===
                     -1 ? (
-                      <MapPlaceholder />
-                    ) : (
-                      <Error>No data found for selected scenario.</Error>
-                    )
+                    <Error>No data found for selected scenario.</Error>
                   ) : (
                     <>
                       <ResponsiveMap
@@ -468,7 +451,11 @@ class FutureBody extends React.Component<Props, State> {
                         selectedDataType={selectedDataType}
                         appType={AppType.FUTURE}
                       />
-                      {!isZoomedIn && <WorldRegionSelector />}
+                      {isZoomedIn ? (
+                        <div style={{ margin: theme.margin() }} />
+                      ) : (
+                        <WorldRegionSelector />
+                      )}
                     </>
                   )}
                   {!ensembleData[selectedDataType][ensembleAreaId] ? (

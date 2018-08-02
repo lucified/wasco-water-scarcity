@@ -9,12 +9,12 @@ import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
+  getHistoricalScenarioId,
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
 } from '../selectors';
 import { TimeScale } from '../types';
-import { historicalDataRequestId } from '../utils';
 import { ScarcityEmbed } from './embeds/scarcity';
 import { ShortageEmbed } from './embeds/shortage';
 import { StressEmbed } from './embeds/stress';
@@ -55,6 +55,7 @@ interface GeneratedDispatchProps {
     climateModel: string,
     impactModel: string,
     timeScale: TimeScale,
+    scenarioId: string,
   ) => void;
 }
 
@@ -62,6 +63,7 @@ interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
   selectedTimeScale: TimeScale;
+  scenarioId: string;
 }
 
 type Props = GeneratedDispatchProps & GeneratedStateProps;
@@ -72,6 +74,7 @@ class AppEmbedPlain extends React.Component<Props> {
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
+      scenarioId,
     } = this.props;
 
     this.props.loadMapData();
@@ -79,6 +82,7 @@ class AppEmbedPlain extends React.Component<Props> {
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
+      scenarioId,
     );
   }
 
@@ -103,6 +107,7 @@ export const AppEmbed = hot(module)(
       selectedClimateModel: getSelectedClimateModel(state),
       selectedImpactModel: getSelectedImpactModel(state),
       selectedTimeScale: getSelectedTimeScale(state),
+      scenarioId: getHistoricalScenarioId(state),
     }),
     dispatch => ({
       loadMapData: () => {
@@ -113,13 +118,14 @@ export const AppEmbed = hot(module)(
         climateModel: string,
         impactModel: string,
         timeScale: TimeScale,
+        scenarioId: string,
       ) => {
         // TODO: figure out how to type this: https://github.com/reduxjs/redux-thunk/issues/103
         dispatch(loadModelData(
           climateModel,
           impactModel,
           timeScale,
-          historicalDataRequestId(climateModel, impactModel, timeScale),
+          scenarioId,
         ) as any);
       },
     }),

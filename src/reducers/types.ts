@@ -23,7 +23,9 @@ export interface SelectionsTree {
 export type ThresholdsTree = { [dataType in AnyDataType]: number[] };
 
 export interface DataTree {
-  stressShortageData?: Array<TimeAggregate<StressShortageDatum>>;
+  stressShortageData: {
+    [scenarioId: string]: Array<TimeAggregate<StressShortageDatum>> | undefined;
+  };
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };

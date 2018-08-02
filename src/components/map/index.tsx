@@ -196,7 +196,7 @@ function getColorScale(dataType: AnyDataType, thresholds: number[]) {
 
 interface PassedProps {
   width: number;
-  selectedData: TimeAggregate<number | undefined>;
+  selectedData?: TimeAggregate<number | undefined>;
   waterRegions: WaterRegionGeoJSON;
   selectedDataType: AnyDataType;
   appType: AppType;
@@ -262,12 +262,16 @@ class Map extends React.Component<Props, State> {
     } = this.props;
     const { zoomInRequested, regionData, worldGeoData } = this.state;
 
-    if (!worldGeoData) {
+    if (!worldGeoData || !selectedData) {
       return;
     }
 
-    if (worldGeoData && !prevState.worldGeoData) {
-      // Map data was loaded
+    if (
+      worldGeoData &&
+      selectedData &&
+      (!prevState.worldGeoData || !prevProps.selectedData)
+    ) {
+      // Initial data load
       this.drawMap();
       if (zoomInRequested) {
         this.zoomToWaterRegion();
@@ -312,48 +316,46 @@ class Map extends React.Component<Props, State> {
         this.removeZoomedInElements();
         this.zoomToWaterRegion();
       }
+
+      return;
+    }
+
+    // Width has stayed the same
+    if (waterRegionNoLongerSelected) {
+      this.removeZoomedInElements();
+      this.zoomToGlobalArea();
+      this.redrawFillsAndBorders();
+    } else if (zoomInRequested) {
+      if (
+        didRequestZoomIn ||
+        waterRegionSelectedAndChanged ||
+        zoomedInDataLoaded ||
+        dataChanged
+      ) {
+        this.removeZoomedInElements();
+        this.zoomToWaterRegion();
+        this.redrawFillsAndBorders();
+      }
     } else {
-      // Width has stayed the same
-      if (waterRegionNoLongerSelected) {
+      // Not zoomed in
+      if (dataChanged || waterRegionSelectedAndChanged) {
+        this.redrawFillsAndBorders();
+      }
+
+      if (selectedWorldRegionChanged) {
+        this.zoomToGlobalArea();
+      }
+
+      if (didRequestZoomOut) {
         this.removeZoomedInElements();
         this.zoomToGlobalArea();
         this.redrawFillsAndBorders();
-      } else if (zoomInRequested) {
-        if (
-          didRequestZoomIn ||
-          waterRegionSelectedAndChanged ||
-          zoomedInDataLoaded ||
-          dataChanged
-        ) {
-          this.removeZoomedInElements();
-          this.zoomToWaterRegion();
-          this.redrawFillsAndBorders();
-        }
-
-        if (zoomedInDataLoaded) {
-          this.props.setZoomedInToRegion(true);
-        }
-      } else {
-        // Not zoomed in
-        if (dataChanged || waterRegionSelectedAndChanged) {
-          this.redrawFillsAndBorders();
-        }
-
-        if (selectedWorldRegionChanged) {
-          this.zoomToGlobalArea();
-        }
-
-        if (didRequestZoomOut) {
-          this.removeZoomedInElements();
-          this.zoomToGlobalArea();
-          this.redrawFillsAndBorders();
-        }
       }
     }
   }
 
   private getHeight() {
-    return this.props.width / 1.9;
+    return Math.ceil(this.props.width / 1.9);
   }
 
   private clearMap() {
@@ -529,11 +531,11 @@ class Map extends React.Component<Props, State> {
   };
 
   private getColorForWaterRegion(featureId: number): string {
-    const {
-      colorScale,
-      selectedData: { data },
-    } = this.props;
-    const value = data[featureId];
+    const { colorScale, selectedData } = this.props;
+    if (!selectedData) {
+      return missingDataColor;
+    }
+    const value = selectedData.data[featureId];
     return value != null ? colorScale(value) : missingDataColor;
   }
 
@@ -576,6 +578,13 @@ class Map extends React.Component<Props, State> {
       appType === AppType.FUTURE
         ? await getFutureLocalRegionData(regionId)
         : await getPastLocalRegionData(regionId, selectedScenarioId!); // Ugly: we assume scenarioId exists
+    if (
+      data &&
+      this.props.selectedWaterRegionId === regionId &&
+      this.state.zoomInRequested
+    ) {
+      this.props.setZoomedInToRegion(true);
+    }
     this.setState(state => ({
       fetchingDataForRegions: state.fetchingDataForRegions.filter(
         id => id !== regionId,
@@ -625,17 +634,18 @@ class Map extends React.Component<Props, State> {
 
   private zoomToWaterRegion() {
     const { worldGeoData } = this.state;
-    if (!worldGeoData) {
-      return;
-    }
-
     const {
       selectedWaterRegionId,
       selectedGridVariable,
       width,
       waterRegions: { features },
-      selectedData: { startYear },
+      selectedData,
     } = this.props;
+
+    if (!worldGeoData || !selectedData) {
+      return;
+    }
+
     const { zoomInRequested } = this.state;
 
     const selectedWaterRegion =
@@ -841,7 +851,8 @@ class Map extends React.Component<Props, State> {
             },
             properties: {
               data:
-                d[selectedGridVariable] && d[selectedGridVariable]![startYear],
+                d[selectedGridVariable] &&
+                d[selectedGridVariable]![selectedData.startYear],
             },
           })),
         };
@@ -1050,26 +1061,34 @@ class Map extends React.Component<Props, State> {
     );
   }
 
+  private getSpinnerOverlay() {
+    const { width } = this.props;
+    const height = this.getHeight();
+    return (
+      <SpinnerOverlay style={{ width: width + 10, height }}>
+        <div>
+          <Spinner />
+        </div>
+      </SpinnerOverlay>
+    );
+  }
+
   public render() {
     const {
       selectedDataType,
       width,
       selectedWaterRegionId,
       isZoomedIn,
+      selectedData,
     } = this.props;
     const { zoomInRequested, worldGeoData } = this.state;
     const height = this.getHeight();
 
     return (
       <Container>
-        {!worldGeoData ? (
-          <div style={{ width, height }}>
-            <SpinnerOverlay style={{ width: width + 10, height }}>
-              <div>
-                <p>Loading...</p>
-                <Spinner />
-              </div>
-            </SpinnerOverlay>
+        {!selectedData || !worldGeoData ? (
+          <div style={{ width, height: height + 3 }}>
+            {this.getSpinnerOverlay()}
           </div>
         ) : (
           <>
@@ -1127,14 +1146,8 @@ class Map extends React.Component<Props, State> {
               selectedWaterRegionId &&
               !this.state.regionData[selectedWaterRegionId] &&
               this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
-                -1 && (
-                <SpinnerOverlay style={{ width: width + 10, height }}>
-                  <div>
-                    <p>Loading...</p>
-                    <Spinner />
-                  </div>
-                </SpinnerOverlay>
-              )}
+                -1 &&
+              this.getSpinnerOverlay()}
             {!isZoomedIn &&
               selectedDataType !== 'scarcity' && (
                 <StyledThresholdSelector
@@ -1142,7 +1155,7 @@ class Map extends React.Component<Props, State> {
                   dataType={selectedDataType}
                 />
               )}
-            {selectedWaterRegionId && (
+            {selectedWaterRegionId != null && (
               <ZoomButton onClick={this.toggleZoomInToRegion}>
                 {isZoomedIn ? 'Zoom out' : 'Zoom in'}
               </ZoomButton>

@@ -9,13 +9,19 @@ import styled, { injectGlobal } from 'styled-components';
 import { loadMapData, loadModelData } from '../actions';
 import { StateTree } from '../reducers';
 import {
+  getHistoricalScenarioId,
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
+  getStressShortageDataForScenario,
   isRequestOngoing,
 } from '../selectors';
-import { AppType, TimeScale } from '../types';
-import { historicalDataRequestId } from '../utils';
+import {
+  AppType,
+  StressShortageDatum,
+  TimeAggregate,
+  TimeScale,
+} from '../types';
 import { Header } from './header';
 import { MinWidthWarning } from './min-width-warning';
 import NotFound from './pages/not-found';
@@ -66,6 +72,7 @@ interface GeneratedDispatchProps {
     climateModel: string,
     impactModel: string,
     timeScale: TimeScale,
+    scenarioId: string,
   ) => void;
 }
 
@@ -73,6 +80,8 @@ interface GeneratedStateProps {
   selectedImpactModel: string;
   selectedClimateModel: string;
   selectedTimeScale: TimeScale;
+  selectedScenarioId: string;
+  scenarioData?: Array<TimeAggregate<StressShortageDatum>>;
   isLoading: boolean;
 }
 
@@ -84,6 +93,7 @@ class AppPlain extends React.Component<Props> {
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
+      selectedScenarioId,
     } = this.props;
 
     this.props.loadMapData();
@@ -91,6 +101,7 @@ class AppPlain extends React.Component<Props> {
       selectedClimateModel,
       selectedImpactModel,
       selectedTimeScale,
+      selectedScenarioId,
     );
   }
 
@@ -102,14 +113,17 @@ class AppPlain extends React.Component<Props> {
     } = this.props;
 
     if (
-      selectedClimateModel !== nextProps.selectedClimateModel ||
-      selectedImpactModel !== nextProps.selectedImpactModel ||
-      selectedTimeScale !== nextProps.selectedTimeScale
+      !nextProps.isLoading &&
+      !nextProps.scenarioData &&
+      (selectedClimateModel !== nextProps.selectedClimateModel ||
+        selectedImpactModel !== nextProps.selectedImpactModel ||
+        selectedTimeScale !== nextProps.selectedTimeScale)
     ) {
       this.props.loadModelData(
         nextProps.selectedClimateModel,
         nextProps.selectedImpactModel,
         nextProps.selectedTimeScale,
+        nextProps.selectedScenarioId,
       );
     }
   }
@@ -196,19 +210,14 @@ class AppPlain extends React.Component<Props> {
 export const App = hot(module)(
   connect<GeneratedStateProps, GeneratedDispatchProps, PassedProps, StateTree>(
     state => {
-      const selectedClimateModel = getSelectedClimateModel(state);
-      const selectedImpactModel = getSelectedImpactModel(state);
-      const selectedTimeScale = getSelectedTimeScale(state);
-      const requestId = historicalDataRequestId(
-        selectedClimateModel,
-        selectedImpactModel,
-        selectedTimeScale,
-      );
+      const selectedScenarioId = getHistoricalScenarioId(state);
       return {
-        selectedClimateModel,
-        selectedImpactModel,
-        selectedTimeScale,
-        isLoading: isRequestOngoing(state, requestId),
+        selectedClimateModel: getSelectedClimateModel(state),
+        selectedImpactModel: getSelectedImpactModel(state),
+        selectedTimeScale: getSelectedTimeScale(state),
+        selectedScenarioId,
+        scenarioData: getStressShortageDataForScenario(state),
+        isLoading: isRequestOngoing(state, selectedScenarioId),
       };
     },
     dispatch => ({
@@ -220,13 +229,14 @@ export const App = hot(module)(
         climateModel: string,
         impactModel: string,
         timeScale: TimeScale,
+        scenarioId: string,
       ) => {
         // TODO: figure out how to type this: https://github.com/reduxjs/redux-thunk/issues/103
         dispatch(loadModelData(
           climateModel,
           impactModel,
           timeScale,
-          historicalDataRequestId(climateModel, impactModel, timeScale),
+          scenarioId,
         ) as any);
       },
     }),

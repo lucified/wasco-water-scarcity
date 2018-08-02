@@ -246,10 +246,6 @@ class TimeSelector extends React.PureComponent<Props, State> {
     } = this.props;
     const { isPlaying } = this.state;
 
-    if (!data) {
-      return null;
-    }
-
     return (
       <div>
         <h3>
@@ -261,26 +257,30 @@ class TimeSelector extends React.PureComponent<Props, State> {
             />
           )}
         </h3>
-        <BarChart
-          data={this.generateBarChartData(data, dataType)}
-          height={120}
-          marginBottom={20}
-          marginRight={0}
-          marginTop={5}
-          marginLeft={40}
-          yTickFormat={formatPopulation}
-          xTickFormat={i => {
-            const d = data[parseInt(i, 10)];
-            // Should have at least 70px per long-form title
-            return formatYearRange(d, data.length * 70 < width);
-          }}
-          selectedIndex={selectedIndex}
-          indexLocked={timeIndexLocked}
-          onMouseEnter={this.handleHover}
-          onClick={this.handleClick}
-          hideSelectedLabel
-          transitionDuration={100}
-        />
+        {!data ? (
+          <div style={{ height: 120 + 3, width: '100%' }} />
+        ) : (
+          <BarChart
+            data={this.generateBarChartData(data, dataType)}
+            height={120}
+            marginBottom={20}
+            marginRight={0}
+            marginTop={5}
+            marginLeft={40}
+            yTickFormat={formatPopulation}
+            xTickFormat={i => {
+              const d = data[parseInt(i, 10)];
+              // Should have at least 70px per long-form title
+              return formatYearRange(d, data.length * 70 < width);
+            }}
+            selectedIndex={selectedIndex}
+            indexLocked={timeIndexLocked}
+            onMouseEnter={this.handleHover}
+            onClick={this.handleClick}
+            hideSelectedLabel
+            transitionDuration={100}
+          />
+        )}
       </div>
     );
   }

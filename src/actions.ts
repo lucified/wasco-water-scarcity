@@ -141,13 +141,16 @@ export function setThresholdsForDataType(
 
 export interface StoreWaterDataAction {
   type: 'STORE_WATER_DATA';
+  scenarioId: string;
   data: Array<TimeAggregate<StressShortageDatum>>;
 }
 export function storeWaterData(
+  scenarioId: string,
   data: Array<TimeAggregate<StressShortageDatum>>,
 ): StoreWaterDataAction {
   return {
     type: 'STORE_WATER_DATA',
+    scenarioId,
     data,
   };
 }
@@ -226,18 +229,18 @@ export function loadModelData(
   climateModel: string,
   impactModel: string,
   timeScale: TimeScale,
-  requestId: string,
+  scenarioId: string,
 ) {
   return async (dispatch: Dispatch<Action>) => {
-    dispatch(requestStarted(requestId));
+    dispatch(requestStarted(scenarioId));
     const waterData = await fetchHistoricalStressShortageData(
       climateModel,
       impactModel,
       timeScale,
     );
-    dispatch(requestCompleted(requestId));
+    dispatch(requestCompleted(scenarioId));
     if (waterData) {
-      dispatch(storeWaterData(waterData));
+      dispatch(storeWaterData(scenarioId, waterData));
     }
   };
 }
