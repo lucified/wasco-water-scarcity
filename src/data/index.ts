@@ -339,11 +339,13 @@ export const defaultDataTypeThresholdMaxValues: {
 export function generateWaterToWorldRegionsMap(
   waterRegionsData: WaterRegionGeoJSON,
 ) {
-  const map: { [waterRegionId: number]: number } = {};
-  waterRegionsData.features.forEach(region => {
-    map[region.properties.featureId] = region.properties.worldRegionID;
-  });
-  return map;
+  return waterRegionsData.features.reduce<{ [waterRegionId: number]: number }>(
+    (result, region) => {
+      result[region.properties.featureId] = region.properties.worldRegionID;
+      return result;
+    },
+    {},
+  );
 }
 
 // tslint:disable:no-implicit-dependencies
