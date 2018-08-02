@@ -12,8 +12,22 @@ export function getStressShortageData(state: StateTree) {
   return state.data.stressShortageData;
 }
 
+export const getHistoricalScenarioId = createSelector(
+  getSelectedClimateModel,
+  getSelectedImpactModel,
+  getSelectedTimeScale,
+  (climateModel, impactModel, timeScale) =>
+    `FPU_${timeScale}_bluewater_${impactModel}_${climateModel}`,
+);
+
+export const getStressShortageDataForScenario = createSelector(
+  getStressShortageData,
+  getHistoricalScenarioId,
+  (data, scenarioId) => data && data[scenarioId],
+);
+
 export function getSelectedStressShortageData(state: StateTree) {
-  const data = getStressShortageData(state);
+  const data = getStressShortageDataForScenario(state);
   return data && data[getSelectedHistoricalTimeIndex(state)];
 }
 
@@ -22,7 +36,7 @@ export function isHistoricalTimeIndexLocked(state: StateTree) {
 }
 
 const getAggregateData = createSelector(
-  getStressShortageData,
+  getStressShortageDataForScenario,
   getThresholds,
   getWaterToWorldRegionMap,
   (allData, thresholds, waterToWorldRegionMap) => {
@@ -227,7 +241,7 @@ export function isRequestOngoing(state: StateTree, requestId: string) {
 
 export const getTimeSeriesForSelectedWaterRegion = createSelector(
   getSelectedWaterRegionId,
-  getStressShortageData,
+  getStressShortageDataForScenario,
   (selectedRegion, data) => {
     if (!data || selectedRegion === undefined) {
       return undefined;
@@ -288,18 +302,10 @@ export const getNameForWorldRegionId = createSelector(
   },
 );
 
-export const getHistoricalScenarioId = createSelector(
-  getSelectedClimateModel,
-  getSelectedImpactModel,
-  getSelectedTimeScale,
-  (climateModel, impactModel, timeScale) =>
-    `FPU_${timeScale}_bluewater_${impactModel}_${climateModel}`,
-);
-
 // Note: this function removes zero and negative values from the
 // stress and shortage data.
 export const getDataByRegion = createSelector(
-  getStressShortageData,
+  getStressShortageDataForScenario,
   getWorldRegionData,
   getWaterRegionData,
   (stressShortageData, worldRegions, waterRegions) => {

@@ -7,7 +7,7 @@ import {
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
-  getStressShortageData,
+  getStressShortageDataForScenario,
 } from '../../../selectors';
 import { StressShortageDatum, TimeAggregate, TimeScale } from '../../../types';
 import { theme } from '../../theme';
@@ -78,5 +78,5 @@ export const DownloadCSV = connect<
   climateModel: getSelectedClimateModel(state),
   impactModel: getSelectedImpactModel(state),
   timeScale: getSelectedTimeScale(state),
-  data: getStressShortageData(state),
+  data: getStressShortageDataForScenario(state),
 }))(DownloadCSVPlain);

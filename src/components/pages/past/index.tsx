@@ -75,7 +75,6 @@ export class PastBody extends React.Component<Props> {
       waterRegions,
       selectedDataType,
       selectedWaterData,
-      isLoading,
       isZoomedIn,
       scenarioId,
     } = this.props;
@@ -88,7 +87,7 @@ export class PastBody extends React.Component<Props> {
         <DataTypeLinks />
         <BodyContainer className="container-fluid">
           <StickyGraphics>
-            {isLoading || !waterRegions || !selectedWaterData ? (
+            {!waterRegions ? (
               <StyledSpinner />
             ) : (
               <>
@@ -99,10 +98,12 @@ export class PastBody extends React.Component<Props> {
                 </div>
                 <div className="row ">
                   <MapContainer className="col-xs-12">
-                    <StyledYearLabel
-                      startYear={selectedWaterData.startYear}
-                      endYear={selectedWaterData.endYear}
-                    />
+                    {selectedWaterData && (
+                      <StyledYearLabel
+                        startYear={selectedWaterData.startYear}
+                        endYear={selectedWaterData.endYear}
+                      />
+                    )}
                     <ResponsiveMap
                       selectedData={selectedWaterData}
                       selectedDataType={selectedDataType}
