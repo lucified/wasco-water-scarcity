@@ -18,7 +18,7 @@ import {
   TimeScale,
   WorldRegion,
 } from '../types';
-import { futureDatasets, historicalDatasets } from './datasets';
+import { futureDatasets, historicalDataset } from './datasets';
 import {
   allFutureScenarioVariables,
   FutureDataset,
@@ -30,6 +30,7 @@ import {
   FutureScenarioWithData,
   GridQuintileColors,
   GridVariable,
+  HistoricalScenario,
   KcalEnsembleThreshold,
   LocalData,
   RawRegionStressShortageDatum,
@@ -61,23 +62,27 @@ function generateStressShortageData(
   }));
 }
 
+function getHistoricalScenarioURL(scenario: HistoricalScenario) {
+  return Object.keys(scenario).reduce(
+    (url: string, variable: string) =>
+      url.replace(
+        `{{${variable}}}`,
+        scenario[variable as keyof HistoricalScenario],
+      ),
+    historicalDataset.urlTemplateScenario,
+  );
+}
+
 export async function fetchHistoricalStressShortageData(
   climateModel: string,
   impactModel: string,
   timeScale: TimeScale,
 ): Promise<Array<TimeAggregate<StressShortageDatum>> | undefined> {
-  const dataset = historicalDatasets.find(
-    d =>
-      d.impactModel === impactModel &&
-      d.climateModel === climateModel &&
-      d.timeScale === timeScale &&
-      ['NA', 'noco2'].indexOf(d.co2Forcing) > -1,
-  );
-  if (!dataset) {
-    console.error('Unable to find dataset for', climateModel, impactModel);
-    return undefined;
-  }
-  const { url } = dataset;
+  const url = getHistoricalScenarioURL({
+    timeScale,
+    impactModel,
+    climateModel,
+  });
 
   try {
     const result = await fetch(url, { credentials: 'same-origin' });
@@ -90,31 +95,27 @@ export async function fetchHistoricalStressShortageData(
 }
 
 export function getHistoricalClimateModels() {
-  return uniq(historicalDatasets.map(d => d.climateModel)).sort();
+  return historicalDataset.climateModel;
 }
 
 export function getHistoricalImpactModels() {
-  return uniq(historicalDatasets.map(d => d.impactModel)).sort();
+  return historicalDataset.impactModel;
 }
 
 export function getDefaultHistoricalClimateModel() {
-  const defaultDataset = historicalDatasets.find(d => !!d.default);
-  return defaultDataset ? defaultDataset.climateModel : 'watch';
+  return historicalDataset.default.climateModel;
 }
 
 export function getDefaultHistoricalImpactModel() {
-  const defaultDataset = historicalDatasets.find(d => !!d.default);
-  return defaultDataset ? defaultDataset.impactModel : 'watergap';
+  return historicalDataset.default.impactModel;
 }
 
 export async function getPastLocalRegionData(
   regionId: number,
-  _scenarioId: string,
+  scenarioId: string,
 ) {
   try {
-    // TODO: use this format:
-    // const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v2_20180801/${scenarioId}/${regionId}.json`;
-    const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/localdata_v1_20180318/FPU_decadal_bluewater/${regionId}.json`;
+    const url = `https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v3-20180820/local/${scenarioId}/${regionId}.json`;
     const result = await fetch(url, { credentials: 'same-origin' });
     const parsedData: LocalData = await result.json();
     return parsedData;
@@ -514,15 +515,15 @@ export function labelForGridVariable(variable: GridVariable) {
 }
 
 export const availableImpactModels = uniq(
-  historicalDatasets
-    .map(d => d.impactModel)
-    .concat(flatMap(futureDatasets, dataset => dataset.impactModel)),
+  historicalDataset.impactModel.concat(
+    flatMap(futureDatasets, dataset => dataset.impactModel),
+  ),
 );
 
 export const availableClimateModels = uniq(
-  historicalDatasets
-    .map(d => d.climateModel)
-    .concat(flatMap(futureDatasets, dataset => dataset.climateModel)),
+  historicalDataset.climateModel.concat(
+    flatMap(futureDatasets, dataset => dataset.climateModel),
+  ),
 );
 
 export * from './types';
