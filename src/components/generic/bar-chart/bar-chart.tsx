@@ -301,7 +301,7 @@ export default class BarChart extends React.Component<Props, {}> {
 
   private getSelectionBackground() {
     const { data, selectedIndex, indexLocked } = this.props;
-    if (selectedIndex == null) {
+    if (selectedIndex == null || selectedIndex >= data.length) {
       return null;
     }
 
@@ -325,7 +325,7 @@ export default class BarChart extends React.Component<Props, {}> {
   private getSelectionLabel() {
     const { data, selectedIndex, yTickFormat, hideSelectedLabel } = this
       .props as PropsWithDefaults;
-    if (selectedIndex == null || hideSelectedLabel) {
+    if (selectedIndex == null || hideSelectedLabel  || selectedIndex >= data.length) {
       return null;
     }
 
