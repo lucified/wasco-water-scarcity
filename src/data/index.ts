@@ -484,11 +484,12 @@ export const gridQuintileColors: GridQuintileColors = {
 
 export const allGridVariables: GridVariable[] = [
   'pop',
-  'dom',
-  'elec',
   'irri',
-  'live',
+  'dom',
   'man',
+  // Temporarily disable display of electricity because we reuse 'man' as 'ind'
+  //'elec',
+  'live',
 ];
 
 export function isGridVariable(x: any): x is GridVariable {
@@ -509,8 +510,10 @@ export function labelForGridVariable(variable: GridVariable) {
       return 'Irrigation';
     case 'live':
       return 'Livestock';
+    /* Some models combine electricity and manufacturing.
+    As a temporary fix, we reuse the man variable */
     case 'man':
-      return 'Manufacturing';
+      return 'Industry';
   }
 }
 

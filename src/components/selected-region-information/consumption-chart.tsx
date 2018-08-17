@@ -46,25 +46,27 @@ const legendItems: Array<LegendItem & { field: keyof Datum }> = [
     field: 'consumptionDomestic',
     color: colorScale[8],
   },
-  {
-    title: 'Electric',
-    field: 'consumptionElectric',
-    color: colorScale[7],
-  },
+  // {
+  //   title: 'Electric',
+  //   field: 'consumptionElectric',
+  //   color: colorScale[7],
+  // },
   {
     title: 'Irrigation',
     field: 'consumptionIrrigation',
     color: colorScale[5],
   },
+    /* Some models combine electricity and manufacturing.
+    As a temporary fix, we reuse the man variable */
+    {
+      title: 'Industry',
+      field: 'consumptionManufacturing',
+      color: colorScale[2],
+    },
   {
     title: 'Livestock',
     field: 'consumptionLivestock',
     color: colorScale[3],
-  },
-  {
-    title: 'Manufacturing',
-    field: 'consumptionManufacturing',
-    color: colorScale[2],
   },
 ];
 
