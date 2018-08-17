@@ -5,7 +5,7 @@ import {
   defaultDataTypeThresholds,
   getDefaultHistoricalClimateModel,
   getDefaultHistoricalImpactModel,
-  getHistoricalClimateModels,
+  getHistoricalImpactModels,
 } from '../data';
 import { getGlobalStateFromURLHash } from '../url-state';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
@@ -198,33 +198,43 @@ function selectionsReducer(
       return state;
     case 'SET_SELECTED_CLIMATE_MODEL':
       if (action.climateModel !== state.climateModel) {
-        let { impactModel } = state;
-
-        if (action.climateModel === 'watch') {
-          impactModel = 'watergap';
+        if (
+          action.climateModel !== 'watch' &&
+          state.impactModel === 'watergap-nat'
+        ) {
+          return {
+            ...state,
+            impactModel: getHistoricalImpactModels().filter(
+              m => m !== 'watergap-nat',
+            )[0],
+            climateModel: action.climateModel,
+          };
         }
 
         return {
           ...state,
-          impactModel,
           climateModel: action.climateModel,
         };
       }
 
       return state;
     case 'SET_SELECTED_TIME_SCALE':
-      let { climateModel } = state;
-
       if (action.timeScale !== state.timeScale) {
-        if (action.timeScale === 'annual' && state.climateModel === 'watch') {
-          climateModel = getHistoricalClimateModels().filter(
-            m => m !== 'watch',
-          )[0];
+        if (
+          action.timeScale === 'annual' &&
+          state.impactModel === 'watergap-nat'
+        ) {
+          return {
+            ...state,
+            impactModel: getHistoricalImpactModels().filter(
+              m => m !== 'watergap-nat',
+            )[0],
+            timeScale: action.timeScale,
+          };
         }
 
         return {
           ...state,
-          climateModel,
           timeScale: action.timeScale,
         };
       }
