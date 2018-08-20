@@ -110,6 +110,14 @@ export function getDefaultHistoricalImpactModel() {
   return historicalDataset.default.impactModel;
 }
 
+export function toPastScenarioId(
+  climateModel: string,
+  impactModel: string,
+  timeScale: TimeScale,
+) {
+  return `FPU_${timeScale}_bluewater_${impactModel}_${climateModel}`;
+}
+
 export async function getPastLocalRegionData(
   regionId: number,
   scenarioId: string,
@@ -190,7 +198,7 @@ export function toEnsembleRegionId(regionId: number) {
   return regionId.toString();
 }
 
-export function toScenarioId(scenario: FutureScenario) {
+export function toFutureScenarioId(scenario: FutureScenario) {
   return allFutureScenarioVariables
     .map(variable => scenario[variable])
     .join('-');

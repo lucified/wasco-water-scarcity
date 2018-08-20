@@ -63,17 +63,7 @@ const StyledSpinner = styled(Spinner)`
   margin-top: 40px;
 `;
 
-const Error = styled.div`
-  width: 100%;
-  text-align: center;
-  margin: 100px 0;
-`;
-
-interface PassedProps {
-  isLoading: boolean;
-}
-
-type Props = MapDataProps & PassedProps;
+type Props = MapDataProps;
 
 export class PastBody extends React.Component<Props> {
   public render() {
@@ -83,8 +73,13 @@ export class PastBody extends React.Component<Props> {
       selectedWaterData,
       isZoomedIn,
       scenarioId,
-      isLoading,
     } = this.props;
+
+    // FIXME: It would be good to show an error message if loading fails, which
+    // could be determined by checking if we're missing data and not loading any,
+    // but this approach currently can't be used since we render this view once
+    // with missing data and no ongoing data requests before the data loading is
+    // triggered by the App component.
 
     return (
       <div>
@@ -105,25 +100,19 @@ export class PastBody extends React.Component<Props> {
                 </div>
                 <div className="row ">
                   <MapContainer className="col-xs-12">
-                    {!selectedWaterData && !isLoading ? (
-                      <Error>Unable to load data for scenario</Error>
-                    ) : (
-                      <>
-                        {selectedWaterData && (
-                          <StyledYearLabel
-                            startYear={selectedWaterData.startYear}
-                            endYear={selectedWaterData.endYear}
-                          />
-                        )}
-                        <ResponsiveMap
-                          selectedData={selectedWaterData}
-                          selectedDataType={selectedDataType}
-                          waterRegions={waterRegions}
-                          appType={AppType.PAST}
-                          selectedScenarioId={scenarioId}
-                        />
-                      </>
+                    {selectedWaterData && (
+                      <StyledYearLabel
+                        startYear={selectedWaterData.startYear}
+                        endYear={selectedWaterData.endYear}
+                      />
                     )}
+                    <ResponsiveMap
+                      selectedData={selectedWaterData}
+                      selectedDataType={selectedDataType}
+                      waterRegions={waterRegions}
+                      appType={AppType.PAST}
+                      selectedScenarioId={scenarioId}
+                    />
                   </MapContainer>
                 </div>
                 <div className="row">
