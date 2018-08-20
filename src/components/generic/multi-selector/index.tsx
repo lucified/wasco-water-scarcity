@@ -34,11 +34,10 @@ export default class MultiSelector extends React.Component<PassedProps> {
       disallowEmptyMultiselect,
     } = this.props;
     if (multiSelectedValues && onChangeMultiSelect) {
-      if (
-        multiSelectedValues.indexOf(value) > -1 &&
-        (!disallowEmptyMultiselect || multiSelectedValues.length > 1)
-      ) {
-        onChangeMultiSelect(multiSelectedValues.filter(d => d !== value));
+      if (multiSelectedValues.indexOf(value) > -1) {
+        if (!disallowEmptyMultiselect || multiSelectedValues.length > 1) {
+          onChangeMultiSelect(multiSelectedValues.filter(d => d !== value));
+        }
       } else {
         onChangeMultiSelect(multiSelectedValues.concat([value]));
       }
