@@ -488,7 +488,7 @@ export const allGridVariables: GridVariable[] = [
   'dom',
   'man',
   // Temporarily disable display of electricity because we reuse 'man' as 'ind'
-  //'elec',
+  // 'elec',
   'live',
 ];
 

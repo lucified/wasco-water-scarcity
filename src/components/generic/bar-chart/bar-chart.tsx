@@ -325,7 +325,11 @@ export default class BarChart extends React.Component<Props, {}> {
   private getSelectionLabel() {
     const { data, selectedIndex, yTickFormat, hideSelectedLabel } = this
       .props as PropsWithDefaults;
-    if (selectedIndex == null || hideSelectedLabel  || selectedIndex >= data.length) {
+    if (
+      selectedIndex == null ||
+      hideSelectedLabel ||
+      selectedIndex >= data.length
+    ) {
       return null;
     }
 

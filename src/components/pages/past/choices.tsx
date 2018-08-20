@@ -269,7 +269,7 @@ class ChoicesPlain extends React.Component<Props> {
           title="Water model"
           description="Water availability and use are estimated using three global water models"
           options={
-            timeScale === 'annual' || climateModel!=='watch'
+            timeScale === 'annual' || climateModel !== 'watch'
               ? // watergap-nat data only has decadal data
                 impactModelOptions.map(o => ({
                   ...o,

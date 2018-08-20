@@ -4,15 +4,15 @@ import { FutureDataset, HistoricalDataset } from './types';
 
 // prettier-ignore
 export const historicalDataset: HistoricalDataset =   {
-  urlTemplateScenario:'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v3-20180820/FPU_{{timeScale}}_bluewater_{{impactModel}}_{{climateModel}}_hist_varsoc_co2.json',
-  timeScale:['annual','decadal'],
-  impactModel: ['h08', 'pcr-globwb', 'watergap2','watergap-nat'],
-  climateModel: ['gswp3','princeton','watch','wfdei'],
-  default:{
-    timeScale:'decadal',
-    impactModel:'watergap-nat',
-    climateModel:'watch'
-  }
+  urlTemplateScenario: 'https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/v3-20180820/FPU_{{timeScale}}_bluewater_{{impactModel}}_{{climateModel}}_hist_varsoc_co2.json',
+  timeScale: ['annual', 'decadal'],
+  impactModel: ['h08', 'pcr-globwb', 'watergap2', 'watergap-nat'],
+  climateModel: ['gswp3', 'princeton', 'watch', 'wfdei'],
+  default: {
+    timeScale: 'decadal',
+    impactModel: 'watergap-nat',
+    climateModel: 'watch',
+  },
 };
 
 export const futureDatasets: FutureDataset[] = [
