@@ -231,7 +231,7 @@ interface State {
       [regionId: number]: LocalData | undefined;
     };
   };
-  fetchingDataForRegions: string[];
+  ongoingRequests: string[];
   zoomInRequested: boolean;
   worldGeoData?: TopoJSON.Topology;
 }
@@ -246,7 +246,7 @@ class Map extends React.Component<Props, State> {
 
     this.state = {
       regionData: {},
-      fetchingDataForRegions: [],
+      ongoingRequests: [],
       zoomInRequested: props.isZoomedIn,
     };
   }
@@ -587,11 +587,11 @@ class Map extends React.Component<Props, State> {
   private async fetchRegionData(scenarioId: string, regionId: number) {
     const { appType } = this.props;
     const requestId = getRequestId(scenarioId, regionId);
-    if (this.state.fetchingDataForRegions.indexOf(requestId) > -1) {
+    if (this.state.ongoingRequests.indexOf(requestId) > -1) {
       return;
     }
     this.setState(state => ({
-      fetchingDataForRegions: state.fetchingDataForRegions.concat(requestId),
+      ongoingRequests: state.ongoingRequests.concat(requestId),
     }));
     const data =
       appType === AppType.FUTURE
@@ -605,9 +605,7 @@ class Map extends React.Component<Props, State> {
       this.props.setZoomedInToRegion(true);
     }
     this.setState(state => ({
-      fetchingDataForRegions: state.fetchingDataForRegions.filter(
-        id => id !== requestId,
-      ),
+      ongoingRequests: state.ongoingRequests.filter(id => id !== requestId),
       regionData: data
         ? {
             ...state.regionData,
@@ -1173,7 +1171,7 @@ class Map extends React.Component<Props, State> {
               selectedWaterRegionId &&
               (!this.state.regionData[scenarioId] ||
                 !this.state.regionData[scenarioId][selectedWaterRegionId]) &&
-              this.state.fetchingDataForRegions.indexOf(
+              this.state.ongoingRequests.indexOf(
                 getRequestId(scenarioId, selectedWaterRegionId),
               ) > -1 &&
               this.getSpinnerOverlay()}
