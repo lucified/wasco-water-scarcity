@@ -23,13 +23,21 @@ interface PassedProps {
   selectedValue: string;
   onEnterHoverRow?: (value: string) => void;
   onLeaveHoverRow?: (value: string) => void;
+  disallowEmptyMultiselect?: boolean;
 }
 
 export default class MultiSelector extends React.Component<PassedProps> {
   private handleToggleMultiselectValue = (value: string) => {
-    const { multiSelectedValues, onChangeMultiSelect } = this.props;
+    const {
+      multiSelectedValues,
+      onChangeMultiSelect,
+      disallowEmptyMultiselect,
+    } = this.props;
     if (multiSelectedValues && onChangeMultiSelect) {
-      if (multiSelectedValues.indexOf(value) > -1) {
+      if (
+        multiSelectedValues.indexOf(value) > -1 &&
+        (!disallowEmptyMultiselect || multiSelectedValues.length > 1)
+      ) {
         onChangeMultiSelect(multiSelectedValues.filter(d => d !== value));
       } else {
         onChangeMultiSelect(multiSelectedValues.concat([value]));
