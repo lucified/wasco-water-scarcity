@@ -50,6 +50,10 @@ const StickyGraphics = styled(Sticky)`
   width: calc(100% - ${selectorsWidth});
 `;
 
+const GraphicsContainer = styled.div`
+  padding-right: ${theme.margin(1)};
+`;
+
 const MapContainer = styled.div`
   position: relative;
 `;
@@ -92,7 +96,7 @@ export class PastBody extends React.Component<Props> {
             {!waterRegions ? (
               <StyledSpinner />
             ) : (
-              <>
+              <GraphicsContainer>
                 <div className="row middle-xs">
                   <div className="col-xs-12">
                     <TimeSelector dataType={selectedDataType} />
@@ -125,7 +129,7 @@ export class PastBody extends React.Component<Props> {
                 <div className="row">
                   <SelectedRegionInformation dataType={selectedDataType} />
                 </div>
-              </>
+              </GraphicsContainer>
             )}
           </StickyGraphics>
           <SelectorsContent>

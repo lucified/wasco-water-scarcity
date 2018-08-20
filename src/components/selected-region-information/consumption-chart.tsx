@@ -17,10 +17,10 @@ const LegendContainer = styled.div`
 const Instructions = styled.span`
   white-space: nowrap;
   font-family: ${theme.labelFontFamily};
-  font-size: 12px;
+  font-size: 11px;
   color: ${theme.colors.textMenu};
   position: relative;
-  top: 4px;
+  top: 3px;
 `;
 
 interface PassedProps {

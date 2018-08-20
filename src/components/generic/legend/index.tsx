@@ -36,7 +36,7 @@ const Box = styled.div`
 
 const Title = styled.div`
   padding-left: 5px;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 `;
 
 export interface LegendItem {
