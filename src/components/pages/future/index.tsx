@@ -192,7 +192,8 @@ class FutureBody extends React.Component<Props, State> {
   );
 
   private getTimeLabels = createSelector(
-    (state: State) => state.scenarioData[toFutureScenarioId(state.selectedScenario)],
+    (state: State) =>
+      state.scenarioData[toFutureScenarioId(state.selectedScenario)],
     scenarioData => {
       if (!scenarioData) {
         return undefined;
@@ -440,8 +441,9 @@ class FutureBody extends React.Component<Props, State> {
                     </TimeSelectorContainer>
                   </MapHeaderRow>
                   {!mapData &&
-                  scenariosRequested.indexOf(toFutureScenarioId(selectedScenario)) ===
-                    -1 ? (
+                  scenariosRequested.indexOf(
+                    toFutureScenarioId(selectedScenario),
+                  ) === -1 ? (
                     <Error>No data found for selected scenario.</Error>
                   ) : (
                     <>
