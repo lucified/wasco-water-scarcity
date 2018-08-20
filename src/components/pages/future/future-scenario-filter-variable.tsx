@@ -144,6 +144,7 @@ export class FutureScenarioFilterVariable extends React.Component<
         <SelectorDescription>{description}</SelectorDescription>
         <StyledMultiSelector
           multiselect={multiselect}
+          disallowEmptyMultiselect
           multiSelectedValues={comparisonVariables[variable]}
           options={filteredOptions}
           selectedValue={selectedScenario[variable]}
