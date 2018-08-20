@@ -19,7 +19,7 @@ import {
   StressEnsembleThreshold,
   toEnsembleRegionId,
   toEnsembleWorldId,
-  toScenarioId,
+  toFutureScenarioId,
   WaterRegionGeoJSON,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
@@ -159,7 +159,7 @@ class FutureBody extends React.Component<Props, State> {
 
   private getMapData = createSelector(
     (state: State, _props: Props) =>
-      state.scenarioData[toScenarioId(state.selectedScenario)],
+      state.scenarioData[toFutureScenarioId(state.selectedScenario)],
     (state: State, _props: Props) => state.selectedTimeIndex,
     (_state: State, props: Props) => props.selectedDataType,
     (scenarioData, timeIndex, dataType) => {
@@ -192,7 +192,8 @@ class FutureBody extends React.Component<Props, State> {
   );
 
   private getTimeLabels = createSelector(
-    (state: State) => state.scenarioData[toScenarioId(state.selectedScenario)],
+    (state: State) =>
+      state.scenarioData[toFutureScenarioId(state.selectedScenario)],
     scenarioData => {
       if (!scenarioData) {
         return undefined;
@@ -248,7 +249,7 @@ class FutureBody extends React.Component<Props, State> {
     dataset: FutureDataset,
     scenario: FutureScenario,
   ) {
-    const scenarioId = toScenarioId(scenario);
+    const scenarioId = toFutureScenarioId(scenario);
     if (this.state.scenariosRequested.indexOf(scenarioId) > -1) {
       console.error('Already loading scenario', scenarioId);
       return;
@@ -317,7 +318,7 @@ class FutureBody extends React.Component<Props, State> {
   private handleSetSelectedScenario = (scenario: FutureScenario) => {
     const { selectedScenario, scenarioData, selectedDataset } = this.state;
     if (!isEqual(selectedScenario, scenario)) {
-      if (!scenarioData[toScenarioId(scenario)]) {
+      if (!scenarioData[toFutureScenarioId(scenario)]) {
         this.fetchFutureScenarioData(selectedDataset, scenario);
       }
       this.setState({ selectedScenario: scenario }, () => {
@@ -440,8 +441,9 @@ class FutureBody extends React.Component<Props, State> {
                     </TimeSelectorContainer>
                   </MapHeaderRow>
                   {!mapData &&
-                  scenariosRequested.indexOf(toScenarioId(selectedScenario)) ===
-                    -1 ? (
+                  scenariosRequested.indexOf(
+                    toFutureScenarioId(selectedScenario),
+                  ) === -1 ? (
                     <Error>No data found for selected scenario.</Error>
                   ) : (
                     <>

@@ -1,6 +1,7 @@
 import { keyBy } from 'lodash';
 import { createSelector } from 'reselect';
 import { Data as GapminderData } from './components/generic/gapminder';
+import { toPastScenarioId } from './data';
 import { StateTree } from './reducers';
 import {
   AggregateStressShortageDatum,
@@ -16,8 +17,7 @@ export const getHistoricalScenarioId = createSelector(
   getSelectedClimateModel,
   getSelectedImpactModel,
   getSelectedTimeScale,
-  (climateModel, impactModel, timeScale) =>
-    `FPU_${timeScale}_bluewater_${impactModel}_${climateModel}`,
+  toPastScenarioId,
 );
 
 export const getStressShortageDataForScenario = createSelector(

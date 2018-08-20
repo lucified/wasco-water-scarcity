@@ -9,7 +9,7 @@ import {
   getDataTypeColors,
   isFutureScenarioInComparisonVariables,
   isScenarioEqual,
-  toScenarioId,
+  toFutureScenarioId,
 } from '../../../data';
 import { StateTree } from '../../../reducers';
 import {
@@ -62,7 +62,7 @@ const getComparisonSeries = createSelector(
       comparisonVariables,
     );
     return data.filter(scenarioFilter).map(series => ({
-      id: toScenarioId(series),
+      id: toFutureScenarioId(series),
       color: theme.colors.grayLight,
       points: series.data.map(d => ({
         value: d.value,
@@ -82,7 +82,7 @@ const getSelectedSerie = createSelector(
       return undefined;
     }
     return {
-      id: toScenarioId(datum),
+      id: toFutureScenarioId(datum),
       color: theme.colors.textSelection,
       points: datum.data.map(d => ({
         value: d.value,
@@ -97,7 +97,7 @@ const getHoveredSeries = createSelector(
   data =>
     data &&
     data.map(datum => ({
-      id: toScenarioId(datum),
+      id: toFutureScenarioId(datum),
       color: theme.colors.gray,
       points: datum.data.map(d => ({
         value: d.value,

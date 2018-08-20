@@ -47,34 +47,56 @@ const impactModelOptions = [
   {
     title: 'PCR-GlobWB',
     description: 'Utrecht University, Netherlands',
-    value: 'pcrglobwb',
+    value: 'pcr-globwb',
   },
   {
     title: 'WaterGAP',
     description: 'University of Kassel, Germany',
-    value: 'watergap',
+    value: 'watergap2',
+  },
+  {
+    title: 'WaterGAP with natural landuse',
+    description: (
+      <div>
+        As used in Kummu et al. 2016.
+        <br />
+        (only WATCH + decadal)
+      </div>
+    ),
+    value: 'watergap-nat',
   },
 ];
 const climateModelOptions = [
   {
-    title: 'WATCH reanalysis 1900-2010',
-    description: 'Adapted from the EU WATCH project (decadal only)',
+    title: 'WATCH',
+    description: (
+      <div>
+        EU WATCH project
+        <br />
+        (Weedon et al. 2011)
+      </div>
+    ),
     value: 'watch',
   },
   {
-    title: 'GFDL-ESM2M 1971-2000',
-    description: 'NOAA Geophysical Fluid Dynamics Laboratory',
-    value: 'gfdl-esm2m',
+    title: 'GSWP3',
+    description: 'Global Soil Wetness Project',
+    value: 'gswp3',
   },
   {
-    title: 'HadGEM2-ES 1971-2000',
-    description: 'UK MET office Hadley Centre ',
-    value: 'hadgem2-es',
+    title: 'PGMFD v.2',
+    description: 'Princeton University',
+    value: 'princeton',
+  },
+  {
+    title: 'WFD-EI',
+    description: 'Weedon et al. 2014',
+    value: 'wfdei',
   },
 ];
 const timeScaleOptions: Array<{
   title: string;
-  description: string;
+  description: string | JSX.Element;
   value: TimeScale;
 }> = [
   {
@@ -85,8 +107,14 @@ const timeScaleOptions: Array<{
   },
   {
     title: 'Annual',
-    description:
-      'Surplus water stored only between months, usually underestimating water availability',
+    description: (
+      <div>
+        Surplus water stored only between months, usually underestimating water
+        availability.
+        <br />
+        (Irrigation data only)
+      </div>
+    ),
     value: 'annual',
   },
 ];
@@ -219,18 +247,10 @@ class ChoicesPlain extends React.Component<Props> {
           }
         />
         <ModelSelector
-          title="Climate model"
-          description="Water models are driven by temperature and rainfall obtained either by reanalysis of observations or directly from climate models."
+          title="Climate data"
+          description="Water models are driven by temperature and rainfall estimates for the whole world, obtained by reanalysis of observations."
           selectedValue={climateModel}
-          options={
-            timeScale === 'annual'
-              ? // WATCH data only has decadal data
-                climateModelOptions.map(o => ({
-                  ...o,
-                  disabled: o.value === 'watch',
-                }))
-              : climateModelOptions
-          }
+          options={climateModelOptions}
           setModel={onClimateModelChange}
           furtherInformation={
             <div>
@@ -247,13 +267,13 @@ class ChoicesPlain extends React.Component<Props> {
         />
         <ModelSelector
           title="Water model"
-          description="Water availability and use are estimated using three global water models."
+          description="Water availability and use are estimated using three global water models"
           options={
-            climateModel === 'watch'
-              ? // WATCH data only exists for watergap
+            timeScale === 'annual' || climateModel !== 'watch'
+              ? // watergap-nat data only has decadal data
                 impactModelOptions.map(o => ({
                   ...o,
-                  disabled: o.value !== 'watergap',
+                  disabled: o.value === 'watergap-nat',
                 }))
               : impactModelOptions
           }
@@ -261,9 +281,9 @@ class ChoicesPlain extends React.Component<Props> {
           selectedValue={impactModel}
           furtherInformation={
             <div>
-              WaterGAP WATCH data is from{' '}
-              <a href="http://waterscarcityatlas.org">Kummu et al. 2016</a>. All
-              other data is from the ISIMIP Fast-Track project.
+              WaterGAP WATCH data with natural landuse is from{' '}
+              <a href="https://waterscarcityatlas.org/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
+              Kummu et al. 2016</a>. All other data is from ISIMIP 2a, using current land use.
               <p>
                 <a href="http://waterscarcityatlas.org">
                   Full description of analysis

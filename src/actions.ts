@@ -238,10 +238,10 @@ export function loadModelData(
       impactModel,
       timeScale,
     );
-    dispatch(requestCompleted(scenarioId));
     if (waterData) {
       dispatch(storeWaterData(scenarioId, waterData));
     }
+    dispatch(requestCompleted(scenarioId));
   };
 }
 
@@ -250,7 +250,6 @@ export function loadMapData() {
     const requestId = 'mapdata';
     dispatch(requestStarted(requestId));
     const results = await fetchWaterRegionsTopojson();
-    dispatch(requestCompleted(requestId));
     if (results) {
       const [waterRegionData, worldRegionsData] = results;
       if (waterRegionData) {
@@ -266,6 +265,7 @@ export function loadMapData() {
         dispatch(storeWorldRegionData(worldRegionsData));
       }
     }
+    dispatch(requestCompleted(requestId));
   };
 }
 

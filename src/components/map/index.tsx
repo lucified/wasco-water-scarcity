@@ -200,6 +200,9 @@ interface PassedProps {
   waterRegions: WaterRegionGeoJSON;
   selectedDataType: AnyDataType;
   appType: AppType;
+  /**
+   * Required for the the Past app.
+   */
   selectedScenarioId?: string;
 }
 
@@ -224,11 +227,17 @@ type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 interface State {
   regionData: {
-    [id: string]: LocalData | undefined;
+    [scenarioId: string]: {
+      [regionId: number]: LocalData | undefined;
+    };
   };
-  fetchingDataForRegions: number[];
+  ongoingRequests: string[];
   zoomInRequested: boolean;
   worldGeoData?: TopoJSON.Topology;
+}
+
+function getRequestId(scenarioId: string, regionId: number) {
+  return `${scenarioId}-${regionId}`;
 }
 
 class Map extends React.Component<Props, State> {
@@ -237,7 +246,7 @@ class Map extends React.Component<Props, State> {
 
     this.state = {
       regionData: {},
-      fetchingDataForRegions: [],
+      ongoingRequests: [],
       zoomInRequested: props.isZoomedIn,
     };
   }
@@ -261,6 +270,7 @@ class Map extends React.Component<Props, State> {
       width,
     } = this.props;
     const { zoomInRequested, regionData, worldGeoData } = this.state;
+    const scenarioId = this.getScenarioId();
 
     if (!worldGeoData || !selectedData) {
       return;
@@ -295,8 +305,10 @@ class Map extends React.Component<Props, State> {
       selectedWorldRegion !== prevProps.selectedWorldRegion;
     const zoomedInDataLoaded =
       selectedWaterRegionId &&
-      regionData[selectedWaterRegionId] &&
-      !prevState.regionData[selectedWaterRegionId];
+      regionData[scenarioId] &&
+      regionData[scenarioId][selectedWaterRegionId] &&
+      (!prevState.regionData[scenarioId] ||
+        !prevState.regionData[scenarioId][selectedWaterRegionId]);
     const dataChanged =
       prevProps.selectedData !== selectedData ||
       prevProps.selectedDataType !== selectedDataType ||
@@ -566,18 +578,25 @@ class Map extends React.Component<Props, State> {
     ).raise();
   }
 
-  private async fetchRegionData(regionId: number) {
-    if (this.state.fetchingDataForRegions.indexOf(regionId) > -1) {
+  private getScenarioId() {
+    const { appType, selectedScenarioId } = this.props;
+    // We assume that the scenarioId exists if we're in the PAST page
+    return appType === AppType.PAST ? selectedScenarioId! : 'no-scenario';
+  }
+
+  private async fetchRegionData(scenarioId: string, regionId: number) {
+    const { appType } = this.props;
+    const requestId = getRequestId(scenarioId, regionId);
+    if (this.state.ongoingRequests.indexOf(requestId) > -1) {
       return;
     }
-    const { appType, selectedScenarioId } = this.props;
     this.setState(state => ({
-      fetchingDataForRegions: state.fetchingDataForRegions.concat(regionId),
+      ongoingRequests: state.ongoingRequests.concat(requestId),
     }));
     const data =
       appType === AppType.FUTURE
         ? await getFutureLocalRegionData(regionId)
-        : await getPastLocalRegionData(regionId, selectedScenarioId!); // Ugly: we assume scenarioId exists
+        : await getPastLocalRegionData(regionId, scenarioId);
     if (
       data &&
       this.props.selectedWaterRegionId === regionId &&
@@ -586,13 +605,14 @@ class Map extends React.Component<Props, State> {
       this.props.setZoomedInToRegion(true);
     }
     this.setState(state => ({
-      fetchingDataForRegions: state.fetchingDataForRegions.filter(
-        id => id !== regionId,
-      ),
+      ongoingRequests: state.ongoingRequests.filter(id => id !== requestId),
       regionData: data
         ? {
             ...state.regionData,
-            [regionId]: data,
+            [scenarioId]: {
+              ...(state.regionData[scenarioId] || {}),
+              [regionId]: data,
+            },
           }
         : state.regionData,
     }));
@@ -661,9 +681,13 @@ class Map extends React.Component<Props, State> {
       return;
     }
 
-    const localData = this.state.regionData[selectedWaterRegionId];
+    const scenarioId = this.getScenarioId();
+
+    const localData =
+      this.state.regionData[scenarioId] &&
+      this.state.regionData[scenarioId][selectedWaterRegionId];
     if (!localData) {
-      this.fetchRegionData(selectedWaterRegionId);
+      this.fetchRegionData(scenarioId, selectedWaterRegionId);
       return;
     }
 
@@ -1083,6 +1107,7 @@ class Map extends React.Component<Props, State> {
     } = this.props;
     const { zoomInRequested, worldGeoData } = this.state;
     const height = this.getHeight();
+    const scenarioId = this.getScenarioId();
 
     return (
       <Container>
@@ -1144,9 +1169,11 @@ class Map extends React.Component<Props, State> {
             {/* Note: we currently don't give an error message if loading data fails */}
             {zoomInRequested &&
               selectedWaterRegionId &&
-              !this.state.regionData[selectedWaterRegionId] &&
-              this.state.fetchingDataForRegions.indexOf(selectedWaterRegionId) >
-                -1 &&
+              (!this.state.regionData[scenarioId] ||
+                !this.state.regionData[scenarioId][selectedWaterRegionId]) &&
+              this.state.ongoingRequests.indexOf(
+                getRequestId(scenarioId, selectedWaterRegionId),
+              ) > -1 &&
               this.getSpinnerOverlay()}
             {!isZoomedIn &&
               selectedDataType !== 'scarcity' && (

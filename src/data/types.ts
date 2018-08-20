@@ -1,6 +1,6 @@
 import { ExtendedFeature, ExtendedFeatureCollection } from 'd3-geo';
 import * as GeoJSON from 'geojson';
-import { FutureDataType, StressShortageDatum, TimeScale } from '../types';
+import { FutureDataType, StressShortageDatum } from '../types';
 
 export interface WorldRegionGeoJSONFeature {
   geometry: any;
@@ -12,21 +12,23 @@ export interface WorldRegionGeoJSONFeature {
   };
 }
 
-export interface HistoricalDataset {
-  default?: boolean;
-  spatialUnit: string;
-  timeScale: TimeScale;
-  dataType: string;
-  population: string;
-  impactModel: string;
-  climateModel: string;
-  climateExperiment: string;
-  socialForcing: string;
-  co2Forcing: string;
-  startYear: string;
-  endYear: string;
-  url: string;
-}
+export type HistoricalDataset = HistoricalDatasetVariables & {
+  urlTemplateScenario: string;
+  default: HistoricalScenario;
+};
+
+export type HistoricalDatasetVariables = {
+  [variable in HistoricalScenarioVariableName]: string[]
+};
+
+export type HistoricalScenario = {
+  [variable in HistoricalScenarioVariableName]: string
+};
+
+export type HistoricalScenarioVariableName =
+  | 'timeScale'
+  | 'impactModel'
+  | 'climateModel';
 
 export type FutureDatasetVariables = {
   [variable in FutureScenarioVariableName]: string[]

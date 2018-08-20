@@ -129,8 +129,6 @@ class AppPlain extends React.Component<Props> {
   }
 
   public render() {
-    const { isLoading } = this.props;
-
     return (
       <Root>
         <Helmet
@@ -182,21 +180,15 @@ class AppPlain extends React.Component<Props> {
             {/* These routes also handle any data loading or other onLoad trigger */}
             <Route
               path="/stress"
-              render={() => (
-                <Past isLoading={isLoading} selectedDataType="stress" />
-              )}
+              render={() => <Past selectedDataType="stress" />}
             />
             <Route
               path="/shortage"
-              render={() => (
-                <Past isLoading={isLoading} selectedDataType="shortage" />
-              )}
+              render={() => <Past selectedDataType="shortage" />}
             />
             <Route
               path="/scarcity"
-              render={() => (
-                <Past isLoading={isLoading} selectedDataType="scarcity" />
-              )}
+              render={() => <Past selectedDataType="scarcity" />}
             />
             <Route path="/" exact render={() => <Redirect to="/stress" />} />
             <Route component={NotFound} />
