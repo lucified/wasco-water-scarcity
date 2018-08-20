@@ -10,6 +10,9 @@ export interface Option {
   value: string;
   title: string;
   description?: string | JSX.Element;
+  /**
+   * Only has an effect when single select is enabled.
+   */
   disabled?: boolean;
 }
 

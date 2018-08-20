@@ -177,10 +177,10 @@ export class MultiSelectorRow extends React.Component<Props> {
     return (
       <Row
         onClick={
-          disabled
-            ? undefined
-            : multiselect
-              ? this.handleMultiselectChange
+          multiselect
+            ? this.handleMultiselectChange
+            : disabled
+              ? undefined
               : this.handleSelectToggle
         }
         onMouseEnter={this.handleMouseEnter}
@@ -189,7 +189,7 @@ export class MultiSelectorRow extends React.Component<Props> {
         {multiselect && <Checkbox value={value} checked={multiselectChecked} />}
         <Button
           className={multiselect ? 'hide-radio' : ''}
-          disabled={disabled}
+          disabled={!multiselect && disabled}
           selected={selected}
         >
           <Title>{title}</Title>
