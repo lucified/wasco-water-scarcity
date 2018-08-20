@@ -107,6 +107,7 @@ export const BodyText = styled.div`
 export const SelectorHeader = styled.h3`
   font-size: 16px;
   font-weight: 700;
+  margin-bottom: 4px;
 `;
 
 export const SelectorDescription = BodyText.extend`
