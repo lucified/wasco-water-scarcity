@@ -474,10 +474,11 @@ class Gapminder extends React.Component<Props> {
     label: Selection<SVGTextElement, undefined, any, any>,
   ) => {
     const { data, selectedTimeIndex } = this.props;
+    const labelData = data.timeRanges[selectedTimeIndex];
 
-    label.text(
-      data.timeRanges[selectedTimeIndex].map(d => d.getFullYear()).join('-'),
-    );
+    if (labelData) {
+      label.text(labelData.map(d => d.getFullYear()).join('-'));
+    }
   };
 
   private handleCircleClick = (d: ChartDatum) => {
@@ -530,9 +531,27 @@ class Gapminder extends React.Component<Props> {
     const { selectedTimeIndex } = this.props;
     const { xScale, yScale, sizeScale } = this;
     circle
-      .attr('cx', d => xScale!(d.x[selectedTimeIndex]))
-      .attr('cy', d => yScale!(d.y[selectedTimeIndex]))
-      .attr('r', d => sizeScale!(d.size[selectedTimeIndex]));
+      .attr(
+        'cx',
+        d =>
+          d.x[selectedTimeIndex] != null
+            ? xScale!(d.x[selectedTimeIndex])
+            : null,
+      )
+      .attr(
+        'cy',
+        d =>
+          d.y[selectedTimeIndex] != null
+            ? yScale!(d.y[selectedTimeIndex])
+            : null,
+      )
+      .attr(
+        'r',
+        d =>
+          d.size[selectedTimeIndex] != null
+            ? sizeScale!(d.size[selectedTimeIndex])
+            : null,
+      );
   };
 
   private drawSelectedPath = (
@@ -568,6 +587,13 @@ class Gapminder extends React.Component<Props> {
 
     if (b.id === selectedData) {
       return -1;
+    }
+
+    if (
+      b.size[selectedTimeIndex] == null ||
+      a.size[selectedTimeIndex] == null
+    ) {
+      return 0;
     }
 
     return b.size[selectedTimeIndex] - a.size[selectedTimeIndex];
