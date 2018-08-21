@@ -26,10 +26,21 @@ export const getStressShortageDataForScenario = createSelector(
   (data, scenarioId) => data && data[scenarioId],
 );
 
-export function getSelectedStressShortageData(state: StateTree) {
-  const data = getStressShortageDataForScenario(state);
-  return data && data[getSelectedHistoricalTimeIndex(state)];
-}
+/**
+ * If the time index is larger than the number of datum in the scenario data,
+ * give the last one.
+ */
+export const getSelectedHistoricalTimeIndex = createSelector(
+  getStressShortageDataForScenario,
+  (state: StateTree) => state.selections.historicalTimeIndex,
+  (data, timeIndex) => data && Math.min(timeIndex, data.length - 1),
+);
+
+export const getSelectedStressShortageData = createSelector(
+  getStressShortageDataForScenario,
+  getSelectedHistoricalTimeIndex,
+  (data, index) => (data && index != null ? data[index] : undefined),
+);
 
 export function isHistoricalTimeIndexLocked(state: StateTree) {
   return state.selections.lockHistoricalTimeIndex;
@@ -192,10 +203,6 @@ const getAggregateData = createSelector(
     });
   },
 );
-
-export function getSelectedHistoricalTimeIndex(state: StateTree) {
-  return state.selections.historicalTimeIndex;
-}
 
 export function getSelectedWaterRegionId(state: StateTree) {
   return state.selections.region;
