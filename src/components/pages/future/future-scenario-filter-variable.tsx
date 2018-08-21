@@ -129,13 +129,24 @@ export class FutureScenarioFilterVariable extends React.Component<
       )
       .map(o => ({
         ...o,
-        disabled: !every(
-          o.requiredValues,
-          (vals, varname) =>
-            vals.indexOf(
-              selectedScenario[varname as FutureScenarioVariableName],
-            ) > -1,
-        ),
+        disabled:
+          // All variables must have a valid value
+          !every(
+            o.requiredValues,
+            (vals, varname) =>
+              vals.indexOf(
+                selectedScenario[varname as FutureScenarioVariableName],
+              ) > -1,
+          ) ||
+          // At least one variable must have a valid value
+          (variable === 'reuse' &&
+            every(
+              ['dietChange', 'foodLossRed', 'yieldGap', 'agriExp'].map(
+                v =>
+                  selectedScenario[v as FutureScenarioVariableName] ===
+                  'current',
+              ),
+            )),
       }));
 
     return (
