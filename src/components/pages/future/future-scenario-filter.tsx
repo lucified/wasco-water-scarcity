@@ -424,7 +424,7 @@ function scenarioIsInvalid(
   requiredValues: RequiredScenarioValues,
   scenario: FutureScenario,
 ) {
-  return !every(
+  return !every<RequiredScenarioValues>(
     requiredValues,
     (vals, varname) =>
       vals.indexOf(scenario[varname as FutureScenarioVariableName]) > -1,
@@ -548,15 +548,11 @@ class FutureScenarioFilter extends React.Component<Props, State> {
         setHoveredScenarios(
           ensembleData.filter(d =>
             allFutureScenarioVariables.every(variable => {
-              const value = d[variable as FutureScenarioVariableName];
+              const value = d[variable];
               if (variable === hoveredVariable) {
                 return value === hoveredValue;
               } else {
-                return (
-                  comparisonVariables[
-                    variable as FutureScenarioVariableName
-                  ].indexOf(value) > -1
-                );
+                return comparisonVariables[variable].indexOf(value) > -1;
               }
             }),
           ),

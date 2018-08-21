@@ -64,9 +64,11 @@ const Button = styled.div`
     background-color: ${({ disabled, selected }: ButtonProps) =>
       selected && disabled ? theme.colors.gray : 'white'};
     border: ${theme.borderWidth}px solid ${theme.colors.border};
-    ${({ selected }: ButtonProps) =>
+    ${({ selected, disabled }: ButtonProps) =>
       selected
-        ? `border-color: ${theme.colors.textSelection}; opacity: 0.3;`
+        ? disabled
+          ? `border-color: ${theme.colors.grayDarker}; opacity: 0.3;`
+          : `border-color: ${theme.colors.textSelection}; opacity: 0.3;`
         : ''};
   }
 
@@ -99,10 +101,12 @@ const Button = styled.div`
 
   &:not(.hide-radio):hover:after {
     background-color: ${({ disabled, selected }: ButtonProps) =>
-      disabled
-        ? 'white'
-        : selected
-          ? theme.colors.textSelection
+      selected
+        ? disabled
+          ? theme.colors.gray
+          : theme.colors.textSelection
+        : disabled
+          ? 'white'
           : theme.colors.grayLight};
   }
 `;
