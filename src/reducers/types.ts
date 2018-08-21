@@ -9,7 +9,8 @@ import {
 
 // Most of these are used only in the past page
 export interface SelectionsTree {
-  historicalTimeIndex: number;
+  historicalTimeStartYear: number;
+  historicalTimeEndYear: number;
   lockHistoricalTimeIndex: boolean;
   impactModel: string;
   climateModel: string;

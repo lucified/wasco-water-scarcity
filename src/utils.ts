@@ -1,5 +1,4 @@
 import { format } from 'd3-format';
-
 import { Datum } from './types';
 
 export function formatAxisNumber(d: number) {
@@ -23,4 +22,27 @@ export function formatYearRange(d: Datum, longForm = false) {
     : `'${shortFormatter(d.startYear % 100)}-'${shortFormatter(
         d.endYear % 100,
       )}`;
+}
+
+function toMidpoint(startYear: number, endYear: number) {
+  return startYear + (endYear - startYear) / 2;
+}
+
+function indexOfSmallest(d: number[]) {
+  return d.reduce(
+    (smallestIndex, x, i, arr) => (x < arr[smallestIndex] ? i : smallestIndex),
+    0,
+  );
+}
+
+export function findClosestTimeRange(
+  ranges: Array<[number, number]>,
+  startYear: number,
+  endYear: number,
+) {
+  const selectedTimeRangeMidpoint = toMidpoint(startYear, endYear);
+  const distanceFromMidpoint = ranges.map(d =>
+    Math.abs(toMidpoint(d[0], d[1]) - selectedTimeRangeMidpoint),
+  );
+  return ranges[indexOfSmallest(distanceFromMidpoint)];
 }

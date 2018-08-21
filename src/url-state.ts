@@ -17,7 +17,8 @@ const urlToSelectionsState: { [paramName: string]: keyof SelectionsTree } = {
   im: 'impactModel',
   cm: 'climateModel',
   ts: 'timeScale',
-  t: 'historicalTimeIndex',
+  t0: 'historicalTimeStartYear',
+  t1: 'historicalTimeEndYear',
   wr: 'worldRegion',
   r: 'region',
   gv: 'selectedGridVariable',
@@ -166,7 +167,8 @@ export function getGlobalStateFromURLHash(): {
     let num: number;
 
     switch (property) {
-      case 'historicalTimeIndex':
+      case 'historicalTimeStartYear':
+      case 'historicalTimeEndYear':
       case 'region':
       case 'worldRegion':
         num = parseInt(value as string, 10);

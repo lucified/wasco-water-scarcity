@@ -2,11 +2,13 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import styled from 'styled-components';
-import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../actions';
+import { setTimeRange, toggleHistoricalTimeIndexLock } from '../actions';
 import { belowThresholdColor, getDataTypeColors } from '../data';
 import { StateTree } from '../reducers';
 import {
-  getSelectedHistoricalTimeIndex,
+  getHistoricalDataTimeIndex,
+  getHistoricalDataTimeRanges,
+  getNearestHistoricalTimeRange,
   getSelectedWorldRegion,
   getTimeSeriesForSelectedGlobalRegion,
   isHistoricalTimeIndexLocked,
@@ -113,7 +115,8 @@ function getTitle(dataType: HistoricalDataType, worldRegion?: WorldRegion) {
 }
 
 interface GeneratedStateProps {
-  selectedIndex: number;
+  selectedIndex?: number;
+  timeRanges?: Array<[number, number]>;
   currentIndexLabel: string;
   data?: AggregateStressShortageDatum[];
   selectedWorldRegion?: WorldRegion;
@@ -121,7 +124,7 @@ interface GeneratedStateProps {
 }
 
 interface GeneratedDispatchProps {
-  setSelectedTime: (value: number) => void;
+  setSelectedTime: (startYear: number, endYear: number) => void;
   onToggleLock: () => void;
 }
 
@@ -140,7 +143,7 @@ interface State {
   isPlaying: boolean;
 }
 
-class TimeSelector extends React.PureComponent<Props, State> {
+class BarChartTimeSelector extends React.PureComponent<Props, State> {
   private timerReference: any;
 
   public state = {
@@ -148,8 +151,10 @@ class TimeSelector extends React.PureComponent<Props, State> {
   };
 
   public componentDidMount() {
-    if (this.props.autoplay && this.props.data) {
-      this.props.setSelectedTime(0);
+    const { autoplay, timeRanges, setSelectedTime } = this.props;
+    if (autoplay && timeRanges) {
+      const firstTimeRange = timeRanges[0];
+      setSelectedTime(firstTimeRange[0], firstTimeRange[1]);
       setTimeout(() => {
         this.play();
       }, 2000);
@@ -157,8 +162,10 @@ class TimeSelector extends React.PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    if (this.props.autoplay && !prevProps.data && this.props.data) {
-      this.props.setSelectedTime(0);
+    const { autoplay, timeRanges, setSelectedTime } = this.props;
+    if (autoplay && !prevProps.timeRanges && timeRanges) {
+      const firstTimeRange = timeRanges[0];
+      setSelectedTime(firstTimeRange[0], firstTimeRange[1]);
       setTimeout(() => {
         this.play();
       }, 2000);
@@ -178,16 +185,23 @@ class TimeSelector extends React.PureComponent<Props, State> {
   );
 
   private handleClick = (item: BarChartDatum) => {
-    const { onToggleLock, setSelectedTime } = this.props;
+    const { onToggleLock, setSelectedTime, timeRanges } = this.props;
     if (onToggleLock) {
       onToggleLock();
     }
-    setSelectedTime(item.key);
+    if (timeRanges) {
+      const selectedRange = timeRanges[item.key];
+      setSelectedTime(selectedRange[0], selectedRange[1]);
+    }
   };
 
   private handleHover = (item: BarChartDatum) => {
     this.pause();
-    this.props.setSelectedTime(item.key);
+    const { setSelectedTime, timeRanges } = this.props;
+    if (timeRanges) {
+      const selectedRange = timeRanges[item.key];
+      setSelectedTime(selectedRange[0], selectedRange[1]);
+    }
   };
 
   private handleToggle = () => {
@@ -210,30 +224,30 @@ class TimeSelector extends React.PureComponent<Props, State> {
   }
 
   private play() {
-    const { setSelectedTime, selectedIndex, data } = this.props;
-    if (!data) {
+    const { setSelectedTime, selectedIndex, timeRanges } = this.props;
+    if (!timeRanges || selectedIndex == null) {
       console.warn('No time information to play.');
       return;
     }
     this.setState({ isPlaying: true });
-    if (selectedIndex === data.length - 1) {
-      setSelectedTime(0);
-    } else {
-      setSelectedTime(selectedIndex + 1);
-    }
+    const index =
+      selectedIndex === timeRanges.length - 1 ? 0 : selectedIndex + 1;
+    const selectedRange = timeRanges[index];
+    setSelectedTime(selectedRange[0], selectedRange[1]);
     this.timerReference = setInterval(this.setNextPeriod, 1500);
   }
 
   private setNextPeriod = () => {
-    const { setSelectedTime, selectedIndex, data } = this.props;
-    if (!data) {
+    const { setSelectedTime, selectedIndex, timeRanges } = this.props;
+    if (!timeRanges || selectedIndex == null) {
       console.warn('No time information to play.');
       return;
     }
-    if (selectedIndex === data.length - 1) {
+    if (selectedIndex === timeRanges.length - 1) {
       this.pause();
     } else {
-      setSelectedTime(selectedIndex + 1);
+      const nextRange = timeRanges[selectedIndex + 1];
+      setSelectedTime(nextRange[0], nextRange[1]);
     }
   };
 
@@ -296,29 +310,29 @@ export default connect<
   StateTree
 >(
   state => {
-    const data = getTimeSeriesForSelectedGlobalRegion(state);
-    const selectedIndex = getSelectedHistoricalTimeIndex(state);
-    const currentSelectedData = data && data[selectedIndex];
-    const label = currentSelectedData
-      ? currentSelectedData.startYear !== currentSelectedData.endYear
-        ? `${currentSelectedData.startYear} - ${currentSelectedData.endYear}`
-        : String(currentSelectedData.startYear)
+    const selectedIndex = getHistoricalDataTimeIndex(state);
+    const selectedRange = getNearestHistoricalTimeRange(state);
+    const label = selectedRange
+      ? selectedRange[0] !== selectedRange[1]
+        ? `${selectedRange[0]} - ${selectedRange[1]}`
+        : String(selectedRange[0])
       : '';
 
     return {
       selectedIndex,
+      timeRanges: getHistoricalDataTimeRanges(state),
       currentIndexLabel: label,
-      data,
+      data: getTimeSeriesForSelectedGlobalRegion(state),
       selectedWorldRegion: getSelectedWorldRegion(state),
       timeIndexLocked: isHistoricalTimeIndexLocked(state),
     };
   },
   dispatch => ({
-    setSelectedTime: (value: number) => {
-      dispatch(setTimeIndex(value));
+    setSelectedTime: (startYear: number, endYear: number) => {
+      dispatch(setTimeRange(startYear, endYear));
     },
     onToggleLock: () => {
       dispatch(toggleHistoricalTimeIndexLock());
     },
   }),
-)(responsive(TimeSelector));
+)(responsive(BarChartTimeSelector));

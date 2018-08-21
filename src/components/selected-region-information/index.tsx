@@ -4,11 +4,12 @@ import { max } from 'd3-array';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { setTimeIndex, toggleHistoricalTimeIndexLock } from '../../actions';
+import { setTimeRange, toggleHistoricalTimeIndexLock } from '../../actions';
 import { getDataTypeColors } from '../../data';
 import { StateTree } from '../../reducers';
 import {
-  getSelectedHistoricalTimeIndex,
+  getHistoricalDataTimeIndex,
+  getHistoricalDataTimeRanges,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
@@ -57,7 +58,8 @@ interface PassedProps {
 }
 
 interface GeneratedStateProps {
-  selectedTimeIndex: number;
+  selectedTimeIndex?: number;
+  timeRanges?: Array<[number, number]>;
   selectedWaterRegionId?: number;
   selectedWorldRegion?: WorldRegion;
   timeSeriesForSelectedWaterRegion?: StressShortageDatum[];
@@ -68,7 +70,7 @@ interface GeneratedStateProps {
 }
 
 interface GeneratedDispatchProps {
-  setTimeIndex: (value: number) => void;
+  setTimeRange: (startYear: number, endYear: number) => void;
   toggleTimeIndexLock: () => void;
 }
 
@@ -76,7 +78,11 @@ type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
 
 class SelectedRegionInformation extends React.Component<Props> {
   private handleTimeIndexChange = (index: number) => {
-    this.props.setTimeIndex(index);
+    const { timeRanges } = this.props;
+    if (timeRanges) {
+      const selectedRange = timeRanges[index];
+      this.props.setTimeRange(selectedRange[0], selectedRange[1]);
+    }
   };
 
   private getChartTitle(type: string) {
@@ -119,7 +125,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       <div className="col-xs-12 col-md-4">
         <Heading>{this.getChartTitle('stress')}</Heading>
         <Description>Consumption / Availability</Description>
-        {timeSeriesForSelectedWaterRegion ? (
+        {timeSeriesForSelectedWaterRegion && selectedTimeIndex != null ? (
           <DataLineChart
             dataType="stress"
             dataColor="darkcyan"
@@ -152,7 +158,7 @@ class SelectedRegionInformation extends React.Component<Props> {
       <div className="col-xs-12 col-md-4">
         <Heading>{this.getChartTitle('shortage')}</Heading>
         <Description>Availability per person (m³)</Description>
-        {timeSeriesForSelectedWaterRegion ? (
+        {timeSeriesForSelectedWaterRegion && selectedTimeIndex != null ? (
           <DataLineChart
             dataType="shortage"
             dataColor="darkcyan"
@@ -188,17 +194,19 @@ class SelectedRegionInformation extends React.Component<Props> {
       <div className="col-xs-12 col-md-4">
         <Heading>{this.getChartTitle('availability')}</Heading>
         <Description>Total availability (m³)</Description>
-        <AvailabilityChart
-          data={
-            timeSeriesForSelectedWaterRegion ||
-            timeSeriesForSelectedWorldRegion!
-          }
-          selectedTimeIndex={selectedTimeIndex}
-          onTimeIndexChange={this.handleTimeIndexChange}
-          maxY={maxConsumptionOrAvailability}
-          onToggleLock={toggleTimeIndexLock}
-          timeIndexLocked={timeIndexLocked}
-        />
+        {selectedTimeIndex != null && (
+          <AvailabilityChart
+            data={
+              timeSeriesForSelectedWaterRegion ||
+              timeSeriesForSelectedWorldRegion!
+            }
+            selectedTimeIndex={selectedTimeIndex}
+            onTimeIndexChange={this.handleTimeIndexChange}
+            maxY={maxConsumptionOrAvailability}
+            onToggleLock={toggleTimeIndexLock}
+            timeIndexLocked={timeIndexLocked}
+          />
+        )}
       </div>
     );
   }
@@ -216,17 +224,19 @@ class SelectedRegionInformation extends React.Component<Props> {
       <div className="col-xs-12 col-md-4">
         <Heading>{this.getChartTitle('consumption')}</Heading>
         <Description>Consumption (m³)</Description>
-        <ConsumptionChart
-          data={
-            timeSeriesForSelectedWaterRegion ||
-            timeSeriesForSelectedWorldRegion!
-          }
-          selectedTimeIndex={selectedTimeIndex}
-          onTimeIndexChange={this.handleTimeIndexChange}
-          maxY={maxConsumptionOrAvailability}
-          onToggleLock={toggleTimeIndexLock}
-          timeIndexLocked={timeIndexLocked}
-        />
+        {selectedTimeIndex != null && (
+          <ConsumptionChart
+            data={
+              timeSeriesForSelectedWaterRegion ||
+              timeSeriesForSelectedWorldRegion!
+            }
+            selectedTimeIndex={selectedTimeIndex}
+            onTimeIndexChange={this.handleTimeIndexChange}
+            maxY={maxConsumptionOrAvailability}
+            onToggleLock={toggleTimeIndexLock}
+            timeIndexLocked={timeIndexLocked}
+          />
+        )}
       </div>
     );
   }
@@ -244,16 +254,18 @@ class SelectedRegionInformation extends React.Component<Props> {
       <div className="col-xs-12 col-md-4">
         <Heading>{this.getChartTitle('population')}</Heading>
         <Description>Population</Description>
-        <PopulationChart
-          data={
-            timeSeriesForSelectedWaterRegion ||
-            timeSeriesForSelectedWorldRegion!
-          }
-          selectedTimeIndex={selectedTimeIndex}
-          onTimeIndexChange={this.handleTimeIndexChange}
-          onToggleLock={toggleTimeIndexLock}
-          timeIndexLocked={timeIndexLocked}
-        />
+        {selectedTimeIndex != null && (
+          <PopulationChart
+            data={
+              timeSeriesForSelectedWaterRegion ||
+              timeSeriesForSelectedWorldRegion!
+            }
+            selectedTimeIndex={selectedTimeIndex}
+            onTimeIndexChange={this.handleTimeIndexChange}
+            onToggleLock={toggleTimeIndexLock}
+            timeIndexLocked={timeIndexLocked}
+          />
+        )}
       </div>
     );
   }
@@ -344,7 +356,7 @@ export default connect<
   StateTree
 >(
   state => ({
-    selectedTimeIndex: getSelectedHistoricalTimeIndex(state),
+    selectedTimeIndex: getHistoricalDataTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
     timeSeriesForSelectedWaterRegion: getTimeSeriesForSelectedWaterRegion(
@@ -353,13 +365,14 @@ export default connect<
     timeSeriesForSelectedWorldRegion: getTimeSeriesForSelectedGlobalRegion(
       state,
     ),
+    timeRanges: getHistoricalDataTimeRanges(state),
     timeIndexLocked: isHistoricalTimeIndexLocked(state),
     stressThresholds: getThresholdsForDataType(state, 'stress'),
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   }),
   dispatch => ({
-    setTimeIndex: (value: number) => {
-      dispatch(setTimeIndex(value));
+    setTimeRange: (startYear: number, endYear: number) => {
+      dispatch(setTimeRange(startYear, endYear));
     },
     toggleTimeIndexLock: () => {
       dispatch(toggleHistoricalTimeIndexLock());

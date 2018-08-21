@@ -1,12 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { AppType } from '../../../types';
+import BarChartTimeSelector from '../../bar-chart-time-selector';
 import Spinner from '../../generic/spinner';
 import { GridVariableSelector } from '../../grid-variable-selector';
 import { ResponsiveMap } from '../../map/responsive';
 import SelectedRegionInformation from '../../selected-region-information';
 import { theme, Title, TitleContainer } from '../../theme';
-import TimeSelector from '../../time-selector';
 import withMapData, { Props as MapDataProps } from '../../with-map-data';
 import WorldRegionSelector from '../../world-region-selector';
 import YearLabel from '../../year-label';
@@ -99,7 +99,7 @@ export class PastBody extends React.Component<Props> {
               <GraphicsContainer>
                 <div className="row middle-xs">
                   <div className="col-xs-12">
-                    <TimeSelector dataType={selectedDataType} />
+                    <BarChartTimeSelector dataType={selectedDataType} />
                   </div>
                 </div>
                 <div className="row ">

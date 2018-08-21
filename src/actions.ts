@@ -16,12 +16,17 @@ import {
 
 export interface SetTimeIndexAction {
   type: 'SET_HISTORICAL_TIME_INDEX';
-  value: number;
+  startYear: number;
+  endYear: number;
 }
-export function setTimeIndex(value: number): SetTimeIndexAction {
+export function setTimeRange(
+  startYear: number,
+  endYear: number,
+): SetTimeIndexAction {
   return {
     type: 'SET_HISTORICAL_TIME_INDEX',
-    value,
+    startYear,
+    endYear,
   };
 }
 

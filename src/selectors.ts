@@ -8,6 +8,7 @@ import {
   AnyDataType,
   TimeAggregate,
 } from './types';
+import { findClosestTimeRange } from './utils';
 
 export function getStressShortageData(state: StateTree) {
   return state.data.stressShortageData;
@@ -27,20 +28,54 @@ export const getStressShortageDataForScenario = createSelector(
 );
 
 /**
- * If the time index is larger than the number of datum in the scenario data,
- * give the last one.
+ * This returns the actual currently selected start and end years. It's set when
+ * the user changes the selected time by e.g. hovering on a time selector.
+ * The time range might not be available in the data, which is why
+ * getNearestHistoricalTimeRange should generally be used instead.
  */
-export const getSelectedHistoricalTimeIndex = createSelector(
+const getSelectedHistoricalTimeRange = createSelector(
+  (state: StateTree) => state.selections.historicalTimeStartYear,
+  (state: StateTree) => state.selections.historicalTimeEndYear,
+  (startYear, endYear) => [startYear, endYear],
+);
+
+/**
+ * Returns the available time ranges of the current scenario data.
+ */
+export const getHistoricalDataTimeRanges = createSelector(
   getStressShortageDataForScenario,
-  (state: StateTree) => state.selections.historicalTimeIndex,
-  (data, timeIndex) =>
-    !data ? timeIndex : Math.min(timeIndex, data.length - 1),
+  data => data && data.map<[number, number]>(d => [d.startYear, d.endYear]),
+);
+
+/**
+ * This should be used in the UI to get the time range to display data for.
+ */
+export const getNearestHistoricalTimeRange = createSelector(
+  getSelectedHistoricalTimeRange,
+  getHistoricalDataTimeRanges,
+  ([startYear, endYear], ranges) =>
+    ranges && findClosestTimeRange(ranges, startYear, endYear),
+);
+
+/**
+ * The index of the datum for the currently selected time range.
+ */
+export const getHistoricalDataTimeIndex = createSelector(
+  getNearestHistoricalTimeRange,
+  getHistoricalDataTimeRanges,
+  (range, ranges) =>
+    range &&
+    ranges &&
+    ranges.findIndex(d => d[0] === range[0] && d[1] === range[1]),
 );
 
 export const getSelectedStressShortageData = createSelector(
   getStressShortageDataForScenario,
-  getSelectedHistoricalTimeIndex,
-  (data, index) => (data && index != null ? data[index] : undefined),
+  getNearestHistoricalTimeRange,
+  (data, range) =>
+    data &&
+    range &&
+    data.find(d => d.startYear === range[0] && d.endYear === range[1]),
 );
 
 export function isHistoricalTimeIndexLocked(state: StateTree) {
