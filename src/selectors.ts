@@ -33,7 +33,8 @@ export const getStressShortageDataForScenario = createSelector(
 export const getSelectedHistoricalTimeIndex = createSelector(
   getStressShortageDataForScenario,
   (state: StateTree) => state.selections.historicalTimeIndex,
-  (data, timeIndex) => data && Math.min(timeIndex, data.length - 1),
+  (data, timeIndex) =>
+    !data ? timeIndex : Math.min(timeIndex, data.length - 1),
 );
 
 export const getSelectedStressShortageData = createSelector(
