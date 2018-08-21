@@ -333,7 +333,7 @@ export const defaultDataTypeThresholds: {
   /**
    * Higher is bettter.
    */
-  kcal: [1845, 2355, 2894],
+  kcal: [1000, 1845, 2355],
 };
 
 export const defaultDataTypeThresholdMaxValues: {
