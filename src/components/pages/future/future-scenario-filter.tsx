@@ -208,21 +208,21 @@ const sections: {
     },
     {
       title: 'How are productivity improvements used?',
-      description: 'How are water resources used when they are freed up?',
+      description: 'Changes to the status quo free up water resources',
       variable: 'reuse',
       options: [
         {
-          title: 'Meet food demand, minimise water use',
+          title: 'Meet food demand, decrease water use',
           description: 'How little water could we use?',
           value: 'meetfood',
         },
         {
-          title: 'Maximise food production',
+          title: 'Increase food production',
           description: 'Keeping water use constant',
           value: 'maxfood',
         },
         {
-          title: 'Minimise water use',
+          title: 'Decrease water use',
           description: 'Keeping food production constant',
           value: 'minwater',
         },
