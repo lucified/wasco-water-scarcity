@@ -209,7 +209,6 @@ const sections: {
     {
       title: 'How are productivity improvements used?',
       description: 'Changes to the status quo free up water resources',
-      // Note: reuse has custom validation in future-scenario-filter-variable.tsx
       variable: 'reuse',
       options: [
         {

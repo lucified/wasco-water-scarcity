@@ -122,12 +122,6 @@ export class FutureScenarioFilterVariable extends React.Component<
       furtherInformation,
     } = this.props;
     const { furtherInformationOpen } = this.state;
-    const variablesWithCurrent: FutureScenarioVariableName[] = [
-      'dietChange',
-      'foodLossRed',
-      'yieldGap',
-      'agriExp',
-    ];
 
     const filteredOptions = options
       .filter(
@@ -135,18 +129,13 @@ export class FutureScenarioFilterVariable extends React.Component<
       )
       .map(o => ({
         ...o,
-        disabled:
-          // All variables must have a valid value
-          !every(
-            o.requiredValues,
-            (vals, varname) =>
-              vals.indexOf(
-                selectedScenario[varname as FutureScenarioVariableName],
-              ) > -1,
-          ) ||
-          // At least one variable must have a valid value
-          (variable === 'reuse' &&
-            variablesWithCurrent.every(v => selectedScenario[v] === 'current')),
+        disabled: !every(
+          o.requiredValues,
+          (vals, varname) =>
+            vals.indexOf(
+              selectedScenario[varname as FutureScenarioVariableName],
+            ) > -1,
+        ),
       }));
 
     return (
