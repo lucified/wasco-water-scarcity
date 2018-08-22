@@ -5,7 +5,6 @@ import { scaleLog, scaleThreshold, ScaleThreshold } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
-import { GeometryCollection } from 'geojson';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -233,7 +232,14 @@ interface State {
   };
   ongoingRequests: string[];
   zoomInRequested: boolean;
-  worldGeoData?: TopoJSON.Topology;
+  countryGeoData?: GeoJSON.FeatureCollection<
+    GeoJSON.GeometryObject,
+    GeoJSON.GeoJsonProperties
+  >;
+  landGeoData?: GeoJSON.FeatureCollection<
+    GeoJSON.GeometryObject,
+    GeoJSON.GeoJsonProperties
+  >;
 }
 
 function getRequestId(scenarioId: string, regionId: number) {
@@ -269,17 +275,17 @@ class Map extends React.Component<Props, State> {
       selectedWorldRegion,
       width,
     } = this.props;
-    const { zoomInRequested, regionData, worldGeoData } = this.state;
+    const { zoomInRequested, regionData, landGeoData } = this.state;
     const scenarioId = this.getScenarioId();
 
-    if (!worldGeoData || !selectedData) {
+    if (!landGeoData || !selectedData) {
       return;
     }
 
     if (
-      worldGeoData &&
+      landGeoData &&
       selectedData &&
-      (!prevState.worldGeoData || !prevProps.selectedData)
+      (!prevState.landGeoData || !prevProps.selectedData)
     ) {
       // Initial data load
       this.drawMap();
@@ -387,15 +393,22 @@ class Map extends React.Component<Props, State> {
     try {
       const result = await fetch(worldDataFilename);
       const parsedData: TopoJSON.Topology = await result.json();
-      this.setState({ worldGeoData: parsedData });
+      // TODO: improve typings
+      this.setState({
+        countryGeoData: feature(
+          parsedData,
+          parsedData.objects.countries,
+        ) as any,
+        landGeoData: feature(parsedData, parsedData.objects.land) as any,
+      });
     } catch (error) {
       console.error('Unable to fetch map data:', error);
     }
   }
 
   private drawMap() {
-    const { worldGeoData } = this.state;
-    if (!worldGeoData) {
+    const { landGeoData } = this.state;
+    if (!landGeoData) {
       return;
     }
 
@@ -430,7 +443,7 @@ class Map extends React.Component<Props, State> {
     // Countries land mass
     svg
       .select<SVGPathElement>('path#land')
-      .datum(feature(worldGeoData, worldGeoData.objects.land))
+      .datum(landGeoData)
       .attr('d', path);
 
     // Water regions
@@ -653,7 +666,7 @@ class Map extends React.Component<Props, State> {
   }
 
   private zoomToWaterRegion() {
-    const { worldGeoData } = this.state;
+    const { countryGeoData } = this.state;
     const {
       selectedWaterRegionId,
       selectedGridVariable,
@@ -662,7 +675,7 @@ class Map extends React.Component<Props, State> {
       selectedData,
     } = this.props;
 
-    if (!worldGeoData || !selectedData) {
+    if (!countryGeoData || !selectedData) {
       return;
     }
 
@@ -764,10 +777,7 @@ class Map extends React.Component<Props, State> {
     svg
       .select('g#country-borders')
       .selectAll('path')
-      .data<GeometryCollection>(
-        // TODO: improve typings
-        (feature(worldGeoData, worldGeoData.objects.countries) as any).features,
-      )
+      .data(countryGeoData.features)
       .enter()
       .append('path')
       .attr('d', path);
@@ -1105,13 +1115,13 @@ class Map extends React.Component<Props, State> {
       isZoomedIn,
       selectedData,
     } = this.props;
-    const { zoomInRequested, worldGeoData } = this.state;
+    const { zoomInRequested, landGeoData } = this.state;
     const height = this.getHeight();
     const scenarioId = this.getScenarioId();
 
     return (
       <Container>
-        {!selectedData || !worldGeoData ? (
+        {!selectedData || !landGeoData ? (
           <div style={{ width, height: height + 3 }}>
             {this.getSpinnerOverlay()}
           </div>
