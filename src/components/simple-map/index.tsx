@@ -113,7 +113,6 @@ function getLabel(dataType: HistoricalDataType) {
 
 class SimpleMap extends React.Component<Props> {
   private svgRef!: SVGElement;
-  private legendWidth = 200;
   private colorScale?: ScaleThreshold<number, string>;
   private legendXScale?: ScaleLinear<number, number>;
   private legendExtentPairs?: Array<[number, number]>;
@@ -164,6 +163,7 @@ class SimpleMap extends React.Component<Props> {
 
   private generateScales() {
     const { colorScale, thresholds, selectedDataType } = this.props;
+    const legendWidth = 200;
     // Based on https://bl.ocks.org/mbostock/4060606
     const maxThreshold = thresholds[thresholds.length - 1];
     const xScale = scaleLinear()
@@ -174,7 +174,7 @@ class SimpleMap extends React.Component<Props> {
           defaultDataTypeThresholdMaxValues[selectedDataType],
         ),
       ])
-      .rangeRound([0, this.legendWidth]);
+      .rangeRound([0, legendWidth]);
 
     this.legendExtentPairs = colorScale.range().map(d => {
       const colorExtent = colorScale.invertExtent(d);
@@ -446,7 +446,7 @@ class SimpleMap extends React.Component<Props> {
           id="legend"
           transform={`translate(${Math.round(width * 0.6)}, ${Math.round(
             height - 26,
-          )})`}
+          )}) scale(${Math.min(1, Math.max(width / 530, 0.5))})`}
         >
           <LegendCaption x="0" y="-6">
             {getLabel(selectedDataType)}
