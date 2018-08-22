@@ -2,7 +2,7 @@ import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import {
-  setTimeRange as setTimeIndexAction,
+  setTimeRange as setTimeRangeAction,
   toggleSelectedRegion as toggleSelectedRegionAction,
 } from '../../actions';
 import { getDataTypeColors } from '../../data';
@@ -144,7 +144,7 @@ export const ConnectedGapminder = connect<
   }),
   dispatch => ({
     setSelectedTimeRange: (startYear: number, endYear: number) => {
-      dispatch(setTimeIndexAction(startYear, endYear));
+      dispatch(setTimeRangeAction(startYear, endYear));
     },
     toggleSelectedRegion: (id: string) => {
       dispatch(toggleSelectedRegionAction(Number(id)));

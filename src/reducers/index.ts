@@ -116,7 +116,7 @@ function selectionsReducer(
   action: Action,
 ): SelectionsTree {
   switch (action.type) {
-    case 'SET_HISTORICAL_TIME_INDEX':
+    case 'SET_HISTORICAL_TIME':
       if (
         !state.lockHistoricalTimeIndex &&
         (action.startYear !== state.historicalTimeStartYear ||

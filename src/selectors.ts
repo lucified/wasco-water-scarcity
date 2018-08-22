@@ -29,7 +29,10 @@ export const getStressShortageDataForScenario = createSelector(
 
 /**
  * This returns the actual currently selected start and end years. It's set when
- * the user changes the selected time by e.g. hovering on a time selector.
+ * the user changes the selected time by e.g. hovering on a time selector or when
+ * we load a new dataset. It is NOT set when we switch to a dataset that's already
+ * been loaded.
+ *
  * The time range might not be available in the data, which is why
  * getNearestHistoricalTimeRange should generally be used instead.
  */

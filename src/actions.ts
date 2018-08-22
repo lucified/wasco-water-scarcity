@@ -14,17 +14,17 @@ import {
   WorldRegion,
 } from './types';
 
-export interface SetTimeIndexAction {
-  type: 'SET_HISTORICAL_TIME_INDEX';
+export interface SetTimeAction {
+  type: 'SET_HISTORICAL_TIME';
   startYear: number;
   endYear: number;
 }
 export function setTimeRange(
   startYear: number,
   endYear: number,
-): SetTimeIndexAction {
+): SetTimeAction {
   return {
-    type: 'SET_HISTORICAL_TIME_INDEX',
+    type: 'SET_HISTORICAL_TIME',
     startYear,
     endYear,
   };
@@ -281,7 +281,7 @@ export type Action =
   | SetSelectedRegionAction
   | SetSelectedTimeScaleAction
   | SetThresholdsForDataTypeAction
-  | SetTimeIndexAction
+  | SetTimeAction
   | SetGridVariableAction
   | SetRegionZoomAction
   | StoreWaterDataAction
