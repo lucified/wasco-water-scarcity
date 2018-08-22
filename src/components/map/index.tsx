@@ -347,12 +347,13 @@ class Map extends React.Component<Props, State> {
       if (
         didRequestZoomIn ||
         waterRegionSelectedAndChanged ||
-        zoomedInDataLoaded ||
-        dataChanged
+        zoomedInDataLoaded
       ) {
         this.removeZoomedInElements();
         this.zoomToWaterRegion();
         this.redrawFillsAndBorders();
+      } else if (dataChanged) {
+        this.updateWaterRegionData();
       }
     } else {
       // Not zoomed in
@@ -665,8 +666,142 @@ class Map extends React.Component<Props, State> {
     select(this.mapTooltipRef).style('opacity', 0);
   }
 
+  private updateWaterRegionData() {
+    const { countryGeoData, zoomInRequested } = this.state;
+    const {
+      selectedWaterRegionId,
+      selectedGridVariable,
+      width,
+      waterRegions: { features },
+      selectedData,
+    } = this.props;
+
+    // FIXME: duplicating the code below from zoomToWaterRegion is ugly
+    if (!countryGeoData || !selectedData) {
+      return;
+    }
+
+    const selectedWaterRegion =
+      selectedWaterRegionId != null
+        ? features.find(r => r.properties.featureId === selectedWaterRegionId)
+        : undefined;
+
+    if (
+      !zoomInRequested ||
+      selectedWaterRegionId == null ||
+      selectedWaterRegion == null
+    ) {
+      return;
+    }
+
+    const scenarioId = this.getScenarioId();
+
+    const localData =
+      this.state.regionData[scenarioId] &&
+      this.state.regionData[scenarioId][selectedWaterRegionId];
+    if (!localData) {
+      this.fetchRegionData(scenarioId, selectedWaterRegionId);
+      return;
+    }
+
+    const height = this.getHeight();
+    const svg = select<SVGElement, undefined>(this.svgRef);
+
+    svg
+      .select('g#grid-data')
+      .selectAll('path')
+      .remove();
+
+    this.removeGridLegend();
+
+    if (localData.grid != null && localData.gridQuintiles != null) {
+      const quintiles = localData.gridQuintiles[selectedGridVariable];
+      if (quintiles != null) {
+        // TODO?: projection should be specific to spatial unit
+        // Based on https://bl.ocks.org/iamkevinv/0a24e9126cd2fa6b283c6f2d774b69a2
+        const projection = geoNaturalEarth1()
+          .precision(0.1)
+          .scale(width / 4.6)
+          .translate([width / 2.2, height / 1.7]);
+
+        const path = geoPath().projection(projection);
+
+        // TODO: might be a more efficient way of doing this?
+        const griddataPoly: GeoJSON.FeatureCollection<GeoJSON.Polygon> = {
+          type: 'FeatureCollection',
+          features: localData.grid.map((d: GridData) => ({
+            type: 'Feature' as 'Feature',
+            geometry: {
+              type: 'Polygon' as 'Polygon',
+              coordinates: [
+                [
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] + 0.25],
+                  [d.centre[0] + 0.25, d.centre[1] - 0.25],
+                  [d.centre[0] - 0.25, d.centre[1] - 0.25],
+                ],
+              ],
+            },
+            properties: {
+              data:
+                d[selectedGridVariable] &&
+                d[selectedGridVariable]![selectedData.startYear],
+            },
+          })),
+        };
+
+        const colorScale = scaleThreshold<number, string>()
+          .domain(quintiles)
+          .range(gridQuintileColors[selectedGridVariable]);
+
+        const bounds = path.bounds(selectedWaterRegion);
+        const dy0 = bounds[1][1] - bounds[0][1];
+        const legendMargin = 54;
+        bounds[1][1] = bounds[1][1] + (legendMargin / height) * dy0;
+        const dx = bounds[1][0] - bounds[0][0];
+        const dy = bounds[1][1] - bounds[0][1];
+        const x = (bounds[0][0] + bounds[1][0]) / 2;
+        const y = (bounds[0][1] + bounds[1][1]) / 2;
+
+        const scale = 0.9 / Math.max(dx / width, dy / height);
+        const translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+        const gridDataSelection = svg.select<SVGGElement>('g#grid-data');
+        gridDataSelection
+          .selectAll<
+            SVGPathElement,
+            ExtendedFeature<GeoJSON.Polygon, { data: number }>
+          >('path')
+          .data(griddataPoly.features)
+          .enter()
+          .append<SVGPathElement>('path')
+          .attr('d', path)
+          .attr(
+            'fill',
+            d =>
+              d.properties!.data == null
+                ? 'none'
+                : colorScale(d.properties!.data),
+          );
+        gridDataSelection.attr(
+          'transform',
+          `translate(${translate[0]}, ${translate[1]}) scale(${scale})`,
+        );
+
+        this.addGridLegend(
+          colorScale,
+          // The log scale breaks if we pass in 0.
+          // FIXME: if the lowest quintile is 0, we won't get a color for it in the scale.
+          [Math.max(0.0001, quintiles[0]), quintiles[quintiles.length - 1] * 2],
+          labelForGridVariable(selectedGridVariable),
+        );
+      }
+    }
+  }
+
   private zoomToWaterRegion() {
-    const { countryGeoData } = this.state;
+    const { countryGeoData, zoomInRequested } = this.state;
     const {
       selectedWaterRegionId,
       selectedGridVariable,
@@ -678,8 +813,6 @@ class Map extends React.Component<Props, State> {
     if (!countryGeoData || !selectedData) {
       return;
     }
-
-    const { zoomInRequested } = this.state;
 
     const selectedWaterRegion =
       selectedWaterRegionId != null
@@ -935,13 +1068,13 @@ class Map extends React.Component<Props, State> {
     const scale = 0.9 / Math.max(dx / width, dy / height);
     const translate = [width / 2 - scale * x, height / 2 - scale * y];
 
-    const ourZoom = zoom().on('zoom', zoomed);
+    const ourZoom = zoom<SVGElement, undefined>().on('zoom', zoomed);
 
     const t = transition('zoom').duration(750);
     svg
       .transition(t as any)
       .call(
-        ourZoom.transform as any,
+        ourZoom.transform,
         zoomIdentity.translate(translate[0], translate[1]).scale(scale),
       );
 
