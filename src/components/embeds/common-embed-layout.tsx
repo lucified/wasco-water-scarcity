@@ -1,10 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { HistoricalDataType } from '../../types';
+import BarChartTimeSelector from '../bar-chart-time-selector';
 import responsive, { ResponsiveProps } from '../generic/responsive';
 import Spinner from '../generic/spinner';
 import SimpleMap from '../simple-map';
-import TimeSelector from '../time-selector';
 import withMapData, { GeneratedMapProps } from '../with-map-data';
 import WorldRegionSelector from '../world-region-selector';
 import YearLabel from '../year-label';
@@ -56,7 +56,7 @@ class CommonEmbedLayout extends React.Component<Props> {
           <div>
             <div className="row middle-xs">
               <div className="col-xs-12">
-                <TimeSelector
+                <BarChartTimeSelector
                   dataType={selectedDataType}
                   showPlayButton
                   autoplay={autoplay}

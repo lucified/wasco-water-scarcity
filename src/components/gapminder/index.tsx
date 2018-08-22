@@ -2,14 +2,15 @@ import { scaleThreshold } from 'd3-scale';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import {
-  setTimeIndex as setTimeIndexAction,
+  setTimeRange as setTimeRangeAction,
   toggleSelectedRegion as toggleSelectedRegionAction,
 } from '../../actions';
 import { getDataTypeColors } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getDataByRegion,
-  getSelectedHistoricalTimeIndex,
+  getHistoricalDataTimeIndex,
+  getHistoricalDataTimeRanges,
   getSelectedWaterRegionId,
   getSelectedWorldRegionId,
   getThresholdsForDataType,
@@ -38,7 +39,8 @@ interface PassedProps {
 }
 
 interface GeneratedStateProps {
-  selectedTimeIndex: number;
+  selectedTimeIndex?: number;
+  timeRanges?: Array<[number, number]>;
   waterToWorldRegionMap?: { [waterRegionId: number]: number };
   selectedRegion?: number;
   selectedWorldRegionId: number;
@@ -48,7 +50,7 @@ interface GeneratedStateProps {
 }
 
 interface GeneratedDispatchProps {
-  setTimeIndex: (value: number) => void;
+  setSelectedTimeRange: (startYear: number, endYear: number) => void;
   toggleSelectedRegion: (id: string) => void;
 }
 
@@ -60,13 +62,14 @@ function GapminderWrapper({
   selectedWorldRegionId,
   waterToWorldRegionMap,
   data,
-  setTimeIndex,
+  timeRanges,
+  setSelectedTimeRange,
   toggleSelectedRegion,
   stressThresholds,
   shortageThresholds,
   height,
 }: Props) {
-  if (!waterToWorldRegionMap || !data) {
+  if (!waterToWorldRegionMap || !data || selectedTimeIndex == null) {
     return null;
   }
 
@@ -96,7 +99,13 @@ function GapminderWrapper({
         selectedData={
           selectedRegion != null ? String(selectedRegion) : undefined
         }
-        onHover={setTimeIndex}
+        onHover={index => {
+          if (!timeRanges) {
+            return;
+          }
+          const selectedRange = timeRanges[index];
+          setSelectedTimeRange(selectedRange[0], selectedRange[1]);
+        }}
         onClick={toggleSelectedRegion}
         xSelector={shortageSelector}
         xBackgroundColorScale={shortageColorsScale}
@@ -124,7 +133,8 @@ export const ConnectedGapminder = connect<
   StateTree
 >(
   state => ({
-    selectedTimeIndex: getSelectedHistoricalTimeIndex(state),
+    selectedTimeIndex: getHistoricalDataTimeIndex(state),
+    timeRanges: getHistoricalDataTimeRanges(state),
     selectedRegion: getSelectedWaterRegionId(state),
     selectedWorldRegionId: getSelectedWorldRegionId(state),
     waterToWorldRegionMap: getWaterToWorldRegionMap(state),
@@ -133,8 +143,8 @@ export const ConnectedGapminder = connect<
     shortageThresholds: getThresholdsForDataType(state, 'shortage'),
   }),
   dispatch => ({
-    setTimeIndex: (value: number) => {
-      dispatch(setTimeIndexAction(value));
+    setSelectedTimeRange: (startYear: number, endYear: number) => {
+      dispatch(setTimeRangeAction(startYear, endYear));
     },
     toggleSelectedRegion: (id: string) => {
       dispatch(toggleSelectedRegionAction(Number(id)));

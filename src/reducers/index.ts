@@ -8,6 +8,7 @@ import {
   getHistoricalImpactModels,
 } from '../data';
 import { getGlobalStateFromURLHash } from '../url-state';
+import { findClosestTimeRange } from '../utils';
 import { DataTree, SelectionsTree, StateTree, ThresholdsTree } from './types';
 
 const defaultState: StateTree = {
@@ -21,7 +22,8 @@ const defaultState: StateTree = {
     kcal: [...defaultDataTypeThresholds.kcal],
   },
   selections: {
-    historicalTimeIndex: 0,
+    historicalTimeStartYear: 1900,
+    historicalTimeEndYear: 1900,
     lockHistoricalTimeIndex: false,
     impactModel: getDefaultHistoricalImpactModel(),
     climateModel: getDefaultHistoricalClimateModel(),
@@ -114,25 +116,36 @@ function selectionsReducer(
   action: Action,
 ): SelectionsTree {
   switch (action.type) {
-    case 'SET_HISTORICAL_TIME_INDEX':
+    case 'SET_HISTORICAL_TIME':
       if (
         !state.lockHistoricalTimeIndex &&
-        action.value !== state.historicalTimeIndex
+        (action.startYear !== state.historicalTimeStartYear ||
+          action.endYear !== state.historicalTimeEndYear)
       ) {
         return {
           ...state,
-          historicalTimeIndex: action.value,
+          historicalTimeStartYear: action.startYear,
+          historicalTimeEndYear: action.endYear,
         };
       }
 
       return state;
     case 'STORE_WATER_DATA':
-      // When we load a new data set, set the selected time index to the latest
-      // time period if the selected time is larger than the available data
-      if (state.historicalTimeIndex >= action.data.length) {
+      // When we load a new data set, set the selected time range to the closest
+      // datum time range available
+      const [startYear, endYear] = findClosestTimeRange(
+        action.data.map<[number, number]>(d => [d.startYear, d.endYear]),
+        state.historicalTimeStartYear,
+        state.historicalTimeEndYear,
+      );
+      if (
+        state.historicalTimeStartYear !== startYear ||
+        state.historicalTimeEndYear !== endYear
+      ) {
         return {
           ...state,
-          historicalTimeIndex: action.data.length - 1,
+          historicalTimeStartYear: startYear,
+          historicalTimeEndYear: endYear,
         };
       }
 
