@@ -52,17 +52,18 @@ const BodyContainer = styled.div`
 `;
 
 const desktopBreakpoint = '1000px';
-const selectorsDesktopWidth = '400px';
-const selectorsTabletWidth = '320px';
+const selectorsDesktopWidth = '410px';
+const selectorsTabletWidth = '330px';
 
 const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsTabletWidth};
-  padding-right: ${theme.margin()};
-  margin-top: ${theme.margin()};
+  padding-right: ${theme.margin(1.5)};
+  margin-top: ${theme.margin(0.5)};
 
   @media screen and (min-width: ${desktopBreakpoint}) {
     width: ${selectorsDesktopWidth};
+    padding-right: ${theme.margin(2)};
   }
 `;
 
@@ -400,7 +401,6 @@ class FutureBody extends React.Component<Props, State> {
         <TitleContainer className="container-fluid">
           <Title>Explore possible futures of water scarcity</Title>
         </TitleContainer>
-        <DataTypeLinks />
         <BodyContainer className="container-fluid">
           <SelectorsContent>
             <FutureScenarioFilter
@@ -414,6 +414,7 @@ class FutureBody extends React.Component<Props, State> {
             />
           </SelectorsContent>
           <StickyGraphics>
+            <DataTypeLinks />
             <GraphicsContainer>
               {!waterRegions ||
               (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (
@@ -464,11 +465,11 @@ class FutureBody extends React.Component<Props, State> {
                     ensemblesRequested.indexOf(
                       ensembleRequestId(ensembleAreaId, selectedDataType),
                     ) > -1 ? (
-                      <div style={{ height: 220 }}>
+                      <div style={{ height: 240 }}>
                         <StyledSpinner />
                       </div>
                     ) : (
-                      <Error style={{ height: 220 }}>
+                      <Error style={{ height: 240 }}>
                         No data found for selected area.
                       </Error>
                     )

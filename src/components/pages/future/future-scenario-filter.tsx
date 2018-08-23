@@ -106,7 +106,31 @@ const sections: {
     furtherInformation?: JSX.Element;
   }>;
 } = {
-  'Changes to water use': [
+  'Impact of actions': [
+    {
+      title: 'How are productivity improvements used?',
+      description: 'Changes to the status quo free up water resources',
+      variable: 'reuse',
+      options: [
+        {
+          title: 'Decrease water stress',
+          description: 'No effect on food supply',
+          value: 'minwater',
+        },
+        {
+          title: 'Increase food supply',
+          description: 'No effect on water stress',
+          value: 'maxfood',
+        },
+        {
+          title: 'Meet food demand, decrease water stress',
+          description: 'How little water could we use?',
+          value: 'meetfood',
+        },
+      ],
+    },
+  ],
+  Actions: [
     {
       title: 'Diet',
       description:
@@ -203,28 +227,6 @@ const sections: {
           title: 'Increased agricultural area',
           description: '10% increase',
           value: 'increase',
-        },
-      ],
-    },
-    {
-      title: 'How are productivity improvements used?',
-      description: 'Changes to the status quo free up water resources',
-      variable: 'reuse',
-      options: [
-        {
-          title: 'Meet food demand, decrease water use',
-          description: 'How little water could we use?',
-          value: 'meetfood',
-        },
-        {
-          title: 'Increase food production',
-          description: 'Keeping water use constant',
-          value: 'maxfood',
-        },
-        {
-          title: 'Decrease water use',
-          description: 'Keeping food production constant',
-          value: 'minwater',
         },
       ],
     },

@@ -255,7 +255,7 @@ export function getDefaultFutureScenario(): FutureScenario {
     dietChange: 'current',
     foodLossRed: 'current',
     trade: 'current volume',
-    reuse: 'meetfood',
+    reuse: 'minwater',
     agriExp: 'current',
     // Social uncertainties
     population: 'SSP1',
@@ -428,7 +428,7 @@ export function getDefaultComparison(
         foodLossRed: ['current'],
         yieldGap: ['current'],
         agriExp: ['current'],
-        reuse: ['meetfood'],
+        reuse: ['minwater'],
         trade: ['current volume'],
         impactModel: ['mean'],
         climateModel: ['mean'],
