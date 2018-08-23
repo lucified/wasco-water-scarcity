@@ -464,11 +464,11 @@ class FutureBody extends React.Component<Props, State> {
                     ensemblesRequested.indexOf(
                       ensembleRequestId(ensembleAreaId, selectedDataType),
                     ) > -1 ? (
-                      <div style={{ height: 220 }}>
+                      <div style={{ height: 240 }}>
                         <StyledSpinner />
                       </div>
                     ) : (
-                      <Error style={{ height: 220 }}>
+                      <Error style={{ height: 240 }}>
                         No data found for selected area.
                       </Error>
                     )
