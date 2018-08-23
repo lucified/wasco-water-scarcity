@@ -47,7 +47,7 @@ export default function DataTypeLinks() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-xs-12">
-              <NavigationTheme>Impact:</NavigationTheme>
+              <NavigationTheme>Impact on:</NavigationTheme>
               <NavigationItem
                 to={`/stress${window.location.hash}`}
                 isActive={(_match, location) =>
@@ -55,7 +55,7 @@ export default function DataTypeLinks() {
                 }
                 activeClassName="selected"
               >
-                Changing water stress
+                Water stress
               </NavigationItem>
               <NavigationItem
                 to={`/kcal${window.location.hash}`}
@@ -64,7 +64,7 @@ export default function DataTypeLinks() {
                 }
                 activeClassName="selected"
               >
-                Changing food supply
+                Food supply
               </NavigationItem>
             </div>
           </div>
