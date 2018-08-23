@@ -111,6 +111,29 @@ const sections: {
       title: 'How are productivity improvements used?',
       description: 'Changes to the status quo free up water resources',
       variable: 'reuse',
+      furtherInformation: (
+        <div>
+          <p>
+            In this analysis, each action uses multipliers that increase
+            productivity or efficiency. Those improvements can be used to
+            decrease water use (and therefore stress), increase food production
+            (and therefore food supply), or a combination of both.
+          </p>
+          <p>
+            Depending on what you select, the map and time series for one of the
+            impact indicators (water stress and food supply) might not show any
+            changes - check the other indicator!
+          </p>
+          <p>
+            <a
+              target="_blank"
+              href="http://waterscarcityatlas.org/data/water-scarcity-futures-tool/"
+            >
+              Full description of analysis
+            </a>
+          </p>
+        </div>
+      ),
       options: [
         {
           title: 'Decrease water stress',
@@ -137,7 +160,6 @@ const sections: {
         'Eating only what we need means less food needs to be produced. ' +
         'Water needed to feed animals means that eating less animal products generally requires less water.',
       variable: 'dietChange',
-      furtherInformation: <div>Jalava et al.</div>,
       options: [
         {
           title: 'Current',
@@ -186,14 +208,6 @@ const sections: {
       description:
         'There is potential to produce more crops with limited changes to water use',
       variable: 'yieldGap',
-      furtherInformation: (
-        <ul style={{ margin: 0 }}>
-          <li>Kummu et al. 2017</li>
-          <li>Mueller et al. 2012</li>
-          <li>Fader et al. 2013</li>
-          <li>Jägermeyr et al. 2016</li>
-        </ul>
-      ),
       options: [
         {
           title: 'Current',
@@ -261,12 +275,9 @@ const sections: {
             SSP stands for Shared Socio-economic Pathway, which are scenarios
             developed by the Intergovernmental Panel on Climate Change (IPCC).
             Each scenario is associated with a narrative describing how the
-            future could unfold. The scenarios have then been quantified …
-          </p>
-          <p>
-            Water for food is driven only by population when examining potential
-            for change, but also by GDP when using pre-designed scenarios.
-            Domestic and industrial water use are driven by all three factors.
+            future could unfold. The scenarios have then been quantified in
+            combination with RCPs using global models of climate, population,
+            GDP and water.
           </p>
         </div>
       ),
