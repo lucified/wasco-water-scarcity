@@ -1,7 +1,0 @@
-{
-  "publicRoot": "dist",
-  "build": {
-    "image": "kkarczmarczyk/node-yarn:7.6",
-    "commands": ["yarn", "LUCIFY_ENV=staging yarn run build"]
-  }
-}

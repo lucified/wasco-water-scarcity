@@ -63,7 +63,6 @@
     "jsts": "^1.6.1",
     "lodash": "^4.17.10",
     "lucify-deploy-config": "^0.1.8",
-    "lucify-notifier": "^0.1.17",
     "normalize.css": "^8.0.0",
     "pepjs": "^0.4.3",
     "postcss-flexbugs-fixes": "^4.1.0",
