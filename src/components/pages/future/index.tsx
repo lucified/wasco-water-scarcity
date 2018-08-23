@@ -400,7 +400,6 @@ class FutureBody extends React.Component<Props, State> {
         <TitleContainer className="container-fluid">
           <Title>Explore possible futures of water scarcity</Title>
         </TitleContainer>
-        <DataTypeLinks />
         <BodyContainer className="container-fluid">
           <SelectorsContent>
             <FutureScenarioFilter
@@ -414,6 +413,7 @@ class FutureBody extends React.Component<Props, State> {
             />
           </SelectorsContent>
           <StickyGraphics>
+            <DataTypeLinks />
             <GraphicsContainer>
               {!waterRegions ||
               (!mapData && !ensembleData[selectedDataType][ensembleAreaId]) ? (

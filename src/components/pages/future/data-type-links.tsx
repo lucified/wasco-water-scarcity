@@ -9,34 +9,33 @@ const Root = styled.div`
 `;
 
 const Navigation = styled.div`
-  background-color: ${theme.colors.grayLightest};
+  background-color: white;
   width: 100%;
 
   & .selected {
-    border-bottom: 3px solid ${theme.colors.blueAalto};
+    border-bottom: 1px solid ${theme.colors.grayLighter};
   }
 `;
 
 const NavigationItem = styled(NavLink)`
   display: inline-block;
-  padding: ${theme.margin(1)} 0;
+  padding: 1rem;
   margin-right: ${theme.margin(1)};
-  font-weight: 500;
-  text-transform: uppercase;
+  font-size: 14px;
   text-decoration: none;
   color: ${theme.colors.text};
-
-  &:hover {
-    color: #666;
+  border-bottom: 3px solid white;
+  &.selected {
+    border-bottom: 3px solid
+    color: #256EC3;
   }
 `;
 
 const NavigationTheme = styled.div`
   display: inline-block;
-  padding: ${theme.margin(1)} 0;
+  padding: 1rem;
   margin-right: ${theme.margin(1)};
-  font-weight: 500;
-  text-transform: uppercase;
+  font-size: 14px
   text-decoration: none;
   color: ${theme.colors.gray};
 `;
@@ -48,7 +47,7 @@ export default function DataTypeLinks() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-xs-12">
-              <NavigationTheme>Future:</NavigationTheme>
+              <NavigationTheme>Impact:</NavigationTheme>
               <NavigationItem
                 to={`/stress${window.location.hash}`}
                 isActive={(_match, location) =>
@@ -56,7 +55,7 @@ export default function DataTypeLinks() {
                 }
                 activeClassName="selected"
               >
-                Water stress
+                Changing water stress
               </NavigationItem>
               <NavigationItem
                 to={`/kcal${window.location.hash}`}
@@ -65,7 +64,7 @@ export default function DataTypeLinks() {
                 }
                 activeClassName="selected"
               >
-                Food production
+                Changing food supply
               </NavigationItem>
             </div>
           </div>
