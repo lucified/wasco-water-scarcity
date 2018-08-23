@@ -57,10 +57,7 @@ const impactModelOptions = [
   {
     title: 'WaterGAP with natural landuse',
     description: (
-      <div>
-        As used by Kummu and others, 2016
-        (only WATCH + decadal)
-      </div>
+      <div>As used by Kummu and others, 2016 (only WATCH + decadal)</div>
     ),
     value: 'watergap-nat',
   },

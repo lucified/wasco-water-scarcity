@@ -127,7 +127,7 @@ const sections: {
           <p>
             <a
               target="_blank"
-              href="http://waterscarcityatlas.org/data/water-scarcity-futures-tool/"
+              href="https://waterscarcityatlas.org/data/water-scarcity-futures-tool/"
             >
               Full description of analysis
             </a>

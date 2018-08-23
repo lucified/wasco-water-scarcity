@@ -49,8 +49,7 @@ const NavLink = styled.a`
   }
 `;
 
-// TODO: update to proper URLs
-const WEBSITE_URL = 'https://dev.mediapool.fi/wasco';
+const WEBSITE_URL = 'https://waterscarcityatlas.org';
 const TOOLS = [
   {
     appType: AppType.PAST,
