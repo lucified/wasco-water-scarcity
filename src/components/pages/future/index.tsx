@@ -52,17 +52,18 @@ const BodyContainer = styled.div`
 `;
 
 const desktopBreakpoint = '1000px';
-const selectorsDesktopWidth = '400px';
-const selectorsTabletWidth = '320px';
+const selectorsDesktopWidth = '410px';
+const selectorsTabletWidth = '330px';
 
 const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsTabletWidth};
-  padding-right: ${theme.margin()};
+  padding-right: ${theme.margin(1.5)};
   margin-top: ${theme.margin(0.5)};
 
   @media screen and (min-width: ${desktopBreakpoint}) {
     width: ${selectorsDesktopWidth};
+    padding-right: ${theme.margin(2)};
   }
 `;
 
