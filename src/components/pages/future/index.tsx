@@ -59,7 +59,7 @@ const SelectorsContent = styled.div`
   position: relative;
   width: ${selectorsTabletWidth};
   padding-right: ${theme.margin()};
-  margin-top: ${theme.margin()};
+  margin-top: ${theme.margin(0.5)};
 
   @media screen and (min-width: ${desktopBreakpoint}) {
     width: ${selectorsDesktopWidth};

@@ -29,6 +29,10 @@ const NavigationItem = styled(NavLink)`
     border-bottom: 3px solid
     color: #256EC3;
   }
+
+  &:last-of-type {
+    margin-right: 0;
+  }
 `;
 
 const NavigationTheme = styled.div`
@@ -44,29 +48,27 @@ export default function DataTypeLinks() {
   return (
     <Root>
       <Navigation>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-xs-12">
-              <NavigationTheme>Impact on:</NavigationTheme>
-              <NavigationItem
-                to={`/stress${window.location.hash}`}
-                isActive={(_match, location) =>
-                  location.pathname.indexOf('/stress') === 0
-                }
-                activeClassName="selected"
-              >
-                Water stress
-              </NavigationItem>
-              <NavigationItem
-                to={`/kcal${window.location.hash}`}
-                isActive={(_match, location) =>
-                  location.pathname.indexOf('/kcal') === 0
-                }
-                activeClassName="selected"
-              >
-                Food supply
-              </NavigationItem>
-            </div>
+        <div className="row">
+          <div className="col-xs-12">
+            <NavigationTheme>Impact on:</NavigationTheme>
+            <NavigationItem
+              to={`/stress${window.location.hash}`}
+              isActive={(_match, location) =>
+                location.pathname.indexOf('/stress') === 0
+              }
+              activeClassName="selected"
+            >
+              Water stress
+            </NavigationItem>
+            <NavigationItem
+              to={`/kcal${window.location.hash}`}
+              isActive={(_match, location) =>
+                location.pathname.indexOf('/kcal') === 0
+              }
+              activeClassName="selected"
+            >
+              Food supply
+            </NavigationItem>
           </div>
         </div>
       </Navigation>
