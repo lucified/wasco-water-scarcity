@@ -49,7 +49,7 @@ const Axis = styled.g`
   }
 `;
 
-const XAxis = Axis.extend`
+const XAxis = styled(Axis)`
   & path {
     display: none;
   }

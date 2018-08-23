@@ -110,11 +110,11 @@ export const SelectorHeader = styled.h3`
   margin-bottom: 4px;
 `;
 
-export const SelectorDescription = BodyText.extend`
+export const SelectorDescription = styled(BodyText)`
   font-size: ${bodyFontSize - 2}px;
 `;
 
-export const SecondaryContent = BodyText.extend`
+export const SecondaryContent = styled(BodyText)`
   font-size: 15px;
   padding-left: ${defaultMargin}px;
   padding-top: 5px;

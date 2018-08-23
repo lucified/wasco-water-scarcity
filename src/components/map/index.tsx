@@ -54,7 +54,7 @@ const StyledThresholdSelector = styled(ThresholdSelector)`
   position: absolute;
 `;
 
-const ZoomButton = Button.extend`
+const ZoomButton = styled(Button)`
   position: absolute;
   right: 5px;
   bottom: 5px;
