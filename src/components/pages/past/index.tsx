@@ -138,8 +138,7 @@ export class PastBody extends React.Component<Props> {
               <>
                 <Separator />
                 <StyledCSVButton />
-                {/* TODO: change to proper URL */}
-                <MoreInformation href="https://dev.mediapool.fi/wasco/research-data/data-and-code/">
+                <MoreInformation href="https://waterscarcityatlas.org/data/water-scarcity-exploration-tool/">
                   More information
                 </MoreInformation>
               </>

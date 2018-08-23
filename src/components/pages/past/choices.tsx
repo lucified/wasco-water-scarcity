@@ -58,8 +58,7 @@ const impactModelOptions = [
     title: 'WaterGAP with natural landuse',
     description: (
       <div>
-        As used in Kummu et al. 2016.
-        <br />
+        As used by Kummu and others, 2016
         (only WATCH + decadal)
       </div>
     ),
@@ -68,29 +67,29 @@ const impactModelOptions = [
 ];
 const climateModelOptions = [
   {
-    title: 'WATCH',
+    title: 'WATCH 1971-2001/1901-2010',
     description: (
       <div>
         EU WATCH project
         <br />
-        (Weedon et al. 2011)
+        (Weedon and others, 2011)
       </div>
     ),
     value: 'watch',
   },
   {
-    title: 'GSWP3',
+    title: 'GSWP3 1971-2010',
     description: 'Global Soil Wetness Project',
     value: 'gswp3',
   },
   {
-    title: 'PGMFD v.2',
+    title: 'PGMFD v.2 1971-2012',
     description: 'Princeton University',
     value: 'princeton',
   },
   {
-    title: 'WFD-EI',
-    description: 'Weedon et al. 2014',
+    title: 'WFD-EI 1971-2010',
+    description: 'Weedon and others, 2014',
     value: 'wfdei',
   },
 ];
@@ -129,8 +128,6 @@ const ReadMore = styled.a`
   display: inline-block;
 `;
 
-// TODO: Update all URLs to production URLs
-
 function getDescriptionForDataType(dataType: HistoricalDataType) {
   switch (dataType) {
     case 'scarcity':
@@ -141,7 +138,7 @@ function getDescriptionForDataType(dataType: HistoricalDataType) {
           Water stress reflects impacts of high water use relative to water
           availability.
           <ReadMore
-            href="https://dev.mediapool.fi/wasco/water-stress/"
+            href="https://waterscarcityatlas.org/water-stress/"
             target="_blank"
           >
             Read more
@@ -153,7 +150,7 @@ function getDescriptionForDataType(dataType: HistoricalDataType) {
         <div>
           Water shortage means there is not enough water to meet human needs.
           <ReadMore
-            href="https://dev.mediapool.fi/wasco/water-shortage/"
+            href="https://waterscarcityatlas.org/water-shortage/"
             target="_blank"
           >
             Read more
@@ -204,17 +201,24 @@ class ChoicesPlain extends React.Component<Props> {
           selectedValue="fpu"
           furtherInformation={
             <div>
+              <p>
               Data on water availability and use is aggregated to regions that
-              are a mix of river basins and country borders, as used in{' '}
-              <a href="https://dev.mediapool.fi/wasco/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
-                Kummu et al. 2016
-              </a>. It is assumed that water can be managed and moved within these
+              are a mix of river basins and country borders, as used by{' '}
+              <a href="https://waterscarcityatlas.org/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
+                Kummu and others in 2016
+              </a>.
+              </p>
+              <p> It is assumed that water can be managed and moved within these
               regions in order to make as much water as possible available for
-              use. Water would only be used from outside these regions if
+              use.
+              </p>
+              <p>
+              Water would only be used from outside these regions if
               scarcity occurs. In large basins, water is allocated between FPUs
               according to discharge.
+              </p>
               <p>
-                <a href="http://waterscarcityatlas.org">
+                <a target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-exploration-tool/">
                   Full description of analysis
                 </a>
               </p>
@@ -229,17 +233,24 @@ class ChoicesPlain extends React.Component<Props> {
           selectedValue={timeScale}
           furtherInformation={
             <div>
+              <p>
               Timing of water availability and use is uncertain and can be
               influenced by management actions. Aggregating availability means
               that timing has less effect on results, but assumes that water can
-              be stored over time. For annual data, aggregating to twelve month
+              be stored over time.
+              </p>
+              <p>For annual data, aggregating to twelve month
               periods (January-December) assumes surplus water cannot be stored
-              across years. If water availability is overestimated
+              across years.
+              </p>
+              <p>
+                If water availability is overestimated
               (underestimated), more (less) regions will appear stressed, but
               this can help highlight areas where storage and variability over
               time are important.
+              </p>
               <p>
-                <a href="http://waterscarcityatlas.org">
+                <a target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-exploration-tool/">
                   Full description of analysis
                 </a>
               </p>
@@ -254,11 +265,17 @@ class ChoicesPlain extends React.Component<Props> {
           setModel={onClimateModelChange}
           furtherInformation={
             <div>
-              The WATCH climate forcing dataset was created as part of the
-              European Union WATCH project. It provides temperature and
-              precipitation data for 1900-2001 for the water models to use.
               <p>
-                <a href="http://waterscarcityatlas.org">
+              The four climate datasets are taken primarily from the ISIMIP2a project.
+              The datasets were produced by different research groups, with different methods.
+              They cover different timeframes. ISIMIP2a only used data from 1971 onwards.
+              </p>
+              <p>
+              WATCH data for WaterGAP with natural landuse is used from an analysis by <a href="https://waterscarcityatlas.org/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">Kummu and others in 2016</a>.
+              The full length of the WATCH dataset is used (1901-2001). Water use and availability for 2001-2010 is based on 1990s climate data.
+              </p>
+              <p>
+                <a target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-exploration-tool/">
                   Full description of analysis
                 </a>
               </p>
@@ -281,11 +298,17 @@ class ChoicesPlain extends React.Component<Props> {
           selectedValue={impactModel}
           furtherInformation={
             <div>
-              WaterGAP WATCH data with natural landuse is from{' '}
-              <a href="https://waterscarcityatlas.org/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
-              Kummu et al. 2016</a>. All other data is from ISIMIP 2a, using current land use.
               <p>
-                <a href="http://waterscarcityatlas.org">
+                Different models use different assumptions about runoff and water use, which potentially give different results.
+              </p>
+              <p>
+                Most data is from ISIMIP2a, using current land use. WaterGAP WATCH runoff data with natural landuse is taken from the study by{' '}
+              <a href="https://waterscarcityatlas.org/publications/the-worlds-road-to-water-scarcity-shortage-and-stress-in-the-20th-century-and-pathways-towards-sustainability-2016/">
+              Kummu and others in 2016</a>, along with corresponding water use from the WaterGAP model. This dataset was  also used to replace any missing data:
+              H08 does not estimate livestock, and ISIMIP2a does not provide WaterGAP data for domestic, industrial and livestock water use.
+              </p>
+              <p>
+              <a target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-exploration-tool/">
                   Full description of analysis
                 </a>
               </p>
