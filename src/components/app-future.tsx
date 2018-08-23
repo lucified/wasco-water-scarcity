@@ -49,10 +49,9 @@ const Root = styled.div`
   height: 100%;
 `;
 
-// TODO: go over copy
 const TITLE = 'Futures tool – Water Scarcity Atlas';
 const DESCRIPTION =
-  'Compare different future scenarios for global water stress and food production';
+  'Compare different future scenarios for global water stress and food supply';
 const META_IMAGE = `${
   process.env.HOST
 }${require('../../images/screenshot-futures.png')}`;

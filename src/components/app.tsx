@@ -56,7 +56,6 @@ const Root = styled.div`
   height: 100%;
 `;
 
-// TODO: go over copy
 const TITLE = 'Exploration tool – Water Scarcity Atlas';
 const DESCRIPTION =
   'Explore how water stress, shortage and scarcity have changed in the past using different models';
