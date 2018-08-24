@@ -614,7 +614,8 @@ class FutureScenarioFilter extends React.Component<Props, State> {
           </p>
           <p>
             The best we can do is build scenarios capturing different
-            perspectives on how the world works. We provide two starting points to explore these scenarios:
+            perspectives on how the world works. We provide two starting points
+            to explore these scenarios:
           </p>
         </BodyText>
         <StartingPointSelector>
