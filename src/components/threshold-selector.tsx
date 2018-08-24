@@ -189,7 +189,7 @@ function getHeaderText(dataType: SupportedDataTypes) {
       body = 'Available water per capita (m³)';
       break;
     case 'kcal':
-      header = 'Food production';
+      header = 'Food supply';
       body = 'Kcal per person per day';
       break;
   }
