@@ -89,6 +89,14 @@ const SelectionModeValue = styled.div`
   cursor: pointer;
 `;
 
+const MoreInformation = styled.a`
+  color: ${theme.colors.gray};
+  font-size: 14px;
+  text-align: right;
+  display: block;
+  margin-bottom: 20px;
+`;
+
 interface RequiredScenarioValues {
   [varname: string]: string[];
 }
@@ -677,6 +685,9 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             ))}
           </Section>
         ))}
+        <MoreInformation target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-futures-tool/">
+          More information
+        </MoreInformation>
       </div>
     );
   }
