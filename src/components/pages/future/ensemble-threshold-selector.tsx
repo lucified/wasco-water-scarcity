@@ -13,9 +13,8 @@ import { FutureDataType } from '../../../types';
 import { theme } from '../../theme';
 
 const Container = styled.div`
-  width: 220px;
-  max-width: 100%;
-  float: right;
+  flex-basis: 220px;
+  margin-left: 40px;
 `;
 
 const Title = styled.div`

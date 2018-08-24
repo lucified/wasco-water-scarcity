@@ -100,11 +100,18 @@ const TimeSelectorContainer = styled.div`
   padding-right: ${theme.margin()};
 `;
 
+const FooterContainer = styled.div`
+  display: flex;
+  flex-flow: wrap-reverse;
+  justify-content: flex-end;
+`;
+
 const BetaDisclaimer = styled.div`
   color: ${theme.colors.gray};
   font-size: 14px;
-  padding-right: 260px;
-  position: absolute;
+  flex-basis: 270px;
+  flex-grow: 100;
+  margin-bottom: ${theme.margin(2)};
 `;
 
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {
@@ -498,19 +505,21 @@ class FutureBody extends React.Component<Props, State> {
                       hoveredScenarios={hoveredScenarios}
                     />
                   )}
-                  <BetaDisclaimer>
-                    These are <i>beta</i> results that are expected to change in
-                    future. Food supply includes feed and does not account for
-                    losses. Decreases in water use are assumed to be inversely
-                    proportional to increases in food supply.
-                  </BetaDisclaimer>
-                  {selectedWaterRegionId == null && (
-                    <EnsembleThresholdSelector
-                      threshold={ensembleThresholds[selectedDataType]}
-                      dataType={selectedDataType}
-                      onChange={this.handleSetEnsembleThreshold}
-                    />
-                  )}
+                  <FooterContainer>
+                    <BetaDisclaimer>
+                      These are <i>beta</i> results that are expected to change
+                      in future. Food supply includes feed and does not account
+                      for losses. Decreases in water use are assumed to be
+                      inversely proportional to increases in food supply.
+                    </BetaDisclaimer>
+                    {selectedWaterRegionId == null && (
+                      <EnsembleThresholdSelector
+                        threshold={ensembleThresholds[selectedDataType]}
+                        dataType={selectedDataType}
+                        onChange={this.handleSetEnsembleThreshold}
+                      />
+                    )}
+                  </FooterContainer>
                 </>
               )}
             </GraphicsContainer>
