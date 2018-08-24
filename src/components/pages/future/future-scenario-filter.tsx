@@ -608,9 +608,14 @@ class FutureScenarioFilter extends React.Component<Props, State> {
     return (
       <div className={className}>
         <BodyText>
-          The future depends on the actions we take, with outcomes that are also
-          uncertain. We provide two starting points to explore the future of
-          water scarcity:
+          <p>
+            The future depends on the actions we take, with outcomes that are
+            also uncertain.
+          </p>
+          <p>
+            The best we can do is build scenarios capturing different
+            perspectives on how the world works. We provide two starting points to explore these scenarios:
+          </p>
         </BodyText>
         <StartingPointSelector>
           <StartingPointValue
@@ -685,7 +690,10 @@ class FutureScenarioFilter extends React.Component<Props, State> {
             ))}
           </Section>
         ))}
-        <MoreInformation target="_blank" href="https://waterscarcityatlas.org/data/water-scarcity-futures-tool/">
+        <MoreInformation
+          target="_blank"
+          href="https://waterscarcityatlas.org/data/water-scarcity-futures-tool/"
+        >
           More information
         </MoreInformation>
       </div>

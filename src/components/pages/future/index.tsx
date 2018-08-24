@@ -100,6 +100,13 @@ const TimeSelectorContainer = styled.div`
   padding-right: ${theme.margin()};
 `;
 
+const BetaDisclaimer = styled.div`
+  color: ${theme.colors.gray};
+  font-size: 14px;
+  padding-right: 260px;
+  position: absolute;
+`;
+
 function ensembleRequestId(areaId: string, dataType: FutureDataType) {
   return `${dataType}-${areaId}`;
 }
@@ -399,7 +406,9 @@ class FutureBody extends React.Component<Props, State> {
     return (
       <div>
         <TitleContainer className="container-fluid">
-          <Title>Explore possible futures of water scarcity</Title>
+          <Title>
+            Explore possible futures of water scarcity <sup>&beta;</sup>
+          </Title>
         </TitleContainer>
         <BodyContainer className="container-fluid">
           <SelectorsContent>
@@ -489,6 +498,12 @@ class FutureBody extends React.Component<Props, State> {
                       hoveredScenarios={hoveredScenarios}
                     />
                   )}
+                  <BetaDisclaimer>
+                    These are <i>beta</i> results that are expected to change in
+                    future. Food supply includes feed and does not account for
+                    losses. Decreases in water use are assumed to be inversely
+                    proportional to increases in food supply.
+                  </BetaDisclaimer>
                   {selectedWaterRegionId == null && (
                     <EnsembleThresholdSelector
                       threshold={ensembleThresholds[selectedDataType]}
