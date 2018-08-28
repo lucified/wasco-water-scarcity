@@ -8,7 +8,7 @@ import { zoom, zoomIdentity } from 'd3-zoom';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { feature } from 'topojson';
+import { feature, mesh } from 'topojson';
 import {
   setRegionZoom,
   setSelectedRegion,
@@ -232,10 +232,7 @@ interface State {
   };
   ongoingRequests: string[];
   zoomInRequested: boolean;
-  countryGeoData?: GeoJSON.FeatureCollection<
-    GeoJSON.GeometryObject,
-    GeoJSON.GeoJsonProperties
-  >;
+  countryGeoData?: GeoJSON.MultiLineString;
   landGeoData?: GeoJSON.FeatureCollection<
     GeoJSON.GeometryObject,
     GeoJSON.GeoJsonProperties
@@ -396,10 +393,7 @@ class Map extends React.Component<Props, State> {
       const parsedData: TopoJSON.Topology = await result.json();
       // TODO: improve typings
       this.setState({
-        countryGeoData: feature(
-          parsedData,
-          parsedData.objects.countries,
-        ) as any,
+        countryGeoData: mesh(parsedData),
         landGeoData: feature(parsedData, parsedData.objects.land) as any,
       });
     } catch (error) {
@@ -909,11 +903,10 @@ class Map extends React.Component<Props, State> {
 
     svg
       .select('g#country-borders')
-      .selectAll('path')
-      .data(countryGeoData.features)
-      .enter()
       .append('path')
-      .attr('d', path);
+      // TODO: improve typings
+      .attr('d', path(countryGeoData) as any)
+      .attr('stroke-dasharray', '0.25 0.25');
 
     if (localData.countries != null) {
       svg
