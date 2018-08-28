@@ -111,7 +111,7 @@ const SVG = styled.svg`
     transition: opacity 0.2s ease-in;
 
     &.selected {
-      stroke: ${theme.colors.grayDark};
+      stroke: ${theme.colors.cerise};
       stroke-width: 0.75px;
       transition: opacity 0.2s ease-out;
     }
@@ -142,7 +142,7 @@ const SelectedRegion = styled.g`
 
 const CountryBorders = styled.g`
   stroke-width: 0.5px;
-  stroke: #ccc;
+  stroke: ${theme.colors.grayDarkest};
   fill: none;
 `;
 
