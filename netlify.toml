@@ -7,7 +7,7 @@
   LUCIFY_ENV = "staging"
 
 [context."netlify/future".environment]
-  APP = "future"
+  APP = ""
 
 [context."netlify/embed".environment]
   APP = "embed"
