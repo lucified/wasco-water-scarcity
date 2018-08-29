@@ -3,13 +3,22 @@
 import { max } from 'd3-array';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import 'react-select/dist/react-select.css';
+import Select from 'react-virtualized-select';
+import 'react-virtualized-select/styles.css';
 import styled from 'styled-components';
-import { setTimeRange, toggleHistoricalTimeIndexLock } from '../../actions';
-import { getDataTypeColors } from '../../data';
+import { Option } from '../../../node_modules/@types/react-select';
+import {
+  setSelectedRegion,
+  setTimeRange,
+  toggleHistoricalTimeIndexLock,
+} from '../../actions';
+import { getDataTypeColors, RegionSearchTerms } from '../../data';
 import { StateTree } from '../../reducers';
 import {
   getHistoricalDataTimeIndex,
   getHistoricalDataTimeRanges,
+  getRegionSearchTerms,
   getSelectedWaterRegionId,
   getSelectedWorldRegion,
   getThresholdsForDataType,
@@ -45,12 +54,17 @@ const Description = styled.p`
 
 const Empty = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  justify-content: left;
   height: 180px;
   font-weight: 200;
   font-family: ${theme.labelFontFamily};
   color: ${theme.colors.gray};
+  & > div {
+    margin-top: 15px;
+  }
 `;
 
 interface PassedProps {
@@ -58,6 +72,7 @@ interface PassedProps {
 }
 
 interface GeneratedStateProps {
+  regionSearchTerms?: RegionSearchTerms[];
   selectedTimeIndex?: number;
   timeRanges?: Array<[number, number]>;
   selectedWaterRegionId?: number;
@@ -72,6 +87,7 @@ interface GeneratedStateProps {
 interface GeneratedDispatchProps {
   setTimeRange: (startYear: number, endYear: number) => void;
   toggleTimeIndexLock: () => void;
+  selectRegion: (option: Option<number>) => void;
 }
 
 type Props = GeneratedStateProps & GeneratedDispatchProps & PassedProps;
@@ -112,6 +128,32 @@ class SelectedRegionInformation extends React.Component<Props> {
     return `Blue water ${type}`;
   }
 
+  private getRegionSearchBox() {
+    const { regionSearchTerms, selectRegion } = this.props;
+    if (!regionSearchTerms) {
+      return null;
+    }
+    return (
+      <Empty>
+        <div>Select a region</div>
+        <Select
+          options={regionSearchTerms}
+          maxHeight={100}
+          style={
+            {
+              width: '220px',
+              'flex-basis': 'auto',
+              'flex-grow': 3,
+            } as React.CSSProperties
+          }
+          placeholder="By country, place or river"
+          // TODO: Typing
+          onChange={selectRegion as any}
+        />
+      </Empty>
+    );
+  }
+
   private getStressChart() {
     const {
       timeSeriesForSelectedWaterRegion,
@@ -139,7 +181,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <Empty>Select an area</Empty>
+          this.getRegionSearchBox()
         )}
       </div>
     );
@@ -175,7 +217,7 @@ class SelectedRegionInformation extends React.Component<Props> {
             timeIndexLocked={timeIndexLocked}
           />
         ) : (
-          <Empty>Select an area</Empty>
+          this.getRegionSearchBox()
         )}
       </div>
     );
@@ -356,6 +398,7 @@ export default connect<
   StateTree
 >(
   state => ({
+    regionSearchTerms: getRegionSearchTerms(state),
     selectedTimeIndex: getHistoricalDataTimeIndex(state),
     selectedWaterRegionId: getSelectedWaterRegionId(state),
     selectedWorldRegion: getSelectedWorldRegion(state),
@@ -376,6 +419,9 @@ export default connect<
     },
     toggleTimeIndexLock: () => {
       dispatch(toggleHistoricalTimeIndexLock());
+    },
+    selectRegion: (option: Option<number>) => {
+      dispatch(setSelectedRegion(option.value));
     },
   }),
 )(SelectedRegionInformation);
