@@ -75,6 +75,11 @@ function dataReducer(state = defaultState.data, action: Action): DataTree {
         ...state,
         waterToWorldRegionsMap: action.map,
       };
+    case 'STORE_REGION_SEARCH_TERMS':
+      return {
+        ...state,
+        regionSearchTerms: action.data,
+      };
   }
   return state;
 }

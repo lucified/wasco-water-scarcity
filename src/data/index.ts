@@ -34,11 +34,14 @@ import {
   KcalEnsembleThreshold,
   LocalData,
   RawRegionStressShortageDatum,
+  RegionSearchTerms,
   StressEnsembleThreshold,
   toStressShortageDatum,
   WaterRegionGeoJSON,
   WorldRegionGeoJSON,
 } from './types';
+
+const searchTermsFilename = require('file-loader!../../data/region_search_terms.jsonfix');
 
 /* PAST */
 
@@ -536,5 +539,18 @@ export const availableClimateModels = uniq(
     flatMap(futureDatasets, dataset => dataset.climateModel),
   ),
 );
+
+export async function fetchRegionSearchTerms() {
+  try {
+    const result = await fetch(searchTermsFilename, {
+      credentials: 'same-origin',
+    });
+    const searchTerms: RegionSearchTerms[] = await result.json();
+    return searchTerms;
+  } catch (error) {
+    console.error('Unable to fetch search terms:', error);
+    return undefined;
+  }
+}
 
 export * from './types';

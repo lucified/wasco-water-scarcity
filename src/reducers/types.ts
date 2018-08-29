@@ -1,4 +1,4 @@
-import { GridVariable, WaterRegionGeoJSON } from '../data';
+import { GridVariable, RegionSearchTerms, WaterRegionGeoJSON } from '../data';
 import {
   AnyDataType,
   StressShortageDatum,
@@ -27,6 +27,7 @@ export interface DataTree {
   stressShortageData: {
     [scenarioId: string]: Array<TimeAggregate<StressShortageDatum>> | undefined;
   };
+  regionSearchTerms?: RegionSearchTerms[];
   worldRegions?: WorldRegion[];
   waterRegions?: WaterRegionGeoJSON;
   waterToWorldRegionsMap?: { [waterId: number]: number };

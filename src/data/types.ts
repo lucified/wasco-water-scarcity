@@ -257,3 +257,8 @@ export interface LocalData {
   grid?: GridData[];
   gridQuintiles?: GridQuintile;
 }
+
+export interface RegionSearchTerms {
+  name: string;
+  region: number;
+}

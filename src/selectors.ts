@@ -243,6 +243,10 @@ const getAggregateData = createSelector(
   },
 );
 
+export function getRegionSearchTerms(state: StateTree) {
+  return state.data.regionSearchTerms;
+}
+
 export function getSelectedWaterRegionId(state: StateTree) {
   return state.selections.region;
 }

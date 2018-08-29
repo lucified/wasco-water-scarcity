@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import styled, { injectGlobal } from 'styled-components';
-import { loadMapData, loadModelData } from '../actions';
+import { loadMapData, loadModelData, loadRegionSearchTerms } from '../actions';
 import { StateTree } from '../reducers';
 import {
   getHistoricalScenarioId,
@@ -73,6 +73,7 @@ interface GeneratedDispatchProps {
     timeScale: TimeScale,
     scenarioId: string,
   ) => void;
+  loadRegionSearchTerms: () => void;
 }
 
 interface GeneratedStateProps {
@@ -102,6 +103,7 @@ class AppPlain extends React.Component<Props> {
       selectedTimeScale,
       selectedScenarioId,
     );
+    this.props.loadRegionSearchTerms();
   }
 
   public componentWillReceiveProps(nextProps: Props) {
@@ -229,6 +231,9 @@ export const App = hot(module)(
           timeScale,
           scenarioId,
         ) as any);
+      },
+      loadRegionSearchTerms: () => {
+        dispatch(loadRegionSearchTerms() as any);
       },
     }),
   )(AppPlain),

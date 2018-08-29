@@ -1,9 +1,11 @@
 import { Dispatch } from 'redux';
 import {
   fetchHistoricalStressShortageData,
+  fetchRegionSearchTerms,
   fetchWaterRegionsTopojson,
   generateWaterToWorldRegionsMap,
   GridVariable,
+  RegionSearchTerms,
   WaterRegionGeoJSON,
 } from './data';
 import {
@@ -274,6 +276,28 @@ export function loadMapData() {
   };
 }
 
+export interface StoreRegionSearchTermsAction {
+  type: 'STORE_REGION_SEARCH_TERMS';
+  data: RegionSearchTerms[];
+}
+export function StoreRegionSearchTermsAction(
+  data: RegionSearchTerms[],
+): StoreRegionSearchTermsAction {
+  return {
+    type: 'STORE_REGION_SEARCH_TERMS',
+    data,
+  };
+}
+
+export function loadRegionSearchTerms() {
+  return async (dispatch: Dispatch<Action>) => {
+    const results = await fetchRegionSearchTerms();
+    if (results) {
+      dispatch(StoreRegionSearchTermsAction(results));
+    }
+  };
+}
+
 export type Action =
   | SetSelectedImpactModelAction
   | SetSelectedClimateModelAction
@@ -284,6 +308,7 @@ export type Action =
   | SetTimeAction
   | SetGridVariableAction
   | SetRegionZoomAction
+  | StoreRegionSearchTermsAction
   | StoreWaterDataAction
   | StoreWaterRegionDataAction
   | StoreWorldRegionDataAction
