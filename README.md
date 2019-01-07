@@ -2,7 +2,7 @@
 
 This project contains three separate buildable apps: a tool for looking at
 historical data, a tool for looking at future predictions, and embeddable
-single visualizations. The visualizations can be found at https://waterscarcityatlas.org/ or separately at They are available at:
+single visualizations. The visualizations can be found at https://waterscarcityatlas.org/ or separately at:
 
 - Historical: https://explore.waterscarcityatlas.org/
 - Future: https://futures.waterscarcityatlas.org/
@@ -126,7 +126,7 @@ or by placing the contents of this file inside a `<script>` tag. Once that's
 done, something like the below should be done per embed:
 
 ```html
-<iframe id="myIframe" src="https://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
+<iframe id="myIframe" src="https://embed.waterscarcityatlas.org/stress" scrolling="no"></iframe>
 <script>iFrameResize({}, '#myIframe')</script>
 ```
 
@@ -134,7 +134,7 @@ done, something like the below should be done per embed:
 
 ## Deploying to production
 
-The production environment is currently managed by Lucify.
+The production environment is currently managed by [Lucify](https://www.lucify.com/).
 Production deployments require Lucify's production credentials.
 
 Run a production deployment locally with:
