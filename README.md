@@ -2,13 +2,13 @@
 
 This project contains three separate buildable apps: a tool for looking at
 historical data, a tool for looking at future predictions, and embeddable
-single visualizations. They are available at:
+single visualizations. The visualizations can be found at https://waterscarcityatlas.org/ or separately at They are available at:
 
-- Historical: https://wasco.lucify.com
-- Future: https://wasco-future.lucify.com
-- Embeds: https://wasco-embed.lucify.com
+- Historical: https://explore.waterscarcityatlas.org/
+- Future: https://futures.waterscarcityatlas.org/
+- Embeds: https://embed.waterscarcityatlas.org/
 
-The URL format for embeds is: `https://wasco-embed.lucify.com/PAGE/AUTOPLAY`,
+The URL format for embeds is: `https://embed.waterscarcityatlas.org/PAGE/AUTOPLAY`,
 where `PAGE` can be either `stress`, `shortage` or `scarcity`, with a fallback
 of `stress`. If `AUTOPLAY` is not empty, the visualization will start playing
 automatically.
@@ -77,16 +77,6 @@ The datasets are defined in `src/data/datasets.ts`. The URL defined in the `url`
 field should be one that accepts AJAX requests, i.e. CORS should be configured
 appropriately.
 
-To upload new datasets to Lucify hostiung, assume the AWS admin role, place the
-data in the appropriate folder under `data-external/wasco` and run:
-
-```shell
-yarn run upload-data
-```
-
-These files will be available under
-`https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/`.
-
 ## Building a distribution
 
 The end result of this project is a bunch of static HTML, CSS, JS and JSON
@@ -122,23 +112,6 @@ To use the `ws` command, you need to install `local-web-server`
 yarn add global local-web-server
 ```
 
-## Deploying to production
-
-The production environment is currently managed by Lucify.
-Production deployments require Lucify's production credentials.
-
-Run a production deployment locally with:
-
-```shell
-NODE_ENV=production yarn run deploy
-```
-
-To deploy the `future` or `embed` apps, add them as environment variables:
-
-```shell
-APP=embed NODE_ENV=production yarn run deploy
-```
-
 ## Embedding a visualization in a page
 
 In order to embed a visualization, the host page needs to have the
@@ -156,3 +129,34 @@ done, something like the below should be done per embed:
 <iframe id="myIframe" src="https://wasco-embed.lucify.com/stress" scrolling="no"></iframe>
 <script>iFrameResize({}, '#myIframe')</script>
 ```
+
+# Internal notes
+
+## Deploying to production
+
+The production environment is currently managed by Lucify.
+Production deployments require Lucify's production credentials.
+
+Run a production deployment locally with:
+
+```shell
+NODE_ENV=production yarn run deploy
+```
+
+To deploy the `future` or `embed` apps, add them as environment variables:
+
+```shell
+APP=embed NODE_ENV=production yarn run deploy
+```
+
+## Deploying new data
+
+To upload new datasets to Lucify hosting, assume the AWS admin role, place the
+data in the appropriate folder under `data-external/wasco` and run:
+
+```shell
+yarn run upload-data
+```
+
+These files will be available under
+`https://s3-eu-west-1.amazonaws.com/lucify-large-files/wasco/`.
